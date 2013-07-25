@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="FIRM-OMPL" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/FIRM-OMPL" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
+				</Compiler>
+				<Linker>
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_app.so" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_base.so" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_control.so" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_geometric.so" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.0.12.2" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.6" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.0.12.2" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.6" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/py_boost_function.so" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_rrtstar.so" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_tools.so" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_util.so" />
+					<Add library="/usr/lib/libboost_system.so" />
+					<Add library="/usr/lib/libboost_thread.so" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/FIRM-OMPL" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
+		</Compiler>
+		<Linker>
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_app.so" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_base.so" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_control.so" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_geometric.so" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.0.12.2" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.6" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.0.12.2" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.6" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/py_boost_function.so" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_rrtstar.so" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_tools.so" />
+			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_util.so" />
+			<Add directory="/home/saurav/Research/Softwares/omplapp/build/Release/lib" />
+		</Linker>
+		<Unit filename="Tests.h" />
+		<Unit filename="include/Planner/FIRM.h" />
+		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
+		<Unit filename="include/Weight/FIRMWeight.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="src/FIRM.cpp" />
+		<Unit filename="src/SE2BeliefSpace.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

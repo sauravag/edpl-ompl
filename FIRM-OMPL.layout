@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="Tests.h" open="1" top="0" tabpos="2">
+		<Cursor position="179" topLine="0" />
+	</File>
+	<File name="include/Planner/FIRM.h" open="0" top="0" tabpos="0">
+		<Cursor position="2258" topLine="21" />
+	</File>
+	<File name="include/Spaces/SE2BeliefSpace.h" open="0" top="0" tabpos="0">
+		<Cursor position="3543" topLine="111" />
+	</File>
+	<File name="main.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="4222" topLine="124" />
+	</File>
+	<File name="src/FIRM.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1857" topLine="15" />
+	</File>
+	<File name="src/SE2BeliefSpace.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2306" topLine="37" />
+	</File>
+</CodeBlocks_layout_file>
