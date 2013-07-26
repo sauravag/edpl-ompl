@@ -154,7 +154,7 @@ int main(int, char **)
 
     //plan();
 
-    //std::cout << std::endl << std::endl;
+    std::cout << std::endl << std::endl;
 
     //planWithSimpleSetup();
 

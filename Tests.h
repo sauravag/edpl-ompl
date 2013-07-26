@@ -1,5 +1,5 @@
-#ifndef FIRM_OMPL_TESTS_H
-#define FIRM_OMPL_TESTS_H
+#ifndef FIRM_OMPL_TESTS_
+#define FIRM_OMPL_TESTS_
 
 #include "FIRMOMPL.h"
 
@@ -10,7 +10,7 @@ using namespace std;
 
 void TestSE2BeliefSpace()
 {
-    typedef SE2BeliefSpace::StateType BeliefStateType;
+    typedef SE2BeliefSpace::StateType StateType;
     SE2BeliefSpace *space;
     space =  new SE2BeliefSpace();
 
@@ -25,11 +25,11 @@ void TestSE2BeliefSpace()
     ob::State *from = space->allocState();
     ob::State *to   = space->allocState();
 
-    from->as<SE2BeliefSpace::StateType>()->setXYYaw(1,1,3.14157);
-    to->as<SE2BeliefSpace::StateType>()->setXYYaw(5,5,1.57);
+    from->as<StateType>()->setXYYaw(1,1,3.14157);
+    to->as<StateType>()->setXYYaw(5,5,1.57);
 
-    cout<<"The from State is: "<<from->as<SE2BeliefSpace::StateType>()->getX()<<endl;
-    cout<<"The to state is: "<<to->as<SE2BeliefSpace::StateType>()->getX()<<endl;
+    cout<<"The from State is: "<<from->as<StateType>()->getX()<<endl;
+    cout<<"The to state is: "<<to->as<StateType>()->getX()<<endl;
 
     arma::mat testCov(3,3);
 
@@ -37,17 +37,16 @@ void TestSE2BeliefSpace()
         <<1<<2<<3<<endr
         <<1<<2<<3<<endr;
 
-    from->as<SE2BeliefSpace::StateType>()->setCovariance(testCov);
-    to->as<SE2BeliefSpace::StateType>()->setCovariance(testCov*-1);
+    from->as<StateType>()->setCovariance(testCov);
+    to->as<StateType>()->setCovariance(testCov*-1);
 
     ob::State *result = space->allocState();
-
     space->getRelativeState(from, to, result);
 
-    cout<<"The Resultant State X    : "<<result->as<BeliefStateType>()->getX()<<endl;
-    cout<<"The Resultant State Y    : "<<result->as<BeliefStateType>()->getY()<<endl;
-    cout<<"The Resultant State Yaw  : "<<result->as<BeliefStateType>()->getYaw()<<endl;
-    cout<<"The Resultant State Cov  : "<<result->as<BeliefStateType>()->getCovariance()<<endl;
+    cout<<"The Resultant State X    : "<<result->as<StateType>()->getX()<<endl;
+    cout<<"The Resultant State Y    : "<<result->as<StateType>()->getY()<<endl;
+    cout<<"The Resultant State Yaw  : "<<result->as<StateType>()->getYaw()<<endl;
+    cout<<"The Resultant State Cov  : "<<result->as<StateType>()->getCovariance()<<endl;
 
     cout<<"-----------------------"<<endl;
     space->printState(result);

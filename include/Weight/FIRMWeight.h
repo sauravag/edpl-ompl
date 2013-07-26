@@ -1,5 +1,5 @@
-#ifndef FIRMWEIGHT_H_
-#define FIRMWEIGHT_H_
+#ifndef FIRM_WEIGHT_
+#define FIRM_WEIGHT_
 
 class FIRMWeight {
 

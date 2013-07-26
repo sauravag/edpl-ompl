@@ -292,7 +292,7 @@
 1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/GreedyKCenters.h
 	"ompl/util/RandomNumbers.h"
 
-1374613172 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
+1374798286 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
 	<ompl/base/SpaceInformation.h>
 	<ompl/base/spaces/SE3StateSpace.h>
 	<ompl/geometric/SimpleSetup.h>
@@ -353,7 +353,7 @@
 	<boost/foreach.hpp>
 	<boost/thread.hpp>
 
-1374600293 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Planner/FIRM.h
+1374797869 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Planner/FIRM.h
 	"ompl/geometric/planners/PlannerIncludes.h"
 	"ompl/datastructures/NearestNeighbors.h"
 	<boost/graph/graph_traits.hpp>
@@ -365,7 +365,7 @@
 	<map>
 	"../Weight/FIRMWeight.h"
 
-1373573884 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Weight/FIRMWeight.h
+1374797899 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Weight/FIRMWeight.h
 
 1374612770 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Spaces/SE2BeliefSpace.h
 	"ompl/base/spaces/SE2StateSpace.h"
@@ -384,9 +384,21 @@
 1374612879 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SE2BeliefSpace.cpp
 	"../include/Spaces/SE2BeliefSpace.h"
 
-1374613117 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
+1374798254 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
 	"include/Spaces/SE2BeliefSpace.h"
+	"include/Samplers/GaussianValidBeliefSampler.h"
 
-1374613149 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
+1374859897 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
 	"FIRMOMPL.h"
+
+1374798582 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/GaussianValidBeliefSampler.h
+	"ompl/base/ValidStateSampler.h"
+	"ompl/base/StateSampler.h"
+
+1374800346 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/GaussianValidBeliefSampler.cpp
+	"../include/Samplers/GaussianValidBeliefSampler.h"
+	"ompl/base/SpaceInformation.h"
+	"ompl/tools/config/MagicConstants.h"
+
+1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/tools/config/MagicConstants.h
 

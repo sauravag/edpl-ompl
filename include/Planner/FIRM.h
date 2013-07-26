@@ -34,8 +34,8 @@
 /* Author: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 /* Some of the comments have been preserved from PRM.h of OMPL */
-#ifndef FIRM_H_
-#define FIRM_H_
+#ifndef FIRM_PLANNER_
+#define FIRM_PLANNER_
 
 #include "ompl/geometric/planners/PlannerIncludes.h"
 #include "ompl/datastructures/NearestNeighbors.h"
@@ -50,9 +50,9 @@
 
 namespace ompl
 {
-class FIRM : public base::Planner
-{
-  public:
+  class FIRM : public base::Planner
+  {
+    public:
 
       /**
         @anchor FIRM
@@ -254,7 +254,7 @@ class FIRM : public base::Planner
           return nn_;
       }
 
-  protected:
+    protected:
 
       /** \brief Free all the memory allocated by the planner */
       void freeMemory(void);

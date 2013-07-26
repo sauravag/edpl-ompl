@@ -60,7 +60,7 @@ void SE2BeliefSpace::printState(const State *state)
         <<", "<<state->as<SE2BeliefSpace::StateType>()->getYaw()<<"]"<<std::endl;
     std::cout<<"Covariance  is" <<std::endl;
     std::cout<<state->as<SE2BeliefSpace::StateType>()->getCovariance()<<std::endl;
-    std::cout<<"----End BeliefState----"<<std::endl;
+    std::cout<<"------End BeliefState-------"<<std::endl;
 }
 /*
 void SE2BeliefSpace::registerProjections(void)

@@ -34,20 +34,48 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#ifndef FIRM_OMPL_H_
-#define FIRM_OMPL_H_
+#ifndef GAUSSIAN_VALID_BELIEF_SAMPLER_
+#define GAUSSIAN_VALID_BELIEF_SAMPLER_
 
+#include "ompl/base/ValidStateSampler.h"
+#include "ompl/base/StateSampler.h"
 
-//Spaces
-#include "include/Spaces/SE2BeliefSpace.h"
+/** \brief Generate valid samples using the Gaussian sampling strategy */
+class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
+{
+  public:
 
-// Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
+    /** \brief Constructor */
+    GaussianValidBeliefSampler(const ompl::base::SpaceInformation *si);
 
-//Observation Models
-#include "include/ObservationModels/ObservationModelMethod.h"
-#include "include/ObservationModels/CamAruco2DObservationModel.h"
+    virtual ~GaussianValidBeliefSampler(void)
+    {
+    }
 
-//Motion Models
+    virtual bool sample(ompl::base::State *state);
+    virtual bool sampleNear(ompl::base::State *state, const ompl::base::State *near, const double distance);
+
+    /** \brief Get the standard deviation used when sampling */
+    double getStdDev(void) const
+    {
+      return stddev_;
+    }
+
+    /** \brief Set the standard deviation to use when sampling */
+    void setStdDev(double stddev)
+    {
+      stddev_ = stddev;
+    }
+
+  protected:
+
+    bool isObservable(ompl::base::State *state);
+
+    /** \brief The sampler to build upon */
+    ompl::base::StateSamplerPtr sampler_;
+
+    /** \brief The standard deviation to use in the sampling process */
+    double                  stddev_;
+};
 
 #endif
