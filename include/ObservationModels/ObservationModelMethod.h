@@ -40,6 +40,10 @@
 //#include "Utilities/MPUtils.h"
 #include "armadillo"
 
+/*
+Base class for all observation models
+Provides a uniform interface
+*/
 class ObservationModelMethod
 {
   public:
@@ -56,50 +60,50 @@ class ObservationModelMethod
 
 
     //TODO: ensure all children pass up the noise dimension
-    ObservationModelMethod() : m_noiseDim(0) {}
+    //ObservationModelMethod() : noiseDim_(0) {}
     
-    ObservationModelMethod(int _nDim=0) : m_noiseDim(_nDim), m_zeroNoise(_nDim) {}
+    ObservationModelMethod(int nDim=0) : noiseDim_(nDim), zeroNoise_(nDim) {}
 
     // z = h(x,v)
     //get the observation for a given configuration,
     //corrupted by noise from a given distribution
     virtual
-      ObservationType GetObservation(ompl::base::State *state, bool _isSimulation) = 0;
+      ObservationType getObservation(const ompl::base::State *state, bool isSimulation) = 0;
     
     virtual
-      ObservationType GetObservationPrediction(ompl::base::State *state, const ObservationType& _Zg) = 0;
+      ObservationType getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg) = 0;
       
     virtual
-      ObservationType RemoveSpuriousObservations(const ObservationType& _Zg) = 0;
+      ObservationType removeSpuriousObservations(const ObservationType& Zg) = 0;
 
     // Jx = dh/dx
     virtual
-      ObsToStateJacobianType GetObservationJacobian(ompl::base::State *state, const NoiseType& _v, const ObservationType& _z) = 0;
+      ObsToStateJacobianType getObservationJacobian(const ompl::base::State *state, const NoiseType& v, const ObservationType& z) = 0;
 
     // Jv = dh/dv
     virtual
-      ObsToNoiseJacobianType GetNoiseJacobian(ompl::base::State *state, const NoiseType& _v, const ObservationType& _z) = 0;	
+      ObsToNoiseJacobianType getNoiseJacobian(const ompl::base::State *state, const NoiseType& v, const ObservationType& z) = 0;	
 
     //virtual
     //  NoiseType GenerateObservationNoise(const CfgType& _x) = 0;
 
     virtual
-      ObservationType ComputeInnovation(ompl::base::State *predictedState, const ObservationType& _Zg) = 0;
+      ObservationType computeInnovation(ompl::base::State *predictedState, const ObservationType& Zg) = 0;
 
     virtual
-      arma::mat GetObservationNoiseCovariance(ompl::base::State *state, const ObservationType& _z) = 0;
+      arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z) = 0;
 
     virtual const 
-      NoiseType GetZeroNoise() {return m_zeroNoise; }
+      NoiseType getZeroNoise() {return zeroNoise_; }
 
-    arma::colvec m_etaPhi;
-    arma::colvec m_etaD;
-    arma::colvec m_sigma;
+    arma::colvec etaPhi_;
+    arma::colvec etaD_;
+    arma::colvec sigma_;
   private:
 
     //noise vector dimension is specific to each observation model subclass
-    const int m_noiseDim; 
-    const NoiseType m_zeroNoise; 
+    const int noiseDim_; 
+    const NoiseType zeroNoise_; 
 };
 
 #endif

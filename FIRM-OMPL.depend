@@ -367,7 +367,7 @@
 
 1374797899 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Weight/FIRMWeight.h
 
-1374612770 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Spaces/SE2BeliefSpace.h
+1374885384 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Spaces/SE2BeliefSpace.h
 	"ompl/base/spaces/SE2StateSpace.h"
 	"ompl/base/spaces/SE3StateSpace.h"
 	<boost/math/constants/constants.hpp>
@@ -384,14 +384,16 @@
 1374612879 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SE2BeliefSpace.cpp
 	"../include/Spaces/SE2BeliefSpace.h"
 
-1374798254 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
+1374861229 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
 	"include/Spaces/SE2BeliefSpace.h"
 	"include/Samplers/GaussianValidBeliefSampler.h"
+	"include/ObservationModels/ObservationModelMethod.h"
+	"include/ObservationModels/CamAruco2DObservationModel.h"
 
 1374859897 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
 	"FIRMOMPL.h"
 
-1374798582 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/GaussianValidBeliefSampler.h
+1374861348 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/GaussianValidBeliefSampler.h
 	"ompl/base/ValidStateSampler.h"
 	"ompl/base/StateSampler.h"
 
@@ -401,4 +403,11 @@
 	"ompl/tools/config/MagicConstants.h"
 
 1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/tools/config/MagicConstants.h
+
+1374885230 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ObservationModels/ObservationModelMethod.h
+	"armadillo"
+
+1374884356 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ObservationModels/CamAruco2DObservationModel.h
+	"ObservationModelMethod.h"
+	<boost/math/constants/constants.hpp>
 

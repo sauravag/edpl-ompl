@@ -18,8 +18,9 @@ void SE2BeliefSpace::getRelativeState(const State *from, const State *to, State 
 	state->as<StateType>()->setY(to->as<StateType>()->getY() - from->as<StateType>()->getY());
 
 	/*
-		Calculating relative angle is a bit tricky
-		Refer to "interpolate" function of SO2StateSpace at line 122 of SO2StateSpace.h  in OMPL lib
+    	Calculating relative angle is a bit tricky.
+    	Refer to "interpolate" function of SO2StateSpace at line 122 of SO2StateSpace.h  in OMPL lib
+        to see the original implementation in OMPL
 	*/
 
 	double diff = to->as<StateType>()->getYaw() - from->as<StateType>()->getYaw();
@@ -62,6 +63,7 @@ void SE2BeliefSpace::printState(const State *state)
     std::cout<<state->as<SE2BeliefSpace::StateType>()->getCovariance()<<std::endl;
     std::cout<<"------End BeliefState-------"<<std::endl;
 }
+
 /*
 void SE2BeliefSpace::registerProjections(void)
 {

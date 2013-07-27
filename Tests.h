@@ -51,4 +51,9 @@ void TestSE2BeliefSpace()
     cout<<"-----------------------"<<endl;
     space->printState(result);
 }
+
+void TestObservationModel()
+{
+    
+}
 #endif

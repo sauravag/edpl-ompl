@@ -38,9 +38,9 @@
 #include "ompl/base/SpaceInformation.h"
 #include "ompl/tools/config/MagicConstants.h"
 
-using namespace ompl::base;
+//using namespace ompl::base;
 
-GaussianValidBeliefSampler::GaussianValidBeliefSampler(const SpaceInformation *si) :
+GaussianValidBeliefSampler::GaussianValidBeliefSampler(const ompl::base::SpaceInformation *si) :
     ValidStateSampler(si), sampler_(si->allocStateSampler()), stddev_(si->getMaximumExtent() * ompl::magic::STD_DEV_AS_SPACE_EXTENT_FRACTION)
 {
     name_ = "gaussian";
@@ -49,11 +49,11 @@ GaussianValidBeliefSampler::GaussianValidBeliefSampler(const SpaceInformation *s
                                  boost::bind(&GaussianValidBeliefSampler::getStdDev, this));
 }
 
-bool GaussianValidBeliefSampler::sample(State *state)
+bool GaussianValidBeliefSampler::sample(ompl::base::State *state)
 {
     bool result = false;
     unsigned int attempts = 0;
-    State *temp = si_->allocState();
+    ompl::base::State *temp = si_->allocState();
     do
     {
         sampler_->sampleUniform(state);
@@ -72,11 +72,11 @@ bool GaussianValidBeliefSampler::sample(State *state)
     return result;
 }
 
-bool GaussianValidBeliefSampler::sampleNear(State *state, const State *near, const double distance)
+bool GaussianValidBeliefSampler::sampleNear(ompl::base::State *state, const ompl::base::State *near, const double distance)
 {
     bool result = false;
     unsigned int attempts = 0;
-    State *temp = si_->allocState();
+    ompl::base::State *temp = si_->allocState();
     do
     {
         sampler_->sampleUniformNear(state, near, distance);
@@ -95,7 +95,7 @@ bool GaussianValidBeliefSampler::sampleNear(State *state, const State *near, con
     return result;
 }
 
-bool GaussianValidBeliefSampler::isObservable(State *state)
+bool GaussianValidBeliefSampler::isObservable(ompl::base::State *state)
 {
     return true;
 }

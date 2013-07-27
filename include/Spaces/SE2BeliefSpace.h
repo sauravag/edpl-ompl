@@ -89,6 +89,16 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             covariance_ = cov;
         }
 
+        arma::colvec getArmaData(void) const
+        {
+            arma::colvec stateVec(3);
+
+            stateVec[0] = getX();
+            stateVec[1] = getY();
+            stateVec[2] = getYaw();
+            return stateVec;
+        }
+
         static double meanNormWeight_, covNormWeight_;
 
         private:

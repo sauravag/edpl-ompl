@@ -37,8 +37,18 @@
 #ifndef LANDMARK_RANGEBEARING_H_
 #define LANDMARK_RANGEBEARING_H_
 
-
 #include "ObservationModelMethod.h"
+#include <boost/math/constants/constants.hpp>
+/*
+Observation model method based on the combination of a monocular camera,
+and visual markers with unique ids.
+
+How it works:
+
+1. The locations of visual landmarks is known a-priori.
+2. Using location of the robot and pre-known location of landmarks, it generates a noisy observation
+   of the relative location of the landmark w.r.t the robot.
+*/
 
 class CamAruco2DObservationModel : public ObservationModelMethod
 {
@@ -48,51 +58,54 @@ class CamAruco2DObservationModel : public ObservationModelMethod
   static const int singleObservationDim = 4; /*[ ID, X, Y, Orientation of Landmark in Environment ]*/
   static const int landmarkInfoDim = 2; /*[ X, Y]*/
   //static const int obsNoiseDim = 3;
-  
-  public:
-    typedef typename MPTraits::CfgType CfgType;
 
-    typedef typename ObservationModelMethod<MPTraits>::ObservationType ObservationType;
-    typedef typename ObservationModelMethod<MPTraits>::NoiseType ObsNoiseType;
+  public:
+
+    typedef ObservationModelMethod::ObservationType ObservationType;
+    typedef ObservationModelMethod::NoiseType ObsNoiseType;
     typedef arma::mat JacobianType;
+
     // z = h(x,v)
     // get the observation for a given configuration,
     // corrupted by noise from a given distribution
 
-    CamAruco2DObservationModel() : ObservationModelMethod<MPTraits>() {
-      this->SetName("CamAruco2DObservationModel");  
+    CamAruco2DObservationModel() : ObservationModelMethod()
+    {
+      // TODO: Create a function which sets up the obs model by loading landmarks and noise paramters
+      // Load landmarks in construction
+
+      // initialize etaPhi_, etaD_, sigma_;
+
     }
 
-    CamAruco2DObservationModel(typename MPTraits::MPProblemType* _problem,
-    XMLNodeReader& _node);
+    //CamAruco2DObservationModel(typename MPTraits::MPProblemType* _problem, XMLNodeReader& _node);
 
-      
-    void PrintOptions(ostream& _out);
-    void ParseXML(XMLNodeReader& _node);
 
-    ObservationType GetObservation(const CfgType& _x, bool _isSimulation);
-    ObservationType GetObservationPrediction(const CfgType& _x, const ObservationType& _Zg);
+    //void PrintOptions(ostream& _out);
+    //void ParseXML(XMLNodeReader& _node);
+
+    ObservationType getObservation(const ompl::base::State *state, bool isSimulation);
+
+    ObservationType getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg);
 
     // Jx = dh/dx
-    JacobianType GetObservationJacobian(const CfgType& _x, const ObsNoiseType& _v, const ObservationType& _z);
+    JacobianType getObservationJacobian(const ompl::base::State *state, const ObsNoiseType& v, const ObservationType& z);
     // Jv = dh/dv
-    JacobianType GetNoiseJacobian(const CfgType& _x, const ObsNoiseType& _v, const ObservationType& _z);  
+    JacobianType getNoiseJacobian(const ompl::base::State *state, const ObsNoiseType& v, const ObservationType& z);
 
-    ObservationType ComputeInnovation(CfgType& _xPrd, const ObservationType& _Zg);
-    ObservationType RemoveSpuriousObservations(const ObservationType& _Zg);
-    
-    arma::mat GetObservationNoiseCovariance(const CfgType& _x, const ObservationType& _z);
+    ObservationType computeInnovation(ompl::base::State *predictedState, const ObservationType& Zg);
 
-    //TODO: this is a specialization; it could do well if it were generalized and moved somewhere else
-    bool ArePointsCovisible(CfgType const& _x, arma::colvec const& _l);
-    bool IsLandmarkVisible(const CfgType& _x, const arma::colvec& _l, double& _range, double& _bearing, double& _viewingAngle);
-  //void WriteLandmarks();
+    ObservationType removeSpuriousObservations(const ObservationType& Zg);
+
+    arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z);
+
+    bool isLandmarkVisible(const arma::colvec xVec, const arma::colvec& landmark, double& range, double& bearing, double& viewingAngle);
+
+    //void WriteLandmarks();
 
   private:
 
-    vector<arma::colvec> m_landmarks;
-    //vector<int> m_seenLandmarks; // contains the list of Landmarks that are currently in the observation
-    //vector<int> m_predictedLandmarks;
+    std::vector<arma::colvec> landmarks_;
 };
 
 
