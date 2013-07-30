@@ -61,7 +61,7 @@ class ObservationModelMethod
 
     //TODO: ensure all children pass up the noise dimension
     //ObservationModelMethod() : noiseDim_(0) {}
-    
+
     ObservationModelMethod(int nDim=0) : noiseDim_(nDim), zeroNoise_(nDim) {}
 
     // z = h(x,v)
@@ -69,10 +69,10 @@ class ObservationModelMethod
     //corrupted by noise from a given distribution
     virtual
       ObservationType getObservation(const ompl::base::State *state, bool isSimulation) = 0;
-    
+
     virtual
       ObservationType getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg) = 0;
-      
+
     virtual
       ObservationType removeSpuriousObservations(const ObservationType& Zg) = 0;
 
@@ -82,7 +82,7 @@ class ObservationModelMethod
 
     // Jv = dh/dv
     virtual
-      ObsToNoiseJacobianType getNoiseJacobian(const ompl::base::State *state, const NoiseType& v, const ObservationType& z) = 0;	
+      ObsToNoiseJacobianType getNoiseJacobian(const ompl::base::State *state, const NoiseType& v, const ObservationType& z) = 0;
 
     //virtual
     //  NoiseType GenerateObservationNoise(const CfgType& _x) = 0;
@@ -93,7 +93,7 @@ class ObservationModelMethod
     virtual
       arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z) = 0;
 
-    virtual const 
+    virtual const
       NoiseType getZeroNoise() {return zeroNoise_; }
 
     arma::colvec etaPhi_;
@@ -102,8 +102,8 @@ class ObservationModelMethod
   private:
 
     //noise vector dimension is specific to each observation model subclass
-    const int noiseDim_; 
-    const NoiseType zeroNoise_; 
+    const int noiseDim_;
+    const NoiseType zeroNoise_;
 };
 
 #endif

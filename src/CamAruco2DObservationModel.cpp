@@ -35,7 +35,7 @@
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 #include "../include/Spaces/SE2BeliefSpace.h"
 #include "../include/ObservationModels/CamAruco2DObservationModel.h"
-
+#include "../tinyxml/tinyxml.h"
 /*
   For each landmark, produces an observation that is the range and bearing
   of the given State from that landmark. Result is the concatenation of all
@@ -127,7 +127,7 @@ CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *st
   //int counter = 0;
 
   //generate observation from state, and corrupt with the given noise
-  for(int k = 0; k< Zg.n_rows / singleObservationDim ;k++){
+  for(unsigned int k = 0; k< Zg.n_rows / singleObservationDim ;k++){
 
     for(unsigned int i = 0; i < landmarks_.size() ; i++) {
 
@@ -160,7 +160,7 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const arma::colvec xVec, cons
 
     //cout<<"Checking visibility for ID: "<<_l[0]<<endl;
 
-    double fov = 30* boost::math::constants::pi<double>()/180; // radians
+    double fov = 30*boost::math::constants::pi<double>()/180; // radians
     double maxrange = 2.5; // meters // NOTE: if you change this value, you must make a corresponding change in the "draw" function of the Cfg.cpp file.
 
     //colvec xVec = _x.GetArmaData(); // GetArmaData
@@ -222,7 +222,7 @@ CamAruco2DObservationModel::getObservationJacobian(const ompl::base::State *stat
 {
   using namespace arma;
 
-  int number_of_landmarks = z.n_rows / singleObservationDim ;
+  unsigned int number_of_landmarks = z.n_rows / singleObservationDim ;
 
   colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
@@ -232,7 +232,7 @@ CamAruco2DObservationModel::getObservationJacobian(const ompl::base::State *stat
 
     int Indx=-999;
 
-    for(int j=0;j< landmarks_.size() ; j++){
+    for(unsigned int j=0;j< landmarks_.size() ; j++){
 
       if( z(i*singleObservationDim) == landmarks_[j](0)){
 
@@ -285,17 +285,17 @@ arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::
   //extract state from Cfg and normalize
   colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
-  int number_of_landmarks = z.n_rows/singleObservationDim ;
+  unsigned int number_of_landmarks = z.n_rows/singleObservationDim ;
 
   //generate noise scaling/shifting factors
   colvec noise( number_of_landmarks*(landmarkInfoDim));
 
-  for(int i =0; i< number_of_landmarks ; i++){
+  for(unsigned int i =0; i< number_of_landmarks ; i++){
 
     int indx=0; // is the index of the landmark in the vector m_landmarks, whose id matches the id contained in _z[i]
 
     // we find the landmark whose id matches the one in the list of common Ids
-    for(int j=0;j< landmarks_.size() ; j++){
+    for(unsigned int j=0;j< landmarks_.size() ; j++){
 
       if( z(i*singleObservationDim) == landmarks_[j](0)){
 
@@ -347,7 +347,7 @@ CamAruco2DObservationModel::computeInnovation(ompl::base::State *predictedState,
 
   assert( Zg.n_rows == Zprd.n_rows);
 
-  for(int i =0; i< Zg.n_rows/singleObservationDim ; i++){
+  for(unsigned int i =0; i< Zg.n_rows/singleObservationDim ; i++){
 
     //cout<<" The current iteration in innovation is: "<<i<<endl;
     assert(Zg(i*singleObservationDim) == Zprd(i*singleObservationDim)) ;
@@ -378,9 +378,9 @@ typename CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel:
 
   int counter  = 0;
 
-  for(int j=0; j < landmarks_.size() ; j++){
+  for(unsigned int j=0; j < landmarks_.size() ; j++){
 
-    for(int i=0; i < Zg.n_rows / singleObservationDim ; i++) {
+    for(unsigned int i=0; i < Zg.n_rows / singleObservationDim ; i++) {
 
       if(Zg(i*singleObservationDim) == landmarks_[j](0)) {
 
@@ -401,5 +401,114 @@ typename CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel:
   }
 
   return Zcorrected;
+
+}
+
+void CamAruco2DObservationModel::loadLandmarks(const char *pathToSetupFile)
+{
+  using namespace arma;
+  // Load XML containing landmarks
+  TiXmlDocument doc(pathToSetupFile);
+  bool loadOkay = doc.LoadFile();
+
+  if ( !loadOkay )
+  {
+    printf( "Could not load Landmark list . Error='%s'. Exiting.\n", doc.ErrorDesc() );
+
+    exit( 1 );
+  }
+
+  TiXmlNode* node = 0;
+  TiXmlElement* landmarkElement = 0;
+  TiXmlElement* itemElement = 0;
+
+  // Get the landmarklist node
+  node = doc.FirstChild( "LandmarkList" );
+  assert( node );
+  landmarkElement = node->ToElement(); //convert node to element
+  assert( landmarkElement  );
+
+  TiXmlNode* child = 0;
+
+  //Iterate through all the landmarks and put them into the "landmarks_" list
+  while( (child = landmarkElement ->IterateChildren(child)))
+  {
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+
+    ObservationType landmark(singleObservationDim);
+    landmark.zeros();
+    double *attributeVal;
+    itemElement->QueryDoubleAttribute("id", attributeVal) ;
+    landmark[0] = *attributeVal;
+    itemElement->QueryDoubleAttribute("x", attributeVal) ;
+    landmark[1] = *attributeVal;
+    itemElement->QueryDoubleAttribute("y", attributeVal) ;
+    landmark[2] = *attributeVal;
+    itemElement->QueryDoubleAttribute("theta", attributeVal) ;
+    landmark[3] = *attributeVal;
+
+    std::cout<<"New landmark loaded [id,x,y,theta]:  "<<std::endl<<landmark<<std::endl;
+    this->landmarks_.push_back(landmark);
+  }
+    std::cout<<"Total number of landmarks loaded successfully :"<<landmarks_.size()<<endl;
+}
+
+void CamAruco2DObservationModel::loadNoiseParameters(const char *pathToSetupFile)
+{
+  using namespace arma;
+  // Load XML containing landmarks
+  TiXmlDocument doc(pathToSetupFile);
+  bool loadOkay = doc.LoadFile();
+
+  if ( !loadOkay )
+  {
+    printf( "Could not load setup file . Error='%s'. Exiting.\n", doc.ErrorDesc() );
+
+    exit( 1 );
+  }
+
+  TiXmlNode* node = 0;
+  TiXmlElement* obsModelElement = 0;
+  TiXmlElement* itemElement = 0;
+
+  // Get the landmarklist node
+  node = doc.FirstChild( "ObservationModels" );
+  assert( node );
+  //obsModelElement  = node->ToElement(); //convert node to element
+  //assert( obsModelElement   );
+
+  TiXmlNode* child = 0;
+
+  child = node->FirstChild("CamAruco2DObservationModel");
+  //Iterate through all the landmarks and put them into the "landmarks_" list
+  assert( child );
+  itemElement = child->ToElement();
+  assert( itemElement );
+
+
+  double sigmaRange=0;
+  double sigmaAngle=0;
+  double etaRD=0;
+  double etaRPhi=0;
+  double etaThetaD=0;
+  double etaThetaPhi=0;
+  itemElement->QueryDoubleAttribute("sigma_range", &sigmaRange) ;
+  std::cout<<"Read sigmaRange :"<<sigmaRange<<endl;
+  itemElement->QueryDoubleAttribute("sigma_angle", &sigmaAngle) ;
+  itemElement->QueryDoubleAttribute("eta_rd", &etaRD) ;
+  itemElement->QueryDoubleAttribute("eta_rphi", &etaRPhi) ;
+  itemElement->QueryDoubleAttribute("eta_thetad", &etaThetaD) ;
+  itemElement->QueryDoubleAttribute("eta_thetaphi", &etaThetaPhi) ;
+
+  this->sigma_ << sigmaRange << sigmaAngle * boost::math::constants::pi<double>()*180 << endr;
+  this->etaD_  << etaRD << etaThetaD <<endr;
+  this->etaPhi_<< etaRPhi << etaThetaPhi << endr;
+
+  std::cout<<"Noise parameters loaded"<<std::endl;
+  std::cout<<"sigma_  : "<<sigma_<<std::endl;
+  std::cout<<"etaD_   :"<<etaD_<<std::endl;
+  std::cout<<"etaPhi_ :"<<etaPhi_<<std::endl;
 
 }

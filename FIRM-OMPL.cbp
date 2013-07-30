@@ -69,12 +69,18 @@
 			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_util.so" />
 			<Add directory="/home/saurav/Research/Softwares/omplapp/build/Release/lib" />
 		</Linker>
+		<Unit filename="FIRMOMPL.h" />
 		<Unit filename="Tests.h" />
+		<Unit filename="include/ObservationModels/CamAruco2DObservationModel.h" />
+		<Unit filename="include/ObservationModels/ObservationModelMethod.h" />
 		<Unit filename="include/Planner/FIRM.h" />
+		<Unit filename="include/Samplers/GaussianValidBeliefSampler.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
 		<Unit filename="include/Weight/FIRMWeight.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/CamAruco2DObservationModel.cpp" />
 		<Unit filename="src/FIRM.cpp" />
+		<Unit filename="src/GaussianValidBeliefSampler.cpp" />
 		<Unit filename="src/SE2BeliefSpace.cpp" />
 		<Extensions>
 			<code_completion />

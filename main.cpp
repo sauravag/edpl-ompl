@@ -158,7 +158,9 @@ int main(int, char **)
 
     //planWithSimpleSetup();
 
-    TestSE2BeliefSpace();
+    //TestSE2BeliefSpace();
+
+    TestObservationModel();
 
     return 0;
 }

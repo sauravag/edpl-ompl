@@ -69,13 +69,14 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     // get the observation for a given configuration,
     // corrupted by noise from a given distribution
 
-    CamAruco2DObservationModel() : ObservationModelMethod()
+    CamAruco2DObservationModel(const char *pathToSetupFile) : ObservationModelMethod()
     {
       // TODO: Create a function which sets up the obs model by loading landmarks and noise paramters
       // Load landmarks in construction
 
       // initialize etaPhi_, etaD_, sigma_;
-
+      this->loadLandmarks(pathToSetupFile);
+      this->loadNoiseParameters(pathToSetupFile);
     }
 
     //CamAruco2DObservationModel(typename MPTraits::MPProblemType* _problem, XMLNodeReader& _node);
@@ -106,6 +107,10 @@ class CamAruco2DObservationModel : public ObservationModelMethod
   private:
 
     std::vector<arma::colvec> landmarks_;
+
+    //Function to load landmarks from XML file into the object
+    void loadLandmarks(const char *pathToSetupFile);
+    void loadNoiseParameters(const char *pathToSetupFile);
 };
 
 
