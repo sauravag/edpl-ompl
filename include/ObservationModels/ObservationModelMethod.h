@@ -57,6 +57,7 @@ class ObservationModelMethod
     //typedef arma::mat JacobianType;
     typedef arma::mat ObsToStateJacobianType;
     typedef arma::mat ObsToNoiseJacobianType;
+    typedef boost::shared_ptr<ObservationModelMethod> ObservationModelPointer;
 
 
     //TODO: ensure all children pass up the noise dimension
