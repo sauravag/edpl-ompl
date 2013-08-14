@@ -32,6 +32,7 @@
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_util.so" />
 					<Add library="/usr/lib/libboost_system.so" />
 					<Add library="/usr/lib/libboost_thread.so" />
+					<Add library="/usr/lib/libarmadillo.so" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -82,6 +83,12 @@
 		<Unit filename="src/FIRM.cpp" />
 		<Unit filename="src/GaussianValidBeliefSampler.cpp" />
 		<Unit filename="src/SE2BeliefSpace.cpp" />
+		<Unit filename="tinyxml/tinystr.cpp" />
+		<Unit filename="tinyxml/tinystr.h" />
+		<Unit filename="tinyxml/tinyxml.cpp" />
+		<Unit filename="tinyxml/tinyxml.h" />
+		<Unit filename="tinyxml/tinyxmlerror.cpp" />
+		<Unit filename="tinyxml/tinyxmlparser.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
