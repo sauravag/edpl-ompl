@@ -49,5 +49,14 @@
 #include "include/ObservationModels/CamAruco2DObservationModel.h"
 
 //Motion Models
+#include "include/MotionModels/MotionModelMethod.h"
+#include "include/MotionModels/UnicycleMotionModel.h"
+
+//LinearSyste
+//#include "include/LinearSystem/LinearSystem.h"
+
+//Filters
+//#include "include/Filters/dare.h"
+//#include "include/Filters/KalmanFilterMethod.h"
 
 #endif

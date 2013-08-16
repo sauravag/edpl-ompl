@@ -455,7 +455,7 @@ void CamAruco2DObservationModel::loadLandmarks(const char *pathToSetupFile)
     std::cout<<"Total number of landmarks loaded successfully :"<<landmarks_.size()<<endl;
 }
 
-void CamAruco2DObservationModel::loadNoiseParameters(const char *pathToSetupFile)
+void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
 {
   using namespace arma;
   // Load XML containing landmarks

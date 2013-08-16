@@ -35,8 +35,8 @@ void TestSE2BeliefSpace()
     arma::mat testCov(3,3);
 
     testCov<<1<<2<<3<<endr
-        <<1<<2<<3<<endr
-        <<1<<2<<3<<endr;
+           <<1<<2<<3<<endr
+           <<1<<2<<3<<endr;
 
     from->as<StateType>()->setCovariance(testCov);
     to->as<StateType>()->setCovariance(testCov*-1);
@@ -80,8 +80,6 @@ void TestObservationModel()
 
     ObservationModelMethod::ObservationType pred_obs =  om.getObservationPrediction(from, obs);
 
-
-
     assert(obs.n_rows == pred_obs.n_rows && obs.n_cols == pred_obs.n_cols);
     // Check if the IDs of the predicted and seen observations match.
     for(int i=0; i<obs.n_rows/4; i++)
@@ -93,4 +91,71 @@ void TestObservationModel()
 
     cout<<"Observation Model passed tests"<<endl;
 }
+
+
+void TestMotionModel()
+{
+    UnicycleMotionModel mm( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" );
+
+    typedef SE2BeliefSpace::StateType StateType;
+    SE2BeliefSpace *space;
+    space =  new SE2BeliefSpace();
+
+    ob::RealVectorBounds bounds(2);
+    bounds.setLow(-5);
+    bounds.setHigh(5);
+
+    space->setBounds(bounds);
+
+    ob::State *from = space->allocState();
+
+    from->as<StateType>()->setXYYaw(1.3,3,0);
+
+    ob::State *to = space->allocState();
+
+    to->as<StateType>()->setXYYaw(5,3,1.57);
+
+    cout<<"The from State is: "<<from->as<StateType>()->getX()<<endl;
+
+    colvec u(2);
+    u[0] = 0.1;
+    u[1] = 0.1;
+
+
+    colvec noise = mm.GenerateNoise(from, u);
+
+    cout<<"Noise :"<<noise<<endl;
+
+    mat stateJacobian = mm.GetStateJacobian(from, u , noise);
+
+    mat controlJacobian = mm.GetControlJacobian(from, u, noise);
+
+    mat noiseJacobian = mm.GetNoiseJacobian(from, u, noise);
+
+    mat processNoiseCovariance = mm.ProcessNoiseCovariance(from , u);
+
+    vector<colvec> openLoopControls = mm.GenerateOpenLoopControls(from, to);
+
+    ompl::base::State *nextState =  from;
+
+    for(int i=0; i< openLoopControls.size() ; i++)
+    {
+        colvec w = mm.GenerateNoise(nextState, openLoopControls[i]);
+        nextState = mm.Evolve(nextState, openLoopControls[i], w);
+
+    }
+
+    assert(abs(nextState->as<MotionModelMethod::StateType>()->getX() -
+                    to->as<MotionModelMethod::StateType>()->getX()) < 1e-3);
+
+    assert(abs(nextState->as<MotionModelMethod::StateType>()->getY() -
+                    to->as<MotionModelMethod::StateType>()->getY()) < 1e-3);
+
+    cout<<"The final evolved State is :"<<nextState->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
+    cout<<"the final commanded state was :"<<to->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
+
+    cout<<"Motion Model passed tests"<<endl;
+
+}
+
 #endif

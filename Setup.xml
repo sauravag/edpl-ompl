@@ -114,3 +114,32 @@
 	>
 	</CamAruco2DObservationModel>
 </ObservationModels>
+<MotionModels>
+	<UnicycleMotionModel
+		sigmaV="0.012"
+		etaV="0.05"
+    sigmaOmega="0.001"
+    etaOmega="0.03"
+		P_Wg_filename=""
+		orbit_radius=5.0
+		wind_noise_pos="0.000001"
+		wind_noise_ang="0.000001" 
+		min_linear_velocity= 0.2
+		max_linear_velocity= 0.2
+		max_angular_velocity= 0.3
+		dt= 0.1
+	  /> <!--omega is in radians--> 
+	<OmnidirectionalMotionModel 
+		max_connect_radius="30.0"
+		robot_link_length="0.2"
+		sigma="0.00"
+		eta="0.000"
+		wind_noise_pos="0.05"
+		wind_noise_ang="0.00" 
+		P_Wg_filename=""
+	  dt=0.10 
+	  V=5.0 
+	  omega="1.5708"/> <!--omega is in radians, wind_noise_ang is in degrees -->
+		<!--wind_noise_pos="1.000"
+		wind_noise_ang="7.0"-->
+</MotionModels>

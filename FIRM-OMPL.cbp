@@ -72,6 +72,8 @@
 		</Linker>
 		<Unit filename="FIRMOMPL.h" />
 		<Unit filename="Tests.h" />
+		<Unit filename="include/MotionModels/MotionModelMethod.h" />
+		<Unit filename="include/MotionModels/UnicycleMotionModel.h" />
 		<Unit filename="include/ObservationModels/CamAruco2DObservationModel.h" />
 		<Unit filename="include/ObservationModels/ObservationModelMethod.h" />
 		<Unit filename="include/Planner/FIRM.h" />
@@ -80,9 +82,11 @@
 		<Unit filename="include/Weight/FIRMWeight.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/CamAruco2DObservationModel.cpp" />
+		<Unit filename="src/ExtendedKF.cpp" />
 		<Unit filename="src/FIRM.cpp" />
 		<Unit filename="src/GaussianValidBeliefSampler.cpp" />
 		<Unit filename="src/SE2BeliefSpace.cpp" />
+		<Unit filename="src/UnicycleMotionModel.cpp" />
 		<Unit filename="tinyxml/tinystr.cpp" />
 		<Unit filename="tinyxml/tinystr.h" />
 		<Unit filename="tinyxml/tinyxml.cpp" />

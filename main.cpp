@@ -161,6 +161,7 @@ int main(int, char **)
     //TestSE2BeliefSpace();
 
     TestObservationModel();
+    TestMotionModel();
 
     return 0;
 }

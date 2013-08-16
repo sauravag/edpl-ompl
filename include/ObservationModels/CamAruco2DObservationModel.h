@@ -76,7 +76,7 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
       // initialize etaPhi_, etaD_, sigma_;
       this->loadLandmarks(pathToSetupFile);
-      this->loadNoiseParameters(pathToSetupFile);
+      this->loadParameters(pathToSetupFile);
     }
 
     //CamAruco2DObservationModel(typename MPTraits::MPProblemType* _problem, XMLNodeReader& _node);
@@ -110,7 +110,7 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     //Function to load landmarks from XML file into the object
     void loadLandmarks(const char *pathToSetupFile);
-    void loadNoiseParameters(const char *pathToSetupFile);
+    void loadParameters(const char *pathToSetupFile);
 };
 
 
