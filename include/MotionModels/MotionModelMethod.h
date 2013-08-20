@@ -44,7 +44,7 @@
 #define MOTIONMODELMETHOD_
 
 #include "armadillo"
-
+#include "../Spaces/SE2BeliefSpace.h"
 
 class MotionModelMethod
 {
@@ -57,7 +57,7 @@ class MotionModelMethod
     typedef SE2BeliefSpace SpaceType;
 		typedef SE2BeliefSpace::StateType StateType;
 		typedef arma::mat     JacobianType;
-    typedef boost::shared_ptr<MotionModelMethod> MotionModelMethodPointer;
+    typedef boost::shared_ptr<MotionModelMethod> MotionModelPointer;
 
     ///////////////////////////////////////////
     //		Constructors and destructors 			 //
@@ -92,7 +92,7 @@ class MotionModelMethod
 
 		//Generate open loop control between two specified Cfgs/states
 		//Implementation is specific to particular motion model
-		virtual std::vector<ControlType> GenerateOpenLoopControls(const ompl::base::State *startState,
+		virtual std::vector<ControlType> generateOpenLoopControls(const ompl::base::State *startState,
                                                         const ompl::base::State *endState) = 0;
 
     /*
@@ -107,25 +107,25 @@ class MotionModelMethod
 
 		//Generate noise according to specified state and control input
 		//Appears to be common to all motion models
-		virtual NoiseType GenerateNoise(const ompl::base::State *state, const ControlType& u) = 0;
+		virtual NoiseType generateNoise(const ompl::base::State *state, const ControlType& u) = 0;
 
 		// df/dx
 		virtual JacobianType
-		GetStateJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w) = 0;
+		getStateJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w) = 0;
 		// df/du
 		virtual JacobianType
-		GetControlJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w) = 0;
+		getControlJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w) = 0;
 		// df/dw
 		virtual JacobianType
-		GetNoiseJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w) = 0;
+		getNoiseJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w) = 0;
 
 		virtual arma::mat
-		ProcessNoiseCovariance(const ompl::base::State *state, const ControlType& u) = 0;
+		processNoiseCovariance(const ompl::base::State *state, const ControlType& u) = 0;
 
-		virtual const ControlType& GetZeroControl() { return zeroControl_; }
-		virtual const NoiseType& GetZeroNoise()     { return zeroNoise_; }
+		virtual const ControlType& getZeroControl() { return zeroControl_; }
+		virtual const NoiseType& getZeroNoise()     { return zeroNoise_; }
 
-    virtual const size_t ControlDim()           { return controlDim_; }
+    virtual const size_t controlDim()           { return controlDim_; }
 
     /*
 		virtual bool GenerateOrbit(const CfgType& _start,
@@ -137,7 +137,7 @@ class MotionModelMethod
 		}
     */
 
-    virtual double GetTimestepSize() { return dt_; }
+    virtual double getTimestepSize() { return dt_; }
 
 	protected:
 

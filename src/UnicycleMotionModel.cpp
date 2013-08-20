@@ -96,7 +96,7 @@ ompl::base::State* UnicycleMotionModel::Evolve(const ompl::base::State *state, c
 
 //Generate open loop control between two specified Cfgs/states
 std::vector<typename UnicycleMotionModel::ControlType>
-UnicycleMotionModel::GenerateOpenLoopControls(const ompl::base::State *startState,
+UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *startState,
                                                   const ompl::base::State *endState)
 {
 
@@ -200,7 +200,7 @@ UnicycleMotionModel::GenerateOpenLoopControls(const ompl::base::State *startStat
 
 //Generate noise according to specified state and control input
 typename UnicycleMotionModel::NoiseType
-UnicycleMotionModel::GenerateNoise(const ompl::base::State *state, const ControlType& u)
+UnicycleMotionModel::generateNoise(const ompl::base::State *state, const ControlType& u)
 {
 
   using namespace arma;
@@ -218,7 +218,7 @@ UnicycleMotionModel::GenerateNoise(const ompl::base::State *state, const Control
 
 // df/dx
 typename UnicycleMotionModel::JacobianType
-UnicycleMotionModel::GetStateJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w)
+UnicycleMotionModel::getStateJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w)
 {
 
   using namespace arma;
@@ -250,7 +250,7 @@ UnicycleMotionModel::GetStateJacobian(const ompl::base::State *state, const Cont
 
 // df/du
 typename UnicycleMotionModel::JacobianType
-UnicycleMotionModel::GetControlJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w)
+UnicycleMotionModel::getControlJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w)
 {
 
   using namespace arma;
@@ -274,7 +274,7 @@ UnicycleMotionModel::GetControlJacobian(const ompl::base::State *state, const Co
 
 // df/dw
 typename UnicycleMotionModel::JacobianType
-UnicycleMotionModel::GetNoiseJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w)
+UnicycleMotionModel::getNoiseJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w)
 {
 
   using namespace arma;
@@ -302,7 +302,7 @@ UnicycleMotionModel::GetNoiseJacobian(const ompl::base::State *state, const Cont
 }
 
 // Q matrix
-arma::mat UnicycleMotionModel::ProcessNoiseCovariance(const ompl::base::State *state, const ControlType& u)
+arma::mat UnicycleMotionModel::processNoiseCovariance(const ompl::base::State *state, const ControlType& u)
 {
 
   using namespace arma;
@@ -330,7 +330,7 @@ arma::mat UnicycleMotionModel::ProcessNoiseCovariance(const ompl::base::State *s
 
 
 arma::mat
-UnicycleMotionModel::ControlNoiseCovariance(const ControlType& u)
+UnicycleMotionModel::controlNoiseCovariance(const ControlType& u)
 {
 
   using namespace arma;

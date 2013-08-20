@@ -122,25 +122,25 @@ void TestMotionModel()
     u[1] = 0.1;
 
 
-    colvec noise = mm.GenerateNoise(from, u);
+    colvec noise = mm.generateNoise(from, u);
 
     cout<<"Noise :"<<noise<<endl;
 
-    mat stateJacobian = mm.GetStateJacobian(from, u , noise);
+    mat stateJacobian = mm.getStateJacobian(from, u , noise);
 
-    mat controlJacobian = mm.GetControlJacobian(from, u, noise);
+    mat controlJacobian = mm.getControlJacobian(from, u, noise);
 
-    mat noiseJacobian = mm.GetNoiseJacobian(from, u, noise);
+    mat noiseJacobian = mm.getNoiseJacobian(from, u, noise);
 
-    mat processNoiseCovariance = mm.ProcessNoiseCovariance(from , u);
+    mat processNoiseCovariance = mm.processNoiseCovariance(from , u);
 
-    vector<colvec> openLoopControls = mm.GenerateOpenLoopControls(from, to);
+    vector<colvec> openLoopControls = mm.generateOpenLoopControls(from, to);
 
     ompl::base::State *nextState =  from;
 
     for(int i=0; i< openLoopControls.size() ; i++)
     {
-        colvec w = mm.GenerateNoise(nextState, openLoopControls[i]);
+        colvec w = mm.generateNoise(nextState, openLoopControls[i]);
         nextState = mm.Evolve(nextState, openLoopControls[i], w);
 
     }

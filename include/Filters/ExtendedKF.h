@@ -52,8 +52,8 @@ class ExtendedKF : public  KalmanFilterMethod
   	typedef MotionModelMethod::SpaceType SpaceType;
     typedef MotionModelMethod::StateType StateType;
   	typedef typename ObservationModelMethod::ObservationType ObservationType;
-  	typedef typename MPTraits::MPProblemType::MotionModelPointer MotionModelPointer;
-  	typedef typename MPTraits::MPProblemType::ObservationModelPointer ObservationModelPointer;	
+  	typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
+  	typedef typename ObservationModelMethod::ObservationModelPointer ObservationModelPointer;	
           
   	ExtendedKF() { }
 
@@ -78,7 +78,7 @@ class ExtendedKF : public  KalmanFilterMethod
   	const bool isConstruction=false);
   	
   	
-  	arma::mat ComputeStationaryCovariance (const LinearSystem& ls){}
+  	arma::mat computeStationaryCovariance (const LinearSystem& ls){}
 
 };
 

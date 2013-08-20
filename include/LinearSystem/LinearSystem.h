@@ -42,13 +42,14 @@
 
 #include "armadillo"
 
-class LinearSystem 
+class LinearSystem
 {
 
   public:
-
-  	typedef typename MPProblemType::MotionModelPointer MotionModelPointer;
-  	typedef typename MPProblemType::ObservationModelPointer ObservationModelPointer;
+    typedef MotionModelMethod::SpaceType SpaceType;
+    typedef MotionModelMethod::StateType StateType;
+  	typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
+  	typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
   	typedef arma::mat ControlType;
     typedef arma::mat MotionNoiseType;
     typedef arma::mat ObservationType;
@@ -68,19 +69,24 @@ class LinearSystem
 
   	LinearSystem() {}
 
-    LinearSystem (const ompl::base::State* state, const ControlType& u,
+    LinearSystem (const ompl::base::State *state, const ControlType& u,
       MotionModelPointer motionModel,
       ObservationModelPointer observationModel):
-      x_(_x), u_(_u), motionModel_(motionModel),
+      u_(u), motionModel_(motionModel),
       observationModel_(observationModel) {
 
       using namespace arma;
 
       assert(observationModel_);
-
+      SpaceType *space;
+      space =  new SpaceType();
+      ompl::base::State *tempState = space->allocState();
+      
+      &tempState = &state;
+      x_ = tempState;
 
       //TODO: zero noise??
-      w_ = motionModel_->GetZeroNoise();
+      w_ = motionModel_->getZeroNoise();
       //v_ = observationModel_->GetZeroNoise();
       colvec junknoise = arma::zeros<colvec>(1); // this is just useless junk that we are creating just so that we don't need to change interface to observationmodel functions
       v_ = junknoise;
@@ -96,18 +102,26 @@ class LinearSystem
       //cout << "GetR: " << GetR() << endl;
     }
 
-    LinearSystem (const CfgType& _x, const ControlType& _u, const ObservationType& _obs,
-      MotionModelPointer _motionModel,
-      ObservationModelPointer _observationModel):
-      x_(_x), u_(_u), motionModel_(_motionModel),
-      observationModel_(_observationModel) {
+    LinearSystem (const ompl::base::State *state, const ControlType& u, const ObservationType& obs,
+      MotionModelPointer motionModel,
+      ObservationModelPointer observationModel):
+      u_(u), motionModel_(motionModel),
+      observationModel_(observationModel)
+      {
 
       using namespace arma;
       assert(observationModel_);
 
-      ObservationType obs = _obs;
+      SpaceType *space;
+      space =  new SpaceType();
+      ompl::base::State *tempState = space->allocState();
+      
+      &tempState = &state;
+      x_ = tempState;
+      
+      ObservationType observation = obs;
 
-      z_ = obs; // using the ids from outside
+      z_ = observation; // using the ids from outside
 
       //TODO: zero noise??
       w_ = motionModel_->GetZeroNoise();
@@ -126,22 +140,22 @@ class LinearSystem
       //cout << "GetR: " << GetR() << endl;
     }
 
-    CfgType GetX() {return x_; }
+    ompl::base::State* getX() {return x_; }
 
-    arma::mat GetA() const { return motionModel_->GetStateJacobian(x_, u_, w_); }
-    arma::mat GetB() const { return motionModel_->GetControlJacobian(x_, u_, w_); }
-    arma::mat GetG() const { return motionModel_->GetNoiseJacobian(x_, u_, w_); }
-    arma::mat GetQ() const { return motionModel_->ProcessNoiseCovariance(x_, u_); }
+    arma::mat GetA() const { return motionModel_->getStateJacobian(x_, u_, w_); }
+    arma::mat GetB() const { return motionModel_->getControlJacobian(x_, u_, w_); }
+    arma::mat GetG() const { return motionModel_->getNoiseJacobian(x_, u_, w_); }
+    arma::mat GetQ() const { return motionModel_->processNoiseCovariance(x_, u_); }
 
-    arma::mat GetH() const { return observationModel_->GetObservationJacobian(x_, v_, z_);}
+    arma::mat GetH() const { return observationModel_->getObservationJacobian(x_, v_, z_);}
 
-    arma::mat GetM() const { return observationModel_->GetNoiseJacobian(x_, v_, z_); }
+    arma::mat GetM() const { return observationModel_->getNoiseJacobian(x_, v_, z_); }
 
-    arma::mat GetR() const { return observationModel_->GetObservationNoiseCovariance(x_, z_); }
+    arma::mat GetR() const { return observationModel_->getObservationNoiseCovariance(x_, z_); }
 
   private:
 
-    CfgType x_;
+    ompl::base::State *x_;
     ControlType u_;
     MotionNoiseType w_;
     ObsNoiseType v_;

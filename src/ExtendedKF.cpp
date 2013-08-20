@@ -36,25 +36,24 @@
 
 #include "../include/Filters/ExtendedKF.h"
 
-ExtendedKF::ExtendedKF(MotionModelPointer _motionModel,
-ObservationModelPointer _observationModel) :
-KalmanFilterMethod<MPTraits>(_motionModel, _observationModel) {
+ExtendedKF::ExtendedKF(MotionModelPointer motionModel,
+ObservationModelPointer observationModel) :
+KalmanFilterMethod(motionModel, observationModel) {
 
 }
 
-template <class MPTraits>
-typename ExtendedKF<MPTraits>::CfgType
-ExtendedKF<MPTraits>::Predict(const CfgType& _belief, 
-const typename MotionModelMethod<MPTraits>::ControlType& _control, 
-const LinearSystem<MPTraits>& _ls,const bool _isConstruction=false) {
+
+ompl::base::State*
+ExtendedKF::Predict(const ompl::base::State *belief, 
+  const ControlType& control, const LinearSystem& ls, const bool isConstruction=false) 
+{
 
   using namespace arma;
   
-  CfgType xPred = this->m_motionModel->Evolve(_belief, _control,
-    this->m_motionModel->GetZeroNoise());
+  ompl::base::State *predState = this->motionModel_->Evolve(belief, control,this->motionModel_->GetZeroNoise());
 
-  mat covPred = _ls.GetA() * _belief.GetCovariance() * trans(_ls.GetA()) + 
-    _ls.GetG() * _ls.GetQ() * trans(_ls.GetG());
+  mat covPred = ls.GetA() * belief->as<StateType>()->GetCovariance() * trans(ls.GetA()) + 
+    ls.GetG() * ls.GetQ() * trans(ls.GetG());
 
   if(!_isConstruction)
     {
@@ -72,20 +71,20 @@ const LinearSystem<MPTraits>& _ls,const bool _isConstruction=false) {
     myfile.close();
   }
 
+  predState->as<StateType>()->setCovariance
   return CfgType(xPred, covPred);
 
 }
 
-template <class MPTraits>
-typename ExtendedKF<MPTraits>::CfgType
-ExtendedKF<MPTraits>::Update(const CfgType& _belief, const typename ObservationModelMethod<MPTraits>::ObservationType& _obs,
-const LinearSystem<MPTraits>& _ls, const bool _isConstruction=false) {
+ompl::base::State*
+ExtendedKF::Update(const ompl::base::State *belief, const typename ObservationModelMethod::ObservationType& obs,
+const LinearSystem& ls, const bool isConstruction=false) {
 
   using namespace arma;
 
   CfgType xPred = _belief;
 
-  colvec innov = this->m_observationModel->ComputeInnovation(xPred, _obs);
+  colvec innov = this->observationModel_->ComputeInnovation(xPred, obs);
   
  // cout<<"innovation calculated"<<endl;
   if(!innov.n_rows || !innov.n_cols){
@@ -142,20 +141,19 @@ const LinearSystem<MPTraits>& _ls, const bool _isConstruction=false) {
   
 }
 
-template <class MPTraits>
-typename ExtendedKF<MPTraits>::CfgType
-ExtendedKF<MPTraits>::Evolve(const CfgType& _belief,
-const typename MotionModelMethod<MPTraits>::ControlType& _control,
-const typename ObservationModelMethod<MPTraits>::ObservationType& _obs,
-const LinearSystem<MPTraits>& _lsPred, 
-const LinearSystem<MPTraits>& _lsUpdate,
+ompl::base::State*
+ExtendedKF::Evolve(const CfgType& _belief,
+const typename MotionModelMethod::ControlType& _control,
+const typename ObservationModelMethod::ObservationType& _obs,
+const LinearSystem& _lsPred, 
+const LinearSystem& _lsUpdate,
 const bool _isConstruction=false) {
 
   // In the EKF we do not use the linear systems passed to the filter, instead we generate the linear systems on the fly
 
   using namespace arma;
   
-  LinearSystem<MPTraits> lsPred(_belief, _control, this->m_motionModel, this->m_observationModel) ;
+  LinearSystem lsPred(_belief, _control, this->motionModel_, this->observationModel_) ;
 
   CfgType bPred = Predict(_belief, _control, lsPred, _isConstruction);
   
@@ -164,7 +162,7 @@ const bool _isConstruction=false) {
     return bPred;
   }
   
-  LinearSystem<MPTraits> lsUpdate(bPred, _control, _obs, this->m_motionModel, this->m_observationModel) ;
+  LinearSystem lsUpdate(bPred, _control, _obs, this->motionModel_, this->observationModel_) ;
 
   CfgType bEst = Update(bPred, _obs, lsUpdate, _isConstruction);
 

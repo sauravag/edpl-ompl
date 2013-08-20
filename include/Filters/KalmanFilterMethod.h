@@ -67,13 +67,13 @@ class KalmanFilterMethod
   	//gets a belief and control, returns predicted belief if control
   	//were to be applied
 
-  	MotionModelPointer GetMotionModelPointer(){return motionModel_;}
+  	MotionModelPointer getMotionModelPointer(){return motionModel_;}
 
-  	void SetMotionModelPointeer(const MotionModelPointer& mm) { motionModel_ = mm;}
+  	void setMotionModelPointeer(const MotionModelPointer& mm) { motionModel_ = mm;}
 
-  	ObservationModelPointer GetObservationModelPointer(){return observationModel_;}
+  	ObservationModelPointer getObservationModelPointer(){return observationModel_;}
 
-  	void SetObservationModelPointer(const ObservationModelPointer& om) { observationModel_ = om;}
+  	void setObservationModelPointer(const ObservationModelPointer& om) { observationModel_ = om;}
 
   	virtual
   	ompl::base::State* Predict(const ompl::base::State *belief,
@@ -97,7 +97,7 @@ class KalmanFilterMethod
   	const bool isConstruction=false) = 0;
 
   	virtual
-  	arma::mat ComputeStationaryCovariance(const LinearSystem& ls) = 0;
+  	arma::mat computeStationaryCovariance(const LinearSystem& ls) = 0;
 
 
 	protected:
