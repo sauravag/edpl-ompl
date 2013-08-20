@@ -64,6 +64,7 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     typedef ObservationModelMethod::ObservationType ObservationType;
     typedef ObservationModelMethod::NoiseType ObsNoiseType;
     typedef arma::mat JacobianType;
+    //typedef boost::shared_ptr<CamAruco2DObservationModel> ObservationModelPointer;
 
     // z = h(x,v)
     // get the observation for a given configuration,
@@ -94,7 +95,7 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     // Jv = dh/dv
     JacobianType getNoiseJacobian(const ompl::base::State *state, const ObsNoiseType& v, const ObservationType& z);
 
-    ObservationType computeInnovation(ompl::base::State *predictedState, const ObservationType& Zg);
+    ObservationType computeInnovation(const ompl::base::State *predictedState, const ObservationType& Zg);
 
     ObservationType removeSpuriousObservations(const ObservationType& Zg);
 

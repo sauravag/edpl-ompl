@@ -207,7 +207,7 @@ UnicycleMotionModel::generateNoise(const ompl::base::State *state, const Control
   //TODO: confirm that this is the correct noise generation method
   NoiseType noise(this->noiseDim_);
   colvec indepUn = randn(this->controlDim_,1);
-  mat P_Un = ControlNoiseCovariance(u);
+  mat P_Un = controlNoiseCovariance(u);
   colvec Un = indepUn % sqrt((P_Un.diag()));
 
   colvec Wg = sqrt(P_Wg_) * randn(this->stateDim_,1);
@@ -315,7 +315,7 @@ arma::mat UnicycleMotionModel::processNoiseCovariance(const ompl::base::State *s
   ?? What is P_Wg?
   */
 
-  mat P_Un = ControlNoiseCovariance(u);
+  mat P_Un = controlNoiseCovariance(u);
   mat Q_processNoise = zeros<mat>(P_Un.n_rows + P_Wg_.n_rows, P_Un.n_cols +
   P_Wg_.n_cols);
 

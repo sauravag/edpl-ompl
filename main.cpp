@@ -1,4 +1,3 @@
-#include <ompl/base/SpaceInformation.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/geometric/SimpleSetup.h>
 
@@ -160,8 +159,9 @@ int main(int, char **)
 
     //TestSE2BeliefSpace();
 
-    TestObservationModel();
-    TestMotionModel();
+    //TestObservationModel();
+    //TestMotionModel();
+    TestKalmanFilter();
 
     return 0;
 }

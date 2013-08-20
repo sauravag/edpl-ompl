@@ -7,6 +7,14 @@ ompl::base::State* SE2BeliefSpace::allocState(void) const
     return state;
 }
 
+void SE2BeliefSpace::copyState(State *destination, const State *source) const
+{
+    destination->as<StateType>()->setX(source->as<StateType>()->getX());
+    destination->as<StateType>()->setY(source->as<StateType>()->getY());
+    destination->as<StateType>()->setYaw(source->as<StateType>()->getYaw());
+    destination->as<StateType>()->setCovariance(source->as<StateType>()->getCovariance());
+}
+
 void SE2BeliefSpace::freeState(State *state) const
 {
     CompoundStateSpace::freeState(state);

@@ -327,7 +327,7 @@ arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::
 }
 
 typename CamAruco2DObservationModel::ObservationType
-CamAruco2DObservationModel::computeInnovation(ompl::base::State *predictedState, const ObservationType& Zg)
+CamAruco2DObservationModel::computeInnovation(const ompl::base::State *predictedState, const ObservationType& Zg)
 {
   using namespace arma;
 

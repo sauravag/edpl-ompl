@@ -89,7 +89,7 @@ class ObservationModelMethod
     //  NoiseType GenerateObservationNoise(const CfgType& _x) = 0;
 
     virtual
-      ObservationType computeInnovation(ompl::base::State *predictedState, const ObservationType& Zg) = 0;
+      ObservationType computeInnovation(const ompl::base::State *predictedState, const ObservationType& Zg) = 0;
 
     virtual
       arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z) = 0;

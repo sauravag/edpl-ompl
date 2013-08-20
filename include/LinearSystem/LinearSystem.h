@@ -39,7 +39,7 @@
 
 #include "../MotionModels/MotionModelMethod.h"
 #include "../ObservationModels/ObservationModelMethod.h"
-
+#include <ompl/base/SpaceInformation.h>
 #include "armadillo"
 
 class LinearSystem
@@ -78,12 +78,13 @@ class LinearSystem
       using namespace arma;
 
       assert(observationModel_);
-      SpaceType *space;
-      space =  new SpaceType();
-      ompl::base::State *tempState = space->allocState();
-      
-      &tempState = &state;
-      x_ = tempState;
+      ompl::base::StateSpacePtr space(new SpaceType());
+
+      //ompl::base::State *tempState
+      ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
+      x_ = si->cloneState(state);
+
+       //= tempState;
 
       //TODO: zero noise??
       w_ = motionModel_->getZeroNoise();
@@ -112,19 +113,16 @@ class LinearSystem
       using namespace arma;
       assert(observationModel_);
 
-      SpaceType *space;
-      space =  new SpaceType();
-      ompl::base::State *tempState = space->allocState();
-      
-      &tempState = &state;
-      x_ = tempState;
-      
+      ompl::base::StateSpacePtr space(new SpaceType());
+      ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
+      x_ = si->cloneState(state);
+
       ObservationType observation = obs;
 
       z_ = observation; // using the ids from outside
 
       //TODO: zero noise??
-      w_ = motionModel_->GetZeroNoise();
+      w_ = motionModel_->getZeroNoise();
       //v_ = observationModel_->GetZeroNoise();
       colvec junknoise = arma::zeros<colvec>(1); // this is just useless junk that we are creating just so that we don't need to change interface to observationmodel functions
       v_ = junknoise;
@@ -142,16 +140,16 @@ class LinearSystem
 
     ompl::base::State* getX() {return x_; }
 
-    arma::mat GetA() const { return motionModel_->getStateJacobian(x_, u_, w_); }
-    arma::mat GetB() const { return motionModel_->getControlJacobian(x_, u_, w_); }
-    arma::mat GetG() const { return motionModel_->getNoiseJacobian(x_, u_, w_); }
-    arma::mat GetQ() const { return motionModel_->processNoiseCovariance(x_, u_); }
+    arma::mat getA() const { return motionModel_->getStateJacobian(x_, u_, w_); }
+    arma::mat getB() const { return motionModel_->getControlJacobian(x_, u_, w_); }
+    arma::mat getG() const { return motionModel_->getNoiseJacobian(x_, u_, w_); }
+    arma::mat getQ() const { return motionModel_->processNoiseCovariance(x_, u_); }
 
-    arma::mat GetH() const { return observationModel_->getObservationJacobian(x_, v_, z_);}
+    arma::mat getH() const { return observationModel_->getObservationJacobian(x_, v_, z_);}
 
-    arma::mat GetM() const { return observationModel_->getNoiseJacobian(x_, v_, z_); }
+    arma::mat getM() const { return observationModel_->getNoiseJacobian(x_, v_, z_); }
 
-    arma::mat GetR() const { return observationModel_->getObservationNoiseCovariance(x_, z_); }
+    arma::mat getR() const { return observationModel_->getObservationNoiseCovariance(x_, z_); }
 
   private:
 

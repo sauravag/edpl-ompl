@@ -44,66 +44,72 @@ KalmanFilterMethod(motionModel, observationModel) {
 
 
 ompl::base::State*
-ExtendedKF::Predict(const ompl::base::State *belief, 
-  const ControlType& control, const LinearSystem& ls, const bool isConstruction=false) 
+ExtendedKF::Predict(const ompl::base::State *belief,
+  const ControlType& control, const LinearSystem& ls, const bool isConstruction)
 {
 
   using namespace arma;
-  
-  ompl::base::State *predState = this->motionModel_->Evolve(belief, control,this->motionModel_->GetZeroNoise());
+  SpaceType *space;
+  space =  new SpaceType();
+  ompl::base::State *predState = space->allocState();
+  predState = this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise());
 
-  mat covPred = ls.GetA() * belief->as<StateType>()->GetCovariance() * trans(ls.GetA()) + 
-    ls.GetG() * ls.GetQ() * trans(ls.GetG());
-
-  if(!_isConstruction)
+  mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
+    ls.getG() * ls.getQ() * trans(ls.getG());
+  /*
+  if(!isConstruction)
     {
-    ofstream myfile;
+    std::ofstream myfile;
     myfile.open("DataOut/PredictStepOutput.txt", std::fstream::app);
     assert(myfile.is_open());
     myfile <<"<--ThisStepOutput---->\n";
     myfile <<"<-----Control-------->\n";
     myfile <<_control<<endl;
     myfile <<"<----Predicted Mean------>\n";
-    myfile <<xPred<<endl;
+    myfile <<predState->as<StateType>()->getArmaData()<<endl;
     myfile <<"<----Predicted Covariance---->\n";
-    myfile <<covPred<<endl;  
+    myfile <<covPred<<endl;
     //cout<<"Writing"<<endl;
     myfile.close();
   }
+  */
+  predState->as<StateType>()->setCovariance(covPred);
 
-  predState->as<StateType>()->setCovariance
-  return CfgType(xPred, covPred);
+  return predState;
 
 }
 
 ompl::base::State*
 ExtendedKF::Update(const ompl::base::State *belief, const typename ObservationModelMethod::ObservationType& obs,
-const LinearSystem& ls, const bool isConstruction=false) {
+const LinearSystem& ls, const bool isConstruction) {
 
   using namespace arma;
 
-  CfgType xPred = _belief;
+  colvec innov = this->observationModel_->computeInnovation(belief, obs);
 
-  colvec innov = this->observationModel_->ComputeInnovation(xPred, obs);
-  
+  ompl::base::StateSpacePtr space(new SpaceType());
+  ompl::base::State  *estimatedState = space->allocState();
  // cout<<"innovation calculated"<<endl;
-  if(!innov.n_rows || !innov.n_cols){
-  return _belief; // return the prediction if you don't have any innovation
+  if(!innov.n_rows || !innov.n_cols)
+  {
+    ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
+    estimatedState = si->cloneState(belief);
+    return estimatedState; // return the prediction if you don't have any innovation
   }
 
   assert(innov.n_rows);
   assert(innov.n_cols);
 
-  mat covPred = _belief.GetCovariance();
-    
-  mat rightMatrix = _ls.GetH() * covPred * trans(_ls.GetH()) + _ls.GetR(); 
-  mat leftMatrix = covPred * trans(_ls.GetH());
-  mat KalmanGain = solve(trans(rightMatrix), trans(leftMatrix)); 
+  mat covPred = belief->as<StateType>()->getCovariance();
+
+  mat rightMatrix = ls.getH() * covPred * trans(ls.getH()) + ls.getR();
+  mat leftMatrix = covPred * trans(ls.getH());
+  mat KalmanGain = solve(trans(rightMatrix), trans(leftMatrix));
   KalmanGain = KalmanGain.t();
-  
+
   //cout<<"Kalman gain calculated"<<endl;
 
-  colvec xPredVec = xPred.GetArmaData();
+  colvec xPredVec = belief->as<StateType>()->getArmaData();
 
   colvec xEstVec = xPredVec + KalmanGain*innov;
 
@@ -112,13 +118,15 @@ const LinearSystem& ls, const bool isConstruction=false) {
 
   //cout<<"New State estimated"<<endl;
 
-  CfgType xEst;
-  xEst.SetArmaData(xEstVec);
-  
-  mat covEst = covPred - KalmanGain* _ls.GetH() * covPred;
+  estimatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
 
+  mat covEst = covPred - KalmanGain* ls.getH() * covPred;
+
+  estimatedState->as<StateType>()->setCovariance(covEst);
+
+  /*
   //------Printing Data to text file-----
-  if(!_isConstruction)
+  if(!isConstruction)
   {
     ofstream myfile;
     myfile.open("DataOut/UpdateStepOutput.txt", std::fstream::app);
@@ -132,39 +140,41 @@ const LinearSystem& ls, const bool isConstruction=false) {
     myfile <<"<-----Estimated Mean----->\n";
     myfile << xEst <<endl;
     myfile <<"<--- Estimated Covariance---->\n";
-    myfile <<covEst<<endl;  
+    myfile <<covEst<<endl;
     //cout<<"Writing"<<endl;
     myfile.close();
   }
-  
-  return CfgType(xEst, covEst);
-  
+  */
+
+  return estimatedState;
+
 }
 
 ompl::base::State*
-ExtendedKF::Evolve(const CfgType& _belief,
-const typename MotionModelMethod::ControlType& _control,
-const typename ObservationModelMethod::ObservationType& _obs,
-const LinearSystem& _lsPred, 
-const LinearSystem& _lsUpdate,
-const bool _isConstruction=false) {
+ExtendedKF::Evolve(const ompl::base::State *belief,
+    const ControlType& control,
+    const ObservationType& obs,
+    const LinearSystem& lsPred,
+    const LinearSystem& lsUpdate,
+    const bool isConstruction)
+{
 
   // In the EKF we do not use the linear systems passed to the filter, instead we generate the linear systems on the fly
 
   using namespace arma;
-  
-  LinearSystem lsPred(_belief, _control, this->motionModel_, this->observationModel_) ;
 
-  CfgType bPred = Predict(_belief, _control, lsPred, _isConstruction);
-  
-  
-  if(!_obs.n_rows || !_obs.n_cols) {
+  LinearSystem lsPredicted(belief, control, this->motionModel_, this->observationModel_) ;
+
+  ompl::base::State *bPred = Predict(belief, control, lsPredicted, isConstruction);
+
+
+  if(!obs.n_rows || !obs.n_cols) {
     return bPred;
   }
-  
-  LinearSystem lsUpdate(bPred, _control, _obs, this->motionModel_, this->observationModel_) ;
 
-  CfgType bEst = Update(bPred, _obs, lsUpdate, _isConstruction);
+  LinearSystem lsUpdated(bPred, control, obs, this->motionModel_, this->observationModel_) ;
+
+  ompl::base::State *bEst = Update(bPred, obs, lsUpdated, isConstruction);
 
   //cout<<"Returning updated estimate form EKF"<<endl;
 

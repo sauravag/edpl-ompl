@@ -20,7 +20,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
     public:
         StateType(void) : CompoundStateSpace::StateType()
         {
-          covariance_ = arma::zeros<arma::mat>(2,2);
+          covariance_ = arma::zeros<arma::mat>(3,3);
           reachDist_ = 0;
           controllerID_ = -1;
 
@@ -135,6 +135,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
     }
 
     virtual State* allocState(void) const;
+    virtual void copyState(State *destination,const State *source) const;
     virtual void freeState(State *state) const;
 
     //virtual void registerProjections(void);

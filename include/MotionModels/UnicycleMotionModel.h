@@ -56,6 +56,7 @@ class UnicycleMotionModel : public MotionModelMethod
     typedef typename MotionModelMethod::ControlType ControlType;
     typedef typename MotionModelMethod::NoiseType NoiseType;
     typedef typename MotionModelMethod::JacobianType JacobianType;
+    //typedef boost::shared_ptr<UnicycleMotionModel> MotionModelPointer;
 
     //Default constructor
     UnicycleMotionModel() {}

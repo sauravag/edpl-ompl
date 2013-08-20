@@ -37,7 +37,10 @@
 #ifndef FIRM_OMPL_H_
 #define FIRM_OMPL_H_
 
+#include <iostream>
+#include <fstream>
 
+#include <ompl/base/SpaceInformation.h>
 //Spaces
 #include "include/Spaces/SE2BeliefSpace.h"
 
@@ -56,7 +59,8 @@
 //#include "include/LinearSystem/LinearSystem.h"
 
 //Filters
-//#include "include/Filters/dare.h"
-//#include "include/Filters/KalmanFilterMethod.h"
+#include "include/Filters/dare.h"
+#include "include/Filters/KalmanFilterMethod.h"
+#include "include/Filters/ExtendedKF.h"
 
 #endif
