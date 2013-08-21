@@ -72,12 +72,18 @@
 		</Linker>
 		<Unit filename="FIRMOMPL.h" />
 		<Unit filename="Tests.h" />
+		<Unit filename="include/Filters/ExtendedKF.h" />
+		<Unit filename="include/Filters/KalmanFilterMethod.h" />
+		<Unit filename="include/Filters/dare.h" />
+		<Unit filename="include/LinearSystem/LinearSystem.h" />
 		<Unit filename="include/MotionModels/MotionModelMethod.h" />
 		<Unit filename="include/MotionModels/UnicycleMotionModel.h" />
 		<Unit filename="include/ObservationModels/CamAruco2DObservationModel.h" />
 		<Unit filename="include/ObservationModels/ObservationModelMethod.h" />
 		<Unit filename="include/Planner/FIRM.h" />
 		<Unit filename="include/Samplers/GaussianValidBeliefSampler.h" />
+		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
+		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
 		<Unit filename="include/Weight/FIRMWeight.h" />
 		<Unit filename="main.cpp" />

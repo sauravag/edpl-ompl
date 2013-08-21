@@ -55,7 +55,7 @@ class MotionModelMethod
 		typedef arma::colvec  ControlType;
 		typedef arma::colvec  NoiseType;
     typedef SE2BeliefSpace SpaceType;
-		typedef SE2BeliefSpace::StateType StateType;
+		typedef SpaceType::StateType StateType;
 		typedef arma::mat     JacobianType;
     typedef boost::shared_ptr<MotionModelMethod> MotionModelPointer;
 

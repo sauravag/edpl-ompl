@@ -149,19 +149,23 @@ void planWithSimpleSetup(void)
 
 int main(int, char **)
 {
-    std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
+  std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
 
-    //plan();
+    // set static variables
+  RHCICreate::SetControlQueueSize(10);
+  RHCICreate::SetTurnOnlyDistance(0.05);
 
-    std::cout << std::endl << std::endl;
+  //plan();
 
-    //planWithSimpleSetup();
+  std::cout << std::endl << std::endl;
 
-    //TestSE2BeliefSpace();
+  //planWithSimpleSetup();
 
-    //TestObservationModel();
-    //TestMotionModel();
-    TestKalmanFilter();
+  //TestSE2BeliefSpace();
+  //TestObservationModel();
+  //TestMotionModel();
+  //TestKalmanFilter();
+  TestRHCICreate();
 
-    return 0;
+  return 0;
 }

@@ -34,40 +34,52 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#ifndef FIRM_OMPL_
-#define FIRM_OMPL_
+#ifndef SEPARATED_CONTROLLER_METHOD_
+#define SEPARATED_CONTROLLER_METHOD_
 
-#include <iostream>
-#include <fstream>
 
-#include <ompl/base/SpaceInformation.h>
-//Spaces
-#include "include/Spaces/SE2BeliefSpace.h"
+#include "../MotionModels/MotionModelMethod.h"
+#include "../LinearSystem/LinearSystem.h"
 
-// Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
+class SeparatedControllerMethod
+{
 
-//Observation Models
-#include "include/ObservationModels/ObservationModelMethod.h"
-#include "include/ObservationModels/CamAruco2DObservationModel.h"
+  public:
+    typedef MotionModelMethod::SpaceType SpaceType;
+    typedef MotionModelMethod::StateType StateType;
+    typedef typename MotionModelMethod::ControlType   ControlType;
+    typedef typename ObservationModelMethod::ObservationType ObservationType;
+    typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
+    typedef typename arma::mat CostType;
+    typedef typename arma::mat GainType;
 
-//Motion Models
-#include "include/MotionModels/MotionModelMethod.h"
-#include "include/MotionModels/UnicycleMotionModel.h"
+    SeparatedControllerMethod() {} //: MPBaseObject<MPTraits>() {}
 
-//LinearSystem
-#include "include/LinearSystem/LinearSystem.h"
+    SeparatedControllerMethod(ompl::base::State *goal,
+        const std::vector<ompl::base::State*>& nominalXs,
+        const std::vector<ControlType>& nominalUs,
+        const std::vector<LinearSystem>& linearSystems,
+        const MotionModelPointer mm) :
+        goal_(goal),
+        nominalXs_(nominalXs),
+        nominalUs_(nominalUs),
+        linearSystems_(linearSystems),
+        motionModel_(mm) {}
 
-//Filters
-#include "include/Filters/dare.h"
-#include "include/Filters/KalmanFilterMethod.h"
-#include "include/Filters/ExtendedKF.h"
+    virtual ~SeparatedControllerMethod() {}
 
-//Separated Controllers
-#include "include/SeparatedControllers/SeparatedControllerMethod.h"
-#include "include/SeparatedControllers/RHCICreate.h"
+    virtual ControlType GenerateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) = 0;
 
-//Controllers
-//#include "#include/Controllers/Controller.h"
+    //void SetReachedFlag(bool _flag){m_reachedFlag = _flag;}
+
+  protected:
+
+    ompl::base::State *goal_;
+    std::vector<ompl::base::State*> nominalXs_;
+    std::vector<ControlType> nominalUs_;
+    std::vector< LinearSystem > linearSystems_;
+    MotionModelPointer motionModel_;
+    //bool m_reachedFlag;
+};
 
 #endif

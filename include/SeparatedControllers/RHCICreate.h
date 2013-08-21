@@ -34,40 +34,51 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#ifndef FIRM_OMPL_
-#define FIRM_OMPL_
+#ifndef RHC_ICREATE_
+#define RHC_ICREATE_
 
-#include <iostream>
-#include <fstream>
+#include "SeparatedControllerMethod.h"
+#include <deque>
 
-#include <ompl/base/SpaceInformation.h>
-//Spaces
-#include "include/Spaces/SE2BeliefSpace.h"
+class RHCICreate : public SeparatedControllerMethod
+{
 
-// Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
+  public:
+    typedef typename SeparatedControllerMethod::ControlType   ControlType;
+    typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
+    //typedef typename MPTraits::LinearSystem   LinearSystem;
 
-//Observation Models
-#include "include/ObservationModels/ObservationModelMethod.h"
-#include "include/ObservationModels/CamAruco2DObservationModel.h"
+    RHCICreate() {}
 
-//Motion Models
-#include "include/MotionModels/MotionModelMethod.h"
-#include "include/MotionModels/UnicycleMotionModel.h"
+    RHCICreate(ompl::base::State *goal,
+        const std::vector<ompl::base::State*>& nominalXs,
+        const std::vector<ControlType>& nominalUs,
+        const std::vector<LinearSystem>& linearSystems,  // Linear systems are not used in this class but it is here to unify the interface
+        const MotionModelPointer mm) :
+        SeparatedControllerMethod(goal, nominalXs, nominalUs, linearSystems, mm)
+        {
+          assert(controlQueueSize_ > 0 && "Error: RHCICreate control queue size not valid. Please initialize by calling SetControlQueueSize");
 
-//LinearSystem
-#include "include/LinearSystem/LinearSystem.h"
+         //this->m_reachedFlag = false;
+        }
 
-//Filters
-#include "include/Filters/dare.h"
-#include "include/Filters/KalmanFilterMethod.h"
-#include "include/Filters/ExtendedKF.h"
+    ~RHCICreate() {}
 
-//Separated Controllers
-#include "include/SeparatedControllers/SeparatedControllerMethod.h"
-#include "include/SeparatedControllers/RHCICreate.h"
+    ControlType GenerateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) ;
 
-//Controllers
-//#include "#include/Controllers/Controller.h"
+    static void SetControlQueueSize(const int queueSize)
+    {
+      controlQueueSize_ = queueSize;
+    }
 
+    static void SetTurnOnlyDistance(const double turnDist)
+    {
+      turnOnlyDistance_ = turnDist;
+    }
+
+   private:
+    static int controlQueueSize_;
+    static double turnOnlyDistance_;
+    std::deque<ControlType> openLoopControls_;
+};
 #endif

@@ -383,7 +383,7 @@
 1377034758 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SE2BeliefSpace.cpp
 	"../include/Spaces/SE2BeliefSpace.h"
 
-1377030254 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
+1377106727 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
 	<iostream>
 	<fstream>
 	<ompl/base/SpaceInformation.h>
@@ -393,11 +393,14 @@
 	"include/ObservationModels/CamAruco2DObservationModel.h"
 	"include/MotionModels/MotionModelMethod.h"
 	"include/MotionModels/UnicycleMotionModel.h"
+	"include/LinearSystem/LinearSystem.h"
 	"include/Filters/dare.h"
 	"include/Filters/KalmanFilterMethod.h"
 	"include/Filters/ExtendedKF.h"
+	"include/SeparatedControllers/SeparatedControllerMethod.h"
+	"include/SeparatedControllers/RHCICreate.h"
 
-1377034958 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
+1377038146 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
 	"FIRMOMPL.h"
 	"tinyxml.h"
 
@@ -457,7 +460,7 @@
 	"tinyxml.h"
 	<windows.h>
 
-1377031779 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/MotionModels/MotionModelMethod.h
+1377108910 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/MotionModels/MotionModelMethod.h
 	"armadillo"
 	"../Spaces/SE2BeliefSpace.h"
 
@@ -484,7 +487,7 @@
 	"../LinearSystem/LinearSystem.h"
 	"dare.h"
 
-1377025676 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/LinearSystem/LinearSystem.h
+1377108971 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/LinearSystem/LinearSystem.h
 	"../MotionModels/MotionModelMethod.h"
 	"../ObservationModels/ObservationModelMethod.h"
 	<ompl/base/SpaceInformation.h>
@@ -492,4 +495,12 @@
 
 1377032222 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Filters/ExtendedKF.h
 	"KalmanFilterMethod.h"
+
+1377109020 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SeparatedControllers/SeparatedControllerMethod.h
+	"../MotionModels/MotionModelMethod.h"
+	"../LinearSystem/LinearSystem.h"
+
+1377108674 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SeparatedControllers/RHCICreate.h
+	"SeparatedControllerMethod.h"
+	<deque>
 
