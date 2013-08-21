@@ -50,7 +50,7 @@ void TestSE2BeliefSpace()
     cout<<"The Resultant State Cov  : "<<result->as<StateType>()->getCovariance()<<endl;
 
     cout<<"-----------------------"<<endl;
-    space->printState(result);
+    space->printBeliefState(result);
     cout<<"State Space Passed Tests"<<endl;
 }
 
@@ -145,11 +145,9 @@ void TestMotionModel()
 
     }
 
-    assert(abs(nextState->as<MotionModelMethod::StateType>()->getX() -
-                    to->as<MotionModelMethod::StateType>()->getX()) < 1e-3);
+    colvec diff = to->as<StateType>()->getArmaData() - nextState->as<StateType>()->getArmaData();
 
-    assert(abs(nextState->as<MotionModelMethod::StateType>()->getY() -
-                    to->as<MotionModelMethod::StateType>()->getY()) < 1e-3);
+    assert(norm(diff.subvec(0,1),2) < 1e-1); // the distance between final state and goal is less than eps
 
     cout<<"The final evolved State is :"<<nextState->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"the final commanded state was :"<<to->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
@@ -201,54 +199,42 @@ void TestKalmanFilter()
 
     vector<colvec> openLoopControls = mm->generateOpenLoopControls(from, to);
 
-    ompl::base::State *nextState = space->allocState();;
+    ompl::base::State *nextState = space->allocState();
 
     si->copyState(nextState, from);
 
-    cout<<"--Check to see if covariance and state is copied correctly--"<<endl;
-    cout<<"Source state :"<<from->as<StateType>()->getArmaData()<<endl;
-    cout<<"Dest   state :"<<nextState->as<StateType>()->getArmaData()<<endl;
-    cout<<"Source covariance"<<from->as<StateType>()->getCovariance()<<endl;
-    cout<<"Dest   covariance"<<nextState->as<StateType>()->getCovariance()<<endl;
-
-
-    ompl::base::State *kfPrediction = space->allocState();
-
     ompl::base::State *kfEstimate = space->allocState();
+    si->copyState(kfEstimate, from);
+    //corrupting the initial belief
+    kfEstimate->as<StateType>()->setXYYaw(1.45,3.2,0.025);
 
     LinearSystem dummy;
 
     for(int i=0; i< openLoopControls.size() ; i++)
     {
         colvec w = mm->generateNoise(from, openLoopControls[i]);
-        w = w*2.0;
         nextState = mm->Evolve(from, openLoopControls[i], w);
         colvec obs = om->getObservation(nextState, true);
-        kfEstimate = kf.Evolve(from, openLoopControls[i], obs, dummy, dummy);
-
+        kfEstimate = kf.Evolve(kfEstimate, openLoopControls[i], obs, dummy, dummy);
         si->copyState(from, nextState);
 
 
     }
 
-    /*
-    assert(abs(nextState->as<MotionModelMethod::StateType>()->getX() -
-                    to->as<MotionModelMethod::StateType>()->getX()) < 1e-3);
+    colvec diff = to->as<StateType>()->getArmaData() - nextState->as<StateType>()->getArmaData();
 
-    assert(abs(nextState->as<MotionModelMethod::StateType>()->getY() -
-                    to->as<MotionModelMethod::StateType>()->getY()) < 1e-3);
-    */
+    assert(norm(diff.subvec(0,1),2) < 0.05); // the distance between final state and goal is less than eps
 
     cout<<"The final evolved State is :"<<nextState->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"The final filtered State is :"<<kfEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"the final commanded state was :"<<to->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
 
-    cout<<"Kalman Filter passed tests only if the values make sense to you!"<<endl;
+    cout<<"Kalman Filter passed tests, check if the values make sense to you!"<<endl;
 
 }
 
 
-void TestKalmanFilter()
+void TestRHCICreate()
 {
 
     MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
@@ -283,9 +269,9 @@ void TestKalmanFilter()
 
     arma::mat testCov(3,3);
 
-    testCov<<0.01<<0<<0<<endr
-           <<0<<0.01<<0<<endr
-           <<0<<0<<0.01<<endr;
+    testCov<<0.5<<0<<0<<endr
+           <<0<<0.5<<0<<endr
+           <<0<<0<<0.02<<endr;
 
     from->as<StateType>()->setCovariance(testCov);
 
@@ -295,45 +281,52 @@ void TestKalmanFilter()
 
     si->copyState(nextState, from);
 
-    cout<<"--Check to see if covariance and state is copied correctly--"<<endl;
-    cout<<"Source state :"<<from->as<StateType>()->getArmaData()<<endl;
-    cout<<"Dest   state :"<<nextState->as<StateType>()->getArmaData()<<endl;
-    cout<<"Source covariance"<<from->as<StateType>()->getCovariance()<<endl;
-    cout<<"Dest   covariance"<<nextState->as<StateType>()->getCovariance()<<endl;
-
-
-    ompl::base::State *kfPrediction = space->allocState();
-
     ompl::base::State *kfEstimate = space->allocState();
+    si->copyState(kfEstimate, from);
+    kfEstimate->as<StateType>()->setXYYaw(1.0,3.2,0.1);
 
     LinearSystem dummy;
 
-    for(int i=0; i< openLoopControls.size() ; i++)
+    std::vector<ompl::base::State*> nmx;
+    std::vector<colvec> nmu;
+    std::vector<LinearSystem> lss;
+
+    RHCICreate *sepController = new RHCICreate(to, nmx, nmu, lss, mm);
+    colvec diff = to->as<StateType>()->getArmaData() - from->as<StateType>()->getArmaData();
+
+    while(norm(diff.subvec(0,1), 2) > 0.08)
     {
-        colvec w = mm->generateNoise(from, openLoopControls[i]);
-        w = w*2.0;
-        nextState = mm->Evolve(from, openLoopControls[i], w);
+        cout<<"KF Estimate"<<endl;
+        space->as<SE2BeliefSpace>()->printBeliefState(kfEstimate);
+        cout<<"True State"<<endl;
+        space->as<SE2BeliefSpace>()->printBeliefState(nextState);
+        cin.get();
+
+        // generate control based on belief
+        colvec rhcU = sepController->generateFeedbackControl(kfEstimate);
+        // generate motion noise based on true state
+        colvec w = mm->generateNoise(from, rhcU);
+        // evolve true state
+        nextState = mm->Evolve(from, rhcU, w);
+        //get observation based on true state
         colvec obs = om->getObservation(nextState, true);
-        kfEstimate = kf.Evolve(from, openLoopControls[i], obs, dummy, dummy);
+        //evolve kalman filter using control and obs
+        kfEstimate = kf.Evolve(kfEstimate, rhcU, obs, dummy, dummy);
 
         si->copyState(from, nextState);
 
+        diff = to->as<StateType>()->getArmaData() - kfEstimate->as<StateType>()->getArmaData();
 
     }
 
-    /*
-    assert(abs(nextState->as<MotionModelMethod::StateType>()->getX() -
-                    to->as<MotionModelMethod::StateType>()->getX()) < 1e-3);
 
-    assert(abs(nextState->as<MotionModelMethod::StateType>()->getY() -
-                    to->as<MotionModelMethod::StateType>()->getY()) < 1e-3);
-    */
+    assert(norm(diff.subvec(0,1),2) < 0.10);
 
     cout<<"The final evolved State is :"<<nextState->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"The final filtered State is :"<<kfEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"the final commanded state was :"<<to->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
 
-    cout<<"Kalman Filter passed tests only if the values make sense to you!"<<endl;
+    cout<<"RHC ICreate passed tests only if the values make sense to you!"<<endl;
 
 }
 

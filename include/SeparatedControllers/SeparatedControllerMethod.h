@@ -66,9 +66,9 @@ class SeparatedControllerMethod
         linearSystems_(linearSystems),
         motionModel_(mm) {}
 
-    virtual ~SeparatedControllerMethod() {}
+    ~SeparatedControllerMethod() {}
 
-    virtual ControlType GenerateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) = 0;
+    virtual ControlType generateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) = 0;
 
     //void SetReachedFlag(bool _flag){m_reachedFlag = _flag;}
 

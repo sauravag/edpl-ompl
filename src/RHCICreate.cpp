@@ -40,7 +40,7 @@ int RHCICreate::controlQueueSize_ = -1;
 double RHCICreate::turnOnlyDistance_ = -1;
 
 typename RHCICreate::ControlType
-RHCICreate::GenerateFeedbackControl(const ompl::base::State *state, const size_t& _t)
+RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t& _t)
 {
 
   using namespace arma;

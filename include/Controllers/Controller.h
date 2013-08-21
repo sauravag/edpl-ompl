@@ -43,7 +43,7 @@
 #include "ObservationModels/ObservationModelMethod.h"
 
 
-
+template <class SeparatedControllerType, class FilterType>
 class Controller 
 {
 
@@ -56,27 +56,26 @@ class Controller
 	
 	Controller() {};
 	
-  Controller(const CfgType& _goal,
-		  const std::vector<CfgType>& _nominalXs,
-			const std::vector<ControlType>& _nominalUs,
-      MotionModelPointer _mm,
-			ObservationModelPointer _om,
-			ActuationSystemPointer _as,
-      string _vcLabel);
+  Controller(const ompl::base::State *goal,
+		  const std::vector<ompl::base::State*>& nominalXs,
+			const std::vector<ControlType>& nominalUs,
+      MotionModelPointer mm,
+			ObservationModelPointer om);//,ActuationSystemPointer _as);
 
-  double  Execute(const CfgType& _b, bool& _isFailed, CfgType& _endBelief,bool constructionMode=true, double _sleepTime=0.0);
+  double  Execute(const ompl::base::State *startState, bool& isFailed, 
+                ompl::base::State *endState, bool constructionMode=true, double sleepTime=0.0);
   
-  double  Stabilize(const CfgType& _b, CfgType& _finalBelief);
+  double  Stabilize(const ompl::base::State *startState, ompl::base::State *endState);
   
-  bool    IsTerminated(const CfgType& _b, const size_t _t);
+  bool    isTerminated(onst ompl::base::State *state, const size_t t);
   
-  CfgType Evolve(const CfgType& _b, size_t _t, bool _isConstructionMode);
+  ompl::base::State* Evolve(const ompl::base::State *state, size_t t, bool isConstructionMode);
   
-  CfgType GetGoal() {return m_goal; }
+  ompl::base::State* getGoal() {return goal_; }
   
-  void SetActuationSystem(ActuationSystemPointer _as) { m_actuationSystem = _as ; }
+  //void setActuationSystem(ActuationSystemPointer as) { actuationSystem_ = as ; }
 
-  bool IsValid();
+  bool isValid();
 
 
 /*
@@ -85,27 +84,26 @@ class Controller
 			assert(!"Not supported yet!");
 	}
 */
-  static void SetNodeReachedAngle(double _angle) {m_nodeReachedAngle = _angle; }
-  static void SetNodeReachedDistance(double _d) {m_nodeReachedDistance = _d; }
-  static void SetMaxTries(double _maxtries) {m_maxTries = _maxtries; }
+  static void setNodeReachedAngle(double angle) {nodeReachedAngle_ = angle; }
+  static void setNodeReachedDistance(double d) {nodeReachedDistance_ = d; }
+  static void setMaxTries(double maxtries) {maxTries_ = maxtries; }
   
-  size_t Length() { return m_lss.size(); }
+  size_t Length() { return lss_.size(); }
     
   private:
-    MotionModelPointer m_motionModel;
-		ObservationModelPointer m_observationModel;
-		ActuationSystemPointer m_actuationSystem;
-		vector< LinearSystem<MPTraits> > m_lss;
-		SeparatedControllerType m_separatedController;
-		FilterType m_filter;
-		CfgType m_goal;   // last nominal point
-		int m_tries;
-		static double m_nodeReachedAngle;
-		static double m_nodeReachedDistance;
-		static double m_maxTries;
-		double m_maxExecTime;
-		bool m_obstacleMarkerObserved;
-    string m_vcLabel;
+    MotionModelPointer motionModel_;
+		ObservationModelPointer observationModel_;
+		//ActuationSystemPointer actuationSystem_;
+		vector<LinearSystem> lss_;
+		SeparatedControllerType separatedController_;
+		FilterType filter_;
+		CfgType goal_;   // last nominal point
+		int tries_;
+		static double nodeReachedAngle_;
+		static double nodeReachedDistance_;
+		static double maxTries_;
+		double maxExecTime_;
+		bool obstacleMarkerObserved_;
 
 };
 

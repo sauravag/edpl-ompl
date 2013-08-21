@@ -61,7 +61,7 @@ void SE2BeliefSpace::getRelativeState(const State *from, const State *to, State 
     }
 }
 
-void SE2BeliefSpace::printState(const State *state)
+void SE2BeliefSpace::printBeliefState(const State *state)
 {
     std::cout<<"----Printing BeliefState----"<<std::endl;
     std::cout<<"State [X, Y, Yaw]: ";

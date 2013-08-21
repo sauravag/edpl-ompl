@@ -144,7 +144,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
     // equivalent to result = vectorA-vectorB
     void getRelativeState(const State *from, const State *to, State *state);
 
-    void printState(const State *state);
+    void printBeliefState(const State *state);
 
 };
 #endif

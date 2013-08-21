@@ -152,8 +152,8 @@ int main(int, char **)
   std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
 
     // set static variables
-  RHCICreate::SetControlQueueSize(10);
-  RHCICreate::SetTurnOnlyDistance(0.05);
+  RHCICreate::setControlQueueSize(10);
+  RHCICreate::setTurnOnlyDistance(0.05);
 
   //plan();
 

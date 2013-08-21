@@ -64,14 +64,14 @@ class RHCICreate : public SeparatedControllerMethod
 
     ~RHCICreate() {}
 
-    ControlType GenerateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) ;
+    virtual ControlType generateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) ;
 
-    static void SetControlQueueSize(const int queueSize)
+    static void setControlQueueSize(const int queueSize)
     {
       controlQueueSize_ = queueSize;
     }
 
-    static void SetTurnOnlyDistance(const double turnDist)
+    static void setTurnOnlyDistance(const double turnDist)
     {
       turnOnlyDistance_ = turnDist;
     }
