@@ -72,6 +72,9 @@
 		</Linker>
 		<Unit filename="FIRMOMPL.h" />
 		<Unit filename="Tests.h" />
+		<Unit filename="include/ActuationSystems/ActuationSystemMethod.h" />
+		<Unit filename="include/ActuationSystems/SimulatedActuationSystem.h" />
+		<Unit filename="include/Controllers/Controller.h" />
 		<Unit filename="include/Filters/ExtendedKF.h" />
 		<Unit filename="include/Filters/KalmanFilterMethod.h" />
 		<Unit filename="include/Filters/dare.h" />
@@ -88,11 +91,13 @@
 		<Unit filename="include/Weight/FIRMWeight.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/CamAruco2DObservationModel.cpp" />
+		<Unit filename="src/Controller.cpp" />
 		<Unit filename="src/ExtendedKF.cpp" />
 		<Unit filename="src/FIRM.cpp" />
 		<Unit filename="src/GaussianValidBeliefSampler.cpp" />
 		<Unit filename="src/RHCICreate.cpp" />
 		<Unit filename="src/SE2BeliefSpace.cpp" />
+		<Unit filename="src/SimulatedActuationSystem.cpp" />
 		<Unit filename="src/UnicycleMotionModel.cpp" />
 		<Unit filename="tinyxml/tinystr.cpp" />
 		<Unit filename="tinyxml/tinystr.h" />

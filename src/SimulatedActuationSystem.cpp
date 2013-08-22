@@ -33,45 +33,42 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+#include ".../include/ActuationSystems/SimulatedActuationSystem.h"
 
-#ifndef FIRM_OMPL_
-#define FIRM_OMPL_
+void SimulatedActuationSystem::applyControl(ControlType& u) 
+{
 
-#include <iostream>
-#include <fstream>
+  typename MotionModelMethod::NoiseType noise = motionModel_->generateNoise(trueState_, u);
 
-#include <ompl/base/SpaceInformation.h>
-//Spaces
-#include "include/Spaces/SE2BeliefSpace.h"
+  trueState_ = motionModel_->Evolve(trueState_, u, noise);
+  
+  //OGLDisplay<MPTraits>::UpdateTrueState(m_trueState);
+  //cout<<" The True State is :"<<endl<<m_trueState.GetArmaData()<<endl;
 
-// Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
+}
 
-//Observation Models
-#include "include/ObservationModels/ObservationModelMethod.h"
-#include "include/ObservationModels/CamAruco2DObservationModel.h"
+typename SimulatedActuationSystem::ObservationType
+SimulatedActuationSystem::getObservation() 
+{
+  return observationModel_->getObservation(m_trueState, true);
+}
 
-//Motion Models
-#include "include/MotionModels/MotionModelMethod.h"
-#include "include/MotionModels/UnicycleMotionModel.h"
-
-//LinearSystem
-#include "include/LinearSystem/LinearSystem.h"
-
-//Filters
-#include "include/Filters/dare.h"
-#include "include/Filters/KalmanFilterMethod.h"
-#include "include/Filters/ExtendedKF.h"
-
-//Separated Controllers
-#include "include/SeparatedControllers/SeparatedControllerMethod.h"
-#include "include/SeparatedControllers/RHCICreate.h"
-
-//ActuationSystems
-#include "include/ActuationSystems/ActuationSystemMethod.h"
-#include "include/ActuationSystems/SimulatedActuationSystem.h"
-
-//Controllers
-#include """include/Controllers/Controller.h"
-
-#endif
+bool SimulatedActuationSystem::checkCollision() 
+{
+  /*
+  typedef typename MPProblemType::ValidityCheckerPointer ValidityCheckerPointer;
+  // following variables are used in collision checking procedure
+  ValidityCheckerPointer vc = this->GetMPProblem()->GetValidityChecker(m_vcLabel);
+  string callee = this->GetName();
+  CDInfo cdInfo;
+  StatClass* stats = this->GetMPProblem()->GetStatClass();
+  
+   if(!m_trueState.InBoundary(this->m_environment) || 
+        !vc->IsValid(m_trueState, this->m_environment,  *(this->GetMPProblem()->GetStatClass()), cdInfo, &callee)) {
+     
+      return true;
+    }
+  */
+    return false;
+  
+}

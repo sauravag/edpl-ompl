@@ -53,7 +53,8 @@ class Controller
 	typedef typename ObservationModelMethod::ObservationType ObservationType;
 	typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
 	typedef typename ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
-	
+	typedef typename ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
+
 	Controller() {};
 	
   Controller(const ompl::base::State *goal,
@@ -67,13 +68,13 @@ class Controller
   
   double  Stabilize(const ompl::base::State *startState, ompl::base::State *endState);
   
-  bool    isTerminated(onst ompl::base::State *state, const size_t t);
+  bool    isTerminated(const ompl::base::State *state, const size_t t);
   
   ompl::base::State* Evolve(const ompl::base::State *state, size_t t, bool isConstructionMode);
   
   ompl::base::State* getGoal() {return goal_; }
   
-  //void setActuationSystem(ActuationSystemPointer as) { actuationSystem_ = as ; }
+  void setActuationSystem(ActuationSystemPointer as) { actuationSystem_ = as ; }
 
   bool isValid();
 
@@ -93,7 +94,7 @@ class Controller
   private:
     MotionModelPointer motionModel_;
 		ObservationModelPointer observationModel_;
-		//ActuationSystemPointer actuationSystem_;
+		ActuationSystemPointer actuationSystem_;
 		vector<LinearSystem> lss_;
 		SeparatedControllerType separatedController_;
 		FilterType filter_;
