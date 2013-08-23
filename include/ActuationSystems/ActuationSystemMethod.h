@@ -1,8 +1,10 @@
 #ifndef ACTUATION_SYSTEM_METHOD_
 #define ACTUATION_SYSTEM_METHOD_
 
+#include "../MotionModels/MotionModelMethod.h"
+#include "../ObservationModels/ObservationModelMethod.h"
 
-class ActuationSystemMethod 
+class ActuationSystemMethod
 {
 
   public:
@@ -20,13 +22,15 @@ class ActuationSystemMethod
     virtual ObservationType getObservation() = 0;
 
     virtual bool checkCollision() = 0;
-    
+
     virtual void setBelief(const ompl::base::State *state) = 0;
-     
+
     virtual void setTrueState(const ompl::base::State *state) = 0;
-                
+
+    virtual ompl::base::State* getTrueState() = 0;
+
   //protected:
-  
+
     //Environment* environment_;
 };
 

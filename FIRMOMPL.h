@@ -72,6 +72,6 @@
 #include "include/ActuationSystems/SimulatedActuationSystem.h"
 
 //Controllers
-#include """include/Controllers/Controller.h"
+#include "include/Controllers/Controller.h"
 
 #endif

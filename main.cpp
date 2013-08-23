@@ -165,7 +165,8 @@ int main(int, char **)
   //TestObservationModel();
   //TestMotionModel();
   //TestKalmanFilter();
-  TestRHCICreate();
+  //TestRHCICreate();
+  TestActuationSystem();
 
   return 0;
 }

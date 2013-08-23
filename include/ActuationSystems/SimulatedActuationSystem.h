@@ -37,26 +37,30 @@
 #ifndef SIMULATED_ACTUATION_SYSTEM_
 #define SIMULATED_ACTUATION_SYSTEM_
 
+#include <ompl/base/SpaceInformation.h>
 #include "ActuationSystemMethod.h"
 //<Utilities/OGLDisplay.h>
 #include "armadillo"
 
-class SimulatedActuationSystem : public ActuationSystemMethod 
+class SimulatedActuationSystem : public ActuationSystemMethod
 {
 
   public:
 
     typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
     typedef typename ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
-    
-    SimulatedActuationSystem(MotionModelPointer mm,  ObservationModelPointer om) 
-    : motionModel_(mm), observationModel_(om) 
+
+    SimulatedActuationSystem(MotionModelPointer mm,  ObservationModelPointer om)
+    : motionModel_(mm), observationModel_(om)
     {
-            
+      ompl::base::StateSpacePtr space(new SpaceType());
+
+      trueState_ = space->allocState();
+
       //this->m_environment = _problem->GetEnvironment();
-      
+
       //m_vcLabel = _node.stringXMLParameter("vcLabel", true, "", "Validity Test Method");
-      
+
       //OGLDisplay<MPTraits>::Initialize(_problem);
     }
 
@@ -66,30 +70,30 @@ class SimulatedActuationSystem : public ActuationSystemMethod
 
     virtual ObservationType getObservation();
 
-    virtual ompl::base::State* getTrueState() 
+    virtual ompl::base::State* getTrueState()
     {
-      return trueState_; 
+      return trueState_;
     }
 
-    virtual void setTrueState(const ompl::base::State *state) 
+    virtual void setTrueState(const ompl::base::State *state)
     {
       ompl::base::StateSpacePtr space(new SpaceType());
       ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
-      si->copyState(trueState_, state)
-      trueState_->as<StateType>()->SetCovariance(arma::mat(0,0));
-      //OGLDisplay<MPTraits>::UpdateTrueState(trueState_); 
+      si->copyState(trueState_, state);
+      trueState_->as<StateType>()->setCovariance(arma::mat(0,0));
+      //OGLDisplay<MPTraits>::UpdateTrueState(trueState_);
     }
-    
+
     bool checkCollision();
 
-    void setBelief(const ompl::base::State *state) 
+    void setBelief(const ompl::base::State *state)
     {
       //cout << "SimulatedActuationSystem::SetBelief" << endl;;
       //cout << "_belief cov: " << endl << _belief.m_covariance << endl;
       ompl::base::StateSpacePtr space(new SpaceType());
       ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
-      si->copyState(belief_, state)
-      //cout << "belief_ cov: " << endl << belief_.m_covariance << endl; 
+      si->copyState(belief_, state);
+      //cout << "belief_ cov: " << endl << belief_.m_covariance << endl;
       //OGLDisplay<MPTraits>::UpdateCurrentBelief(_belief);
     }
 

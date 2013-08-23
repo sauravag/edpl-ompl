@@ -33,27 +33,27 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
-#include ".../include/ActuationSystems/SimulatedActuationSystem.h"
+#include "../include/ActuationSystems/SimulatedActuationSystem.h"
 
-void SimulatedActuationSystem::applyControl(ControlType& u) 
+void SimulatedActuationSystem::applyControl(ControlType& u)
 {
 
   typename MotionModelMethod::NoiseType noise = motionModel_->generateNoise(trueState_, u);
 
   trueState_ = motionModel_->Evolve(trueState_, u, noise);
-  
+
   //OGLDisplay<MPTraits>::UpdateTrueState(m_trueState);
   //cout<<" The True State is :"<<endl<<m_trueState.GetArmaData()<<endl;
 
 }
 
 typename SimulatedActuationSystem::ObservationType
-SimulatedActuationSystem::getObservation() 
+SimulatedActuationSystem::getObservation()
 {
-  return observationModel_->getObservation(m_trueState, true);
+  return observationModel_->getObservation(trueState_, true);
 }
 
-bool SimulatedActuationSystem::checkCollision() 
+bool SimulatedActuationSystem::checkCollision()
 {
   /*
   typedef typename MPProblemType::ValidityCheckerPointer ValidityCheckerPointer;
@@ -62,13 +62,13 @@ bool SimulatedActuationSystem::checkCollision()
   string callee = this->GetName();
   CDInfo cdInfo;
   StatClass* stats = this->GetMPProblem()->GetStatClass();
-  
-   if(!m_trueState.InBoundary(this->m_environment) || 
+
+   if(!m_trueState.InBoundary(this->m_environment) ||
         !vc->IsValid(m_trueState, this->m_environment,  *(this->GetMPProblem()->GetStatClass()), cdInfo, &callee)) {
-     
+
       return true;
     }
   */
     return false;
-  
+
 }

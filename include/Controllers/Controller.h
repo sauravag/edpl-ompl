@@ -37,43 +37,45 @@
 #ifndef CONTROLLER_
 #define CONTROLLER_
 
-#include "SeparatedControllers/SeparatedControllerMethod.h"
-#include "Filters/KalmanFilterMethod.h"
-#include "MotionModels/MotionModelMethod.h"
-#include "ObservationModels/ObservationModelMethod.h"
+#include "../SeparatedControllers/SeparatedControllerMethod.h"
+#include "../Filters/KalmanFilterMethod.h"
+#include "../MotionModels/MotionModelMethod.h"
+#include "../ObservationModels/ObservationModelMethod.h"
 
 
 template <class SeparatedControllerType, class FilterType>
-class Controller 
+class Controller
 {
 
   public:
-  
-  typedef typename MotionModelMethod::ControlType   ControlType;
-	typedef typename ObservationModelMethod::ObservationType ObservationType;
-	typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
-	typedef typename ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
-	typedef typename ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
+    typedef MotionModelMethod::SpaceType SpaceType;
+    typedef MotionModelMethod::StateType StateType;
+    typedef typename MotionModelMethod::ControlType   ControlType;
+  	typedef typename ObservationModelMethod::ObservationType ObservationType;
+  	typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
+  	typedef typename ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+  	typedef typename ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
 
-	Controller() {};
-	
+	//Controller() {};
+
   Controller(const ompl::base::State *goal,
-		  const std::vector<ompl::base::State*>& nominalXs,
+		     const std::vector<ompl::base::State*>& nominalXs,
 			const std::vector<ControlType>& nominalUs,
-      MotionModelPointer mm,
-			ObservationModelPointer om);//,ActuationSystemPointer _as);
+            MotionModelPointer mm,
+			ObservationModelPointer om,
+			ActuationSystemPointer as);
 
-  double  Execute(const ompl::base::State *startState, bool& isFailed, 
+  double  Execute(const ompl::base::State *startState, bool& isFailed,
                 ompl::base::State *endState, bool constructionMode=true, double sleepTime=0.0);
-  
+
   double  Stabilize(const ompl::base::State *startState, ompl::base::State *endState);
-  
+
   bool    isTerminated(const ompl::base::State *state, const size_t t);
-  
+
   ompl::base::State* Evolve(const ompl::base::State *state, size_t t, bool isConstructionMode);
-  
+
   ompl::base::State* getGoal() {return goal_; }
-  
+
   void setActuationSystem(ActuationSystemPointer as) { actuationSystem_ = as ; }
 
   bool isValid();
@@ -81,24 +83,24 @@ class Controller
 
 /*
   double ControllerCost(const CfgType& _x, const size_t& _t) {
-  
+
 			assert(!"Not supported yet!");
 	}
 */
   static void setNodeReachedAngle(double angle) {nodeReachedAngle_ = angle; }
   static void setNodeReachedDistance(double d) {nodeReachedDistance_ = d; }
   static void setMaxTries(double maxtries) {maxTries_ = maxtries; }
-  
+
   size_t Length() { return lss_.size(); }
-    
+
   private:
     MotionModelPointer motionModel_;
 		ObservationModelPointer observationModel_;
 		ActuationSystemPointer actuationSystem_;
-		vector<LinearSystem> lss_;
+		std::vector<LinearSystem> lss_;
 		SeparatedControllerType separatedController_;
 		FilterType filter_;
-		CfgType goal_;   // last nominal point
+		ompl::base::State *goal_;   // last nominal point
 		int tries_;
 		static double nodeReachedAngle_;
 		static double nodeReachedDistance_;
@@ -109,4 +111,4 @@ class Controller
 };
 
 
-#endif 
+#endif

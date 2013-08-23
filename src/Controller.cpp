@@ -35,6 +35,7 @@
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #include "../include/ActuationSystems/SimulatedActuationSystem.h"
+#include "../include/Controllers/Controller.h"
 
 template <class SeparatedControllerType, class FilterType>
 double Controller<SeparatedControllerType, FilterType>::nodeReachedAngle_ = -1;
@@ -46,28 +47,24 @@ template <class SeparatedControllerType, class FilterType>
 double Controller<SeparatedControllerType, FilterType>::maxTries_ = -1;
 
 template <class SeparatedControllerType, class FilterType>
-Controller<SeparatedControllerType, FilterType>::
-Controller(const ompl::base::State *goal,
+Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::State *goal,
       const std::vector<ompl::base::State*>& nominalXs,
       const std::vector<ControlType>& nominalUs,
       MotionModelPointer mm,
-      ObservationModelPointer om): 
-      goal_(goal),
-      actuationSystem_(as),
-      motionModel_(mm),
-      observationModel_(om)
+      ObservationModelPointer om,
+      ActuationSystemPointer as): goal_(goal),  actuationSystem_(as),  motionModel_(mm), observationModel_(om)
 {
   //assert(_nominalXs.size() == _nominalUs.size()+1);
 
   //create vector of linear systems
-  
+
   lss_.reserve(nominalXs.size());
-  
-  for(size_t i=0; i<nominalXs.size(); ++i) 
+
+  for(size_t i=0; i<nominalXs.size(); ++i)
   {
-  
+
     LinearSystem ls(nominalXs[i], nominalUs[i], motionModel_, observationModel_);
-    
+
     lss_.push_back(ls);
   }
 
@@ -76,38 +73,38 @@ Controller(const ompl::base::State *goal,
   SeparatedControllerType sepController(goal, nominalXs, nominalUs, lss_, mm);
 
   separatedController_ = sepController;
-  
+
   FilterType filter(motionModel_, observationModel_);
   filter_ = filter;
 
   //lastNominalPoint = motionModel_->Evolve(_nominalXs.back(),
   //_nominalUs.back(), motionModel_->GetZeroNoise());
   tries_ = 0;
-  
-  //nominalXs is scaled by <3> to allow a bit more steps for robot to execute edge. 
+
+  //nominalXs is scaled by <3> to allow a bit more steps for robot to execute edge.
   //Otherwise may not get good performance
-  maxExecTime_ = ceil(nominalXs.size()*3); 
-                                              
+  maxExecTime_ = ceil(nominalXs.size()*3);
+
 }
 
 template <class SeparatedControllerType, class FilterType>
 ompl::base::State*
-Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State *state, size_t t, bool isConstructionMode) 
+Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State *state, size_t t, bool isConstructionMode)
 {
-  
+
   //cout << "==========================================" << endl;
   //cout << "Timestep: " << _t << endl;
   //cout << "HState::: " << endl;
   //cout << "\t trueState: " << _h.m_trueState << endl;
   //cout << "\t belief: " << _h.m_belief << endl;
-  
+
   //std::cout << "Do not forget is_reliable for feedback controls." << std::endl;
   ControlType u = separatedController_.generateFeedbackControl(state, t);
-  
+
   //cout << "Generated control: " << endl << u << endl;
-  
-  actuationSystem_->applyControl(u); 
-  
+
+  actuationSystem_->applyControl(u);
+
   ObservationType z = actuationSystem_->getObservation();
 
   //---- WARNING---//
@@ -117,48 +114,48 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
 
   int singleobservationdim = 4;
   //cout<<" The construction mode is: "<<_isConstructionMode<<endl;
-  
+
   //Adding obstacle markers
   obstacleMarkerObserved_ = false;  // !!---Defaulting to false for development phase---!!
   /*
-  if(!isConstructionMode) 
+  if(!isConstructionMode)
   {
     for(int i=0; i<z.n_rows/singleobservationdim; i++)
     {
       int markerID = z[i*singleobservationdim];
       //cout<<"Checking if marker ID :" <<markerID <<" Is an obstacle marker"<<endl;
-      if(this->GetMPProblem()->IsObstacleMarker(markerID)) 
+      if(this->GetMPProblem()->IsObstacleMarker(markerID))
       {
         //add obstacle to environment if it doesn't already exist
         //flag that you have observed an obstacle marker
         //cout<<"Marker ID :"<<markerID<<" is an obstacle"<<endl;
         if(this->GetMPProblem()->AddObstacle(markerID))
-          m_obstacleMarkerObserved = true;        
+          m_obstacleMarkerObserved = true;
       }
     }
   }
   */
 
-  ObservationType zCorrected = observationModel_->RemoveSpuriousObservations(z);
-  
+  ObservationType zCorrected = observationModel_->removeSpuriousObservations(z);
+
   //cout << "Observation Z: " << endl << Z << endl;
   LinearSystem current;// = lss_[_t];
   LinearSystem next; //= lss_[_t+1];
-                                  
-  current = next = LinearSystem(goal_, 
+
+  current = next = LinearSystem(goal_,
                                 motionModel_->getZeroControl(),
                                 zCorrected,
                                 motionModel_,
-                                observationModel_); 
+                                observationModel_);
 
   if( (Length() > 0) && (t <= Length()-1) )
   {
-        
-    if( t == Length() - 1 ) 
+
+    if( t == Length() - 1 )
     {
       current = lss_[t];
-    } 
-    else 
+    }
+    else
     {
       current = lss_[t];
       next = lss_[t+1];
@@ -169,9 +166,9 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
   ompl::base::State *nextBelief = space->allocState();
 
   nextBelief = filter_.Evolve(state, u, zCorrected, current, next, isConstructionMode);
-  
+
   actuationSystem_->setBelief(nextBelief);
-  
+
   //cout << "nextBelief: " << nextBelief << endl;
   //cout << "-----------***----***---***---------------" << endl;
   return nextBelief;
@@ -180,7 +177,7 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
 
 
 template <class SeparatedControllerType, class FilterType>
-bool Controller<SeparatedControllerType, FilterType>::isValid() 
+bool Controller<SeparatedControllerType, FilterType>::isValid()
 {
   /*
   ValidityCheckerPointer vc = this->GetMPProblem()->GetValidityChecker(m_vcLabel);
@@ -188,27 +185,27 @@ bool Controller<SeparatedControllerType, FilterType>::isValid()
   StatClass* stats = this->GetMPProblem()->GetStatClass();
   string callee = this->GetName();
   CDInfo cdInfo;
-  
+
   for(size_t i = 0; i < lss_.size(); ++i) {
     CfgType x = lss_[i].GetX();
-    
+
     if(!x.InBoundary(env) || !vc->IsValid(x, env, *stats, cdInfo, &callee)) {
       return false;
     }
   }
   */
-  
-  return true; 
+
+  return true;
 }
 
 template <class SeparatedControllerType, class FilterType>
 double Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *state,
                                                                 bool& isFailed,
-                                                                ompl::base::State *state currentBelief,
+                                                                ompl::base::State *currentBelief,
                                                                 bool constructionMode,
-                                                                double sleepTime) 
+                                                                double sleepTime)
 {
-    
+
    currentBelief = state;
 
     int k = 0;
@@ -219,23 +216,23 @@ double Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base
     double cost = 0.01;
     //cout<<"!!-----Executing-----!!"<<endl;
 
-    if(!this->isValid()) 
+    if(!this->isValid())
     {
       isFailed = true;
       return -2;
     }
 
     //cout<<"lss_ size is :" << lss_.size() <<endl;
-    
+
     //cout<<"The robot goal is:  "<<goal_<<endl;
-    while(!this->isTerminated(currentBelief, k)) 
+    while(!this->isTerminated(currentBelief, k))
     {
-      
+
       usleep(sleepTime*1e6);
       //cout << "time: "<< k << endl;
       currentBelief = this->Evolve(currentBelief, k, constructionMode) ;
-      
-      if( actuationSystem_->checkCollision()) 
+
+      if( actuationSystem_->checkCollision())
       {
         //cout << k << " of " << m_maxExecTime << " steps used." << endl;
         isFailed = true;
@@ -244,7 +241,7 @@ double Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base
 
       if(obstacleMarkerObserved_ == true && constructionMode)
       {
-        if(!this->isValid()) 
+        if(!this->isValid())
         {
           isFailed = true;
           return -2;
@@ -258,8 +255,8 @@ double Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base
         nominalX_K = lss_[k].getX();
 
       else nominalX_K = lss_[lss_.size()-1].getX();
-      
-      arma::colvec deviation = (nominalX_K->as<StateType>()->getArmaData()).subvec(0,1) - _currentBelief->as<StateType>()->getArmaData().subvec(0,1);      
+
+      arma::colvec deviation = (nominalX_K->as<StateType>()->getArmaData()).subvec(0,1) - currentBelief->as<StateType>()->getArmaData().subvec(0,1);
 
       // This value of 4 should not be hard coded
       if(norm(deviation,2) > 4.0)
@@ -267,7 +264,7 @@ double Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base
         isFailed = true;
         return -3;
       }
-      
+
       k++;
 
       if(!constructionMode)
@@ -289,13 +286,13 @@ double Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base
 }
 
 template <class SeparatedControllerType, class FilterType>
-double Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base::State *startState, 
-                                                                  ompl::base::State *endState) 
+double Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base::State *startState,
+                                                                  ompl::base::State *endState)
 {
     /*
     int k =0;
     double cost=0;
-    
+
     ompl::base::StateSpacePtr space(new SpaceType());
     ompl::base::State  *b = space->allocState();
 
@@ -303,14 +300,14 @@ double Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::ba
     cout<<"!!-----Stabilizing-----!!"<<endl;
     //cout<<"Controller.h -> stabilize : belief covariance" <<endl<<_b.m_covariance<<endl;
     //cout<<"Controller.h -> stabilize : goal covariance" <<endl<<goal_.m_covariance<<endl;
-    
-    while(!goal_.IsReached(b)) 
+
+    while(!goal_.IsReached(b))
     {
-      //usleep(0.01*1e6); 
+      //usleep(0.01*1e6);
       //cout << "time: "<< k << endl;
       b = this->Evolve(startState, k, true) ;
       k++;
-    
+
       cost += arma::trace(b.GetCovariance());
     }
     //cout<<"The Filter estimate currently is:  "<< b.GetArmaData()(0)<<" "<< b.GetArmaData()(1)<<" "<<b.GetArmaData()(2)*180/PI<<endl;
@@ -324,32 +321,32 @@ double Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::ba
 
 template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::isTerminated(const ompl::base::State *state,
-                                                                   const size_t t ) 
+                                                                   const size_t t )
 {
 
   using namespace arma;
-  
+
   colvec diff = state->as<StateType>()->getArmaData() - goal_->as<StateType>()->getArmaData();
-  
+
   double distance_to_goal = norm(diff.subvec(0,1),2);
-  
+
   if( distance_to_goal > nodeReachedDistance_)   {
       return false;
    }
-   
-   if( distance_to_goal <= nodeReachedDistance_)   
+
+   if( distance_to_goal <= nodeReachedDistance_)
    {
-  
+
     if( abs(diff[2]) > nodeReachedAngle_*boost::math::constants::pi<double>()/180 && tries_ < maxTries_ )
     {
       //cout<<"m_tries :"<<m_tries<<endl;
       tries_++;
       return false;
     }
-   
+
    }
 
   tries_ = 0;
   return true;
-   
+
 }
