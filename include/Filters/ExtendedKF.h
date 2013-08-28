@@ -47,8 +47,6 @@ class ExtendedKF : public  KalmanFilterMethod
 	public:
 
   	typedef typename MotionModelMethod::ControlType   ControlType;
-  	//typedef typename MPTraits::CfgType CfgType;
-    //typedef typename MotionModelMethod::CfgType           CfgType;
   	typedef MotionModelMethod::SpaceType SpaceType;
     typedef MotionModelMethod::StateType StateType;
   	typedef typename ObservationModelMethod::ObservationType ObservationType;

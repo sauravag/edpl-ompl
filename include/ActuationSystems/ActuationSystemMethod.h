@@ -13,9 +13,13 @@ class ActuationSystemMethod
     typedef typename MotionModelMethod::ControlType ControlType;
     typedef typename ObservationModelMethod::ObservationType ObservationType;
     typedef boost::shared_ptr<ActuationSystemMethod> ActuationSystemPointer;
+    typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+    typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
 
 
     ActuationSystemMethod() {}
+
+    ActuationSystemMethod(MotionModelPointer mm, ObservationModelPointer om):motionModel_(mm), observationModel_(om){}
 
     virtual void applyControl(ControlType& u) = 0;
 
@@ -29,9 +33,15 @@ class ActuationSystemMethod
 
     virtual ompl::base::State* getTrueState() = 0;
 
-  //protected:
+    virtual MotionModelPointer getMotionModel() = 0;
+    virtual ObservationModelPointer getObservationModel() = 0;
+
+  protected:
 
     //Environment* environment_;
+    MotionModelPointer motionModel_;
+    ObservationModelPointer observationModel_;
+
 };
 
 

@@ -1,4 +1,4 @@
-#include "../include/Spaces/SE2BeliefSpace.h"
+#include "../../include/Spaces/SE2BeliefSpace.h"
 
 ompl::base::State* SE2BeliefSpace::allocState(void) const
 {

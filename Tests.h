@@ -330,7 +330,7 @@ void TestRHCICreate()
 
 }
 
-void TestActuationSystem()
+void TestController()
 {
 
     MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
@@ -372,6 +372,19 @@ void TestActuationSystem()
     from->as<StateType>()->setCovariance(testCov);
 
     vector<colvec> openLoopControls = mm->generateOpenLoopControls(from, to);
+    vector<ompl::base::State*> intermediates;
+
+    ompl::base::State *intermediate = space->allocState();
+    space->copyState(intermediate, from);
+    for(typename vector<colvec>::iterator c=openLoopControls.begin(), e=openLoopControls.end(); c!=e; ++c)
+    {
+        ompl::base::State *x = space->allocState();
+        x = mm->Evolve(intermediate,*c,mm->getZeroNoise());
+        intermediates.push_back(x);
+        space->copyState(intermediate, x);
+    }
+
+
 
     ompl::base::State *nextState = space->allocState();;
 
@@ -394,42 +407,21 @@ void TestActuationSystem()
 
     as->setTrueState(from);
 
-    //Controller<RHCICreate, ExtendedKF> myController(to, nmx, nmu, mm, om,as );
+    Controller<RHCICreate, ExtendedKF> *myController;
+    myController =  new Controller<RHCICreate,ExtendedKF>(to, intermediates, openLoopControls,as);
+    bool isFailed = false;
+    double cost=0;
+    int failureCode=0;
+    kfEstimate = myController->Execute(kfEstimate, isFailed, failureCode, cost);
 
-    while(norm(diff.subvec(0,1), 2) > 0.08)
-    {
-        cout<<"KF Estimate"<<endl;
-        space->as<SE2BeliefSpace>()->printBeliefState(kfEstimate);
-        cout<<"True State"<<endl;
-        space->as<SE2BeliefSpace>()->printBeliefState(nextState);
-        //cin.get();
-
-        // generate control based on belief
-        colvec rhcU = sepController->generateFeedbackControl(kfEstimate);
-
-        as->applyControl(rhcU);
-
-        // evolve true state
-        nextState = as->getTrueState();
-        //get observation based on true state
-        colvec obs = om->getObservation(nextState, true);
-        //evolve kalman filter using control and obs
-        kfEstimate = kf.Evolve(kfEstimate, rhcU, obs, dummy, dummy);
-
-        si->copyState(from, nextState);
-
-        diff = to->as<StateType>()->getArmaData() - kfEstimate->as<StateType>()->getArmaData();
-
-    }
-
-
-    assert(norm(diff.subvec(0,1),2) < 0.10);
-
-    cout<<"The final evolved State is :"<<nextState->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
+    diff = to->as<StateType>()->getArmaData() - kfEstimate->as<StateType>()->getArmaData();
+    cout<<"The failure code of execution was :"<<failureCode<<endl;
     cout<<"The final filtered State is :"<<kfEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"the final commanded state was :"<<to->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
 
-    cout<<"RHC ICreate passed tests only if the values make sense to you!"<<endl;
+    assert(norm(diff.subvec(0,1),2) < 0.10 && "Controller failed to take robot to goal");
+
+    cout<<"Controller passed tests only if the values make sense to you!"<<endl;
 
 }
 #endif

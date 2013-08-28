@@ -33,9 +33,9 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
-#include "../include/Spaces/SE2BeliefSpace.h"
-#include "../include/ObservationModels/CamAruco2DObservationModel.h"
-#include "../tinyxml/tinyxml.h"
+#include "../../include/Spaces/SE2BeliefSpace.h"
+#include "../../include/ObservationModels/CamAruco2DObservationModel.h"
+#include "../../tinyxml/tinyxml.h"
 /*
   For each landmark, produces an observation that is the range and bearing
   of the given State from that landmark. Result is the concatenation of all

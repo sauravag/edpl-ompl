@@ -34,7 +34,7 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#include "../include/Samplers/GaussianValidBeliefSampler.h"
+#include "../../include/Samplers/GaussianValidBeliefSampler.h"
 #include "ompl/base/SpaceInformation.h"
 #include "ompl/tools/config/MagicConstants.h"
 

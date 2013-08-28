@@ -154,19 +154,22 @@ int main(int, char **)
     // set static variables
   RHCICreate::setControlQueueSize(10);
   RHCICreate::setTurnOnlyDistance(0.05);
+  Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(10); // degrees
+  Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
+  Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
 
   //plan();
 
   std::cout << std::endl << std::endl;
 
-  //planWithSimpleSetup();
+  planWithSimpleSetup();
 
   //TestSE2BeliefSpace();
   //TestObservationModel();
   //TestMotionModel();
   //TestKalmanFilter();
   //TestRHCICreate();
-  TestActuationSystem();
+  //TestController();
 
   return 0;
 }

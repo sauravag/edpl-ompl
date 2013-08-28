@@ -33,7 +33,7 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
-#include "../include/ActuationSystems/SimulatedActuationSystem.h"
+#include "../../include/ActuationSystems/SimulatedActuationSystem.h"
 
 void SimulatedActuationSystem::applyControl(ControlType& u)
 {

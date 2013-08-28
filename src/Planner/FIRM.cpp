@@ -33,7 +33,7 @@
 *********************************************************************/
 /* Author: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#include "../include/Planner/FIRM.h"
+#include "../../include/Planner/FIRM.h"
 #include "ompl/geometric/planners/prm/ConnectionStrategy.h"
 #include "ompl/base/goals/GoalSampleableRegion.h"
 #include "ompl/datastructures/PDF.h"

@@ -34,20 +34,19 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#include "../include/Filters/ExtendedKF.h"
+#include "../../include/Filters/LinearizedKF.h"
 
-ExtendedKF::ExtendedKF(MotionModelPointer motionModel,
+LinearizedKF::LinearizedKF(MotionModelPointer motionModel,
 ObservationModelPointer observationModel) :
 KalmanFilterMethod(motionModel, observationModel) {
+
 
 }
 
 
-ompl::base::State*
-ExtendedKF::Predict(const ompl::base::State *belief,
+ompl::base::State* LinearizedKF::Predict(const ompl::base::State *belief,
   const ControlType& control, const LinearSystem& ls, const bool isConstruction)
 {
-
   using namespace arma;
   SpaceType *space;
   space =  new SpaceType();
@@ -56,32 +55,18 @@ ExtendedKF::Predict(const ompl::base::State *belief,
 
   mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
     ls.getG() * ls.getQ() * trans(ls.getG());
-  /*
-  if(!isConstruction)
-    {
-    std::ofstream myfile;
-    myfile.open("DataOut/PredictStepOutput.txt", std::fstream::app);
-    assert(myfile.is_open());
-    myfile <<"<--ThisStepOutput---->\n";
-    myfile <<"<-----Control-------->\n";
-    myfile <<_control<<endl;
-    myfile <<"<----Predicted Mean------>\n";
-    myfile <<predState->as<StateType>()->getArmaData()<<endl;
-    myfile <<"<----Predicted Covariance---->\n";
-    myfile <<covPred<<endl;
-    //cout<<"Writing"<<endl;
-    myfile.close();
-  }
-  */
+
   predState->as<StateType>()->setCovariance(covPred);
 
   return predState;
 
 }
 
+
 ompl::base::State*
-ExtendedKF::Update(const ompl::base::State *belief, const typename ObservationModelMethod::ObservationType& obs,
-const LinearSystem& ls, const bool isConstruction) {
+LinearizedKF::Update(const ompl::base::State *belief, const typename ObservationModelMethod::ObservationType& obs,
+const LinearSystem& ls, const bool isConstruction)
+{
 
   using namespace arma;
 
@@ -150,8 +135,9 @@ const LinearSystem& ls, const bool isConstruction) {
 
 }
 
+
 ompl::base::State*
-ExtendedKF::Evolve(const ompl::base::State *belief,
+LinearizedKF::Evolve(const ompl::base::State *belief,
     const ControlType& control,
     const ObservationType& obs,
     const LinearSystem& lsPred,
@@ -159,25 +145,56 @@ ExtendedKF::Evolve(const ompl::base::State *belief,
     const bool isConstruction)
 {
 
-  // In the EKF we do not use the linear systems passed to the filter, instead we generate the linear systems on the fly
-
   using namespace arma;
 
-  LinearSystem lsPredicted(belief, control, this->motionModel_, this->observationModel_) ;
-
-  ompl::base::State *bPred = Predict(belief, control, lsPredicted, isConstruction);
-
+  ompl::base::State *bPred = Predict(belief, control, lsPred);
 
   if(!obs.n_rows || !obs.n_cols) {
     return bPred;
   }
 
-  LinearSystem lsUpdated(bPred, control, obs, this->motionModel_, this->observationModel_) ;
+  ompl::base::State *bEst = Update(bPred, obs, lsUpdate);
 
-  ompl::base::State *bEst = Update(bPred, obs, lsUpdated, isConstruction);
-
-  //cout<<"Returning updated estimate form EKF"<<endl;
+  //cout<<"Returning updated estimate from LKF"<<endl;
 
   return bEst;
+
+}
+
+
+
+arma::mat LinearizedKF::computeStationaryCovariance (const LinearSystem& ls)
+{
+  //cout << "LinearizedKF::ComputeStationaryCovariance" << endl;
+  //cout << "Printing linear system: " << endl;
+  //cout << "A: " << ls.getA() << endl;
+  //cout << "H: " << ls.getH() << endl;
+  //cout << "Q: " << ls.getQ() << endl;
+  //cout << "G: " << ls.getG() << endl;
+  //cout << "M: " << ls.getM() << endl;
+  //cout << "R: " << ls.getR() << endl;
+  using namespace arma;
+
+  mat H = ls.getH();
+  mat M = ls.getM();
+  mat R = ls.getR();
+
+  mat Pprd = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
+    ls.getM() * ls.getR() * trans(ls.getM()) );
+
+  //cout << "Pprd: " << endl << Pprd << endl;
+  //makes this symmetric
+  Pprd = (Pprd + trans(Pprd)) / 2;
+
+  //cout << "Pprd after making symmetric: " << endl << Pprd << endl;
+
+  mat Pest = Pprd - ( Pprd * H.t()) * inv( H*Pprd*H.t() + M * R * M.t(), true) * trans(Pprd * H.t()) ;
+
+  //cout << "Pest computed: " << endl << Pest << endl;
+  //makes this symmetric
+  Pest = (Pest + trans(Pest)) / 2;
+  //cout << "Pest after making symmetric: " << endl << Pest << endl;
+
+  return Pest;
 
 }

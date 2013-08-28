@@ -51,11 +51,13 @@ class SimulatedActuationSystem : public ActuationSystemMethod
     typedef typename ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
 
     SimulatedActuationSystem(MotionModelPointer mm,  ObservationModelPointer om)
-    : motionModel_(mm), observationModel_(om)
+    : ActuationSystemMethod(mm, om)
     {
       ompl::base::StateSpacePtr space(new SpaceType());
 
       trueState_ = space->allocState();
+
+      belief_ = space->allocState();
 
       //this->m_environment = _problem->GetEnvironment();
 
@@ -97,11 +99,19 @@ class SimulatedActuationSystem : public ActuationSystemMethod
       //OGLDisplay<MPTraits>::UpdateCurrentBelief(_belief);
     }
 
+    virtual MotionModelPointer getMotionModel()
+    {
+      return motionModel_;
+    }
+
+    virtual ObservationModelPointer getObservationModel()
+    {
+      return observationModel_;
+    }
+
   protected:
     ompl::base::State *trueState_;
     ompl::base::State *belief_;
-    MotionModelPointer motionModel_;
-    ObservationModelPointer observationModel_;
 
 };
 
