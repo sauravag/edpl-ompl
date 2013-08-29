@@ -54,6 +54,37 @@ void TestSE2BeliefSpace()
     cout<<"State Space Passed Tests"<<endl;
 }
 
+bool isTheStateValid(const ob::State *state)
+{
+    return true;
+}
+
+void TestBeliefStateSampler()
+{
+    //SE2BeliefSpace *space;
+    //space =  new SE2BeliefSpace();
+    ompl::base::StateSpacePtr space(new SE2BeliefSpace());
+
+    ob::RealVectorBounds bounds(2);
+    bounds.setLow(-5);
+    bounds.setHigh(5);
+
+    //space->setBounds(bounds);
+
+    ompl::base::SpaceInformation *si(new ompl::base::SpaceInformation(space));
+    si->setStateValidityChecker(boost::bind(&isTheStateValid, _1));
+
+    GaussianValidBeliefSampler *sampler = new GaussianValidBeliefSampler(si);
+
+    ompl::base::State *sampleState = space->allocState();
+
+    sampler->setStdDev(0.2);
+
+    sampler->sample(sampleState);
+
+    space->as<SE2BeliefSpace>()->printBeliefState(sampleState);
+
+}
 void TestObservationModel()
 {
     CamAruco2DObservationModel om( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" );

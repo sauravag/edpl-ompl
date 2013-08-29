@@ -52,7 +52,10 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
     {
     }
 
+    // Samples a new node
     virtual bool sample(ompl::base::State *state);
+
+    // samples a new node near some state at some distance
     virtual bool sampleNear(ompl::base::State *state, const ompl::base::State *near, const double distance);
 
     /** \brief Get the standard deviation used when sampling */
@@ -68,7 +71,9 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
     }
 
   protected:
-
+    /** brief Checks if the sample is observable 
+        i.e. If it can observe sufficient landmarks
+    */
     bool isObservable(ompl::base::State *state);
 
     /** \brief The sampler to build upon */

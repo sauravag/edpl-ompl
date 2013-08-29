@@ -162,9 +162,10 @@ int main(int, char **)
 
   std::cout << std::endl << std::endl;
 
-  planWithSimpleSetup();
+  //planWithSimpleSetup();
 
   //TestSE2BeliefSpace();
+  TestBeliefStateSampler();
   //TestObservationModel();
   //TestMotionModel();
   //TestKalmanFilter();
