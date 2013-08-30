@@ -15,47 +15,49 @@ using namespace std;
 
 bool isStateValid(const ob::State *state)
 {
-    // cast the abstract state type to the type we expect
-    const ob::SE3StateSpace::StateType *se3state = state->as<ob::SE3StateSpace::StateType>();
+    //No collision check involved right now
 
-    // extract the first component of the state and cast it to what we expect
-    const ob::RealVectorStateSpace::StateType *pos = se3state->as<ob::RealVectorStateSpace::StateType>(0);
+    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
 
-    // extract the second component of the state and cast it to what we expect
-    const ob::SO3StateSpace::StateType *rot = se3state->as<ob::SO3StateSpace::StateType>(1);
-
-    // check validity of state defined by pos & rot
-
-
-    // return a value that is always true but uses the two variables we define, so we avoid compiler warnings
-    return (void*)rot != (void*)pos;
+    return om->isStateObservable(state);
 }
 
 void plan(void)
 {
+    typedef SE2BeliefSpace::StateType StateType;
+
     // construct the state space we are planning in
-    ob::StateSpacePtr space(new ob::SE3StateSpace());
+    ob::StateSpacePtr space(new SE2BeliefSpace());
 
     // set the bounds for the R^3 part of SE(3)
-    ob::RealVectorBounds bounds(3);
-    bounds.setLow(-5);
-    bounds.setHigh(5);
+    ob::RealVectorBounds bounds(2);
+    bounds.setLow(-25);
+    bounds.setHigh(25);
 
-    space->as<ob::SE3StateSpace>()->setBounds(bounds);
+    space->as<SE2BeliefSpace>()->setBounds(bounds);
 
     // construct an instance of  space information from this state space
     ob::SpaceInformationPtr si(new ob::SpaceInformation(space));
 
+    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+
     // set state validity checking for this space
-    si->setStateValidityChecker(boost::bind(&isStateValid, _1));
+    si->setStateValidityChecker(ompl::base::StateValidityCheckerPtr(new FIRMValidityChecker(si, om)));
 
     // create a random start state
-    ob::ScopedState<> start(space);
-    start.random();
+    ob::State *start = space->allocState();
 
+    start->as<StateType>()->setXYYaw(1.3,3,0);
+
+    cout<<"The start state is :"<<endl;
+    space->as<SE2BeliefSpace>()->printBeliefState(start);
+    cin.get();
     // create a random goal state
-    ob::ScopedState<> goal(space);
-    goal.random();
+    ob::State *goal = space->allocState();
+    goal->as<StateType>()->setXYYaw(5,1.3,0);
+    cout<<"The goal state is:"<<endl;
+    space->as<SE2BeliefSpace>()->printBeliefState(goal);
+    cin.get();
 
     // create a problem instance
     ob::ProblemDefinitionPtr pdef(new ob::ProblemDefinition(si));
@@ -99,54 +101,6 @@ void plan(void)
         std::cout << "No solution found" << std::endl;
 }
 
-void planWithSimpleSetup(void)
-{
-    // construct the state space we are planning in
-    ob::StateSpacePtr space(new ob::SE3StateSpace());
-
-    // set the bounds for the R^3 part of SE(3)
-    ob::RealVectorBounds bounds(3);
-    bounds.setLow(-1);
-    bounds.setHigh(1);
-
-    space->as<ob::SE3StateSpace>()->setBounds(bounds);
-
-    // define a simple setup class
-    og::SimpleSetup ss(space);
-
-    // set state validity checking for this space
-    ss.setStateValidityChecker(boost::bind(&isStateValid, _1));
-
-    // create a random start state
-    ob::ScopedState<> start(space);
-    start.random();
-
-    // create a random goal state
-    ob::ScopedState<> goal(space);
-    goal.random();
-
-    // set the start and goal states
-    ss.setStartAndGoalStates(start, goal);
-
-    // this call is optional, but we put it in to get more output information
-    ss.setup();
-    ss.print();
-
-    // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = ss.solve(1.0);
-
-    if (solved)
-    {
-        std::cout << "Found solution:" << std::endl;
-        // print the path to screen
-        ss.simplifySolution();
-        ss.getSolutionPath().print(std::cout);
-    }
-    else
-        std::cout << "No solution found" << std::endl;
-}
-
-
 int main(int, char **)
 {
   std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
@@ -158,14 +112,12 @@ int main(int, char **)
   Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
   Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
 
-  //plan();
+  plan();
 
   std::cout << std::endl << std::endl;
 
-  //planWithSimpleSetup();
-
   //TestSE2BeliefSpace();
-  TestBeliefStateSampler();
+  //TestBeliefStateSampler();
   //TestObservationModel();
   //TestMotionModel();
   //TestKalmanFilter();

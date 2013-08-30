@@ -55,8 +55,9 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
   static const int stateDim = 3;
   //static const int singleObservationDim = 3;
-  static const int singleObservationDim = 4; /*[ ID, X, Y, Orientation of Landmark in Environment ]*/
+  static const int singleObservationDim = 4; /*[ ID, Range, Bearing, Orientation of Landmark in Environment ]*/
   static const int landmarkInfoDim = 2; /*[ X, Y]*/
+  static const int numLandmarksForObservability = 2;
   //static const int obsNoiseDim = 3;
 
   public:
@@ -104,6 +105,8 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     bool isLandmarkVisible(const arma::colvec xVec, const arma::colvec& landmark, double& range, double& bearing, double& viewingAngle);
 
     //void WriteLandmarks();
+
+    bool isStateObservable(const ompl::base::State *state);
 
   private:
 

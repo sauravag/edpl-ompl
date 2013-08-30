@@ -292,7 +292,7 @@
 1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/GreedyKCenters.h
 	"ompl/util/RandomNumbers.h"
 
-1377734382 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
+1377822652 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
 	<ompl/base/spaces/SE3StateSpace.h>
 	<ompl/geometric/SimpleSetup.h>
 	<ompl/config.h>
@@ -383,12 +383,11 @@
 1377121855 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SE2BeliefSpace.cpp
 	"../include/Spaces/SE2BeliefSpace.h"
 
-1377201632 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
+1377821254 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
 	<iostream>
 	<fstream>
 	<ompl/base/SpaceInformation.h>
 	"include/Spaces/SE2BeliefSpace.h"
-	"include/Samplers/GaussianValidBeliefSampler.h"
 	"include/ObservationModels/ObservationModelMethod.h"
 	"include/ObservationModels/CamAruco2DObservationModel.h"
 	"include/MotionModels/MotionModelMethod.h"
@@ -402,14 +401,18 @@
 	"include/ActuationSystems/ActuationSystemMethod.h"
 	"include/ActuationSystems/SimulatedActuationSystem.h"
 	"include/Controllers/Controller.h"
+	"include/Samplers/GaussianValidBeliefSampler.h"
+	"include/ValidityCheckers/FIRMValidityChecker.h"
 
-1377735448 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
+1377818622 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
 	"FIRMOMPL.h"
 	"tinyxml.h"
 
-1377733595 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/GaussianValidBeliefSampler.h
+1377816454 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/GaussianValidBeliefSampler.h
 	"ompl/base/ValidStateSampler.h"
 	"ompl/base/StateSampler.h"
+	"../ActuationSystems/ActuationSystemMethod.h"
+	"../ObservationModels/ObservationModelMethod.h"
 
 1374862301 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/GaussianValidBeliefSampler.cpp
 	"../include/Samplers/GaussianValidBeliefSampler.h"
@@ -418,10 +421,10 @@
 
 1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/tools/config/MagicConstants.h
 
-1377192274 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ObservationModels/ObservationModelMethod.h
+1377814423 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ObservationModels/ObservationModelMethod.h
 	"armadillo"
 
-1377032245 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ObservationModels/CamAruco2DObservationModel.h
+1377815116 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ObservationModels/CamAruco2DObservationModel.h
 	"ObservationModelMethod.h"
 	<boost/math/constants/constants.hpp>
 
@@ -514,7 +517,7 @@
 	"../MotionModels/MotionModelMethod.h"
 	"../ObservationModels/ObservationModelMethod.h"
 
-1377290201 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ActuationSystems/SimulatedActuationSystem.h
+1377813961 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ActuationSystems/SimulatedActuationSystem.h
 	<ompl/base/SpaceInformation.h>
 	"ActuationSystemMethod.h"
 	"armadillo"
@@ -532,7 +535,7 @@
 1377284024 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SimulatedActuationSystem.cpp
 	"../include/ActuationSystems/SimulatedActuationSystem.h"
 
-1377548165 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/ActuationSystems/SimulatedActuationSystem.cpp
+1377813998 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/ActuationSystems/SimulatedActuationSystem.cpp
 	"../../include/ActuationSystems/SimulatedActuationSystem.h"
 
 1377548170 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Filters/ExtendedKF.cpp
@@ -549,7 +552,7 @@
 	"../../include/MotionModels/UnicycleMotionModel.h"
 	"../../tinyxml/tinyxml.h"
 
-1377548528 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/ObservationModels/CamAruco2DObservationModel.cpp
+1377818076 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/ObservationModels/CamAruco2DObservationModel.cpp
 	"../../include/Spaces/SE2BeliefSpace.h"
 	"../../include/ObservationModels/CamAruco2DObservationModel.h"
 	"../../tinyxml/tinyxml.h"
@@ -567,7 +570,7 @@
 	<boost/foreach.hpp>
 	<boost/thread.hpp>
 
-1377548547 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Samplers/GaussianValidBeliefSampler.cpp
+1377816492 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Samplers/GaussianValidBeliefSampler.cpp
 	"../../include/Samplers/GaussianValidBeliefSampler.h"
 	"ompl/base/SpaceInformation.h"
 	"ompl/tools/config/MagicConstants.h"
@@ -577,4 +580,7 @@
 
 1377548565 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Spaces/SE2BeliefSpace.cpp
 	"../../include/Spaces/SE2BeliefSpace.h"
+
+1377821801 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ValidityCheckers/FIRMValidityChecker.h
+	"../ObservationModels/ObservationModelMethod.h"
 

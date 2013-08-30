@@ -33,42 +33,48 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
-#include "../../include/ActuationSystems/SimulatedActuationSystem.h"
 
-void SimulatedActuationSystem::applyControl(ControlType& u)
+#ifndef LINEARIZED_KF_
+#define LINEARIZED_KF_
+
+#include "KalmanFilterMethod.h"
+
+class LinearizedKF : public KalmanFilterMethod
 {
+  public:
 
-  typename MotionModelMethod::NoiseType noise = motionModel_->generateNoise(trueState_, u);
+    typedef typename MotionModelMethod::ControlType   ControlType;
+    typedef MotionModelMethod::SpaceType SpaceType;
+    typedef MotionModelMethod::StateType StateType;
+    typedef typename ObservationModelMethod::ObservationType ObservationType;
+    typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
+    typedef typename ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
 
-  trueState_ = motionModel_->Evolve(trueState_, u, noise);
+    LinearizedKF() { }
 
-  //OGLDisplay<MPTraits>::UpdateTrueState(m_trueState);
-  //cout<<" The True State is :"<<endl<<m_trueState.GetArmaData()<<endl;
+    LinearizedKF(MotionModelPointer motionModel, ObservationModelPointer observationModel);
 
-}
+    //gets a belief and control, returns predicted belief if control
+    //were to be applied
+    ompl::base::State* Predict(const ompl::base::State *belief,
+    const ControlType& control,
+    const LinearSystem& ls, const bool isConstruction=false);
 
-typename SimulatedActuationSystem::ObservationType
-SimulatedActuationSystem::getObservation()
-{
-  return observationModel_->getObservation(trueState_, true);
-}
+    //gets a belief and observation, returns
+    ompl::base::State* Update(const ompl::base::State *belief,
+    const ObservationType& obs,
+    const LinearSystem& ls, const bool isConstruction=false);
 
-bool SimulatedActuationSystem::checkCollision()
-{
-  /*
-  typedef typename MPProblemType::ValidityCheckerPointer ValidityCheckerPointer;
-  // following variables are used in collision checking procedure
-  ValidityCheckerPointer vc = this->GetMPProblem()->GetValidityChecker(m_vcLabel);
-  string callee = this->GetName();
-  CDInfo cdInfo;
-  StatClass* stats = this->GetMPProblem()->GetStatClass();
+    ompl::base::State* Evolve(const ompl::base::State *belief,
+    const ControlType& control,
+    const ObservationType& obs,
+    const LinearSystem& lsPred,
+    const LinearSystem& lsUpdate,
+    const bool isConstruction=false);
 
-   if(!m_trueState.InBoundary(this->m_environment) ||
-        !vc->IsValid(m_trueState, this->m_environment,  *(this->GetMPProblem()->GetStatClass()), cdInfo, &callee)) {
+    arma::mat computeStationaryCovariance (const LinearSystem& ls);
 
-      return true;
-    }
-  */
-    return false;
+};
 
-}
+#endif
+

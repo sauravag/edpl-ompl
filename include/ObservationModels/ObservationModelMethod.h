@@ -94,6 +94,9 @@ class ObservationModelMethod
     virtual
       arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z) = 0;
 
+    virtual
+      bool isStateObservable(const ompl::base::State *state) = 0;
+
     virtual const
       NoiseType getZeroNoise() {return zeroNoise_; }
 

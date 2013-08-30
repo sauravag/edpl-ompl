@@ -57,9 +57,9 @@ bool GaussianValidBeliefSampler::sample(ompl::base::State *state)
     do
     {
         sampler_->sampleUniform(state);
-        bool v1 = si_->isValid(state) && isObservable(state);
+        bool v1 = si_->isValid(state) ;
         sampler_->sampleGaussian(temp, state, stddev_);
-        bool v2 = si_->isValid(temp) && isObservable(state);
+        bool v2 = si_->isValid(temp) ;
         if (v1 != v2)
         {
             if (v2)
@@ -80,9 +80,9 @@ bool GaussianValidBeliefSampler::sampleNear(ompl::base::State *state, const ompl
     do
     {
         sampler_->sampleUniformNear(state, near, distance);
-        bool v1 = si_->isValid(state) && isObservable(state);
+        bool v1 = si_->isValid(state) ;
         sampler_->sampleGaussian(temp, state, distance);
-        bool v2 = si_->isValid(temp) && isObservable(state);
+        bool v2 = si_->isValid(temp) ;
         if (v1 != v2)
         {
             if (v2)
@@ -95,7 +95,12 @@ bool GaussianValidBeliefSampler::sampleNear(ompl::base::State *state, const ompl
     return result;
 }
 
+/*
 bool GaussianValidBeliefSampler::isObservable(ompl::base::State *state)
 {
-    return true;
+    ObservationModelPointer om = actuationSystem_->getObservationModel();
+
+    return om->isStateObservable(state);
+
 }
+*/

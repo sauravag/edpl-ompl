@@ -33,42 +33,22 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
-#include "../../include/ActuationSystems/SimulatedActuationSystem.h"
+#include "../ObservationModels/ObservationModelMethod.h"
 
-void SimulatedActuationSystem::applyControl(ControlType& u)
+class FIRMValidityChecker : public ompl::base::StateValidityChecker
 {
+  public:
+    typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
 
-  typename MotionModelMethod::NoiseType noise = motionModel_->generateNoise(trueState_, u);
-
-  trueState_ = motionModel_->Evolve(trueState_, u, noise);
-
-  //OGLDisplay<MPTraits>::UpdateTrueState(m_trueState);
-  //cout<<" The True State is :"<<endl<<m_trueState.GetArmaData()<<endl;
-
-}
-
-typename SimulatedActuationSystem::ObservationType
-SimulatedActuationSystem::getObservation()
-{
-  return observationModel_->getObservation(trueState_, true);
-}
-
-bool SimulatedActuationSystem::checkCollision()
-{
-  /*
-  typedef typename MPProblemType::ValidityCheckerPointer ValidityCheckerPointer;
-  // following variables are used in collision checking procedure
-  ValidityCheckerPointer vc = this->GetMPProblem()->GetValidityChecker(m_vcLabel);
-  string callee = this->GetName();
-  CDInfo cdInfo;
-  StatClass* stats = this->GetMPProblem()->GetStatClass();
-
-   if(!m_trueState.InBoundary(this->m_environment) ||
-        !vc->IsValid(m_trueState, this->m_environment,  *(this->GetMPProblem()->GetStatClass()), cdInfo, &callee)) {
-
-      return true;
+    FIRMValidityChecker(const ompl::base::SpaceInformationPtr &si, ObservationModelPointer om) :
+    ompl::base::StateValidityChecker(si), observationModel_(om)
+    {
     }
-  */
-    return false;
 
-}
+    virtual bool isValid(const ompl::base::State *state) const
+    {
+      return observationModel_->isStateObservable(state);
+    }
+  private:
+    ObservationModelPointer observationModel_;
+};

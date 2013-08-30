@@ -56,7 +56,9 @@ void TestSE2BeliefSpace()
 
 bool isTheStateValid(const ob::State *state)
 {
-    return true;
+    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+
+    return om->isStateObservable(state);
 }
 
 void TestBeliefStateSampler()
@@ -70,6 +72,10 @@ void TestBeliefStateSampler()
     bounds.setHigh(5);
 
     //space->setBounds(bounds);
+    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
+
+    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+    ActuationSystemMethod::ActuationSystemPointer as(new SimulatedActuationSystem(mm, om));
 
     ompl::base::SpaceInformation *si(new ompl::base::SpaceInformation(space));
     si->setStateValidityChecker(boost::bind(&isTheStateValid, _1));
@@ -79,6 +85,7 @@ void TestBeliefStateSampler()
     ompl::base::State *sampleState = space->allocState();
 
     sampler->setStdDev(0.2);
+    //sampler->setActuationSystem(as);
 
     sampler->sample(sampleState);
 

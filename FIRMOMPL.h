@@ -44,9 +44,6 @@
 //Spaces
 #include "include/Spaces/SE2BeliefSpace.h"
 
-// Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
-
 //Observation Models
 #include "include/ObservationModels/ObservationModelMethod.h"
 #include "include/ObservationModels/CamAruco2DObservationModel.h"
@@ -73,5 +70,11 @@
 
 //Controllers
 #include "include/Controllers/Controller.h"
+
+// Samplers
+#include "include/Samplers/GaussianValidBeliefSampler.h"
+
+// Validity checkers
+#include "include/ValidityCheckers/FIRMValidityChecker.h"
 
 #endif

@@ -439,15 +439,15 @@ void CamAruco2DObservationModel::loadLandmarks(const char *pathToSetupFile)
 
     ObservationType landmark(singleObservationDim);
     landmark.zeros();
-    double *attributeVal;
-    itemElement->QueryDoubleAttribute("id", attributeVal) ;
-    landmark[0] = *attributeVal;
-    itemElement->QueryDoubleAttribute("x", attributeVal) ;
-    landmark[1] = *attributeVal;
-    itemElement->QueryDoubleAttribute("y", attributeVal) ;
-    landmark[2] = *attributeVal;
-    itemElement->QueryDoubleAttribute("theta", attributeVal) ;
-    landmark[3] = *attributeVal;
+    double attributeVal;
+    itemElement->QueryDoubleAttribute("id", &attributeVal) ;
+    landmark[0] = attributeVal;
+    itemElement->QueryDoubleAttribute("x", &attributeVal) ;
+    landmark[1] = attributeVal;
+    itemElement->QueryDoubleAttribute("y", &attributeVal) ;
+    landmark[2] = attributeVal;
+    itemElement->QueryDoubleAttribute("theta", &attributeVal) ;
+    landmark[3] = attributeVal;
 
     std::cout<<"New landmark loaded [id,x,y,theta]:  "<<std::endl<<landmark<<std::endl;
     this->landmarks_.push_back(landmark);
@@ -510,5 +510,20 @@ void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
   std::cout<<"sigma_  : "<<sigma_<<std::endl;
   std::cout<<"etaD_   :"<<etaD_<<std::endl;
   std::cout<<"etaPhi_ :"<<etaPhi_<<std::endl;
+
+}
+
+bool CamAruco2DObservationModel::isStateObservable(const ompl::base::State *state)
+{
+  using namespace arma;
+
+  colvec obs = this->getObservation(state, false);
+
+  //std::cout<<"The observation at this state is :"<<obs<<std::endl;
+
+  if(obs.n_rows >= numLandmarksForObservability*singleObservationDim)
+      return true;
+
+  return false;
 
 }
