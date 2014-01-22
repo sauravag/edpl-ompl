@@ -462,4 +462,15 @@ void TestController()
     cout<<"Controller passed tests only if the values make sense to you!"<<endl;
 
 }
+
+void TestFIRMWeight()
+{
+    FIRMWeight weight(2);
+
+    cout<<"The weight properties are: "<<endl;
+    cout<<weight.getCost()<<endl;
+    cout<<weight.getControllerID()<<endl;
+    cout<<weight.getSuccessProbability()<<endl;
+
+}
 #endif

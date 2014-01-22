@@ -6,7 +6,7 @@ class FIRMWeight {
   public:
 
     // Constructors and Destructor
-    FIRMWeight(double cost=1, double successProbability = 0, size_t controllerID = -1):
+    FIRMWeight(double cost=0, double successProbability = 0, int controllerID = -1):
     cost_(cost), controllerID_(controllerID), successProbability_(successProbability) {}
 
     ~FIRMWeight(){}
@@ -22,7 +22,7 @@ class FIRMWeight {
     const FIRMWeight& operator=(const FIRMWeight& w)
     {
       cost_ = w.cost_;
-      //Note: should successprob and controllerid also be assigned? FIRMApplication doesn't
+      //Note: should successprob and controllerid also be assigned? original pmpl FIRMApplication doesn't
       //successProbability_ = w.successProbability_;
       //controllerID_ = w.controllerID_;
       return *this;
@@ -47,8 +47,8 @@ class FIRMWeight {
     double getCost(){return cost_;}
     void setCost(double c){ cost_ = c;}
 
-    size_t getControllerID() { return controllerID_ ;}
-    void   setControllerID(size_t id) { controllerID_ = id ;}
+    int getControllerID() { return controllerID_ ;}
+    void   setControllerID(int id) { controllerID_ = id ;}
 
     double getSuccessProbability(){return successProbability_ ;}
     void setSuccessProbability(double p){ successProbability_ = p ;}

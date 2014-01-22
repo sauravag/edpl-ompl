@@ -30,7 +30,7 @@
 	"ompl/geometric/PathGeometric.h"
 	"ompl/util/RandomNumbers.h"
 
-1356406268 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/Planner.h
+1387492044 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/Planner.h
 	"ompl/base/SpaceInformation.h"
 	"ompl/base/ProblemDefinition.h"
 	"ompl/base/PlannerData.h"
@@ -48,7 +48,7 @@
 	<string>
 	<map>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/SpaceInformation.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/SpaceInformation.h
 	"ompl/base/State.h"
 	"ompl/base/StateValidityChecker.h"
 	"ompl/base/MotionValidator.h"
@@ -68,21 +68,21 @@
 1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/State.h
 	<boost/concept_check.hpp>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/StateValidityChecker.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/StateValidityChecker.h
 	"ompl/base/State.h"
 	"ompl/util/ClassForward.h"
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/util/ClassForward.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/util/ClassForward.h
 	<boost/shared_ptr.hpp>
 
-1356406268 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/MotionValidator.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/MotionValidator.h
 	"ompl/base/State.h"
 	"ompl/util/ClassForward.h"
 	<utility>
 
 1361498040 /usr/include/boost/utility
 
-1374600936 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/StateSpace.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/StateSpace.h
 	"ompl/base/State.h"
 	"ompl/base/StateSpaceTypes.h"
 	"ompl/base/StateSampler.h"
@@ -99,7 +99,7 @@
 
 1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/StateSpaceTypes.h
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/StateSampler.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/StateSampler.h
 	"ompl/base/State.h"
 	"ompl/util/RandomNumbers.h"
 	"ompl/util/ClassForward.h"
@@ -108,28 +108,29 @@
 	<boost/function.hpp>
 	<boost/noncopyable.hpp>
 
-1358201209 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/util/RandomNumbers.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/util/RandomNumbers.h
 	<boost/random/mersenne_twister.hpp>
 	<boost/random/uniform_real.hpp>
 	<boost/random/normal_distribution.hpp>
 	<boost/random/variate_generator.hpp>
 	<cassert>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/ProjectionEvaluator.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/ProjectionEvaluator.h
 	"ompl/base/State.h"
 	"ompl/util/ClassForward.h"
 	"ompl/util/Console.h"
 	"ompl/base/GenericParam.h"
+	"ompl/base/spaces/RealVectorBounds.h"
 	<vector>
 	<valarray>
 	<iostream>
 	<boost/noncopyable.hpp>
 	<boost/numeric/ublas/matrix.hpp>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/util/Console.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/util/Console.h
 	<string>
 
-1356406268 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/GenericParam.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/GenericParam.h
 	"ompl/util/Console.h"
 	"ompl/util/ClassForward.h"
 	<boost/function.hpp>
@@ -139,7 +140,7 @@
 	<vector>
 	<map>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/ValidStateSampler.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/ValidStateSampler.h
 	"ompl/base/State.h"
 	"ompl/util/ClassForward.h"
 	"ompl/base/GenericParam.h"
@@ -151,13 +152,12 @@
 	<stdexcept>
 	<string>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/ProblemDefinition.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/ProblemDefinition.h
 	"ompl/base/State.h"
 	"ompl/base/Goal.h"
 	"ompl/base/Path.h"
 	"ompl/base/SpaceInformation.h"
 	"ompl/base/SolutionNonExistenceProof.h"
-	"ompl/base/OptimizationObjective.h"
 	"ompl/util/Console.h"
 	"ompl/util/ClassForward.h"
 	"ompl/base/ScopedState.h"
@@ -167,7 +167,7 @@
 	<limits>
 	<boost/noncopyable.hpp>
 
-1356406268 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/Goal.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/Goal.h
 	"ompl/base/State.h"
 	"ompl/base/SpaceInformation.h"
 	"ompl/util/ClassForward.h"
@@ -180,29 +180,29 @@
 
 1356406268 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/GoalTypes.h
 
-1356406268 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/Path.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/Path.h
 	"ompl/util/ClassForward.h"
+	"ompl/base/Cost.h"
 	<iostream>
 	<boost/noncopyable.hpp>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/SolutionNonExistenceProof.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/SolutionNonExistenceProof.h
 	"ompl/base/SpaceInformation.h"
 	"ompl/util/ClassForward.h"
 
-1356406268 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/OptimizationObjective.h
-	"ompl/base/State.h"
-	"ompl/base/Path.h"
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/OptimizationObjective.h
+	"ompl/base/Cost.h"
 	"ompl/base/SpaceInformation.h"
 	"ompl/util/ClassForward.h"
 	<boost/noncopyable.hpp>
-	<limits>
+	<boost/concept_check.hpp>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/ScopedState.h
+1378917547 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/ScopedState.h
 	"ompl/base/SpaceInformation.h"
 	<boost/concept_check.hpp>
 	<iostream>
 
-1356406268 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/PlannerData.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/PlannerData.h
 	<iostream>
 	<vector>
 	<map>
@@ -214,26 +214,26 @@
 	<boost/function.hpp>
 	<boost/serialization/access.hpp>
 
-1356406268 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/PlannerStatus.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/PlannerStatus.h
 	<string>
 	<ostream>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/PlannerTerminationCondition.h
+1387492127 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/PlannerTerminationCondition.h
 	<boost/function.hpp>
-	<boost/thread.hpp>
+	<boost/shared_ptr.hpp>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/util/Time.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/util/Time.h
 	<boost/date_time/posix_time/posix_time.hpp>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/util/Deprecation.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/util/Deprecation.h
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/PathGeometric.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/PathGeometric.h
 	"ompl/base/SpaceInformation.h"
 	"ompl/base/Path.h"
 	<vector>
 	<utility>
 
-1358361325 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/NearestNeighbors.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/NearestNeighbors.h
 	<vector>
 	<boost/bind.hpp>
 	<boost/function.hpp>
@@ -241,25 +241,25 @@
 
 1373573884 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMWeight.h
 
-1357331447 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/planners/prm/ConnectionStrategy.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/planners/prm/ConnectionStrategy.h
 	"ompl/datastructures/NearestNeighbors.h"
 	<boost/function.hpp>
 	<boost/shared_ptr.hpp>
 	<boost/math/constants/constants.hpp>
 	<vector>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/goals/GoalSampleableRegion.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/goals/GoalSampleableRegion.h
 	"ompl/base/goals/GoalRegion.h"
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/goals/GoalRegion.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/goals/GoalRegion.h
 	"ompl/base/Goal.h"
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/PDF.h
+1378917547 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/PDF.h
 	"ompl/util/Exception.h"
 	<iostream>
 	<vector>
 
-1358878495 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/tools/config/SelfConfig.h
+1378917547 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/tools/config/SelfConfig.h
 	"ompl/config.h"
 	"ompl/base/SpaceInformation.h"
 	"ompl/datastructures/NearestNeighborsSqrtApprox.h"
@@ -267,32 +267,33 @@
 	<iostream>
 	<string>
 
-1371768369 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/config.h
+1390336193 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/config.h
 
-1357332213 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/NearestNeighborsSqrtApprox.h
+1373417699 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/NearestNeighborsSqrtApprox.h
 	"ompl/datastructures/NearestNeighborsLinear.h"
 	<algorithm>
 	<cmath>
 
-1357332209 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/NearestNeighborsLinear.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/NearestNeighborsLinear.h
 	"ompl/datastructures/NearestNeighbors.h"
 	"ompl/util/Exception.h"
 	<algorithm>
 
 1361498037 /usr/include/boost/algorithm
 
-1357332179 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/NearestNeighborsGNAT.h
+1387562429 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/NearestNeighborsGNAT.h
 	"ompl/datastructures/NearestNeighbors.h"
 	"ompl/datastructures/GreedyKCenters.h"
+	"ompl/datastructures/PDF.h"
 	"ompl/util/Exception.h"
 	<boost/unordered_set.hpp>
 	<queue>
 	<algorithm>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/GreedyKCenters.h
+1366321850 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/GreedyKCenters.h
 	"ompl/util/RandomNumbers.h"
 
-1377822652 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
+1377895141 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
 	<ompl/base/spaces/SE3StateSpace.h>
 	<ompl/geometric/SimpleSetup.h>
 	<ompl/config.h>
@@ -302,25 +303,25 @@
 	"FIRMOMPL.h"
 	"Tests.h"
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/SE3StateSpace.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/SE3StateSpace.h
 	"ompl/base/StateSpace.h"
 	"ompl/base/spaces/RealVectorStateSpace.h"
 	"ompl/base/spaces/SO3StateSpace.h"
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/RealVectorStateSpace.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/RealVectorStateSpace.h
 	"ompl/base/StateSpace.h"
 	"ompl/base/spaces/RealVectorBounds.h"
 	<vector>
 	<string>
 	<map>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/RealVectorBounds.h
+1378917547 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/RealVectorBounds.h
 	<vector>
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/SO3StateSpace.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/SO3StateSpace.h
 	"ompl/base/StateSpace.h"
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/SimpleSetup.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/SimpleSetup.h
 	"ompl/base/Planner.h"
 	"ompl/base/PlannerData.h"
 	"ompl/base/SpaceInformation.h"
@@ -330,7 +331,7 @@
 	"ompl/util/Console.h"
 	"ompl/util/Exception.h"
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/PathSimplifier.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/PathSimplifier.h
 	"ompl/base/SpaceInformation.h"
 	"ompl/geometric/PathGeometric.h"
 	"ompl/base/PlannerTerminationCondition.h"
@@ -352,38 +353,39 @@
 	<boost/foreach.hpp>
 	<boost/thread.hpp>
 
-1374797869 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Planner/FIRM.h
+1390341051 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Planner/FIRM.h
 	"ompl/geometric/planners/PlannerIncludes.h"
 	"ompl/datastructures/NearestNeighbors.h"
 	<boost/graph/graph_traits.hpp>
 	<boost/graph/adjacency_list.hpp>
 	<boost/pending/disjoint_sets.hpp>
 	<boost/function.hpp>
+	<boost/thread.hpp>
 	<utility>
 	<vector>
 	<map>
 	"../Weight/FIRMWeight.h"
 
-1374797899 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Weight/FIRMWeight.h
+1377895100 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Weight/FIRMWeight.h
 
-1377121844 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Spaces/SE2BeliefSpace.h
+1377882590 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Spaces/SE2BeliefSpace.h
 	"ompl/base/spaces/SE2StateSpace.h"
 	"ompl/base/spaces/SE3StateSpace.h"
 	<boost/math/constants/constants.hpp>
 	<armadillo>
 
-1373580356 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/SE2StateSpace.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/SE2StateSpace.h
 	"ompl/base/StateSpace.h"
 	"ompl/base/spaces/RealVectorStateSpace.h"
 	"ompl/base/spaces/SO2StateSpace.h"
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/SO2StateSpace.h
+1373417698 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/spaces/SO2StateSpace.h
 	"ompl/base/StateSpace.h"
 
 1377121855 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SE2BeliefSpace.cpp
 	"../include/Spaces/SE2BeliefSpace.h"
 
-1377821254 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
+1377883455 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
 	<iostream>
 	<fstream>
 	<ompl/base/SpaceInformation.h>
@@ -404,7 +406,7 @@
 	"include/Samplers/GaussianValidBeliefSampler.h"
 	"include/ValidityCheckers/FIRMValidityChecker.h"
 
-1377818622 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
+1377895018 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
 	"FIRMOMPL.h"
 	"tinyxml.h"
 
@@ -419,7 +421,7 @@
 	"ompl/base/SpaceInformation.h"
 	"ompl/tools/config/MagicConstants.h"
 
-1356406269 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/tools/config/MagicConstants.h
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/tools/config/MagicConstants.h
 
 1377814423 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ObservationModels/ObservationModelMethod.h
 	"armadillo"
@@ -557,18 +559,22 @@
 	"../../include/ObservationModels/CamAruco2DObservationModel.h"
 	"../../tinyxml/tinyxml.h"
 
-1377548538 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/FIRM.cpp
+1390342170 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/FIRM.cpp
 	"../../include/Planner/FIRM.h"
+	"ompl/geometric/planners/prm/PRM.h"
 	"ompl/geometric/planners/prm/ConnectionStrategy.h"
 	"ompl/base/goals/GoalSampleableRegion.h"
+	"ompl/base/objectives/PathLengthOptimizationObjective.h"
 	"ompl/datastructures/PDF.h"
 	"ompl/tools/config/SelfConfig.h"
+	"ompl/tools/config/MagicConstants.h"
 	<boost/lambda/bind.hpp>
 	<boost/graph/astar_search.hpp>
 	<boost/graph/incremental_components.hpp>
 	<boost/property_map/vector_property_map.hpp>
 	<boost/foreach.hpp>
 	<boost/thread.hpp>
+	"GoalVisitor.hpp"
 
 1377816492 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Samplers/GaussianValidBeliefSampler.cpp
 	"../../include/Samplers/GaussianValidBeliefSampler.h"
@@ -578,9 +584,29 @@
 1377548554 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SeparatedControllers/RHCICreate.cpp
 	"../../include/SeparatedControllers/RHCICreate.h"
 
-1377548565 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Spaces/SE2BeliefSpace.cpp
+1377882917 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Spaces/SE2BeliefSpace.cpp
 	"../../include/Spaces/SE2BeliefSpace.h"
 
-1377821801 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ValidityCheckers/FIRMValidityChecker.h
+1377892908 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ValidityCheckers/FIRMValidityChecker.h
 	"../ObservationModels/ObservationModelMethod.h"
+
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/Cost.h
+	<iostream>
+
+1387486426 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/planners/prm/PRM.h
+	"ompl/geometric/planners/PlannerIncludes.h"
+	"ompl/datastructures/NearestNeighbors.h"
+	<boost/graph/graph_traits.hpp>
+	<boost/graph/adjacency_list.hpp>
+	<boost/pending/disjoint_sets.hpp>
+	<boost/function.hpp>
+	<boost/thread.hpp>
+	<utility>
+	<vector>
+	<map>
+
+1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/objectives/PathLengthOptimizationObjective.h
+	"ompl/base/OptimizationObjective.h"
+
+1390340520 /home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/GoalVisitor.hpp
 

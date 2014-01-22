@@ -112,7 +112,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
     SE2BeliefSpace(void) : CompoundStateSpace()
     {
         setName("SE2_BELIEF" + getName());
-        type_ = 2;
+        type_ = STATE_SPACE_SE2;
         addSubspace(StateSpacePtr(new RealVectorStateSpace(2)), 1.0);
         addSubspace(StateSpacePtr(new SO2StateSpace()), 0.5);
         lock();
@@ -139,6 +139,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
     virtual void freeState(State *state) const;
 
     //virtual void registerProjections(void);
+    virtual double distance(const State* state1, const State *state2);
 
     // gets the relative vector between "from" and "to"
     // equivalent to result = vectorA-vectorB

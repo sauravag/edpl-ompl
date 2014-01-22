@@ -77,4 +77,5 @@
 // Validity checkers
 #include "include/ValidityCheckers/FIRMValidityChecker.h"
 
+using namespace std;
 #endif

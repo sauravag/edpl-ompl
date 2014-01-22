@@ -34,10 +34,13 @@
 /* Author: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #include "../../include/Planner/FIRM.h"
+#include "ompl/geometric/planners/prm/PRM.h"
 #include "ompl/geometric/planners/prm/ConnectionStrategy.h"
 #include "ompl/base/goals/GoalSampleableRegion.h"
+#include "ompl/base/objectives/PathLengthOptimizationObjective.h"
 #include "ompl/datastructures/PDF.h"
 #include "ompl/tools/config/SelfConfig.h"
+#include "ompl/tools/config/MagicConstants.h"
 #include <boost/lambda/bind.hpp>
 #include <boost/graph/astar_search.hpp>
 #include <boost/graph/incremental_components.hpp>
@@ -45,35 +48,31 @@
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
 
+#include "GoalVisitor.hpp"
+
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
 
 namespace ompl
 {
-namespace magic
-{
+    namespace magic
+    {
 
-/** \brief Maximum number of sampling attempts to find a valid state,
-    without checking whether the allowed time elapsed. This value
-    should not really be changed. */
-static const unsigned int FIND_VALID_STATE_ATTEMPTS_WITHOUT_TIME_CHECK = 2;
+        /** \brief The number of steps to take for a random bounce
+            motion generated as part of the expansion step of PRM. */
+        static const unsigned int MAX_RANDOM_BOUNCE_STEPS   = 10;
 
-/** \brief The number of steps to take for a random bounce
-    motion generated as part of the expansion step of PRM. */
-static const unsigned int MAX_RANDOM_BOUNCE_STEPS   = 5;
+        /** \brief The number of nearest neighbors to consider by
+            default in the construction of the PRM roadmap */
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
 
-/** \brief The number of nearest neighbors to consider by
-    default in the construction of the PRM roadmap */
-static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
-
-/** \brief The time in seconds for a single roadmap building operation (dt)*/
-static const double ROADMAP_BUILD_TIME = 0.2;
+        /** \brief The time in seconds for a single roadmap building operation (dt)*/
+        static const double ROADMAP_BUILD_TIME = 0.2;
+    }
 }
-}
-
 
 ompl::FIRM::FIRM(const base::SpaceInformationPtr &si, bool starStrategy) :
-    base::Planner(si, "FIRM: Feedback Information Road Map"),
+    base::Planner(si, "FIRM"),
     starStrategy_(starStrategy),
     stateProperty_(boost::get(vertex_state_t(), g_)),
     totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), g_)),
@@ -90,10 +89,7 @@ ompl::FIRM::FIRM(const base::SpaceInformationPtr &si, bool starStrategy) :
     specs_.approximateSolutions = true;
     specs_.optimizingPaths = true;
 
-    Planner::declareParam<unsigned int>("max_nearest_neighbors",
-                                        this, &FIRM::setMaxNearestNeighbors,
-                                        std::string("8:1000"));
-
+    Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
 }
 
 ompl::FIRM::~FIRM(void)
@@ -105,26 +101,36 @@ void ompl::FIRM::setup(void)
 {
     Planner::setup();
     if (!nn_)
+    {
         nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(si_->getStateSpace()));
-
-    nn_->setDistanceFunction(boost::bind(&FIRM::distanceFunction, this, _1, _2));
-
+        nn_->setDistanceFunction(boost::bind(&FIRM::distanceFunction, this, _1, _2));
+    }
     if (!connectionStrategy_)
     {
         if (starStrategy_)
-            connectionStrategy_ = ompl::geometric::KStarStrategy<Vertex>(boost::bind(&FIRM::milestoneCount, this), nn_,
-                                  si_->getStateDimension());
+            connectionStrategy_ = ompl::geometric::KStarStrategy<Vertex>(boost::bind(&FIRM::milestoneCount, this), nn_, si_->getStateDimension());
         else
             connectionStrategy_ = ompl::geometric::KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
     }
     if (!connectionFilter_)
         connectionFilter_ = boost::lambda::constant(true);
+
+    if (pdef_->hasOptimizationObjective())
+        opt_ = pdef_->getOptimizationObjective();
+    else
+    {
+        opt_.reset(new base::PathLengthOptimizationObjective(si_));
+        opt_->setCostThreshold(opt_->infiniteCost());
+    }
 }
 
 void ompl::FIRM::setMaxNearestNeighbors(unsigned int k)
 {
-    if (!setup_)
-        setup();
+    if (!nn_)
+    {
+        nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(si_->getStateSpace()));
+        nn_->setDistanceFunction(boost::bind(&FIRM::distanceFunction, this, _1, _2));
+    }
     connectionStrategy_ = ompl::geometric::KStrategy<Vertex>(k, nn_);
 }
 
@@ -140,6 +146,7 @@ void ompl::FIRM::clearQuery(void)
     goalM_.clear();
     pis_.restart();
 }
+
 void ompl::FIRM::clear(void)
 {
     Planner::clear();
@@ -155,7 +162,7 @@ void ompl::FIRM::clear(void)
 void ompl::FIRM::freeMemory(void)
 {
     foreach (Vertex v, boost::vertices(g_))
-    si_->freeState(stateProperty_[v]);
+        si_->freeState(stateProperty_[v]);
     g_.clear();
 }
 
@@ -176,12 +183,12 @@ void ompl::FIRM::expandRoadmap(const base::PlannerTerminationCondition &ptc)
 }
 
 void ompl::FIRM::expandRoadmap(const base::PlannerTerminationCondition &ptc,
-                               std::vector<base::State*> &workStates)
+                                         std::vector<base::State*> &workStates)
 {
     // construct a probability distribution over the vertices in the roadmap
     // as indicated in
     //  "Probabilistic Roadmaps for Path Planning in High-Dimensional Configuration Spaces"
-    //   Lydia E. Kavraki, Petr Svestka, Jean-Claude Latombe, and Mark H. Overmars
+    //        Lydia E. Kavraki, Petr Svestka, Jean-Claude Latombe, and Mark H. Overmars
 
     PDF<Vertex> pdf;
     foreach (Vertex v, boost::vertices(g_))
@@ -213,7 +220,7 @@ void ompl::FIRM::expandRoadmap(const base::PlannerTerminationCondition &ptc,
                 disjointSets_.make_set(m);
 
                 // add the edge to the parent vertex
-                const FIRMWeight weight(distanceFunction(v, m),1,1);
+                const base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
                 const unsigned int id = maxEdgeID_++;
                 const Graph::edge_property_type properties(weight, id);
                 boost::add_edge(v, m, properties, g_);
@@ -226,10 +233,10 @@ void ompl::FIRM::expandRoadmap(const base::PlannerTerminationCondition &ptc,
 
             // if there are intermediary states or the milestone has not been connected to the initially sampled vertex,
             // we add an edge
-            if (s > 0 || !boost::same_component(v, last, disjointSets_))
+            if (s > 0 || !sameComponent(v, last))
             {
                 // add the edge to the parent vertex
-                const FIRMWeight weight(distanceFunction(v, last),1,1);
+                const base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
                 const unsigned int id = maxEdgeID_++;
                 const Graph::edge_property_type properties(weight, id);
                 boost::add_edge(v, last, properties, g_);
@@ -258,8 +265,9 @@ void ompl::FIRM::growRoadmap(const base::PlannerTerminationCondition &ptc)
 }
 
 void ompl::FIRM::growRoadmap(const base::PlannerTerminationCondition &ptc,
-                             base::State *workState)
+                                       base::State *workState)
 {
+    /* grow roadmap in the regular fashion -- sample valid states, add them to the roadmap, add valid connections */
     while (ptc == false)
     {
         // search for a valid state
@@ -271,8 +279,7 @@ void ompl::FIRM::growRoadmap(const base::PlannerTerminationCondition &ptc,
             {
                 found = sampler_->sample(workState);
                 attempts++;
-            }
-            while (attempts < magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TIME_CHECK && !found);
+            } while (attempts < magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found);
         }
         // add it as a milestone
         if (found)
@@ -280,10 +287,10 @@ void ompl::FIRM::growRoadmap(const base::PlannerTerminationCondition &ptc,
     }
 }
 
-void ompl::FIRM::checkForSolution (const base::PlannerTerminationCondition &ptc,
-                                   base::PathPtr &solution)
+void ompl::FIRM::checkForSolution(const base::PlannerTerminationCondition &ptc,
+                                            base::PathPtr &solution)
 {
-    base::GoalSampleableRegion *goal = dynamic_cast<base::GoalSampleableRegion*>(pdef_->getGoal().get());
+    base::GoalSampleableRegion *goal = static_cast<base::GoalSampleableRegion*>(pdef_->getGoal().get());
     while (!ptc && !addedSolution_)
     {
         // Check for any new goal states
@@ -295,54 +302,45 @@ void ompl::FIRM::checkForSolution (const base::PlannerTerminationCondition &ptc,
         }
 
         // Check for a solution
-        addedSolution_ = haveSolution (startM_, goalM_, solution);
+        addedSolution_ = haveSolution(startM_, goalM_, solution);
         // Sleep for 1ms
-        boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+        if (!addedSolution_)
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1));
     }
 }
 
 bool ompl::FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals, base::PathPtr &solution)
 {
     base::Goal *g = pdef_->getGoal().get();
-    double sol_cost = -1.;
+    base::Cost sol_cost(0.0);
     bool sol_cost_set = false;
     foreach (Vertex start, starts)
     {
         foreach (Vertex goal, goals)
         {
-            if (boost::same_component(start, goal, disjointSets_) &&
-                    g->isStartGoalPairValid(stateProperty_[goal], stateProperty_[start]))
+            // we lock because the connected components algorithm is incremental and may change disjointSets_
+            graphMutex_.lock();
+            bool same_component = sameComponent(start, goal);
+            graphMutex_.unlock();
+
+            if (same_component && g->isStartGoalPairValid(stateProperty_[goal], stateProperty_[start]))
             {
-                // If there is an optimization objective, check it
-                if (pdef_->hasOptimizationObjective())
+                base::PathPtr p = constructSolution(start, goal);
+                if (p)
                 {
-                    base::PathPtr p = constructSolution(start, goal);
-                    double obj_cost = pdef_->getOptimizationObjective()->getCost(p);
-                    if (pdef_->getOptimizationObjective()->isSatisfied(obj_cost)) // Sufficient solution
+                    // Check if optimization objective is satisfied
+                    base::Cost pathCost = p->cost(opt_);
+                    if (opt_->isSatisfied(pathCost))
                     {
                         solution = p;
                         return true;
                     }
-                    else
+                    else if (!sol_cost_set || opt_->isCostBetterThan(pathCost, sol_cost))
                     {
-                        if (solution && !sol_cost_set)
-                        {
-                            sol_cost = pdef_->getOptimizationObjective()->getCost(solution);
-                            sol_cost_set = true;
-                        }
-
-                        if (!solution || obj_cost < sol_cost)
-                        {
-                            solution = p;
-                            sol_cost = obj_cost;
-                            sol_cost_set = true;
-                        }
+                        solution = p;
+                        sol_cost = pathCost;
+                        sol_cost_set = true;
                     }
-                }
-                else // Accept the solution, regardless of cost
-                {
-                    solution = constructSolution(start, goal);
-                    return true;
                 }
             }
         }
@@ -358,16 +356,12 @@ bool ompl::FIRM::addedNewSolution(void) const
 
 ompl::base::PlannerStatus ompl::FIRM::solve(const base::PlannerTerminationCondition &ptc)
 {
-    /*
-      checkValidity() is defined in Planner.h within OMPL
-      It checks whether the planner is in a working state.
-    */
     checkValidity();
     base::GoalSampleableRegion *goal = dynamic_cast<base::GoalSampleableRegion*>(pdef_->getGoal().get());
 
     if (!goal)
     {
-        OMPL_ERROR("Goal undefined or unknown type of goal");
+        OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
         return base::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
     }
 
@@ -377,13 +371,13 @@ ompl::base::PlannerStatus ompl::FIRM::solve(const base::PlannerTerminationCondit
 
     if (startM_.size() == 0)
     {
-        OMPL_ERROR("There are no valid initial states!");
+        OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
         return base::PlannerStatus::INVALID_START;
     }
 
     if (!goal->couldSample())
     {
-        OMPL_ERROR("Insufficient states in sampleable goal region");
+        OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
         return base::PlannerStatus::INVALID_GOAL;
     }
 
@@ -396,66 +390,74 @@ ompl::base::PlannerStatus ompl::FIRM::solve(const base::PlannerTerminationCondit
 
         if (goalM_.empty())
         {
-            OMPL_ERROR("Unable to find any valid goal states");
+            OMPL_ERROR("%s: Unable to find any valid goal states", getName().c_str());
             return base::PlannerStatus::INVALID_GOAL;
         }
     }
 
-    if (!sampler_)
-        sampler_ = si_->allocValidStateSampler();
-    if (!simpleSampler_)
-        simpleSampler_ = si_->allocStateSampler();
-
     unsigned int nrStartStates = boost::num_vertices(g_);
-    OMPL_INFORM("Starting with %u states", nrStartStates);
-
-    std::vector<base::State*> xstates(magic::MAX_RANDOM_BOUNCE_STEPS);
-    si_->allocStates(xstates);
-    bool grow = true;
+    OMPL_INFORM("%s: Starting with %u states", getName().c_str(), nrStartStates);
 
     // Reset addedSolution_ member and create solution checking thread
     addedSolution_ = false;
     base::PathPtr sol;
-    sol.reset();
-    boost::thread slnThread (boost::bind(&FIRM::checkForSolution, this, ptc, boost::ref(sol)));
+    boost::thread slnThread(boost::bind(&FIRM::checkForSolution, this, ptc, boost::ref(sol)));
 
     // construct new planner termination condition that fires when the given ptc is true, or a solution is found
-    base::PlannerOrTerminationCondition ptcOrSolutionFound (ptc, base::PlannerTerminationCondition(boost::bind(&FIRM::addedNewSolution, this)));
+    base::PlannerTerminationCondition ptcOrSolutionFound =
+        base::plannerOrTerminationCondition(ptc, base::PlannerTerminationCondition(boost::bind(&FIRM::addedNewSolution, this)));
 
-    while (ptcOrSolutionFound() == false)
-    {
-        // maintain a 2:1 ratio for growing/expansion of roadmap
-        // call growRoadmap() twice as long for every call of expandRoadmap()
-        if (grow)
-            growRoadmap(base::PlannerOrTerminationCondition(ptcOrSolutionFound, base::timedPlannerTerminationCondition(2.0*magic::ROADMAP_BUILD_TIME)), xstates[0]);
-        else
-            expandRoadmap(base::PlannerOrTerminationCondition(ptcOrSolutionFound, base::timedPlannerTerminationCondition(magic::ROADMAP_BUILD_TIME)), xstates);
-        grow = !grow;
-    }
+    constructRoadmap(ptcOrSolutionFound);
 
     // Ensure slnThread is ceased before exiting solve
     slnThread.join();
 
-    OMPL_INFORM("Created %u states", boost::num_vertices(g_) - nrStartStates);
+    OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_) - nrStartStates);
 
     if (sol)
     {
+        base::PlannerSolution psol(sol);
+        // if the solution was optimized, we mark it as such
         if (addedNewSolution())
-            pdef_->addSolutionPath (sol);
-        else
-            // the solution is exact, but not as short as we'd like it to be
-            pdef_->addSolutionPath (sol, true, 0.0);
+            psol.optimized_ = true;
+        pdef_->addSolutionPath (psol);
     }
-
-    si_->freeStates(xstates);
 
     // Return true if any solution was found.
     return sol ? (addedNewSolution() ? base::PlannerStatus::EXACT_SOLUTION : base::PlannerStatus::APPROXIMATE_SOLUTION) : base::PlannerStatus::TIMEOUT;
 }
 
+void ompl::FIRM::constructRoadmap(const base::PlannerTerminationCondition &ptc)
+{
+    if (!isSetup())
+        setup();
+    if (!sampler_)
+        sampler_ = si_->allocValidStateSampler();
+    if (!simpleSampler_)
+        simpleSampler_ = si_->allocStateSampler();
+
+    std::vector<base::State*> xstates(magic::MAX_RANDOM_BOUNCE_STEPS);
+    si_->allocStates(xstates);
+    bool grow = true;
+
+    while (ptc() == false)
+    {
+        // maintain a 2:1 ratio for growing/expansion of roadmap
+        // call growRoadmap() twice as long for every call of expandRoadmap()
+        if (grow)
+            growRoadmap(base::plannerOrTerminationCondition(ptc, base::timedPlannerTerminationCondition(2.0 * magic::ROADMAP_BUILD_TIME)), xstates[0]);
+        else
+            expandRoadmap(base::plannerOrTerminationCondition(ptc, base::timedPlannerTerminationCondition(magic::ROADMAP_BUILD_TIME)), xstates);
+        grow = !grow;
+    }
+
+    si_->freeStates(xstates);
+}
+
 ompl::FIRM::Vertex ompl::FIRM::addMilestone(base::State *state)
 {
-    graphMutex_.lock();
+    boost::mutex::scoped_lock _(graphMutex_);
+
     Vertex m = boost::add_vertex(g_);
     stateProperty_[m] = state;
     totalConnectionAttemptsProperty_[m] = 1;
@@ -463,35 +465,29 @@ ompl::FIRM::Vertex ompl::FIRM::addMilestone(base::State *state)
 
     // Initialize to its own (dis)connected component.
     disjointSets_.make_set(m);
-    graphMutex_.unlock();
+
+    nn_->add(m);
 
     // Which milestones will we attempt to connect to?
-    if (!connectionStrategy_)
-        throw Exception(name_, "No connection strategy!");
-
     const std::vector<Vertex>& neighbors = connectionStrategy_(m);
 
     foreach (Vertex n, neighbors)
-    if ((boost::same_component(m, n, disjointSets_) || connectionFilter_(m, n)))
-    {
-        totalConnectionAttemptsProperty_[m]++;
-        totalConnectionAttemptsProperty_[n]++;
-        if (si_->checkMotion(stateProperty_[m], stateProperty_[n]))
+        if (connectionFilter_(m, n))
         {
-            successfulConnectionAttemptsProperty_[m]++;
-            successfulConnectionAttemptsProperty_[n]++;
-            const FIRMWeight weight(distanceFunction(m, n),1,1);
-            const unsigned int id = maxEdgeID_++;
-            const Graph::edge_property_type properties(weight, id);
-
-            graphMutex_.lock();
-            boost::add_edge(m, n, properties, g_);
-            uniteComponents(n, m);
-            graphMutex_.unlock();
+            totalConnectionAttemptsProperty_[m]++;
+            totalConnectionAttemptsProperty_[n]++;
+            if (si_->checkMotion(stateProperty_[m], stateProperty_[n]))
+            {
+                successfulConnectionAttemptsProperty_[m]++;
+                successfulConnectionAttemptsProperty_[n]++;
+                const base::Cost weight = opt_->motionCost(stateProperty_[m], stateProperty_[n]);
+                const unsigned int id = maxEdgeID_++;
+                const Graph::edge_property_type properties(weight, id);
+                boost::add_edge(m, n, properties, g_);
+                uniteComponents(n, m);
+            }
         }
-    }
 
-    nn_->add(m);
     return m;
 }
 
@@ -500,23 +496,45 @@ void ompl::FIRM::uniteComponents(Vertex m1, Vertex m2)
     disjointSets_.union_set(m1, m2);
 }
 
-ompl::base::PathPtr ompl::FIRM::constructSolution(const Vertex start, const Vertex goal) const
+bool ompl::FIRM::sameComponent(Vertex m1, Vertex m2)
 {
-    ompl::geometric::PathGeometric *p = new ompl::geometric::PathGeometric(si_);
+    return boost::same_component(m1, m2, disjointSets_);
+}
 
-    graphMutex_.lock();
+ompl::base::PathPtr ompl::FIRM::constructSolution(const Vertex &start, const Vertex &goal)
+{
+    boost::mutex::scoped_lock _(graphMutex_);
     boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
 
-    boost::astar_search(g_, start,
-                        boost::bind(&FIRM::distanceFunction, this, _1, goal),
-                        boost::predecessor_map(prev));
-    graphMutex_.unlock();
+    try
+    {
+        // Consider using a persistent distance_map if it's slow
+        boost::astar_search(g_, start,
+                            boost::bind(&FIRM::costHeuristic, this, _1, goal),
+                            boost::predecessor_map(prev).
+                            distance_compare(boost::bind(&base::OptimizationObjective::
+                                                         isCostBetterThan, opt_.get(), _1, _2)).
+                            distance_combine(boost::bind(&base::OptimizationObjective::
+                                                         combineCosts, opt_.get(), _1, _2)).
+                            distance_inf(opt_->infiniteCost()).
+                            distance_zero(opt_->identityCost()).
+                            visitor(AStarGoalVisitor<Vertex>(goal)));
+    }
+    catch (AStarFoundGoal&)
+    {
+    }
 
     if (prev[goal] == goal)
         throw Exception(name_, "Could not find solution path");
     else
-        for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos])
-            p->append(stateProperty_[pos]);
+        return constructGeometricPath(prev, start, goal);
+}
+
+ompl::base::PathPtr ompl::FIRM::constructGeometricPath(const boost::vector_property_map<Vertex> &prev, const Vertex &start, const Vertex &goal)
+{
+    ompl::geometric::PathGeometric *p = new ompl::geometric::PathGeometric(si_);
+    for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos])
+        p->append(stateProperty_[pos]);
     p->append(stateProperty_[start]);
     p->reverse();
 
@@ -529,10 +547,10 @@ void ompl::FIRM::getPlannerData(base::PlannerData &data) const
 
     // Explicitly add start and goal states:
     for (size_t i = 0; i < startM_.size(); ++i)
-        data.addStartVertex(base::PlannerDataVertex(stateProperty_[startM_[i]]));
+        data.addStartVertex(base::PlannerDataVertex(stateProperty_[startM_[i]], const_cast<FIRM*>(this)->disjointSets_.find_set(startM_[i])));
 
     for (size_t i = 0; i < goalM_.size(); ++i)
-        data.addGoalVertex(base::PlannerDataVertex(stateProperty_[goalM_[i]]));
+        data.addGoalVertex(base::PlannerDataVertex(stateProperty_[goalM_[i]], const_cast<FIRM*>(this)->disjointSets_.find_set(goalM_[i])));
 
     // Adding edges and all other vertices simultaneously
     foreach(const Edge e, boost::edges(g_))
@@ -545,5 +563,14 @@ void ompl::FIRM::getPlannerData(base::PlannerData &data) const
         // Add the reverse edge, since we're constructing an undirected roadmap
         data.addEdge(base::PlannerDataVertex(stateProperty_[v2]),
                      base::PlannerDataVertex(stateProperty_[v1]));
+
+        // Add tags for the newly added vertices
+        data.tagState(stateProperty_[v1], const_cast<FIRM*>(this)->disjointSets_.find_set(v1));
+        data.tagState(stateProperty_[v2], const_cast<FIRM*>(this)->disjointSets_.find_set(v2));
     }
+}
+
+ompl::base::Cost ompl::FIRM::costHeuristic(Vertex u, Vertex v) const
+{
+    return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
 }

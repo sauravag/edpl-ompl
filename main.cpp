@@ -31,8 +31,8 @@ void plan(void)
 
     // set the bounds for the R^3 part of SE(3)
     ob::RealVectorBounds bounds(2);
-    bounds.setLow(-25);
-    bounds.setHigh(25);
+    bounds.setLow(-6);
+    bounds.setHigh(6);
 
     space->as<SE2BeliefSpace>()->setBounds(bounds);
 
@@ -47,17 +47,17 @@ void plan(void)
     // create a random start state
     ob::State *start = space->allocState();
 
-    start->as<StateType>()->setXYYaw(1.3,3,0);
+    start->as<StateType>()->setXYYaw(1.3,3.2,0);
 
     cout<<"The start state is :"<<endl;
     space->as<SE2BeliefSpace>()->printBeliefState(start);
-    cin.get();
+    //cin.get();
     // create a random goal state
     ob::State *goal = space->allocState();
-    goal->as<StateType>()->setXYYaw(5,1.3,0);
+    goal->as<StateType>()->setXYYaw(5,2,0);
     cout<<"The goal state is:"<<endl;
     space->as<SE2BeliefSpace>()->printBeliefState(goal);
-    cin.get();
+    //cin.get();
 
     // create a problem instance
     ob::ProblemDefinitionPtr pdef(new ob::ProblemDefinition(si));
@@ -83,7 +83,7 @@ void plan(void)
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = planner->solve(5.0);
+    ob::PlannerStatus solved = planner->solve(10);
 
     std::cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 
@@ -92,7 +92,7 @@ void plan(void)
         // get the goal representation from the problem definition (not the same as the goal state)
         // and inquire about the found path
         ob::PathPtr path = pdef->getSolutionPath();
-        std::cout << "Found solution:" << std::endl;
+        std::cout << "Found solution, The path is:" << std::endl;
 
         // print the path to screen
         path->print(std::cout);
@@ -114,8 +114,6 @@ int main(int, char **)
 
   plan();
 
-  std::cout << std::endl << std::endl;
-
   //TestSE2BeliefSpace();
   //TestBeliefStateSampler();
   //TestObservationModel();
@@ -123,6 +121,7 @@ int main(int, char **)
   //TestKalmanFilter();
   //TestRHCICreate();
   //TestController();
+  //TestFIRMWeight();
 
   return 0;
 }

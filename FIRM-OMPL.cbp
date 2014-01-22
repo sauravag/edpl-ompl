@@ -16,23 +16,20 @@
 					<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
 				</Compiler>
 				<Linker>
+					<Add library="/usr/lib/libboost_system.so" />
+					<Add library="/usr/lib/libboost_thread.so" />
+					<Add library="/usr/lib/libarmadillo.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_app.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_base.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_control.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_geometric.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.0.12.2" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.6" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.8" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.0.12.2" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.6" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/py_boost_function.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_rrtstar.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_tools.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_util.so" />
-					<Add library="/usr/lib/libboost_system.so" />
-					<Add library="/usr/lib/libboost_thread.so" />
-					<Add library="/usr/lib/libarmadillo.so" />
+					<Add directory="/home/saurav/Research/Softwares/omplapp/build/Release/lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -53,23 +50,6 @@
 			<Add option="-fexceptions" />
 			<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
 		</Compiler>
-		<Linker>
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_app.so" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_base.so" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_control.so" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_geometric.so" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.0.12.2" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.6" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.0.12.2" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.6" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/py_boost_function.so" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_rrtstar.so" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_tools.so" />
-			<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_util.so" />
-			<Add directory="/home/saurav/Research/Softwares/omplapp/build/Release/lib" />
-		</Linker>
 		<Unit filename="FIRMOMPL.h" />
 		<Unit filename="Tests.h" />
 		<Unit filename="include/ActuationSystems/ActuationSystemMethod.h" />
@@ -88,6 +68,7 @@
 		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
 		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
+		<Unit filename="include/ValidityCheckers/FIRMValidityChecker.h" />
 		<Unit filename="include/Weight/FIRMWeight.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/ActuationSystems/SimulatedActuationSystem.cpp" />
@@ -96,6 +77,7 @@
 		<Unit filename="src/MotionModels/UnicycleMotionModel.cpp" />
 		<Unit filename="src/ObservationModels/CamAruco2DObservationModel.cpp" />
 		<Unit filename="src/Planner/FIRM.cpp" />
+		<Unit filename="src/Planner/GoalVisitor.hpp" />
 		<Unit filename="src/Samplers/GaussianValidBeliefSampler.cpp" />
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
 		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />
