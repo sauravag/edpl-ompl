@@ -1,0 +1,55 @@
+\documentclass[10pt,a4paper]{report}
+\usepackage[top=1in, bottom=2in, left=1in, right=1in]{geometry}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\author{Saurav Agarwal}
+
+\title{FIRM-OMPL Integration project report}
+
+\begin{document}
+
+\chapter{Introduction}
+
+This report is a record of the development process of integrating FIRM with OMPL. 
+
+\section{Project Aims}
+
+\begin{itemize}
+ \item To integrate FIRM with OMPL.
+ \item Test and validate FIRM-OMPL by benchmarking with PMPL.
+ \item Integrate with ROS.
+ \item Run experiments.
+\end{itemize}
+
+\section{Timelines}
+
+1. Finish basic FIRM planner implementation by Feb end.
+
+\chapter{Development Issues}
+
+Log of issues faced and discussions on their solutions.
+
+\begin{enumerate}
+ \item Should the optimization functionality in OMPL Planner class be used or should the planner be implemented straight forward, similar to PMPL approach ?
+    \begin{itemize}
+     \item 
+    \end{itemize}
+
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

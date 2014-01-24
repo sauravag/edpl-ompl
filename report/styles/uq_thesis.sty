@@ -1,0 +1,114 @@
+%-----------------------------------------------------------------------------
+% UQ_THESIS.STY	Primary style for U.Q. Ph.D. Thesis by
+%               Chris S. Craddock
+%               Modified version of cit_thesis.sty by
+%               Michael H. Kelsey
+%
+% USAGE:  (LaTeX 2.09) \documentstyle[draftfoot,preprint]{cit_thesis}
+%         (LaTeX2e)    \documentclass[draftfoot,preprint]{cit_thesis}
+%
+% Modifies the {report} style, so that the title page and chapters
+% are handled according to the Caltech Regulations for Format and
+% Presentation of Theses (Office of Graduate Studies), and K. Turabian,
+% _A Manual for Writers_ (U. Chicago Press, Chicago, 1987).
+%-----------------------------------------------------------------------------
+% The secondary style of [preprint] sets the conditional ``\ifpreprintsty''
+% TRUE.  The command ``\preprint'', at the beginning of the document, has
+% the same effect.  This causes a local publication number (see ``\pubnum''
+% below) to be typeset in the upper right corner of the title page.  The author
+% may also write conditional macros using the ``\ifpreprintsty''
+% construction.
+%
+% For preliminary or working copies of the thesis, the secondary style of
+% [draftfoot] may be used, or the command ``\draftfoot'' may be specified at
+% the beginning of the document.  This produces a line at the bottom of every
+% page, with ``DRAFT'' in the lower left corner, and the date and time when
+% LaTeX was executed in the lower right.
+% 
+% A number of useful macros are defined for use in this style.  The
+% title page of a thesis contains several standard phrases with possibly
+% ``variable'' information, such as the degree to be awarded, the name
+% and address of the institution, and copyright information.  The macros
+% below are used to specify these data; the macro arguments indicate
+% the default values as defined in this style file.
+%
+% \degreeaward{Doctor of Philosophy}			Degree to be awarded
+% \university{University of Queensland}			Institution name
+% \address{Brisbane, Australia}				Institution address
+% \copyyear{\the\year}					Year of diploma award
+%
+% \pubnum{}					Publication/preprint number
+%
+% The usual LaTeX macros ``\author,'' ``\title,'' and ``\date'' work as
+% defined in the LaTeX manual.  The argument to \date should be the date
+% on which the candidate's final examination (defense) is scheduled.
+%
+% The publication/preprint number will be typeset in the upper right corner
+% of the title page if and only if the [preprint] style is selected, or if
+% the ``\preprint'' command was executed before \maketitle.
+%
+% The command ``\maketitle'' will generate a title page formatted according
+% to the Caltech instructions, and including all of the information defined
+% by the macros above.  Unlike the standard version, ``\maketitle'' may be
+% repeated several times in a document:  the terms defined for it are _not_
+% reset after the page is formatted.
+%
+% The command ``\extrachapter'' will generate an unnumbered chapter heading,
+% similar to the LaTeX ``\chapter*'' command.  In addition, ``\extrachapter''
+% will produce an entry in the Table of Contents.  This command is used in
+% the {abstract} and {acknowledgements} environments, listed below.
+%
+% The initial portion of the thesis document, typically the copyright page,
+% abstract, and tables of contents, figures, and tables, are numbered in
+% roman numerals, while the body of the thesis is numbered in arabic.  The
+% {frontmatter} environment handles these page numbering conventions.  The
+% author should place
+%
+%	\begin{frontmatter}
+%	...(abstract, contents, etc.)
+%	\end{frontmatter}
+%
+% immediately following the \maketitle command.  The first entry in the
+% {frontmatter} environment should generally be ``\makecopyright.''  This
+% command generates a spearate copyright page, with the text
+%
+%				 (C) \copyyear
+%				    \author
+%			      All Rights Reserved
+%
+% centered at the bottom of the page.  Obviously, the items indicated with
+% macro commands above are filled in with the actual arguments to those
+% commands.
+%
+% The abstract is produced with the {abstract} environment, which generates
+% an unnumbered chapter with an entry in the table of contents.  The author
+% should use
+%
+%	\begin{abstract}
+%	...(body of abstract goes here)
+%	\end{abstract}
+%
+% within the {frontmatter} environment.
+%
+% An acknowledgements page is produced in the same way as the abstract, with
+% the {acknowledgements} environment.
+%
+%
+% 950201  Michael H. Kelsey    Adapted from original of unknown source.
+% 950208  -- Merged with "citthesis.cls" from Blair Zajac.
+%         Change [draft] and \draft to ``draftfoot''.
+% 950525  -- Per request from B. McKenney, chapter headings are done in
+%         \LARGE font, not \Large.
+% 960319  -- Force [letterpaper] option to {report} class
+% 960517  -- Allow double-sided generation (remove \@twosidedfalse)
+%         -- Change \ifpreprintstyle to \ifpreprintsty for REVTeX
+%            compatibility
+% 960521  -- Fix \evensidemargin setting for double-ssided support
+%-----------------------------------------------------------------------------
+\NeedsTeXFormat{LaTeX2e}
+\@obsoletefile{uq_thesis.cls}{uq_thesis.sty}
+\LoadClass{./styles/uq_thesis}
+\endinput
+%%
+%% End of file `report_1.sty'.
+

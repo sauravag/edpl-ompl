@@ -1,0 +1,7 @@
+\begin{abstract}
+
+This report details the software architecture and progress of the development of an open source C++
+implementation of FIRM integrated with OMPL. Our goal is to enable the robotics research community
+to be able to freely use FIRM as part of their work.
+
+\end{abstract}

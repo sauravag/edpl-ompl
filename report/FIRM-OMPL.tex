@@ -1,0 +1,119 @@
+\documentclass[a4paper,10pt,openright,twosides]{./styles/uq_thesis}
+\usepackage{latexsym,newlfont}
+\usepackage{amssymb,bm}
+\usepackage[center]{subfigure}
+\usepackage{overpic,colortbl}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{nomencl}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage[bookmarks=true]{hyperref}
+
+% % Alter some LaTeX defaults for better treatment of figures:
+%     % See p.105 of "TeX Unbound" for suggested values.
+%     % See pp. 199-200 of Lamport's "LaTeX" book for details.
+%     %   General parameters, for ALL pages:
+%     \renewcommand{\topfraction}{0.9}	% max fraction of floats at top
+%     \renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
+%     %   Parameters for TEXT pages (not float pages):
+%     \setcounter{topnumber}{2}
+%     \setcounter{bottomnumber}{2}
+%     \setcounter{totalnumber}{4}     % 2 may work better
+%     \setcounter{dbltopnumber}{2}    % for 2-column pages
+%     \renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text
+%     \renewcommand{\textfraction}{0.07}	% allow minimal text w. figs
+%     %   Parameters for FLOAT pages (not text pages):
+%     \renewcommand{\floatpagefraction}{0.7}	% require fuller float pages
+% 	% N.B.: floatpagefraction MUST be less than topfraction !!
+%     \renewcommand{\dblfloatpagefraction}{0.7}	% require fuller float pages
+% 
+% 	% remember to use [htp] or [htpb] for placement
+
+
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+    text width=5.5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, rectangle,fill=red!20, node distance=3cm, text width=5em, text centered, rounded corners, minimum height=4em]
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\renewcommand{\footrulewidth}{0.4pt}
+%\footrulewidth{0.6pt}
+\makenomenclature
+\newenvironment{mylisting}
+{\begin{list}{}{\setlength{\leftmargin}{1em}}\item\scriptsize\bfseries}
+{\end{list}}
+\newcounter{chapi}
+\numberwithin{equation}{section}
+%% definitions etc %%%%%%
+\def\dg{^\circ}
+%  Real Space
+\newcommand{\R}{\mathbb{R}}
+%   diag function
+\newcommand{\diag}{\mathop{\rm diag}\nolimits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%----------------------------------------------------------------
+% TitlePage
+%----------------------------------------------------------------
+\title{C++ Toolbox for FIRM Using OMPL \\
+      \textit{Software Development Report}}
+\author{Saurav Agarwal}
+\date{\today}
+\university{Department of Aerospace Engineering \\
+            Dwight Look College of Engineering\\
+            Texas A\&M University}                           % Leave blank for no number
+\copyyear{July, 2013}
+
+
+%----------------------------------------------------------------
+% define dropping and captionstyle
+%----------------------------------------------------------------
+%\usepackage[dvips]{./styles/dropping}
+\def\dropword#1#2 {\dropping{2}{\bfseries{} #1}\MakeUppercase{#2} }
+\captionstyle{center}
+\RequirePackage{ifthen}
+\newcommand{\subhead}[1]{\noindent\textbf{#1}\quad}
+\begin{document}
+\newlength{\figurewidth}
+\setlength{\figurewidth}{0.49\textwidth}
+%----------------------------------------------------------------
+% Frontmatter of document
+%----------------------------------------------------------------
+\maketitle
+\begin{frontmatter}
+\makecopyright
+\include{abstract}
+\tableofcontents 
+%\listoffigures   
+%\textbf{ }
+%\clearpage
+\textbf{ }
+\clearpage
+%\printnomenclature
+%\include{Nomenclature}
+\end{frontmatter}
+%chapters
+\include{chap1}
+\include{chap2}
+\include{chap3}
+%endchapter
+% \include{discussion}
+% \appendix
+% \include{appA}
+% \include{appB}
+%----------------------------------------------------------------
+\clearpage
+% \begin{appmatter}
+% \setcounter{page}{1}
+% \include{appenA}
+% \setcounter{page}{1}
+% \include{appenB}
+% \end{appmatter}
+% \bibliographystyle{plain}
+%  \bibliography{References}
+%----------------------------------------------------------------
+\end{document}
