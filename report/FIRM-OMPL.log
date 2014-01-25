@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.2.22)  14 AUG 2013 14:26
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.2.22)  24 JAN 2014 18:16
 entering extended mode
  %&-line parsing enabled.
 **FIRM-OMPL.tex
@@ -705,7 +705,8 @@ Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 LaTeX Warning: Unused global option(s):
     [twosides].
 
-(./FIRM-OMPL.aux (./abstract.aux) (./chap1.aux) (./chap2.aux) (./chap3.aux))
+(./FIRM-OMPL.aux (./abstract.aux) (./chap1.aux) (./chap2.aux) (./chap3.aux)
+(./chap4.aux))
 \openout1 = `FIRM-OMPL.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 80.
@@ -722,8 +723,7 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 80.
 LaTeX Font Info:    ... okay on input line 80.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 80.
 LaTeX Font Info:    ... okay on input line 80.
-
-(/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
+ (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count148
 \scratchdimen=\dimen183
@@ -755,7 +755,7 @@ LaTeX Info: Redefining \pageref on input line 80.
 
 \AtBeginShipoutBox=\box66
 \figurewidth=\skip61
- <./styles/cranfield_crest.jpg, id=50, 451.6875pt x 449.68pt>
+ <./styles/cranfield_crest.jpg, id=58, 451.6875pt x 449.68pt>
 File: ./styles/cranfield_crest.jpg Graphic file (type jpg)
 
 <use ./styles/cranfield_crest.jpg> [1
@@ -811,29 +811,29 @@ Chapter 1.
 Missing character: There is no â in font cmr10!
 Missing character: There is no € in font cmr10!
 Missing character: There is no ™ in font cmr10!
-Missing character: There is no â in font cmr10!
-Missing character: There is no € in font cmr10!
-Missing character: There is no ™ in font cmr10!
-pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
-been already used, duplicate ignored
+)pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
+ been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.43 
-      [1
+l.100 \include{chap1}
+                      [1
 
-
-
-
-]) [2]
-\openout2 = `chap2.aux'.
-
- (./chap2.tex
-Chapter 2.
-) [3
 
 
 
 ]
+\openout2 = `chap2.aux'.
+
+ (./chap2.tex
+Chapter 2.
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+[2
+
+
+
+]) [3]
 \openout2 = `chap3.aux'.
 
  (./chap3.tex
@@ -842,16 +842,21 @@ Chapter 3.
 
 
 
-] (./FIRM-OMPL.aux (./abstract.aux) (./chap1.aux) (./chap2.aux)
-(./chap3.aux)) ) 
+]
+\openout2 = `chap4.aux'.
+
+
+No file chap4.tex.
+(./FIRM-OMPL.aux (./abstract.aux) (./chap1.aux) (./chap2.aux) (./chap3.aux)
+(./chap4.aux)) ) 
 Here is how much of TeX's memory you used:
- 16280 strings out of 495061
- 304010 string characters out of 1182621
- 397296 words of memory out of 3000000
- 18999 multiletter control sequences out of 15000+50000
+ 16300 strings out of 495061
+ 304191 string characters out of 1182621
+ 398730 words of memory out of 3000000
+ 19002 multiletter control sequences out of 15000+50000
  13167 words of font info for 45 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 56i,11n,56p,429b,355s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 56i,11n,56p,429b,437s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/sha
 re/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-te
 xlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-texlive/fonts
@@ -860,9 +865,9 @@ blic/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfont
 s/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.
 pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/s
 hare/texmf-texlive/fonts/type1/urw/times/utmb8a.pfb>
-Output written on FIRM-OMPL.pdf (8 pages, 203025 bytes).
+Output written on FIRM-OMPL.pdf (8 pages, 214227 bytes).
 PDF statistics:
- 171 PDF objects out of 1000 (max. 8388607)
- 45 named destinations out of 1000 (max. 500000)
- 106 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 193 PDF objects out of 1000 (max. 8388607)
+ 57 named destinations out of 1000 (max. 500000)
+ 122 words of extra memory for PDF output out of 10000 (max. 10000000)
 

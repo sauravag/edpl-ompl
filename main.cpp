@@ -54,7 +54,7 @@ void plan(void)
     //cin.get();
     // create a random goal state
     ob::State *goal = space->allocState();
-    goal->as<StateType>()->setXYYaw(5,2,0);
+    goal->as<StateType>()->setXYYaw(1,2,0);
     cout<<"The goal state is:"<<endl;
     space->as<SE2BeliefSpace>()->printBeliefState(goal);
     //cin.get();

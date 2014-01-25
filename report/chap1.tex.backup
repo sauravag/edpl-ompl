@@ -1,1 +1,43 @@
 \chapter{Introduction}
+
+Our goal is to enable the research community at large to be able to use FIRM in their own research (simulations/physical experiments).
+For this purpose, we have developed an open source implementation of FIRM using OMPL (Open Motion Planning Library).
+
+
+\section{Aim}
+
+To integrate FIRM with Open Motion Planning Library and use with ROS for physical and simulation experiments.
+
+\section{Planned Tasks}
+
+\subsection{Stage 1}
+\begin{enumerate}
+ \item Implement the underlying graph structure using Boost
+ \item Implement Edge weight class for OMPL
+ \item Derive from OMPL’s planner class to implement FIRM planner
+ \item Implement the Belief Space by deriving from OMPL Compound State Space
+ \item Implement Belief (State) class deriving from OMPL State
+ \item Using OMPLs sampler class, develop a uniform random belief space sampler
+ \item Implement observation model (monocular camera with image markers)
+ \item Implement motion model
+ \item Implement Controller class (integrate filters)
+ \item Integrate DP with Planner
+ \item Complete component integration and test in simulation (PMPL simulator)
+\end{enumerate}
+
+\subsection{Stage 2}
+
+\begin{itemize}
+ \item Integrate with ROS and test in simulation
+ \item Benchmark with PMPL
+ \item Test on physical system
+\end{itemize}
+
+\section{Notes} 
+
+Significant time was spent in understanding how OMPL implements the underlying 
+graph, state, spaces etc. OMPL’s API is very different programmatically and 
+philosophically from PMPL. Due to its lightweight nature, OMPL does not depend 
+external libraries (except BOOST) which gives it a disadvantage in terms of extra 
+functionality (such as reading setup parameters from XML files etc.).
+

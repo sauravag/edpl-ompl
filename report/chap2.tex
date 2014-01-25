@@ -1,1 +1,44 @@
-\chapter{Software Architecture}
+\chapter{Issues \& Notes}
+
+\section{Notes}
+
+OMPL’s API is very different programmatically and philosophically from PMPL. Due to its lightweight nature, OMPL does not depend 
+external libraries (except BOOST) which gives it a disadvantage in terms of extra functionality (such as reading setup parameters from XML files etc.).
+
+\subsection{How the OMPL PRM planner works}
+\begin{enumerate}
+ \item Call \textit{setProblemDefinition} to define the parameters of the problem.
+ \item Call \textit{setup} to setup the planners specific internals like validity checker etc.
+ \item  Call \textit{solve} to find construct graph and find a solutions:
+  \begin{enumerate}
+    \item Call \textit{checkValidity} : makes sure start and goal states have been set
+    \item set termination conditions
+    \item Call \textit{constructRoadMap}: 
+	    \begin{itemize}
+	     \item Allocates a simple state sampler
+	     \item Calls \textit{growRoadmap} and \textit{expandRoadmap} in a 2:1 ratio
+	     
+
+	    \end{itemize}
+  \end{enumerate}
+
+ \item \textit{addMilestone} : 
+  \begin{enumerate}
+   \item  Adds a state to the graph and creates a vertex with the properties and everything else. 
+   \item After creating the vertex, it attempts to connect the vertex to its nearest neighbours
+   \item during the connection, it finds the motion cost associated with the connection. \color{red}{This is the point where we run the monte carlo simulation to generate edge costs}
+  \end{enumerate}
+
+ \item \textit{growRoadmap}: Takes as input a termination condition and a state, samples a valid state and puts it in input state and adds it to the graph.
+\end{enumerate}
+
+\section{Issues}
+Log of issues faced and discussions on their solutions.
+
+\begin{enumerate}
+ \item Should the optimization functionality in OMPL Planner class be used or should the planner be implemented straight forward, similar to PMPL approach ?
+    \begin{itemize}
+     \item 
+    \end{itemize}
+\item How to add the properties of an edge to the graph i.e. EdgeController; a) Create a hashtable which maps from edge to controller id, b) store the edge controller as the property of an edge i.e. create a custom edge property. Easier approach would be to (a).
+\end{enumerate}
