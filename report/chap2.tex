@@ -17,8 +17,6 @@ external libraries (except BOOST) which gives it a disadvantage in terms of extr
 	    \begin{itemize}
 	     \item Allocates a simple state sampler
 	     \item Calls \textit{growRoadmap} and \textit{expandRoadmap} in a 2:1 ratio
-	     
-
 	    \end{itemize}
   \end{enumerate}
 
@@ -32,6 +30,42 @@ external libraries (except BOOST) which gives it a disadvantage in terms of extr
  \item \textit{growRoadmap}: Takes as input a termination condition and a state, samples a valid state and puts it in input state and adds it to the graph.
 \end{enumerate}
 
+\subsection{Sampling a valid state}
+While sampling we need to check if a state is in collision and observable. The collision check is done by validitychecker. 
+The observability check can be done by filter or observation model (currently chosen).
+
+\subsection{State Validity Checking}
+Can code be simply re-used, is there any need to write a new validitychecker? 
+
+\begin{itemize}
+ \item We need to check for collision. Can use the provided FCL wrapper in OMPL.
+ \item The observability check is also done through validitychecker because the information about space should be accessed through the space information.
+ \item 
+\end{itemize}
+
+\subsection{StateInformation}
+
+This requires us to set:
+\begin{enumerate}
+ \item ValidityChecker
+ \item MotionChecker
+ \item Sampler
+\end{enumerate}
+
+\subsection{Modifications required to OMPL PRM}
+
+\begin{enumerate}
+ \item In the function \textit{addMilestone}:
+  \begin{enumerate}
+   \item Check if a state is observable before adding it to the graph - \textcolor{red}{I think the \textit{GaussianValidBeliefSampler} should check the observability for a sample, whether to actually put the observability check in filter or observation model needs to be decided} 
+   \item Call localplanner to run the monte carlo simulation and generate edge costs
+   \item 
+  \end{enumerate}
+
+  \item Should the motionmodel and observationmodel be provided to the planner or to problemdefinition (like pmpl)?
+\end{enumerate}
+
+
 \section{Issues}
 Log of issues faced and discussions on their solutions.
 
@@ -41,4 +75,7 @@ Log of issues faced and discussions on their solutions.
      \item 
     \end{itemize}
 \item How to add the properties of an edge to the graph i.e. EdgeController; a) Create a hashtable which maps from edge to controller id, b) store the edge controller as the property of an edge i.e. create a custom edge property. Easier approach would be to (a).
+
+ \item What is the job of the validitychecker ? -> to check if a state is in collision or not. 
+
 \end{enumerate}

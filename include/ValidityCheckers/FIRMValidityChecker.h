@@ -34,6 +34,11 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 #include "../ObservationModels/ObservationModelMethod.h"
+/*
+Used to check if a state is in collission or not moreover,
+in FIRM we need to know if a state is observable or not
+before adding it to the graph.
+*/
 
 class FIRMValidityChecker : public ompl::base::StateValidityChecker
 {
@@ -47,8 +52,9 @@ class FIRMValidityChecker : public ompl::base::StateValidityChecker
 
     virtual bool isValid(const ompl::base::State *state) const
     {
-      return observationModel_->isStateObservable(state);
+      return true;
     }
+
   private:
     ObservationModelPointer observationModel_;
 };

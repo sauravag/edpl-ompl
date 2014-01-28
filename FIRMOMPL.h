@@ -73,6 +73,7 @@
 
 // Samplers
 #include "include/Samplers/GaussianValidBeliefSampler.h"
+#include "include/Samplers/UniformValidBeliefSampler.h"
 
 // Validity checkers
 #include "include/ValidityCheckers/FIRMValidityChecker.h"

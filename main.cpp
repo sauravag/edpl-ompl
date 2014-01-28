@@ -22,6 +22,23 @@ bool isStateValid(const ob::State *state)
     return om->isStateObservable(state);
 }
 
+ob::ValidStateSamplerPtr allocGaussianValidBeliefSampler(const ob::SpaceInformation *si)
+{
+    // we can perform any additional setup / configuration of a sampler here,
+    // but there is nothing to tweak in case of the ObstacleBasedValidStateSampler.
+    return ob::ValidStateSamplerPtr(new GaussianValidBeliefSampler(si));
+}
+
+ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const ob::SpaceInformation *si)
+{
+    // we can perform any additional setup / configuration of a sampler here,
+    // but there is nothing to tweak in case of the ObstacleBasedValidStateSampler.
+    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+    UniformValidBeliefSampler *unisampler = new UniformValidBeliefSampler(si);
+    unisampler->setObservationModel(om);
+    return ob::ValidStateSamplerPtr(unisampler);
+}
+
 void plan(void)
 {
     typedef SE2BeliefSpace::StateType StateType;
@@ -36,7 +53,7 @@ void plan(void)
 
     space->as<SE2BeliefSpace>()->setBounds(bounds);
 
-    // construct an instance of  space information from this state space
+    // construct an instance of space information from this state space
     ob::SpaceInformationPtr si(new ob::SpaceInformation(space));
 
     ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
@@ -44,10 +61,30 @@ void plan(void)
     // set state validity checking for this space
     si->setStateValidityChecker(ompl::base::StateValidityCheckerPtr(new FIRMValidityChecker(si, om)));
 
+    //set the state sampler
+    si->setValidStateSamplerAllocator(allocUniformValidBeliefSampler);
+
+    ob::ValidStateSamplerPtr   simpleSampler;
+
+    // allocate a valid state sampler, by default, a uniform sampler is allocated
+    simpleSampler = si->allocValidStateSampler();
+
     // create a random start state
     ob::State *start = space->allocState();
 
-    start->as<StateType>()->setXYYaw(1.3,3.2,0);
+    start->as<StateType>()->setXYYaw(0,0,0);
+
+    simpleSampler->sample(start);
+
+    for(int i=0;i<100;i++)
+    {
+        if(simpleSampler->sample(start))
+        {
+            cout<<"The start state is :"<<endl;
+            space->as<SE2BeliefSpace>()->printBeliefState(start);
+            cin.get();
+        }
+    }
 
     cout<<"The start state is :"<<endl;
     space->as<SE2BeliefSpace>()->printBeliefState(start);
@@ -58,7 +95,7 @@ void plan(void)
     cout<<"The goal state is:"<<endl;
     space->as<SE2BeliefSpace>()->printBeliefState(goal);
     //cin.get();
-
+     /*
     // create a problem instance
     ob::ProblemDefinitionPtr pdef(new ob::ProblemDefinition(si));
 
@@ -99,6 +136,7 @@ void plan(void)
     }
     else
         std::cout << "No solution found" << std::endl;
+    */
 }
 
 int main(int, char **)

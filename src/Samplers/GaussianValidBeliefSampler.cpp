@@ -62,13 +62,14 @@ bool GaussianValidBeliefSampler::sample(ompl::base::State *state)
         bool v2 = si_->isValid(temp) ;
         if (v1 != v2)
         {
-            if (v2)
+            if (v2 && isObservable(temp)) // observability check must also be performed
                 si_->copyState(state, temp);
             result = true;
         }
         ++attempts;
     } while (!result && attempts < attempts_);
     si_->freeState(temp);
+
     return result;
 }
 
@@ -85,7 +86,7 @@ bool GaussianValidBeliefSampler::sampleNear(ompl::base::State *state, const ompl
         bool v2 = si_->isValid(temp) ;
         if (v1 != v2)
         {
-            if (v2)
+            if (v2 && isObservable(temp)) // state must be observable to be a valid FIRM node
                 si_->copyState(state, temp);
             result = true;
         }
@@ -96,11 +97,14 @@ bool GaussianValidBeliefSampler::sampleNear(ompl::base::State *state, const ompl
 }
 
 /*
+ Checks whether a sampled state is observable.
+ It might be better to have the observability check in filter
+ instead of observation model and call it from here.
+*/
+
 bool GaussianValidBeliefSampler::isObservable(ompl::base::State *state)
 {
-    ObservationModelPointer om = actuationSystem_->getObservationModel();
-
-    return om->isStateObservable(state);
+    return observationModel_->isStateObservable(state);
 
 }
-*/
+

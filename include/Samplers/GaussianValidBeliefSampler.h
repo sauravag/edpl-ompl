@@ -43,14 +43,14 @@
 #include "../ObservationModels/ObservationModelMethod.h"
 
 /*
-The state validity checker function should collision and observability
+The state validity checker function should check collision and observability
 */
 
 /** \brief Generate valid samples using the Gaussian sampling strategy */
 class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
 {
   public:
-    //typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+    typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
     //typedef ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
 
     /** \brief Constructor */
@@ -78,18 +78,18 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
       stddev_ = stddev;
     }
 
-    /*
-    void setActuationSystem(ActuationSystemPointer as)
+    void setObservationModel(ObservationModelPointer om)
     {
-        actuationSystem_ = as;
+        observationModel_ = om;
     }
-    */
+
 
   protected:
     /** brief Checks if the sample is observable
         i.e. If it can observe sufficient landmarks
+        Ideally, observability check should be performed in the filter instead of obs model
     */
-    //bool isObservable(ompl::base::State *state);
+    bool isObservable(ompl::base::State *state);
 
     /** \brief The sampler to build upon */
     ompl::base::StateSamplerPtr sampler_;
@@ -98,6 +98,7 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
     double                  stddev_;
 
     //ActuationSystemPointer actuationSystem_;
+    ObservationModelPointer observationModel_;
 };
 
 #endif

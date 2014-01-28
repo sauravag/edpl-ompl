@@ -65,6 +65,7 @@
 		<Unit filename="include/ObservationModels/ObservationModelMethod.h" />
 		<Unit filename="include/Planner/FIRM.h" />
 		<Unit filename="include/Samplers/GaussianValidBeliefSampler.h" />
+		<Unit filename="include/Samplers/UniformValidBeliefSampler.h" />
 		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
 		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
@@ -79,6 +80,7 @@
 		<Unit filename="src/Planner/FIRM.cpp" />
 		<Unit filename="src/Planner/GoalVisitor.hpp" />
 		<Unit filename="src/Samplers/GaussianValidBeliefSampler.cpp" />
+		<Unit filename="src/Samplers/UniformValidBeliefSampler.cpp" />
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
 		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />
 		<Unit filename="tinyxml/tinystr.cpp" />

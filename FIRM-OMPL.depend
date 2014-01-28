@@ -293,7 +293,7 @@
 1366321850 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/GreedyKCenters.h
 	"ompl/util/RandomNumbers.h"
 
-1377895141 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
+1390938690 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
 	<ompl/base/spaces/SE3StateSpace.h>
 	<ompl/geometric/SimpleSetup.h>
 	<ompl/config.h>
@@ -385,7 +385,7 @@
 1377121855 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SE2BeliefSpace.cpp
 	"../include/Spaces/SE2BeliefSpace.h"
 
-1377883455 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
+1390937431 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
 	<iostream>
 	<fstream>
 	<ompl/base/SpaceInformation.h>
@@ -404,13 +404,14 @@
 	"include/ActuationSystems/SimulatedActuationSystem.h"
 	"include/Controllers/Controller.h"
 	"include/Samplers/GaussianValidBeliefSampler.h"
+	"include/Samplers/UniformValidBeliefSampler.h"
 	"include/ValidityCheckers/FIRMValidityChecker.h"
 
-1377895018 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
+1390878812 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
 	"FIRMOMPL.h"
 	"tinyxml.h"
 
-1377816454 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/GaussianValidBeliefSampler.h
+1390879568 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/GaussianValidBeliefSampler.h
 	"ompl/base/ValidStateSampler.h"
 	"ompl/base/StateSampler.h"
 	"../ActuationSystems/ActuationSystemMethod.h"
@@ -524,7 +525,7 @@
 	"ActuationSystemMethod.h"
 	"armadillo"
 
-1377549564 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Controllers/Controller.h
+1390860861 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Controllers/Controller.h
 	"../SeparatedControllers/SeparatedControllerMethod.h"
 	"../Filters/KalmanFilterMethod.h"
 	"../MotionModels/MotionModelMethod.h"
@@ -559,7 +560,7 @@
 	"../../include/ObservationModels/CamAruco2DObservationModel.h"
 	"../../tinyxml/tinyxml.h"
 
-1390342170 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/FIRM.cpp
+1390355338 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/FIRM.cpp
 	"../../include/Planner/FIRM.h"
 	"ompl/geometric/planners/prm/PRM.h"
 	"ompl/geometric/planners/prm/ConnectionStrategy.h"
@@ -576,7 +577,7 @@
 	<boost/thread.hpp>
 	"GoalVisitor.hpp"
 
-1377816492 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Samplers/GaussianValidBeliefSampler.cpp
+1390879758 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Samplers/GaussianValidBeliefSampler.cpp
 	"../../include/Samplers/GaussianValidBeliefSampler.h"
 	"ompl/base/SpaceInformation.h"
 	"ompl/tools/config/MagicConstants.h"
@@ -587,13 +588,13 @@
 1377882917 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Spaces/SE2BeliefSpace.cpp
 	"../../include/Spaces/SE2BeliefSpace.h"
 
-1377892908 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ValidityCheckers/FIRMValidityChecker.h
+1390878771 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ValidityCheckers/FIRMValidityChecker.h
 	"../ObservationModels/ObservationModelMethod.h"
 
 1387397613 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/Cost.h
 	<iostream>
 
-1387486426 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/planners/prm/PRM.h
+1390606223 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/geometric/planners/prm/PRM.h
 	"ompl/geometric/planners/PlannerIncludes.h"
 	"ompl/datastructures/NearestNeighbors.h"
 	<boost/graph/graph_traits.hpp>
@@ -609,4 +610,15 @@
 	"ompl/base/OptimizationObjective.h"
 
 1390340520 /home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/GoalVisitor.hpp
+
+1390938355 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/UniformValidBeliefSampler.h
+	"ompl/base/ValidStateSampler.h"
+	"ompl/base/StateSampler.h"
+	"../ActuationSystems/ActuationSystemMethod.h"
+	"../ObservationModels/ObservationModelMethod.h"
+
+1390938461 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Samplers/UniformValidBeliefSampler.cpp
+	"../../include/Samplers/UniformValidBeliefSampler.h"
+	"ompl/base/SpaceInformation.h"
+	"ompl/tools/config/MagicConstants.h"
 

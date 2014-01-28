@@ -68,7 +68,7 @@ class Controller
 
   ompl::base::State*  Stabilize(const ompl::base::State *startState);
 
-  bool    isTerminated(const ompl::base::State *state, const size_t t);
+  bool isTerminated(const ompl::base::State *state, const size_t t);
 
   ompl::base::State* Evolve(const ompl::base::State *state, size_t t, bool isConstructionMode);
 

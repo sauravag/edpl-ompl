@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.2.22)  24 JAN 2014 18:16
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.2.22)  27 JAN 2014 15:58
 entering extended mode
  %&-line parsing enabled.
 **FIRM-OMPL.tex
@@ -755,7 +755,7 @@ LaTeX Info: Redefining \pageref on input line 80.
 
 \AtBeginShipoutBox=\box66
 \figurewidth=\skip61
- <./styles/cranfield_crest.jpg, id=58, 451.6875pt x 449.68pt>
+ <./styles/cranfield_crest.jpg, id=62, 451.6875pt x 449.68pt>
 File: ./styles/cranfield_crest.jpg Graphic file (type jpg)
 
 <use ./styles/cranfield_crest.jpg> [1
@@ -842,21 +842,16 @@ Chapter 3.
 
 
 
-]
-\openout2 = `chap4.aux'.
-
-
-No file chap4.tex.
-(./FIRM-OMPL.aux (./abstract.aux) (./chap1.aux) (./chap2.aux) (./chap3.aux)
-(./chap4.aux)) ) 
+] (./FIRM-OMPL.aux (./abstract.aux) (./chap1.aux) (./chap2.aux)
+(./chap3.aux)) ) 
 Here is how much of TeX's memory you used:
- 16300 strings out of 495061
- 304191 string characters out of 1182621
- 398730 words of memory out of 3000000
- 19002 multiletter control sequences out of 15000+50000
+ 16305 strings out of 495061
+ 304240 string characters out of 1182621
+ 399730 words of memory out of 3000000
+ 19003 multiletter control sequences out of 15000+50000
  13167 words of font info for 45 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 56i,11n,56p,429b,437s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 56i,11n,56p,429b,386s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/sha
 re/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-te
 xlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-texlive/fonts
@@ -865,9 +860,9 @@ blic/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfont
 s/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.
 pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/s
 hare/texmf-texlive/fonts/type1/urw/times/utmb8a.pfb>
-Output written on FIRM-OMPL.pdf (8 pages, 214227 bytes).
+Output written on FIRM-OMPL.pdf (8 pages, 216570 bytes).
 PDF statistics:
- 193 PDF objects out of 1000 (max. 8388607)
- 57 named destinations out of 1000 (max. 500000)
- 122 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 204 PDF objects out of 1000 (max. 8388607)
+ 63 named destinations out of 1000 (max. 500000)
+ 130 words of extra memory for PDF output out of 10000 (max. 10000000)
 

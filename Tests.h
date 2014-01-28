@@ -80,16 +80,16 @@ void TestBeliefStateSampler()
     ompl::base::SpaceInformation *si(new ompl::base::SpaceInformation(space));
     si->setStateValidityChecker(boost::bind(&isTheStateValid, _1));
 
-    GaussianValidBeliefSampler *sampler = new GaussianValidBeliefSampler(si);
+    //GaussianValidBeliefSampler *sampler = new GaussianValidBeliefSampler(si);
 
     ompl::base::State *sampleState = space->allocState();
 
-    sampler->setStdDev(0.2);
+    //sampler->setStdDev(0.2);
     //sampler->setActuationSystem(as);
 
-    sampler->sample(sampleState);
+    //sampler->sample(sampleState);
 
-    space->as<SE2BeliefSpace>()->printBeliefState(sampleState);
+    //space->as<SE2BeliefSpace>()->printBeliefState(sampleState);
 
 }
 void TestObservationModel()
