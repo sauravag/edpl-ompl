@@ -1,13 +1,13 @@
 /**************************************
 Feedback Information RoadMaps Using Open Motion Planning Library
 Authors:
-Saurav Agarwal
-Ali-akbar Agha-mohammadi
+Saurav Agarwal (sauravag@tamu.edu)
+Ali-akbar Agha-mohammadi (aliagha@mit.edu)
 
 Texas A&M University
-Copyright 2013
+Copyright 2014
 **************************************/
-01/21/2013
+
 
 1. Need to figure out whether to use the optimisation route to construct edge costs
 
