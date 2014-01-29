@@ -1,7 +1,8 @@
+
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2013, Texas A&M University
+*  Copyright (c) 2013, Rice University
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -32,54 +33,39 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+/* Author: Based on examples from BGL documentation  */
 
-#ifndef FIRM_OMPL_
-#define FIRM_OMPL_
+// this file should not be installed
+// and only included in .cpp files
 
-#include <iostream>
-#include <fstream>
+#ifndef OMPL_GEOMETRIC_PLANNERS_PRM_A_STAR_GOAL_VISITOR_
+#define OMPL_GEOMETRIC_PLANNERS_PRM_A_STAR_GOAL_VISITOR_
 
-#include <ompl/base/SpaceInformation.h>
-//Spaces
-#include "include/Spaces/SE2BeliefSpace.h"
+namespace
+{
+    struct AStarFoundGoal {}; // exception for termination
 
-//Observation Models
-#include "include/ObservationModels/ObservationModelMethod.h"
-#include "include/ObservationModels/CamAruco2DObservationModel.h"
+    // visitor that terminates when we find the goal
+    // V is the vertex type
+    template<typename V>
+    class AStarGoalVisitor : public boost::default_astar_visitor
+    {
+    public:
+        AStarGoalVisitor(const V &goal) : goal_(goal)
+        {
+        }
 
-//Motion Models
-#include "include/MotionModels/MotionModelMethod.h"
-#include "include/MotionModels/UnicycleMotionModel.h"
+        // G is the graph type
+        template<typename G>
+        void examine_vertex(const V &u, const G &)
+        {
+            if (u == goal_)
+                throw AStarFoundGoal();
+        }
 
-//State Propagators
-#include "include/MotionModels/UnicycleStatePropagator.h"
+    private:
+        V goal_;
+    };
+}
 
-//LinearSystem
-#include "include/LinearSystem/LinearSystem.h"
-
-//Filters
-#include "include/Filters/dare.h"
-#include "include/Filters/KalmanFilterMethod.h"
-#include "include/Filters/ExtendedKF.h"
-
-//Separated Controllers
-#include "include/SeparatedControllers/SeparatedControllerMethod.h"
-#include "include/SeparatedControllers/RHCICreate.h"
-
-//ActuationSystems
-#include "include/ActuationSystems/ActuationSystemMethod.h"
-#include "include/ActuationSystems/SimulatedActuationSystem.h"
-
-//Controllers
-#include "include/Controllers/Controller.h"
-
-// Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
-#include "include/Samplers/UniformValidBeliefSampler.h"
-
-// Validity checkers
-#include "include/ValidityCheckers/FIRMValidityChecker.h"
-
-using namespace std;
 #endif

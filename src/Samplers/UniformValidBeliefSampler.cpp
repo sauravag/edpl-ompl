@@ -34,52 +34,47 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#ifndef FIRM_OMPL_
-#define FIRM_OMPL_
+#include "../../include/Samplers/UniformValidBeliefSampler.h"
+#include "ompl/base/SpaceInformation.h"
+#include "ompl/tools/config/MagicConstants.h"
 
-#include <iostream>
-#include <fstream>
 
-#include <ompl/base/SpaceInformation.h>
-//Spaces
-#include "include/Spaces/SE2BeliefSpace.h"
+UniformValidBeliefSampler::UniformValidBeliefSampler(const SpaceInformation *si) :
+    ValidStateSampler(si), sampler_(si->allocStateSampler())
+{
+    name_ = "uniform";
+}
 
-//Observation Models
-#include "include/ObservationModels/ObservationModelMethod.h"
-#include "include/ObservationModels/CamAruco2DObservationModel.h"
+bool UniformValidBeliefSampler::sample(State *state)
+{
+    unsigned int attempts = 0;
+    bool valid = false;
+    do
+    {
+        sampler_->sampleUniform(state);
+        valid = si_->isValid(state) && isObservable(state);
 
-//Motion Models
-#include "include/MotionModels/MotionModelMethod.h"
-#include "include/MotionModels/UnicycleMotionModel.h"
+        ++attempts;
+    } while (!valid && attempts < attempts_);
+    return valid;
+}
 
-//State Propagators
-#include "include/MotionModels/UnicycleStatePropagator.h"
+bool UniformValidBeliefSampler::sampleNear(State *state, const State *near, const double distance)
+{
+    unsigned int attempts = 0;
+    bool valid = false;
+    do
+    {
+        sampler_->sampleUniformNear(state, near, distance);
+        valid = si_->isValid(state) && isObservable(state) ;
+        ++attempts;
+    } while (!valid && attempts < attempts_);
+    return valid;
+}
 
-//LinearSystem
-#include "include/LinearSystem/LinearSystem.h"
-
-//Filters
-#include "include/Filters/dare.h"
-#include "include/Filters/KalmanFilterMethod.h"
-#include "include/Filters/ExtendedKF.h"
-
-//Separated Controllers
-#include "include/SeparatedControllers/SeparatedControllerMethod.h"
-#include "include/SeparatedControllers/RHCICreate.h"
-
-//ActuationSystems
-#include "include/ActuationSystems/ActuationSystemMethod.h"
-#include "include/ActuationSystems/SimulatedActuationSystem.h"
-
-//Controllers
-#include "include/Controllers/Controller.h"
-
-// Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
-#include "include/Samplers/UniformValidBeliefSampler.h"
-
-// Validity checkers
-#include "include/ValidityCheckers/FIRMValidityChecker.h"
-
-using namespace std;
-#endif
+bool UniformValidBeliefSampler::isObservable(ompl::base::State *state)
+{
+    //if(observationModel_->isStateObservable(state)) std::cout<<"Observable"<<std::endl;
+    //else std::cout<<"Not Observable"<<std::endl;
+    return observationModel_->isStateObservable(state);
+}

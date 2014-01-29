@@ -130,7 +130,39 @@ void TestObservationModel()
     cout<<"Observation Model passed tests"<<endl;
 }
 
+void TestStatePropagator()
+{
+    using namespace ompl;
 
+    UnicycleStatePropagator sp;
+
+    typedef SE2BeliefSpace::StateType StateType;
+    SE2BeliefSpace *space;
+    space =  new SE2BeliefSpace();
+
+    ob::RealVectorBounds bounds(2);
+    bounds.setLow(-5);
+    bounds.setHigh(5);
+
+    space->setBounds(bounds);
+
+    ob::State *from = space->allocState();
+
+    from->as<StateType>()->setXYYaw(1.3,3,0);
+
+    ob::State *to = space->allocState();
+
+    to->as<StateType>()->setXYYaw(5,3,1.57);
+
+    cout<<"The from State is: "<<from->as<StateType>()->getX()<<endl;
+
+    sp.propagate(from, control, 0, to);
+
+
+
+
+
+}
 void TestMotionModel()
 {
     UnicycleMotionModel mm( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" );

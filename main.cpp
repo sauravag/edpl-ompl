@@ -9,6 +9,7 @@
 #include "Tests.h"
 
 namespace ob = ompl::base;
+//namespace oc = ompl::control;
 namespace og = ompl::geometric;
 using namespace arma;
 using namespace std;
@@ -94,7 +95,7 @@ void plan(void)
     pdef->setStartAndGoalStates(start, goal);
 
     // create a planner for the defined space
-    ob::PlannerPtr planner(new ompl::FIRM(si));
+    ob::PlannerPtr planner(new FIRM(si));
 
     // set the problem we are trying to solve for the planner
     planner->setProblemDefinition(pdef);

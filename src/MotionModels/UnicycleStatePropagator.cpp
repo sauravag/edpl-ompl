@@ -1,7 +1,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2013, Texas A&M University
+*  Copyright (c) 2014, Texas A&M University
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -31,55 +31,46 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
+/* Author: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+#include "../../include/MotionModels/UnicycleStatePropagator.h"
+#include "ompl/control/spaces/RealVectorControlSpace.h"
+#include "ompl/util/Exception.h"
+using namespace ompl;
 
-#ifndef FIRM_OMPL_
-#define FIRM_OMPL_
+UnicycleStatePropagator::UnicycleStatePropagator(const control::SpaceInformationPtr &si) : StatePropagator(si)
+{
+    // The path to this setup file must not be hardcopied, need a better way to do this
+    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel("/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
 
-#include <iostream>
-#include <fstream>
+    motionModel_ = mm;
+}
 
-#include <ompl/base/SpaceInformation.h>
-//Spaces
-#include "include/Spaces/SE2BeliefSpace.h"
+void UnicycleStatePropagator::propagate(const base::State *state, const control::Control* control, const double duration, base::State *result) const
+{
 
-//Observation Models
-#include "include/ObservationModels/ObservationModelMethod.h"
-#include "include/ObservationModels/CamAruco2DObservationModel.h"
+    // convert control into vector of doubles
+    arma::colvec controlVec;
 
-//Motion Models
-#include "include/MotionModels/MotionModelMethod.h"
-#include "include/MotionModels/UnicycleMotionModel.h"
+    const double *conVals = control->as<control::RealVectorControlSpace::ControlType>()->values;
 
-//State Propagators
-#include "include/MotionModels/UnicycleStatePropagator.h"
+    for (unsigned int i = 0; i < motionModel_->controlDim(); i++)
+    {
+        controlVec[i] = conVals[i];
+    }
 
-//LinearSystem
-#include "include/LinearSystem/LinearSystem.h"
+    // copy the start state into the result state
+    si_->copyState(result, state);
 
-//Filters
-#include "include/Filters/dare.h"
-#include "include/Filters/KalmanFilterMethod.h"
-#include "include/Filters/ExtendedKF.h"
+    // set the time step
+    //motionModel_->setTimeStep(duration);
 
-//Separated Controllers
-#include "include/SeparatedControllers/SeparatedControllerMethod.h"
-#include "include/SeparatedControllers/RHCICreate.h"
+    // use the motionmodel to apply the controls
+    motionModel_->Evolve(result, controlVec, motionModel_->getZeroNoise());
+}
 
-//ActuationSystems
-#include "include/ActuationSystems/ActuationSystemMethod.h"
-#include "include/ActuationSystems/SimulatedActuationSystem.h"
+bool UnicycleStatePropagator::canPropagateBackward(void) const
+{
+    return false;
+}
 
-//Controllers
-#include "include/Controllers/Controller.h"
-
-// Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
-#include "include/Samplers/UniformValidBeliefSampler.h"
-
-// Validity checkers
-#include "include/ValidityCheckers/FIRMValidityChecker.h"
-
-using namespace std;
-#endif

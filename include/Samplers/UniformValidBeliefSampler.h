@@ -34,52 +34,54 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#ifndef FIRM_OMPL_
-#define FIRM_OMPL_
+#ifndef UNIFORM_VALID_BELIEF_SAMPLER_
+#define UNIFORM_VALID_BELIEF_SAMPLER_
 
-#include <iostream>
-#include <fstream>
+#include "ompl/base/ValidStateSampler.h"
+#include "ompl/base/StateSampler.h"
+#include "../ActuationSystems/ActuationSystemMethod.h"
+#include "../ObservationModels/ObservationModelMethod.h"
 
-#include <ompl/base/SpaceInformation.h>
-//Spaces
-#include "include/Spaces/SE2BeliefSpace.h"
+/*
+Samples states in the belief space uniformly.
+While sampling, the function should check collision and observability.
+*/
 
-//Observation Models
-#include "include/ObservationModels/ObservationModelMethod.h"
-#include "include/ObservationModels/CamAruco2DObservationModel.h"
+/** \brief Generate valid samples using the Uniform sampling strategy */
+class UniformValidBeliefSampler : public ompl::base::ValidStateSampler
+{
+  public:
+    typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+    //typedef ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
 
-//Motion Models
-#include "include/MotionModels/MotionModelMethod.h"
-#include "include/MotionModels/UnicycleMotionModel.h"
+    /** \brief Constructor */
+    UniformValidBeliefSampler(const SpaceInformation *si);
 
-//State Propagators
-#include "include/MotionModels/UnicycleStatePropagator.h"
+    virtual ~UniformValidBeliefSampler(void)
+    {
+    }
 
-//LinearSystem
-#include "include/LinearSystem/LinearSystem.h"
+    virtual bool sample(State *state);
+    virtual bool sampleNear(State *state, const State *near, const double distance);
 
-//Filters
-#include "include/Filters/dare.h"
-#include "include/Filters/KalmanFilterMethod.h"
-#include "include/Filters/ExtendedKF.h"
+    void setObservationModel(ObservationModelPointer om)
+    {
+        observationModel_ = om;
+    }
 
-//Separated Controllers
-#include "include/SeparatedControllers/SeparatedControllerMethod.h"
-#include "include/SeparatedControllers/RHCICreate.h"
+  protected:
 
-//ActuationSystems
-#include "include/ActuationSystems/ActuationSystemMethod.h"
-#include "include/ActuationSystems/SimulatedActuationSystem.h"
+    /** \brief The sampler to build upon */
+    StateSamplerPtr sampler_;
 
-//Controllers
-#include "include/Controllers/Controller.h"
+    /** brief Checks if the sample is observable
+        i.e. If it can observe sufficient landmarks
+        Ideally, observability check should be performed in the filter instead of obs model
+    */
+    bool isObservable(ompl::base::State *state);
 
-// Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
-#include "include/Samplers/UniformValidBeliefSampler.h"
+    //ActuationSystemPointer actuationSystem_;
+    ObservationModelPointer observationModel_;
+};
 
-// Validity checkers
-#include "include/ValidityCheckers/FIRMValidityChecker.h"
-
-using namespace std;
 #endif

@@ -65,6 +65,7 @@
 		<Unit filename="include/LocalPlanners/MotionModelLP.h" />
 		<Unit filename="include/MotionModels/MotionModelMethod.h" />
 		<Unit filename="include/MotionModels/UnicycleMotionModel.h" />
+		<Unit filename="include/MotionModels/UnicycleStatePropagator.h" />
 		<Unit filename="include/ObservationModels/CamAruco2DObservationModel.h" />
 		<Unit filename="include/ObservationModels/ObservationModelMethod.h" />
 		<Unit filename="include/Planner/FIRM.h" />

@@ -1,7 +1,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2013, Texas A&M University
+*  Copyright (c) 2014, Texas A&M University
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -31,55 +31,46 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
+/* Author: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+#ifndef UNICYCLE_STATE_PROPAGATOR_
+#define UNICYCLE_STATE_PROPAGATOR_
 
-#ifndef FIRM_OMPL_
-#define FIRM_OMPL_
+#include "ompl/control/SpaceInformation.h"
+#include "UnicycleMotionModel.h"
 
-#include <iostream>
-#include <fstream>
+/** \brief State propagation for a unicycle motion model.
 
-#include <ompl/base/SpaceInformation.h>
-//Spaces
-#include "include/Spaces/SE2BeliefSpace.h"
+   */
+class UnicycleStatePropagator : public ompl::control::StatePropagator
+{
+public:
 
-//Observation Models
-#include "include/ObservationModels/ObservationModelMethod.h"
-#include "include/ObservationModels/CamAruco2DObservationModel.h"
+    /** \brief Construct representation of a unicycle state propagator.
+    */
+    UnicycleStatePropagator(const ompl::control::SpaceInformationPtr &si);
 
-//Motion Models
-#include "include/MotionModels/MotionModelMethod.h"
-#include "include/MotionModels/UnicycleMotionModel.h"
+    virtual ~UnicycleStatePropagator(void)
+    {
+    }
 
-//State Propagators
-#include "include/MotionModels/UnicycleStatePropagator.h"
 
-//LinearSystem
-#include "include/LinearSystem/LinearSystem.h"
+    /** \brief Will always return false, as the simulation can only proceed forward in time */
+    virtual bool canPropagateBackward(void) const;
 
-//Filters
-#include "include/Filters/dare.h"
-#include "include/Filters/KalmanFilterMethod.h"
-#include "include/Filters/ExtendedKF.h"
+    /** \brief Propagate from a state, under a given control, for some specified amount of time.
+        We use the motion model to do the actual number crunching.
 
-//Separated Controllers
-#include "include/SeparatedControllers/SeparatedControllerMethod.h"
-#include "include/SeparatedControllers/RHCICreate.h"
+    */
+    virtual void propagate(const ompl::base::State *state, const ompl::control::Control* control, const double duration, ompl::base::State *result) const;
 
-//ActuationSystems
-#include "include/ActuationSystems/ActuationSystemMethod.h"
-#include "include/ActuationSystems/SimulatedActuationSystem.h"
+protected:
 
-//Controllers
-#include "include/Controllers/Controller.h"
+    MotionModelMethod::MotionModelPointer motionModel_;
+    /**
+    You can add a simulated environment here where the controls can get applied, useful for
+    showing the graphics, very similar to the concept of ActuationSystem in PMPL.
+    */
+};
 
-// Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
-#include "include/Samplers/UniformValidBeliefSampler.h"
-
-// Validity checkers
-#include "include/ValidityCheckers/FIRMValidityChecker.h"
-
-using namespace std;
 #endif

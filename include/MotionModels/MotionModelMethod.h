@@ -75,6 +75,8 @@ class MotionModelMethod
 			zeroNoise_(arma::zeros<NoiseType>(noiseDim_)),
 			dt_(0.0) {}
 
+        void setTimeStep(double timeStep){ dt_ = timeStep;}
+
 		//Destructor
 		virtual ~MotionModelMethod() {};
 

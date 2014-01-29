@@ -65,10 +65,16 @@ This requires us to set:
  \item Should we add the monte carlo simulation to this class or keep our own MotionModelLP to do that.
 \end{enumerate}
 
-\subsection{OMPL RealVectorControl}
+\subsection{Using the Control Space}
 
-OMPL defines a control space and we must use that instead of armadillo (old pmpl implementation). So need to change how we use \textcolor{red}{ControlType}.
-Instead of colvec it should use the OMPL stuff.
+\begin{itemize}
+ \item OMPL defines a control space and we must use RealVectorControl instead of armadillo (old pmpl implementation). So need to change how we use \textcolor{red}{ControlType}. Instead of colvec it should use the OMPL stuff. 
+ 
+ \item An instance of a \textbf{StatePropagator} class is to be defined in controlspace. Its job is to propagate the state of a robot based on control input. We need to  derive      our motion model from this class. 
+
+ \end{itemize}
+
+
 
 \subsection{Modifications required to OMPL PRM}
 
