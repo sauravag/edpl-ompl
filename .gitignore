@@ -1,2 +1,5 @@
 *.o
 *.pdf
+*.aux
+*.backup
+*.out
