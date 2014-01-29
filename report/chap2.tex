@@ -30,9 +30,15 @@ external libraries (except BOOST) which gives it a disadvantage in terms of extr
  \item \textit{growRoadmap}: Takes as input a termination condition and a state, samples a valid state and puts it in input state and adds it to the graph.
 \end{enumerate}
 
-\subsection{Sampling a valid state}
-While sampling we need to check if a state is in collision and observable. The collision check is done by validitychecker. 
-The observability check can be done by filter or observation model (currently chosen).
+\subsection{Sampling a valid belief}
+
+\begin{enumerate}
+ \item While sampling we need to check if a state is in collision and observable. 
+ \item The collision check is done by validitychecker. 
+ \item The observability check can be done by filter or observation model (currently chosen).
+ \item If sampled state passes all checks, we need to construct its stationary belief.
+\end{enumerate}
+
 
 \subsection{State Validity Checking}
 Can code be simply re-used, is there any need to write a new validitychecker? 
@@ -43,7 +49,7 @@ Can code be simply re-used, is there any need to write a new validitychecker?
  \item 
 \end{itemize}
 
-\subsection{StateInformation}
+\subsection{SpaceInformation Class}
 
 This requires us to set:
 \begin{enumerate}
@@ -51,6 +57,18 @@ This requires us to set:
  \item MotionChecker
  \item Sampler
 \end{enumerate}
+
+\subsection{The OMPL MotionValidator class}
+
+\begin{enumerate}
+ \item Checks if the intermediate states between start and end states are valid. Is basically the localplanner.
+ \item Should we add the monte carlo simulation to this class or keep our own MotionModelLP to do that.
+\end{enumerate}
+
+\subsection{OMPL RealVectorControl}
+
+OMPL defines a control space and we must use that instead of armadillo (old pmpl implementation). So need to change how we use \textcolor{red}{ControlType}.
+Instead of colvec it should use the OMPL stuff.
 
 \subsection{Modifications required to OMPL PRM}
 

@@ -449,7 +449,7 @@ void CamAruco2DObservationModel::loadLandmarks(const char *pathToSetupFile)
     itemElement->QueryDoubleAttribute("theta", &attributeVal) ;
     landmark[3] = attributeVal;
 
-    std::cout<<"New landmark loaded [id,x,y,theta]:  "<<std::endl<<landmark<<std::endl;
+    //std::cout<<"New landmark loaded [id,x,y,theta]:  "<<std::endl<<landmark<<std::endl;
     this->landmarks_.push_back(landmark);
   }
     std::cout<<"Total number of landmarks loaded successfully :"<<landmarks_.size()<<endl;

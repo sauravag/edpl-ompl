@@ -76,26 +76,17 @@ void plan(void)
 
     simpleSampler->sample(start);
 
-    for(int i=0;i<100;i++)
-    {
-        if(simpleSampler->sample(start))
-        {
-            cout<<"The start state is :"<<endl;
-            space->as<SE2BeliefSpace>()->printBeliefState(start);
-            cin.get();
-        }
-    }
-
     cout<<"The start state is :"<<endl;
     space->as<SE2BeliefSpace>()->printBeliefState(start);
-    //cin.get();
+    ;
     // create a random goal state
     ob::State *goal = space->allocState();
     goal->as<StateType>()->setXYYaw(1,2,0);
+
     cout<<"The goal state is:"<<endl;
     space->as<SE2BeliefSpace>()->printBeliefState(goal);
     //cin.get();
-     /*
+
     // create a problem instance
     ob::ProblemDefinitionPtr pdef(new ob::ProblemDefinition(si));
 
@@ -136,7 +127,7 @@ void plan(void)
     }
     else
         std::cout << "No solution found" << std::endl;
-    */
+
 }
 
 int main(int, char **)

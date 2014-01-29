@@ -54,20 +54,20 @@ class MotionModelMethod
 
 		typedef arma::colvec  ControlType;
 		typedef arma::colvec  NoiseType;
-    typedef SE2BeliefSpace SpaceType;
+        typedef SE2BeliefSpace SpaceType;
 		typedef SpaceType::StateType StateType;
 		typedef arma::mat     JacobianType;
-    typedef boost::shared_ptr<MotionModelMethod> MotionModelPointer;
+        typedef boost::shared_ptr<MotionModelMethod> MotionModelPointer;
 
-    ///////////////////////////////////////////
-    //		Constructors and destructors 			 //
-    ///////////////////////////////////////////
-		//Default constructor
-		//MotionModelMethod() : stateDim_(0), controlDim_(0), noiseDim_(0) {}
+        ///////////////////////////////////////////
+        //		Constructors and destructors 			 //
+        ///////////////////////////////////////////
+        //Default constructor
+        //MotionModelMethod() : stateDim_(0), controlDim_(0), noiseDim_(0) {}
 
 
 		MotionModelMethod(int sDim=0, int cDim=0, int nDim=0):
-      //TODO: can the noise dimension actually be different from the control dimension?
+        //TODO: can the noise dimension actually be different from the control dimension?
 			stateDim_(sDim),
 			controlDim_(cDim),
 			zeroControl_(arma::zeros<ControlType>(controlDim_)),
@@ -78,13 +78,6 @@ class MotionModelMethod
 		//Destructor
 		virtual ~MotionModelMethod() {};
 
-    ////////////////////////////////
-    //		Public functions				//
-    ////////////////////////////////
-    /*
-		virtual void PrintOptions(ostream& _out) const {
-			_out << this->GetName() << endl;
-		}*/
 
 		//Produce the next state, given the current state, a control and a noise
 		//Implementation is specific to particular motion model
@@ -95,15 +88,7 @@ class MotionModelMethod
 		virtual std::vector<ControlType> generateOpenLoopControls(const ompl::base::State *startState,
                                                         const ompl::base::State *endState) = 0;
 
-    /*
-		virtual bool
-		ConnectCfgs(const CfgType& _start, const CfgType& _end,
-		vector<CfgType>& _intermediates, vector<ControlType>& _controls) {
-			assert(!"This function should never be used for production code! \
-			It is there only for unit testing purposes");
 
-		};
-    */
 
 		//Generate noise according to specified state and control input
 		//Appears to be common to all motion models
@@ -122,22 +107,16 @@ class MotionModelMethod
 		virtual arma::mat
 		processNoiseCovariance(const ompl::base::State *state, const ControlType& u) = 0;
 
+        // Get zero control which affects no change on the robot
 		virtual const ControlType& getZeroControl() { return zeroControl_; }
+
+		// Zero noise
 		virtual const NoiseType& getZeroNoise()     { return zeroNoise_; }
 
-    virtual const size_t controlDim()           { return controlDim_; }
+        virtual const size_t controlDim()           { return controlDim_; }
 
-    /*
-		virtual bool GenerateOrbit(const CfgType& _start,
-			vector<CfgType>& _intermediates,
-			vector<ControlType>& _controls) {
 
-				assert(!"The selected motion model does not have an implementation of GenerateOrbit yet!");
-				return false;
-		}
-    */
-
-    virtual double getTimestepSize() { return dt_; }
+        virtual double getTimestepSize() { return dt_; }
 
 	protected:
 

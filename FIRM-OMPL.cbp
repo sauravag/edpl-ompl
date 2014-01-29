@@ -24,8 +24,11 @@
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_control.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_geometric.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.8" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.0.14.1" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.9" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.0.14.1" />
+					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.9" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/py_boost_function.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_tools.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_util.so" />
@@ -59,6 +62,7 @@
 		<Unit filename="include/Filters/KalmanFilterMethod.h" />
 		<Unit filename="include/Filters/dare.h" />
 		<Unit filename="include/LinearSystem/LinearSystem.h" />
+		<Unit filename="include/LocalPlanners/MotionModelLP.h" />
 		<Unit filename="include/MotionModels/MotionModelMethod.h" />
 		<Unit filename="include/MotionModels/UnicycleMotionModel.h" />
 		<Unit filename="include/ObservationModels/CamAruco2DObservationModel.h" />
@@ -75,6 +79,7 @@
 		<Unit filename="src/ActuationSystems/SimulatedActuationSystem.cpp" />
 		<Unit filename="src/Filters/ExtendedKF.cpp" />
 		<Unit filename="src/Filters/LinearizedKF.cpp" />
+		<Unit filename="src/LocalPlanner/MotionModelLP.cpp" />
 		<Unit filename="src/MotionModels/UnicycleMotionModel.cpp" />
 		<Unit filename="src/ObservationModels/CamAruco2DObservationModel.cpp" />
 		<Unit filename="src/Planner/FIRM.cpp" />

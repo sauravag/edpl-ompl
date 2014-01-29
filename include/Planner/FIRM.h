@@ -1,7 +1,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2011, Rice University
+*  Copyright (c) 2014, Texas A&M University
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,7 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
-
-/* Author: Ioan Sucan, James D. Marble, Ryan Luna */
+/* Author: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #ifndef FIRM_PLANNER_
 #define FIRM_PLANNER_
