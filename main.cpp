@@ -142,7 +142,7 @@ int main(int, char **)
   Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
   Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
 
-  plan();
+  //plan();
 
   //TestSE2BeliefSpace();
   //TestBeliefStateSampler();
@@ -152,6 +152,7 @@ int main(int, char **)
   //TestRHCICreate();
   //TestController();
   //TestFIRMWeight();
+  TestStatePropagator();
 
   return 0;
 }

@@ -40,7 +40,7 @@ void SimulatedActuationSystem::applyControl(ControlType& u)
 
   typename MotionModelMethod::NoiseType noise = motionModel_->generateNoise(trueState_, u);
 
-  trueState_ = motionModel_->Evolve(trueState_, u, noise);
+  //trueState_ = motionModel_->Evolve(trueState_, u, noise);
 
   //OGLDisplay<MPTraits>::UpdateTrueState(m_trueState);
   //cout<<" The True State is :"<<endl<<m_trueState.GetArmaData()<<endl;

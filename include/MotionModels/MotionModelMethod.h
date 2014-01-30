@@ -83,7 +83,7 @@ class MotionModelMethod
 
 		//Produce the next state, given the current state, a control and a noise
 		//Implementation is specific to particular motion model
-		virtual ompl::base::State* Evolve(const ompl::base::State *state, const ControlType& u, const NoiseType& w) = 0;
+		virtual void Evolve(const ompl::base::State *state, const ControlType& u, const NoiseType& w, ompl::base::State *result) = 0;
 
 		//Generate open loop control between two specified Cfgs/states
 		//Implementation is specific to particular motion model

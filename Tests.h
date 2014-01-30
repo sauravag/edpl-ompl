@@ -132,35 +132,49 @@ void TestObservationModel()
 
 void TestStatePropagator()
 {
-    using namespace ompl;
-
-    UnicycleStatePropagator sp;
-
+    namespace ob = ompl::base;
+    namespace oc = ompl::control;
     typedef SE2BeliefSpace::StateType StateType;
-    SE2BeliefSpace *space;
-    space =  new SE2BeliefSpace();
 
+    ob::StateSpacePtr space(new SE2BeliefSpace());
+
+    // set the bounds for the R^3 part of SE(3)
     ob::RealVectorBounds bounds(2);
-    bounds.setLow(-5);
-    bounds.setHigh(5);
+    bounds.setLow(-6);
+    bounds.setHigh(6);
 
-    space->setBounds(bounds);
+    space->as<SE2BeliefSpace>()->setBounds(bounds);
+
+    // construct an instance of space information from this state space
+    ob::SpaceInformationPtr si(new ob::SpaceInformation(space));
 
     ob::State *from = space->allocState();
 
-    from->as<StateType>()->setXYYaw(1.3,3,0);
+    from->as<StateType>()->setXYYaw(1,1,0);
 
     ob::State *to = space->allocState();
 
-    to->as<StateType>()->setXYYaw(5,3,1.57);
-
     cout<<"The from State is: "<<from->as<StateType>()->getX()<<endl;
 
-    sp.propagate(from, control, 0, to);
+    unsigned int dim = 2;
 
+    ompl::control::ControlSpacePtr controlSpace( new ompl::control::RealVectorControlSpace(space,2) ) ;
 
+    ompl::control::SpaceInformationPtr controlSpaceInfo(new oc::SpaceInformation(space, controlSpace));
 
+    ompl::control::Control *command = controlSpace->allocControl();
 
+    command->as<oc::RealVectorControlSpace::ControlType>()->values[0] = 1;
+    command->as<oc::RealVectorControlSpace::ControlType>()->values[1] = 1;
+
+    std::cout<<"The set control values are ->"<<std::endl;
+    controlSpace->printControl(command, std::cout) ;
+
+    UnicycleStatePropagator sp(controlSpaceInfo);
+
+    sp.propagate(from, command, 1, to);
+
+    space->as<SE2BeliefSpace>()->printBeliefState(to);
 
 }
 void TestMotionModel()
@@ -210,8 +224,9 @@ void TestMotionModel()
 
     for(int i=0; i< openLoopControls.size() ; i++)
     {
-        colvec w = mm.generateNoise(nextState, openLoopControls[i]);
-        nextState = mm.Evolve(nextState, openLoopControls[i], w);
+        colvec w = mm.generateNoise(from, openLoopControls[i]);
+        mm.Evolve(from, openLoopControls[i], w, nextState);
+        space->copyState(from, nextState);
 
     }
 
@@ -283,7 +298,7 @@ void TestKalmanFilter()
     for(int i=0; i< openLoopControls.size() ; i++)
     {
         colvec w = mm->generateNoise(from, openLoopControls[i]);
-        nextState = mm->Evolve(from, openLoopControls[i], w);
+        mm->Evolve(from, openLoopControls[i], w, nextState);
         colvec obs = om->getObservation(nextState, true);
         kfEstimate = kf.Evolve(kfEstimate, openLoopControls[i], obs, dummy, dummy);
         si->copyState(from, nextState);
@@ -377,7 +392,7 @@ void TestRHCICreate()
         // generate motion noise based on true state
         colvec w = mm->generateNoise(from, rhcU);
         // evolve true state
-        nextState = mm->Evolve(from, rhcU, w);
+        mm->Evolve(from, rhcU, w, nextState);
         //get observation based on true state
         colvec obs = om->getObservation(nextState, true);
         //evolve kalman filter using control and obs
@@ -449,7 +464,7 @@ void TestController()
     for(typename vector<colvec>::iterator c=openLoopControls.begin(), e=openLoopControls.end(); c!=e; ++c)
     {
         ompl::base::State *x = space->allocState();
-        x = mm->Evolve(intermediate,*c,mm->getZeroNoise());
+        mm->Evolve(intermediate,*c,mm->getZeroNoise(), x);
         intermediates.push_back(x);
         space->copyState(intermediate, x);
     }

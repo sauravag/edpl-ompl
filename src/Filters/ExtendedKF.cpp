@@ -51,7 +51,7 @@ ompl::base::State* ExtendedKF::Predict(const ompl::base::State *belief,
   SpaceType *space;
   space =  new SpaceType();
   ompl::base::State *predState = space->allocState();
-  predState = this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise());
+  this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predState);
 
   mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
     ls.getG() * ls.getQ() * trans(ls.getG());

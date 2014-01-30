@@ -41,6 +41,9 @@
 #include <fstream>
 
 #include <ompl/base/SpaceInformation.h>
+#include <ompl/control/SpaceInformation.h>
+#include <ompl/control/spaces/RealVectorControlSpace.h>
+
 //Spaces
 #include "include/Spaces/SE2BeliefSpace.h"
 

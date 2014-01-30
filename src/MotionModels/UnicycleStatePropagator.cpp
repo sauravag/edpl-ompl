@@ -50,7 +50,7 @@ void UnicycleStatePropagator::propagate(const base::State *state, const control:
 {
 
     // convert control into vector of doubles
-    arma::colvec controlVec;
+    arma::colvec controlVec(2);
 
     const double *conVals = control->as<control::RealVectorControlSpace::ControlType>()->values;
 
@@ -59,14 +59,18 @@ void UnicycleStatePropagator::propagate(const base::State *state, const control:
         controlVec[i] = conVals[i];
     }
 
-    // copy the start state into the result state
-    si_->copyState(result, state);
-
     // set the time step
-    //motionModel_->setTimeStep(duration);
+    motionModel_->setTimeStep(duration);
+
+    typedef SE2BeliefSpace::StateType StateType;
+
+    ompl::base::StateSpacePtr space(new SE2BeliefSpace());
+
+    ompl::base::State *to = space->allocState();
 
     // use the motionmodel to apply the controls
-    motionModel_->Evolve(result, controlVec, motionModel_->getZeroNoise());
+    motionModel_->Evolve(state, controlVec, motionModel_->getZeroNoise(), result);
+
 }
 
 bool UnicycleStatePropagator::canPropagateBackward(void) const

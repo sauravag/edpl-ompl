@@ -73,7 +73,7 @@ class UnicycleMotionModel : public MotionModelMethod
 
     ~UnicycleMotionModel() {}
 
-    ompl::base::State* Evolve(const ompl::base::State *state, const ControlType& u, const NoiseType& w);
+    void Evolve(const ompl::base::State *state, const ControlType& u, const NoiseType& w, ompl::base::State *result);
 
     std::vector<ControlType> generateOpenLoopControls(const ompl::base::State *startState,
                                                   const ompl::base::State *endState);

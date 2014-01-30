@@ -52,12 +52,11 @@ inline int signum(double& d)
 }
 
 //Produce the next state, given the current state, a control and a noise
-ompl::base::State* UnicycleMotionModel::Evolve(const ompl::base::State *state, const ControlType& u, const NoiseType& w)
+void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ControlType& u, const NoiseType& w, ompl::base::State *result)
 {
 
   using namespace arma;
   typedef typename MotionModelMethod::StateType StateType;
-  //cout << "Evolve" << endl;
   typedef std::vector<double> stdvec;
   //Assume the cfg type is compatible with this motion model (this should have been checked in the constructor)
 
@@ -66,13 +65,15 @@ ompl::base::State* UnicycleMotionModel::Evolve(const ompl::base::State *state, c
   //cout << "noise vector: " << endl << w << endl;
   //cout << "getting control noise " << endl;
   //cout << "controlDim_ = " << this->controlDim_ << endl;
+  std::cout<<"The input control is :"<<u<<std::endl;
+
   const colvec& Un = w.subvec(0, this->controlDim_-1);
   //cout << "getting process noise " << endl;
   //cout << "noiseDim_ = " << this->noiseDim_ << endl;
   const colvec& Wg = w.subvec(this->controlDim_, this->noiseDim_-1);
 
   colvec x = state->as<StateType>()->getArmaData();
-
+  std::cout<<"The input state is   :"<<x<<std::endl;
   const double c = cos(x[2]);
   const double s = sin(x[2]);
 
@@ -83,13 +84,12 @@ ompl::base::State* UnicycleMotionModel::Evolve(const ompl::base::State *state, c
 
   x += (u2*this->dt_) + (Un2*sqrt(this->dt_)) + (Wg*sqrt(this->dt_));
 
+  std::cout<<"The evolved state is   :"<<x<<std::endl;
+
   SpaceType *space;
   space =  new SpaceType();
-  ompl::base::State *nextState = space->allocState();
 
-  nextState->as<StateType>()->setXYYaw(x[0],x[1],x[2]);
-
-  return nextState;
+  result->as<StateType>()->setXYYaw(x[0],x[1],x[2]);
 }
 
 
