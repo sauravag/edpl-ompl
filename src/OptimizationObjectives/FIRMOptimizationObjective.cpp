@@ -33,28 +33,22 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
-#include "../ObservationModels/ObservationModelMethod.h"
-/*
-Used to check if a state is in collission or not moreover,
-in FIRM we need to know if a state is observable or not
-before adding it to the graph.
-*/
 
-class FIRMValidityChecker : public ompl::base::StateValidityChecker
+#include "../../include/OptimizationObjectives/FIRMOptimizationObjective.h"
+
+ompl::base::Cost FIRMOptimizationObjective::motionCost(const ompl::base::State *s1, const ompl::base::State *s2)
 {
-  public:
-    typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
 
-    FIRMValidityChecker(const ompl::base::SpaceInformationPtr &si/**, ObservationModelPointer om*/) :
-    ompl::base::StateValidityChecker(si)/**, observationModel_(om)*/
-    {
-    }
 
-    virtual bool isValid(const ompl::base::State *state) const
-    {
-      return true;
-    }
 
-//  private:
- //   ObservationModelPointer observationModel_;
-};
+
+
+}
+
+
+
+
+
+
+
+

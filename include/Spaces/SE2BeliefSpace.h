@@ -12,143 +12,144 @@ using namespace ompl::base;
 class SE2BeliefSpace : public ompl::base::CompoundStateSpace
 {
 
-  public:
-
-    /** \brief A belief in SE(2): (x, y, yaw, covariance) */
-    class StateType : public CompoundStateSpace::StateType
-    {
     public:
-        StateType(void) : CompoundStateSpace::StateType()
+
+        /** \brief A belief in SE(2): (x, y, yaw, covariance) */
+        class StateType : public CompoundStateSpace::StateType
         {
-          covariance_ = arma::zeros<arma::mat>(3,3);
-          reachDist_ = 0;
-          controllerID_ = -1;
+        public:
+            StateType(void) : CompoundStateSpace::StateType()
+            {
+              covariance_ = arma::zeros<arma::mat>(3,3);
+              reachDist_ = 0;
+              controllerID_ = -1;
 
-        }
+            }
 
-        /** \brief Get the X component of the state */
-        double getX(void) const
-        {
-            return as<RealVectorStateSpace::StateType>(0)->values[0];
-        }
+            /** \brief Get the X component of the state */
+            double getX(void) const
+            {
+                return as<RealVectorStateSpace::StateType>(0)->values[0];
+            }
 
-        /** \brief Get the Y component of the state */
-        double getY(void) const
-        {
-            return as<RealVectorStateSpace::StateType>(0)->values[1];
-        }
+            /** \brief Get the Y component of the state */
+            double getY(void) const
+            {
+                return as<RealVectorStateSpace::StateType>(0)->values[1];
+            }
 
-        /** \brief Get the yaw component of the state. This is
-            the rotation in plane, with respect to the Z
-            axis. */
-        double getYaw(void) const
-        {
-            return as<SO2StateSpace::StateType>(1)->value;
-        }
+            /** \brief Get the yaw component of the state. This is
+                the rotation in plane, with respect to the Z
+                axis. */
+            double getYaw(void) const
+            {
+                return as<SO2StateSpace::StateType>(1)->value;
+            }
 
-        arma::mat getCovariance(void) const
-        {
-            return covariance_;
-        }
+            arma::mat getCovariance(void) const
+            {
+                return covariance_;
+            }
 
-        /** \brief Set the X component of the state */
-        void setX(double x)
-        {
-            as<RealVectorStateSpace::StateType>(0)->values[0] = x;
-        }
+            /** \brief Set the X component of the state */
+            void setX(double x)
+            {
+                as<RealVectorStateSpace::StateType>(0)->values[0] = x;
+            }
 
-        /** \brief Set the Y component of the state */
-        void setY(double y)
-        {
-            as<RealVectorStateSpace::StateType>(0)->values[1] = y;
-        }
+            /** \brief Set the Y component of the state */
+            void setY(double y)
+            {
+                as<RealVectorStateSpace::StateType>(0)->values[1] = y;
+            }
 
-        /** \brief Set the X and Y components of the state */
-        void setXY(double x, double y)
-        {
-            setX(x);
-            setY(y);
-        }
+            /** \brief Set the X and Y components of the state */
+            void setXY(double x, double y)
+            {
+                setX(x);
+                setY(y);
+            }
 
-        /** \brief Set the yaw component of the state. This is
-            the rotation in plane, with respect to the Z
-            axis. */
-        void setYaw(double yaw)
-        {
-            as<SO2StateSpace::StateType>(1)->value = yaw;
-        }
+            /** \brief Set the yaw component of the state. This is
+                the rotation in plane, with respect to the Z
+                axis. */
+            void setYaw(double yaw)
+            {
+                as<SO2StateSpace::StateType>(1)->value = yaw;
+            }
 
-        void setXYYaw(double x, double y, double yaw)
-        {
-            setX(x);
-            setY(y);
-            setYaw(yaw);
-        }
+            void setXYYaw(double x, double y, double yaw)
+            {
+                setX(x);
+                setY(y);
+                setYaw(yaw);
+            }
 
-        void setCovariance(arma::mat cov){
-            covariance_ = cov;
-        }
+            void setCovariance(arma::mat cov){
+                covariance_ = cov;
+            }
 
-        arma::colvec getArmaData(void) const
-        {
-            arma::colvec stateVec(3);
+            arma::colvec getArmaData(void) const
+            {
+                arma::colvec stateVec(3);
 
-            stateVec[0] = getX();
-            stateVec[1] = getY();
-            stateVec[2] = getYaw();
-            return stateVec;
-        }
+                stateVec[0] = getX();
+                stateVec[1] = getY();
+                stateVec[2] = getYaw();
+                return stateVec;
+            }
 
-        static double meanNormWeight_, covNormWeight_;
+            static double meanNormWeight_, covNormWeight_;
 
         private:
-          arma::mat covariance_;
-          double reachDist_;
-          size_t controllerID_;
+              arma::mat covariance_;
+              double reachDist_;
+              size_t controllerID_;
 
-    };
+        };
 
 
-    SE2BeliefSpace(void) : CompoundStateSpace()
-    {
-        setName("SE2_BELIEF" + getName());
-        type_ = STATE_SPACE_SE2;
-        addSubspace(StateSpacePtr(new RealVectorStateSpace(2)), 1.0);
-        addSubspace(StateSpacePtr(new SO2StateSpace()), 0.5);
-        lock();
-    }
+        SE2BeliefSpace(void) : CompoundStateSpace()
+        {
+            setName("SE2_BELIEF" + getName());
+            type_ = STATE_SPACE_SE2;
+            addSubspace(StateSpacePtr(new RealVectorStateSpace(2)), 1.0);
+            addSubspace(StateSpacePtr(new SO2StateSpace()), 0.5);
+            lock();
+        }
 
-    virtual ~SE2BeliefSpace(void)
-    {
-    }
+        virtual ~SE2BeliefSpace(void)
+        {
+        }
 
-    /** \copydoc RealVectorStateSpace::setBounds() */
-    void setBounds(const RealVectorBounds &bounds)
-    {
-        as<RealVectorStateSpace>(0)->setBounds(bounds);
-    }
+        /** \copydoc RealVectorStateSpace::setBounds() */
+        void setBounds(const RealVectorBounds &bounds)
+        {
+            as<RealVectorStateSpace>(0)->setBounds(bounds);
+        }
 
-    /** \copydoc RealVectorStateSpace::getBounds() */
-    const RealVectorBounds& getBounds(void) const
-    {
-        return as<RealVectorStateSpace>(0)->getBounds();
-    }
+        /** \copydoc RealVectorStateSpace::getBounds() */
+        const RealVectorBounds& getBounds(void) const
+        {
+            return as<RealVectorStateSpace>(0)->getBounds();
+        }
 
-    virtual State* allocState(void) const;
-    virtual void copyState(State *destination,const State *source) const;
-    virtual void freeState(State *state) const;
+        virtual State* allocState(void) const;
+        virtual void copyState(State *destination,const State *source) const;
+        virtual void freeState(State *state) const;
 
-    //virtual void registerProjections(void);
-    virtual double distance(const State* state1, const State *state2);
+        //virtual void registerProjections(void);
+        virtual double distance(const State* state1, const State *state2);
 
-    // gets the relative vector between "from" and "to"
-    // equivalent to result = vectorA-vectorB
-    void getRelativeState(const State *from, const State *to, State *state);
+        // gets the relative vector between "from" and "to"
+        // equivalent to result = vectorA-vectorB
+        void getRelativeState(const State *from, const State *to, State *state);
 
-    void printBeliefState(const State *state);
+        void printBeliefState(const State *state);
 
 };
 #endif
+
 /*
   BeliefSpace(const SE2StateSpace& state = SE2StateSpace(),
                 const arma::mat& covariance = arma::zeros<arma::mat>(0,0),

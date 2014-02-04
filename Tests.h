@@ -120,7 +120,7 @@ void TestObservationModel()
 
     assert(obs.n_rows == pred_obs.n_rows && obs.n_cols == pred_obs.n_cols);
     // Check if the IDs of the predicted and seen observations match.
-    for(int i=0; i<obs.n_rows/4; i++)
+    for(unsigned int i=0; i<obs.n_rows/4; i++)
     {
         //cout<<"The observation is :"<< obs[i*4] <<endl;
         //cout<<"The predicted observation is :"<< pred_obs[i*4]<<endl;
@@ -222,7 +222,7 @@ void TestMotionModel()
 
     ompl::base::State *nextState =  from;
 
-    for(int i=0; i< openLoopControls.size() ; i++)
+    for(unsigned int i=0; i< openLoopControls.size() ; i++)
     {
         colvec w = mm.generateNoise(from, openLoopControls[i]);
         mm.Evolve(from, openLoopControls[i], w, nextState);

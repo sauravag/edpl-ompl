@@ -3,13 +3,14 @@
 
 #include <ompl/config.h>
 #include <iostream>
+#include <istream>
 #include "include/Planner/FIRM.h"
 #include "include/Spaces/SE2BeliefSpace.h"
 #include "FIRMOMPL.h"
 #include "Tests.h"
 
 namespace ob = ompl::base;
-//namespace oc = ompl::control;
+namespace oc = ompl::control;
 namespace og = ompl::geometric;
 using namespace arma;
 using namespace std;
@@ -23,20 +24,20 @@ bool isStateValid(const ob::State *state)
     return om->isStateObservable(state);
 }
 
-ob::ValidStateSamplerPtr allocGaussianValidBeliefSampler(const ob::SpaceInformation *si)
+ob::ValidStateSamplerPtr allocGaussianValidBeliefSampler(const firm::SpaceInformation *si)
 {
     // we can perform any additional setup / configuration of a sampler here,
     // but there is nothing to tweak in case of the ObstacleBasedValidStateSampler.
     return ob::ValidStateSamplerPtr(new GaussianValidBeliefSampler(si));
 }
 
-ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const ob::SpaceInformation *si)
+ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const firm::SpaceInformation *si)
 {
     // we can perform any additional setup / configuration of a sampler here,
     // but there is nothing to tweak in case of the ObstacleBasedValidStateSampler.
-    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+    //ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
     UniformValidBeliefSampler *unisampler = new UniformValidBeliefSampler(si);
-    unisampler->setObservationModel(om);
+    //unisampler->setObservationModel(om);
     return ob::ValidStateSamplerPtr(unisampler);
 }
 
@@ -45,25 +46,41 @@ void plan(void)
     typedef SE2BeliefSpace::StateType StateType;
 
     // construct the state space we are planning in
-    ob::StateSpacePtr space(new SE2BeliefSpace());
+    ob::StateSpacePtr statespace(new SE2BeliefSpace());
 
     // set the bounds for the R^3 part of SE(3)
     ob::RealVectorBounds bounds(2);
     bounds.setLow(-6);
     bounds.setHigh(6);
 
-    space->as<SE2BeliefSpace>()->setBounds(bounds);
+    statespace->as<SE2BeliefSpace>()->setBounds(bounds);
+
+    //Construct the control space
+    oc::ControlSpacePtr controlspace( new oc::RealVectorControlSpace(statespace,2) ) ;
 
     // construct an instance of space information from this state space
-    ob::SpaceInformationPtr si(new ob::SpaceInformation(space));
+    //oc::SpaceInformationPtr si(new FIRMSpaceInformation(statespace, controlspace));
+    firm::SpaceInformation::SpaceInformationPtr si(new firm::SpaceInformation(statespace, controlspace));
 
-    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+    // provide the observation model to the space
+    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel("/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+    si->setObservationModel(om);
+
+    // Provide the motion model to the space
+    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
+    si->setMotionModel(mm);
 
     // set state validity checking for this space
-    si->setStateValidityChecker(ompl::base::StateValidityCheckerPtr(new FIRMValidityChecker(si, om)));
+    si->setStateValidityChecker(ompl::base::StateValidityCheckerPtr(new FIRMValidityChecker(si)));
+
+    // set motion validator
+    si->setMotionValidator(ob::MotionValidatorPtr(new ob::DiscreteMotionValidator(si)));
 
     //set the state sampler
     si->setValidStateSamplerAllocator(allocUniformValidBeliefSampler);
+
+    //set the state propagator
+    si->setStatePropagator(oc::StatePropagatorPtr(new UnicycleStatePropagator(si))) ;
 
     ob::ValidStateSamplerPtr   simpleSampler;
 
@@ -71,21 +88,21 @@ void plan(void)
     simpleSampler = si->allocValidStateSampler();
 
     // create a random start state
-    ob::State *start = space->allocState();
+    ob::State *start = statespace->allocState();
 
     start->as<StateType>()->setXYYaw(0,0,0);
 
     simpleSampler->sample(start);
 
     cout<<"The start state is :"<<endl;
-    space->as<SE2BeliefSpace>()->printBeliefState(start);
-    ;
+    statespace->as<SE2BeliefSpace>()->printBeliefState(start);
+
     // create a random goal state
-    ob::State *goal = space->allocState();
+    ob::State *goal = statespace->allocState();
     goal->as<StateType>()->setXYYaw(1,2,0);
 
     cout<<"The goal state is:"<<endl;
-    space->as<SE2BeliefSpace>()->printBeliefState(goal);
+    statespace->as<SE2BeliefSpace>()->printBeliefState(goal);
     //cin.get();
 
     // create a problem instance
@@ -142,7 +159,7 @@ int main(int, char **)
   Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
   Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
 
-  //plan();
+  plan();
 
   //TestSE2BeliefSpace();
   //TestBeliefStateSampler();
@@ -152,7 +169,7 @@ int main(int, char **)
   //TestRHCICreate();
   //TestController();
   //TestFIRMWeight();
-  TestStatePropagator();
+  //TestStatePropagator();
 
   return 0;
 }

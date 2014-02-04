@@ -40,7 +40,7 @@
 #include "ompl/base/ValidStateSampler.h"
 #include "ompl/base/StateSampler.h"
 #include "../ActuationSystems/ActuationSystemMethod.h"
-#include "../ObservationModels/ObservationModelMethod.h"
+#include "../SpaceInformation/SpaceInformation.h"
 
 /*
 The state validity checker function should check collision and observability
@@ -54,7 +54,7 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
     //typedef ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
 
     /** \brief Constructor */
-    GaussianValidBeliefSampler(const ompl::base::SpaceInformation *si);
+    GaussianValidBeliefSampler(const firm::SpaceInformation *si);
 
     virtual ~GaussianValidBeliefSampler(void)
     {
@@ -78,10 +78,12 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
       stddev_ = stddev;
     }
 
+    /**
     void setObservationModel(ObservationModelPointer om)
     {
         observationModel_ = om;
     }
+    */
 
 
   protected:
@@ -98,7 +100,7 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
     double                  stddev_;
 
     //ActuationSystemPointer actuationSystem_;
-    ObservationModelPointer observationModel_;
+    //ObservationModelPointer observationModel_;
 };
 
 #endif

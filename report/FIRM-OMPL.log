@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.2.22)  29 JAN 2014 12:54
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.2.22)  3 FEB 2014 11:00
 entering extended mode
  %&-line parsing enabled.
 **FIRM-OMPL.tex
@@ -701,11 +701,7 @@ Writing nomenclature file FIRM-OMPL.nlo
 (/usr/share/texmf-texlive/tex/latex/base/ifthen.sty
 Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 ) (./FIRM-OMPL.aux
-(./abstract.aux)
-No file chap1.aux.
-No file chap2.aux.
-No file chap3.aux.
-)
+(./abstract.aux) (./chap1.aux) (./chap2.aux) (./chap3.aux))
 \openout1 = `FIRM-OMPL.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 79.
@@ -722,7 +718,8 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 79.
 LaTeX Font Info:    ... okay on input line 79.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 79.
 LaTeX Font Info:    ... okay on input line 79.
- (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
+
+(/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count148
 \scratchdimen=\dimen183
@@ -844,13 +841,13 @@ Chapter 3.
 ] (./FIRM-OMPL.aux (./abstract.aux) (./chap1.aux) (./chap2.aux)
 (./chap3.aux)) ) 
 Here is how much of TeX's memory you used:
- 16318 strings out of 495061
- 304413 string characters out of 1182621
- 397931 words of memory out of 3000000
- 19005 multiletter control sequences out of 15000+50000
+ 16328 strings out of 495061
+ 304507 string characters out of 1182621
+ 399249 words of memory out of 3000000
+ 19008 multiletter control sequences out of 15000+50000
  13335 words of font info for 46 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 56i,11n,56p,448b,380s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 56i,11n,56p,448b,462s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/sha
 re/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-te
 xlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-texlive/fonts
@@ -860,9 +857,9 @@ s/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.
 pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/s
 hare/texmf-texlive/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texmf-
 texlive/fonts/type1/urw/times/utmb8a.pfb>
-Output written on FIRM-OMPL.pdf (10 pages, 242467 bytes).
+Output written on FIRM-OMPL.pdf (10 pages, 244856 bytes).
 PDF statistics:
- 266 PDF objects out of 1000 (max. 8388607)
- 82 named destinations out of 1000 (max. 500000)
+ 267 PDF objects out of 1000 (max. 8388607)
+ 83 named destinations out of 1000 (max. 500000)
  186 words of extra memory for PDF output out of 10000 (max. 10000000)
 

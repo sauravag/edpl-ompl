@@ -40,12 +40,15 @@
 #include <iostream>
 #include <fstream>
 
+// OMPL includes
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/control/spaces/RealVectorControlSpace.h>
+#include <ompl/base/DiscreteMotionValidator.h>
 
 //Spaces
 #include "include/Spaces/SE2BeliefSpace.h"
+#include "include/SpaceInformation/SpaceInformation.h"
 
 //Observation Models
 #include "include/ObservationModels/ObservationModelMethod.h"
@@ -84,5 +87,7 @@
 // Validity checkers
 #include "include/ValidityCheckers/FIRMValidityChecker.h"
 
-using namespace std;
+// FIRM Optimization Objective
+//#include "include/OptimizationObjectives/FIRMOptimizationObjective.h"
+
 #endif

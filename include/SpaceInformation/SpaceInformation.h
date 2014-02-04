@@ -33,28 +33,69 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+
+#ifndef FIRM_SPACE_INFORMATION_
+#define FIRM_SPACE_INFORMATION_
+
+#include "ompl/control/SpaceInformation.h"
+#include "../MotionModels/MotionModelMethod.h"
 #include "../ObservationModels/ObservationModelMethod.h"
-/*
-Used to check if a state is in collission or not moreover,
-in FIRM we need to know if a state is observable or not
-before adding it to the graph.
+
+/**
+The FIRMSpace information class is a derivative of the control::spaceinformation
+that enables us to add FIRM specific information to the space. Specifically,
+we need to use the motion/observation models time and again. We need not construct
+them multiple times. Instead, we can make them members of this new class
 */
 
-class FIRMValidityChecker : public ompl::base::StateValidityChecker
+namespace firm
 {
-  public:
-    typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
-
-    FIRMValidityChecker(const ompl::base::SpaceInformationPtr &si/**, ObservationModelPointer om*/) :
-    ompl::base::StateValidityChecker(si)/**, observationModel_(om)*/
+    class SpaceInformation : public ompl::control::SpaceInformation
     {
-    }
 
-    virtual bool isValid(const ompl::base::State *state) const
-    {
-      return true;
-    }
+        public:
+            typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
+            typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+            typedef boost::shared_ptr<SpaceInformation> SpaceInformationPtr;
 
-//  private:
- //   ObservationModelPointer observationModel_;
-};
+            SpaceInformation(const ompl::base::StateSpacePtr &stateSpace,
+                                const ompl::control::ControlSpacePtr &controlSpace) :
+            ompl::control::SpaceInformation(stateSpace, controlSpace)
+            {
+            }
+
+
+            virtual ~SpaceInformation(void)
+            {
+            }
+
+            void setObservationModel(ObservationModelPointer om)
+            {
+                observationModel_ = om;
+            }
+
+            void setMotionModel(MotionModelPointer mm)
+            {
+                motionModel_ = mm;
+            }
+
+            ObservationModelPointer getObservationModel(void)
+            {
+                return observationModel_;
+            }
+
+            MotionModelPointer getMotionModel(void)
+            {
+                return motionModel_;
+            }
+
+        protected:
+
+            ObservationModelPointer observationModel_;
+            MotionModelPointer motionModel_;
+
+
+
+    };
+}
+#endif

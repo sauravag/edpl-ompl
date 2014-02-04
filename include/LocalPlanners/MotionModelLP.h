@@ -1,7 +1,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2013, Texas A&M University
+*  Copyright (c) 2014, Texas A&M University
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -31,30 +31,28 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
+/* Author: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
-#include "../ObservationModels/ObservationModelMethod.h"
-/*
-Used to check if a state is in collission or not moreover,
-in FIRM we need to know if a state is observable or not
-before adding it to the graph.
-*/
+#ifndef MOTIONMODEL_LOCAL_PLANNER_
+#define MOTIONMODEL_LOCAL_PLANNER_
 
-class FIRMValidityChecker : public ompl::base::StateValidityChecker
-{
-  public:
-    typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+#include "../../include/MotionModels/MotionModelMethod.h"
 
-    FIRMValidityChecker(const ompl::base::SpaceInformationPtr &si/**, ObservationModelPointer om*/) :
-    ompl::base::StateValidityChecker(si)/**, observationModel_(om)*/
-    {
-    }
 
-    virtual bool isValid(const ompl::base::State *state) const
-    {
-      return true;
-    }
 
-//  private:
- //   ObservationModelPointer observationModel_;
-};
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

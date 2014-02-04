@@ -33,28 +33,39 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
-#include "../ObservationModels/ObservationModelMethod.h"
-/*
-Used to check if a state is in collission or not moreover,
-in FIRM we need to know if a state is observable or not
-before adding it to the graph.
+
+#ifndef FIRM_OPTIMIZATION_OBJECTIVE_
+#define FIRM_OPTIMIZATION_OBJECTIVE_
+
+#include "ompl/base/OptimizationObjective.h"
+#include "ompl/control/SpaceInformation.h"
+#include "../Controllers/Controller.h"
+#include "../SeparatedControllers/RHCICreate.h"
+#include "../Filters/ExtendedKF.h"
+
+/**
+The cost to execute an edge i.e. going from some node A to some node B
+is defined as the FIRM optimization objective. The cost is a measure of the
+uncertainty in the system (e.g. trace(covariance) for all intermediate states on the edge).
+FIRM gives us paths that have the least uncertainty.
 */
-
-class FIRMValidityChecker : public ompl::base::StateValidityChecker
+// We can template this class on the filter and controller
+class FIRMOptimizationObjective : public ompl::base::OptimizationObjective
 {
-  public:
-    typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+    public:
 
-    FIRMValidityChecker(const ompl::base::SpaceInformationPtr &si/**, ObservationModelPointer om*/) :
-    ompl::base::StateValidityChecker(si)/**, observationModel_(om)*/
-    {
-    }
+        FIRMOptimizationObjective(const ompl::control::SpaceInformationPtr &si);
 
-    virtual bool isValid(const ompl::base::State *state) const
-    {
-      return true;
-    }
+        /** \brief Motion cost for this objective is defined as
+            the sum of trace(covariance)for all intermediate states
+            between \e s1 and \e s2, using the method SpaceInformation::distance(). */
+        virtual ompl::base::Cost motionCost(const ompl::base::State *s1, const ompl::base::State *s2);
 
-//  private:
- //   ObservationModelPointer observationModel_;
-};
+
+    protected:
+
+        Controller<RHCICreate, ExtendedKF> controller_;
+
+
+}
+#endif

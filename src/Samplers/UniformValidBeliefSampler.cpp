@@ -76,5 +76,6 @@ bool UniformValidBeliefSampler::isObservable(ompl::base::State *state)
 {
     //if(observationModel_->isStateObservable(state)) std::cout<<"Observable"<<std::endl;
     //else std::cout<<"Not Observable"<<std::endl;
-    return observationModel_->isStateObservable(state);
+    //return observationModel_->isStateObservable(state);
+    return si_->getObservationModel()->isStateObservable(state);
 }

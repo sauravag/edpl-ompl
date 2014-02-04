@@ -294,11 +294,12 @@
 1366325450 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/GreedyKCenters.h
 	"ompl/util/RandomNumbers.h"
 
-1391040334 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
+1391477387 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
 	<ompl/base/spaces/SE3StateSpace.h>
 	<ompl/geometric/SimpleSetup.h>
 	<ompl/config.h>
 	<iostream>
+	<istream>
 	"include/Planner/FIRM.h"
 	"include/Spaces/SE2BeliefSpace.h"
 	"FIRMOMPL.h"
@@ -369,7 +370,7 @@
 
 1377895100 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Weight/FIRMWeight.h
 
-1377882590 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Spaces/SE2BeliefSpace.h
+1391462226 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Spaces/SE2BeliefSpace.h
 	"ompl/base/spaces/SE2StateSpace.h"
 	"ompl/base/spaces/SE3StateSpace.h"
 	<boost/math/constants/constants.hpp>
@@ -386,13 +387,15 @@
 1377121855 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SE2BeliefSpace.cpp
 	"../include/Spaces/SE2BeliefSpace.h"
 
-1391043856 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
+1391477319 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
 	<iostream>
 	<fstream>
 	<ompl/base/SpaceInformation.h>
 	<ompl/control/SpaceInformation.h>
 	<ompl/control/spaces/RealVectorControlSpace.h>
+	<ompl/base/DiscreteMotionValidator.h>
 	"include/Spaces/SE2BeliefSpace.h"
+	"include/SpaceInformation/SpaceInformation.h"
 	"include/ObservationModels/ObservationModelMethod.h"
 	"include/ObservationModels/CamAruco2DObservationModel.h"
 	"include/MotionModels/MotionModelMethod.h"
@@ -411,15 +414,15 @@
 	"include/Samplers/UniformValidBeliefSampler.h"
 	"include/ValidityCheckers/FIRMValidityChecker.h"
 
-1391046973 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
+1391292334 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
 	"FIRMOMPL.h"
 	"tinyxml.h"
 
-1390879568 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/GaussianValidBeliefSampler.h
+1391477490 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/GaussianValidBeliefSampler.h
 	"ompl/base/ValidStateSampler.h"
 	"ompl/base/StateSampler.h"
 	"../ActuationSystems/ActuationSystemMethod.h"
-	"../ObservationModels/ObservationModelMethod.h"
+	"../SpaceInformation/SpaceInformation.h"
 
 1374862301 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/GaussianValidBeliefSampler.cpp
 	"../include/Samplers/GaussianValidBeliefSampler.h"
@@ -529,7 +532,7 @@
 	"ActuationSystemMethod.h"
 	"armadillo"
 
-1390860861 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Controllers/Controller.h
+1391462450 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Controllers/Controller.h
 	"../SeparatedControllers/SeparatedControllerMethod.h"
 	"../Filters/KalmanFilterMethod.h"
 	"../MotionModels/MotionModelMethod.h"
@@ -564,7 +567,7 @@
 	"../../include/ObservationModels/CamAruco2DObservationModel.h"
 	"../../tinyxml/tinyxml.h"
 
-1391025299 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/FIRM.cpp
+1391285040 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/FIRM.cpp
 	"../../include/Planner/FIRM.h"
 	"ompl/geometric/planners/prm/PRM.h"
 	"ompl/geometric/planners/prm/ConnectionStrategy.h"
@@ -592,7 +595,7 @@
 1377882917 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Spaces/SE2BeliefSpace.cpp
 	"../../include/Spaces/SE2BeliefSpace.h"
 
-1390878771 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ValidityCheckers/FIRMValidityChecker.h
+1391463029 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ValidityCheckers/FIRMValidityChecker.h
 	"../ObservationModels/ObservationModelMethod.h"
 
 1387397612 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/Cost.h
@@ -615,11 +618,11 @@
 
 1390340520 /home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/GoalVisitor.hpp
 
-1390938355 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/UniformValidBeliefSampler.h
+1391477452 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Samplers/UniformValidBeliefSampler.h
 	"ompl/base/ValidStateSampler.h"
 	"ompl/base/StateSampler.h"
 	"../ActuationSystems/ActuationSystemMethod.h"
-	"../ObservationModels/ObservationModelMethod.h"
+	"../SpaceInformation/SpaceInformation.h"
 
 1390938842 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Samplers/UniformValidBeliefSampler.cpp
 	"../../include/Samplers/UniformValidBeliefSampler.h"
@@ -682,7 +685,7 @@
 	"ompl/control/SpaceInformation.h"
 	"UnicycleMotionModel.h"
 
-1391046625 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/MotionModels/UnicycleStatePropagator.cpp
+1391047124 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/MotionModels/UnicycleStatePropagator.cpp
 	"../../include/MotionModels/UnicycleStatePropagator.h"
 	"ompl/control/spaces/RealVectorControlSpace.h"
 	"ompl/util/Exception.h"
@@ -691,4 +694,18 @@
 	"ompl/control/ControlSpace.h"
 	"ompl/base/spaces/RealVectorBounds.h"
 	<vector>
+
+1387397612 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/DiscreteMotionValidator.h
+	"ompl/base/MotionValidator.h"
+	"ompl/base/SpaceInformation.h"
+
+1391461996 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SpaceInformation/FIRMSpaceInformation.h
+	"ompl/control/SpaceInformation.h"
+	"../MotionModels/MotionModelMethod.h"
+	"../ObservationModels/ObservationModelMethod.h"
+
+1391478735 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SpaceInformation/SpaceInformation.h
+	"ompl/control/SpaceInformation.h"
+	"../MotionModels/MotionModelMethod.h"
+	"../ObservationModels/ObservationModelMethod.h"
 

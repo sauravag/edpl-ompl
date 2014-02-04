@@ -68,11 +68,13 @@
 		<Unit filename="include/MotionModels/UnicycleStatePropagator.h" />
 		<Unit filename="include/ObservationModels/CamAruco2DObservationModel.h" />
 		<Unit filename="include/ObservationModels/ObservationModelMethod.h" />
+		<Unit filename="include/OptimizationObjectives/FIRMOptimizationObjective.h" />
 		<Unit filename="include/Planner/FIRM.h" />
 		<Unit filename="include/Samplers/GaussianValidBeliefSampler.h" />
 		<Unit filename="include/Samplers/UniformValidBeliefSampler.h" />
 		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
 		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />
+		<Unit filename="include/SpaceInformation/FIRMSpaceInformation.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
 		<Unit filename="include/ValidityCheckers/FIRMValidityChecker.h" />
 		<Unit filename="include/Weight/FIRMWeight.h" />
@@ -82,7 +84,9 @@
 		<Unit filename="src/Filters/LinearizedKF.cpp" />
 		<Unit filename="src/LocalPlanner/MotionModelLP.cpp" />
 		<Unit filename="src/MotionModels/UnicycleMotionModel.cpp" />
+		<Unit filename="src/MotionModels/UnicycleStatePropagator.cpp" />
 		<Unit filename="src/ObservationModels/CamAruco2DObservationModel.cpp" />
+		<Unit filename="src/OptimizationObjectives/FIRMOptimizationObjective.cpp" />
 		<Unit filename="src/Planner/FIRM.cpp" />
 		<Unit filename="src/Planner/GoalVisitor.hpp" />
 		<Unit filename="src/Samplers/GaussianValidBeliefSampler.cpp" />

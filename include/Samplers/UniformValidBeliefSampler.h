@@ -40,7 +40,7 @@
 #include "ompl/base/ValidStateSampler.h"
 #include "ompl/base/StateSampler.h"
 #include "../ActuationSystems/ActuationSystemMethod.h"
-#include "../ObservationModels/ObservationModelMethod.h"
+#include "../SpaceInformation/SpaceInformation.h"
 
 /*
 Samples states in the belief space uniformly.
@@ -51,11 +51,11 @@ While sampling, the function should check collision and observability.
 class UniformValidBeliefSampler : public ompl::base::ValidStateSampler
 {
   public:
-    typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+    //typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
     //typedef ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
 
     /** \brief Constructor */
-    UniformValidBeliefSampler(const SpaceInformation *si);
+    UniformValidBeliefSampler(const firm::SpaceInformation *si);
 
     virtual ~UniformValidBeliefSampler(void)
     {
@@ -64,10 +64,12 @@ class UniformValidBeliefSampler : public ompl::base::ValidStateSampler
     virtual bool sample(State *state);
     virtual bool sampleNear(State *state, const State *near, const double distance);
 
+    /**
     void setObservationModel(ObservationModelPointer om)
     {
         observationModel_ = om;
     }
+    */
 
   protected:
 
@@ -81,7 +83,7 @@ class UniformValidBeliefSampler : public ompl::base::ValidStateSampler
     bool isObservable(ompl::base::State *state);
 
     //ActuationSystemPointer actuationSystem_;
-    ObservationModelPointer observationModel_;
+    //ObservationModelPointer observationModel_;
 };
 
 #endif

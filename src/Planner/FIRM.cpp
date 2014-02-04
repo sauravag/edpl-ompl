@@ -480,6 +480,7 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
             {
                 successfulConnectionAttemptsProperty_[m]++;
                 successfulConnectionAttemptsProperty_[n]++;
+                // This where we perform MC simulation to get edge cost
                 const ompl::base::Cost weight = opt_->motionCost(stateProperty_[m], stateProperty_[n]);
                 const unsigned int id = maxEdgeID_++;
                 const Graph::edge_property_type properties(weight, id);

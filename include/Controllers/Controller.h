@@ -60,8 +60,7 @@ class Controller
 
   Controller(const ompl::base::State *goal,
 		        const std::vector<ompl::base::State*>& nominalXs,
-			      const std::vector<ControlType>& nominalUs,
-			      ActuationSystemPointer as);
+			      const std::vector<ControlType>& nominalUs ,ActuationSystemPointer as);
 
   ompl::base::State*  Execute(const ompl::base::State *startState, bool& isFailed,int& failureCode,
                 double& executionCost, bool constructionMode=true, double sleepTime=0.0);
@@ -189,7 +188,7 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
   //---------------//
   //cout<<"The observations from actuation system are: "<<endl<<z<<endl;
 
-  int singleobservationdim = 4;
+  unsigned int singleobservationdim = 4;
   //cout<<" The construction mode is: "<<_isConstructionMode<<endl;
 
   //Adding obstacle markers
@@ -285,7 +284,7 @@ ompl::base::State* Controller<SeparatedControllerType, FilterType>::Execute(cons
   ompl::base::State* endState = space->allocState();
   si->copyState(endState, startState);
 
-  int k = 0;
+  unsigned int k = 0;
 
   // HOW TO SET INITAL VALUE OF COST
   //cost = 1 - > for time based only if time per execution is "1"
@@ -363,10 +362,10 @@ ompl::base::State* Controller<SeparatedControllerType, FilterType>::Execute(cons
     {
       //this->GetMPProblem()->RemoveDecayedObstacles(); // check and remove decayed obstacles
     }
-    /*
+    /**
      Increment cost by:
-     0.01 for time based
-     trace of covariance for FIRM
+     -> 0.01 for time based
+     -> trace(Covariance) for FIRM
     */
     cost += arma::trace(endState->as<StateType>()->getCovariance());
   }

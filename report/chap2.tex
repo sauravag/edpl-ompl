@@ -45,17 +45,18 @@ Can code be simply re-used, is there any need to write a new validitychecker?
 
 \begin{itemize}
  \item We need to check for collision. Can use the provided FCL wrapper in OMPL.
- \item The observability check is also done through validitychecker because the information about space should be accessed through the space information.
- \item 
+ \item The observability check can also done through validitychecker because the information about space should be accessed through the space information.
+
 \end{itemize}
 
 \subsection{SpaceInformation Class}
 
-This requires us to set:
+We use the \textbf{ompl::control::SpaceInformation} class. This combines the statespace and controlspace information. This requires us to set:
 \begin{enumerate}
- \item ValidityChecker
- \item MotionChecker
- \item Sampler
+ \item ValidityChecker: Checks if a state is collision free.
+ \item MotionChecker: Checks if we can have a valid motion (collision free and satisfying dynamic constraints) between two states.
+ \item Sampler: Samples a valid state which can be added to the graph as a node.
+ \item StatePropagator: Given a control and its duration, it propagates the system.
 \end{enumerate}
 
 \subsection{The OMPL MotionValidator class}
@@ -71,23 +72,36 @@ This requires us to set:
  \item OMPL defines a control space and we must use RealVectorControl instead of armadillo (old pmpl implementation). So need to change how we use \textcolor{red}{ControlType}. Instead of colvec it should use the OMPL stuff. 
  
  \item An instance of a \textbf{StatePropagator} class is to be defined in controlspace. Its job is to propagate the state of a robot based on control input. We need to  derive      our motion model from this class. 
+ 
+  \item We can use the \textbf{SpaceInformation} class belonging to control space for our planner. \textcolor{red}{Should we derive a space from control:spaceinformation and then provide it access to the motion model and observation model? Since the spaceinformationptr gets passed around to all important classes, this will ease implementation.} 
 
  \end{itemize}
 
-
+ \subsubsection{How to define an Edge}
+ In PMPL, we used a Controller class to describe our edges [used it for node controllers also]. These controllers (edges) were stored in a vector and 
+ their indexes were stored for each edge. OMPL gives us a \textbf{PathControl} class, which defines a path in control space. It can be used to derive a new
+ FIRMEdge class.
 
 \subsection{Modifications required to OMPL PRM}
 
 \begin{enumerate}
+
+ \item Check if a state is observable before adding it to the graph. The \textbf{UniformValidBeliefSampler} and   \textbf{GaussianValidBeliefSampler} will check the observability for a sample, whether to actually put the observability check in filter or observation model needs to be decided
+   
  \item In the function \textit{addMilestone}:
   \begin{enumerate}
-   \item Check if a state is observable before adding it to the graph - \textcolor{red}{I think the \textit{GaussianValidBeliefSampler} should check the observability for a sample, whether to actually put the observability check in filter or observation model needs to be decided} 
-   \item Call localplanner to run the monte carlo simulation and generate edge costs
-   \item 
+   \item Need to calculate the cost-to-go between vertices. This is the edge cost + stabilization cost. Should we define it as an optimization objective ?
   \end{enumerate}
 
-  \item Should the motionmodel and observationmodel be provided to the planner or to problemdefinition (like pmpl)?
+  \item Should the motionmodel and observationmodel be provided to the planner or to problemdefinition (like pmpl) or to a new spaceinformation ?
 \end{enumerate}
+
+We can create the controller class inside the planner. Would make sense.
+
+\subsubsection{Calculating Cost-To-Go}
+
+We can define a new \textbf{InformationOptimizationObjective} whose job is to calculate the cost-to-go. This way we can minimize the changes required to the PRM
+class.
 
 
 \section{Issues}
