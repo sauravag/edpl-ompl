@@ -40,6 +40,7 @@
 
 #include "../MotionModels/MotionModelMethod.h"
 #include "../LinearSystem/LinearSystem.h"
+#include "ompl/control/Control.h"
 
 class SeparatedControllerMethod
 {
@@ -68,7 +69,7 @@ class SeparatedControllerMethod
 
     ~SeparatedControllerMethod() {}
 
-    virtual ControlType generateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) = 0;
+    virtual ompl::control::Control* generateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) = 0;
 
     //void SetReachedFlag(bool _flag){m_reachedFlag = _flag;}
 

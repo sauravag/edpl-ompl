@@ -71,7 +71,7 @@ namespace ompl
     }
 }
 
-FIRM::FIRM(const ompl::base::SpaceInformationPtr &si, bool starStrategy) :
+FIRM::FIRM(const ompl::control::SpaceInformationPtr &si, bool starStrategy) :
     ompl::base::Planner(si, "FIRM"),
     starStrategy_(starStrategy),
     stateProperty_(boost::get(vertex_state_t(), g_)),
@@ -85,6 +85,7 @@ FIRM::FIRM(const ompl::base::SpaceInformationPtr &si, bool starStrategy) :
     userSetConnectionStrategy_(false),
     addedSolution_(false)
 {
+    siC_ = si.get();
     specs_.recognizedGoal = ompl::base::GOAL_SAMPLEABLE_REGION;
     specs_.approximateSolutions = true;
     specs_.optimizingPaths = true;

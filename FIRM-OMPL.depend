@@ -48,7 +48,7 @@
 	<string>
 	<map>
 
-1387397612 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/SpaceInformation.h
+1391566362 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/SpaceInformation.h
 	"ompl/base/State.h"
 	"ompl/base/StateValidityChecker.h"
 	"ompl/base/MotionValidator.h"
@@ -294,7 +294,7 @@
 1366325450 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/GreedyKCenters.h
 	"ompl/util/RandomNumbers.h"
 
-1391477387 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
+1391551003 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
 	<ompl/base/spaces/SE3StateSpace.h>
 	<ompl/geometric/SimpleSetup.h>
 	<ompl/config.h>
@@ -355,7 +355,7 @@
 	<boost/foreach.hpp>
 	<boost/thread.hpp>
 
-1391025096 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Planner/FIRM.h
+1391569810 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Planner/FIRM.h
 	"ompl/geometric/planners/PlannerIncludes.h"
 	"ompl/datastructures/NearestNeighbors.h"
 	<boost/graph/graph_traits.hpp>
@@ -367,6 +367,8 @@
 	<vector>
 	<map>
 	"../Weight/FIRMWeight.h"
+	"ompl/control/ControlSpace.h"
+	"ompl/control/SpaceInformation.h"
 
 1377895100 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Weight/FIRMWeight.h
 
@@ -387,7 +389,7 @@
 1377121855 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SE2BeliefSpace.cpp
 	"../include/Spaces/SE2BeliefSpace.h"
 
-1391477319 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
+1391550990 /home/saurav/Research/Development/OMPL/FIRM-OMPL/FIRMOMPL.h
 	<iostream>
 	<fstream>
 	<ompl/base/SpaceInformation.h>
@@ -410,11 +412,9 @@
 	"include/ActuationSystems/ActuationSystemMethod.h"
 	"include/ActuationSystems/SimulatedActuationSystem.h"
 	"include/Controllers/Controller.h"
-	"include/Samplers/GaussianValidBeliefSampler.h"
-	"include/Samplers/UniformValidBeliefSampler.h"
 	"include/ValidityCheckers/FIRMValidityChecker.h"
 
-1391292334 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
+1391569726 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
 	"FIRMOMPL.h"
 	"tinyxml.h"
 
@@ -476,11 +476,12 @@
 	"tinyxml.h"
 	<windows.h>
 
-1391046913 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/MotionModels/MotionModelMethod.h
+1391571560 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/MotionModels/MotionModelMethod.h
 	"armadillo"
 	"../Spaces/SE2BeliefSpace.h"
+	"ompl/control/Control.h"
 
-1391046724 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/MotionModels/UnicycleMotionModel.h
+1391571223 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/MotionModels/UnicycleMotionModel.h
 	"MotionModelMethod.h"
 	<limits>
 	<cassert>
@@ -497,7 +498,7 @@
 	"armadillo"
 	<cassert>
 
-1376684780 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Filters/KalmanFilterMethod.h
+1391566498 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Filters/KalmanFilterMethod.h
 	"../MotionModels/MotionModelMethod.h"
 	"../ObservationModels/ObservationModelMethod.h"
 	"../LinearSystem/LinearSystem.h"
@@ -512,11 +513,12 @@
 1377545854 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Filters/ExtendedKF.h
 	"KalmanFilterMethod.h"
 
-1377114449 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SeparatedControllers/SeparatedControllerMethod.h
+1391569902 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SeparatedControllers/SeparatedControllerMethod.h
 	"../MotionModels/MotionModelMethod.h"
 	"../LinearSystem/LinearSystem.h"
+	"ompl/control/Control.h"
 
-1377114563 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SeparatedControllers/RHCICreate.h
+1391570484 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SeparatedControllers/RHCICreate.h
 	"SeparatedControllerMethod.h"
 	<deque>
 
@@ -532,11 +534,12 @@
 	"ActuationSystemMethod.h"
 	"armadillo"
 
-1391462450 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Controllers/Controller.h
+1391571462 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Controllers/Controller.h
 	"../SeparatedControllers/SeparatedControllerMethod.h"
 	"../Filters/KalmanFilterMethod.h"
 	"../MotionModels/MotionModelMethod.h"
 	"../ObservationModels/ObservationModelMethod.h"
+	"../SpaceInformation/SpaceInformation.h"
 
 1377281536 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Controller.cpp
 	"../include/ActuationSystems/SimulatedActuationSystem.h"
@@ -704,7 +707,7 @@
 	"../MotionModels/MotionModelMethod.h"
 	"../ObservationModels/ObservationModelMethod.h"
 
-1391478735 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SpaceInformation/SpaceInformation.h
+1391571535 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SpaceInformation/SpaceInformation.h
 	"ompl/control/SpaceInformation.h"
 	"../MotionModels/MotionModelMethod.h"
 	"../ObservationModels/ObservationModelMethod.h"

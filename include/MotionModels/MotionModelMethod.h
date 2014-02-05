@@ -45,6 +45,7 @@
 
 #include "armadillo"
 #include "../Spaces/SE2BeliefSpace.h"
+#include "ompl/control/Control.h"
 
 class MotionModelMethod
 {
@@ -83,12 +84,13 @@ class MotionModelMethod
 
 		//Produce the next state, given the current state, a control and a noise
 		//Implementation is specific to particular motion model
-		virtual void Evolve(const ompl::base::State *state, const ControlType& u, const NoiseType& w, ompl::base::State *result) = 0;
+		virtual void Evolve(const ompl::base::State *state, const ompl::control::Control *control, const NoiseType& w, ompl::base::State *result) = 0;
 
 		//Generate open loop control between two specified Cfgs/states
 		//Implementation is specific to particular motion model
-		virtual std::vector<ControlType> generateOpenLoopControls(const ompl::base::State *startState,
-                                                        const ompl::base::State *endState) = 0;
+		virtual void generateOpenLoopControls(const ompl::base::State *startState,
+                                              const ompl::base::State *endState,
+                                              std::vector<ompl::control::Control*> openLoopControls) = 0;
 
 
 

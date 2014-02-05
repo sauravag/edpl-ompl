@@ -1,3 +1,4 @@
+/*
 #ifndef FIRM_OMPL_TESTS_
 #define FIRM_OMPL_TESTS_
 
@@ -75,7 +76,7 @@ void TestBeliefStateSampler()
     MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
 
     ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
-    ActuationSystemMethod::ActuationSystemPointer as(new SimulatedActuationSystem(mm, om));
+    //ActuationSystemMethod::ActuationSystemPointer as(new SimulatedActuationSystem(mm, om));
 
     ompl::base::SpaceInformation *si(new ompl::base::SpaceInformation(space));
     si->setStateValidityChecker(boost::bind(&isTheStateValid, _1));
@@ -521,3 +522,4 @@ void TestFIRMWeight()
 
 }
 #endif
+*/

@@ -53,22 +53,3 @@ SimulatedActuationSystem::getObservation()
   return observationModel_->getObservation(trueState_, true);
 }
 
-bool SimulatedActuationSystem::checkCollision()
-{
-  /*
-  typedef typename MPProblemType::ValidityCheckerPointer ValidityCheckerPointer;
-  // following variables are used in collision checking procedure
-  ValidityCheckerPointer vc = this->GetMPProblem()->GetValidityChecker(m_vcLabel);
-  string callee = this->GetName();
-  CDInfo cdInfo;
-  StatClass* stats = this->GetMPProblem()->GetStatClass();
-
-   if(!m_trueState.InBoundary(this->m_environment) ||
-        !vc->IsValid(m_trueState, this->m_environment,  *(this->GetMPProblem()->GetStatClass()), cdInfo, &callee)) {
-
-      return true;
-    }
-  */
-    return false;
-
-}

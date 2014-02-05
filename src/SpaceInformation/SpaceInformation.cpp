@@ -34,51 +34,22 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#ifndef RHC_ICREATE_
-#define RHC_ICREATE_
+#include "../../include/SpaceInformation/SpaceInformation.h"
 
-#include "SeparatedControllerMethod.h"
-#include <deque>
-
-class RHCICreate : public SeparatedControllerMethod
+void firm::SpaceInformation::applyControl(const ompl::control::Control *control)
 {
 
-  public:
-    typedef typename SeparatedControllerMethod::ControlType   ControlType;
-    typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
-    //typedef typename MPTraits::LinearSystem   LinearSystem;
+    typename MotionModelMethod::NoiseType noise = motionModel_->generateNoise(trueState_, u);
 
-    RHCICreate() {}
+    motionModel_->Evolve(trueState_, control, noise, trueState_);
 
-    RHCICreate(ompl::base::State *goal,
-        const std::vector<ompl::base::State*>& nominalXs,
-        const std::vector<ControlType>& nominalUs,
-        const std::vector<LinearSystem>& linearSystems,  // Linear systems are not used in this class but it is here to unify the interface
-        const MotionModelPointer mm) :
-        SeparatedControllerMethod(goal, nominalXs, nominalUs, linearSystems, mm)
-        {
-          assert(controlQueueSize_ > 0 && "Error: RHCICreate control queue size not valid. Please initialize by calling SetControlQueueSize");
+  //OGLDisplay<MPTraits>::UpdateTrueState(m_trueState);
+  //cout<<" The True State is :"<<endl<<m_trueState.GetArmaData()<<endl;
+}
 
-         //this->m_reachedFlag = false;
-        }
+ObservationModelMethod::ObservationType firm::SpaceInformation::getObservation()
+{
+    return observationModel_->getObservation(trueState_, true);
+}
 
-    ~RHCICreate() {}
 
-    virtual ompl::control::Control* generateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) ;
-
-    static void setControlQueueSize(const int queueSize)
-    {
-      controlQueueSize_ = queueSize;
-    }
-
-    static void setTurnOnlyDistance(const double turnDist)
-    {
-      turnOnlyDistance_ = turnDist;
-    }
-
-   private:
-    static int controlQueueSize_;
-    static double turnOnlyDistance_;
-    std::deque<ompl::control::Control*> openLoopControls_;
-};
-#endif

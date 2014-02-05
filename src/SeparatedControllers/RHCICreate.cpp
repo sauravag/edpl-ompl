@@ -39,7 +39,7 @@ int RHCICreate::controlQueueSize_ = -1;
 
 double RHCICreate::turnOnlyDistance_ = -1;
 
-typename RHCICreate::ControlType
+typename ompl::control::Control*
 RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t& _t)
 {
 
@@ -47,7 +47,7 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
 
   //if no more controls left, regenerate controls
   if(openLoopControls_.size() == 0) {
-    std::vector<ControlType> openLoopControls;
+    std::vector<ompl::control::Control*> openLoopControls;
 
     openLoopControls = this->motionModel_->generateOpenLoopControls(state , this->goal_) ;
 
@@ -62,7 +62,8 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
       openLoopControls_.resize(controlQueueSize_);
   }
   // if there are controls left, apply and remove them one-by-one
-    ControlType control = openLoopControls_.front();
+    ompl::control::Control* control;
+    control->values = openLoopControls_.front();
 
     openLoopControls_.pop_front();
 

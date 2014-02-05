@@ -41,7 +41,7 @@
 #include "../Filters/KalmanFilterMethod.h"
 #include "../MotionModels/MotionModelMethod.h"
 #include "../ObservationModels/ObservationModelMethod.h"
-
+#include "../SpaceInformation/SpaceInformation.h"
 
 template <class SeparatedControllerType, class FilterType>
 class Controller
@@ -50,6 +50,7 @@ class Controller
   public:
     typedef MotionModelMethod::SpaceType SpaceType;
     typedef MotionModelMethod::StateType StateType;
+    typedef firm::SpaceInformation::SpaceInformationPtr SpaceInformationPtr;
     typedef MotionModelMethod::ControlType   ControlType;
   	typedef ObservationModelMethod::ObservationType ObservationType;
   	typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
@@ -59,8 +60,9 @@ class Controller
 	Controller() {};
 
   Controller(const ompl::base::State *goal,
-		        const std::vector<ompl::base::State*>& nominalXs,
-			      const std::vector<ControlType>& nominalUs ,ActuationSystemPointer as);
+		     const std::vector<ompl::base::State*>& nominalXs,
+			 const std::vector<ControlType>& nominalUs,
+			 const firm::SpaceInformation::SpaceInformationPtr si);
 
   ompl::base::State*  Execute(const ompl::base::State *startState, bool& isFailed,int& failureCode,
                 double& executionCost, bool constructionMode=true, double sleepTime=0.0);
@@ -73,7 +75,7 @@ class Controller
 
   ompl::base::State* getGoal() {return goal_; }
 
-  void setActuationSystem(ActuationSystemPointer as) { actuationSystem_ = as ; }
+  void setSpaceInformation(SpaceInformationPtr si) { si_ = si; }
 
   bool isValid();
 
@@ -91,7 +93,8 @@ class Controller
   size_t Length() { return lss_.size(); }
 
   private:
-		ActuationSystemPointer actuationSystem_;
+
+        SpaceInformationPtr si_; // Instead of the actuation system, in OMPL we have the spaceinformation
 		std::vector<LinearSystem> lss_;
 		SeparatedControllerType separatedController_;
 		FilterType filter_;
@@ -120,34 +123,32 @@ template <class SeparatedControllerType, class FilterType>
 Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::State *goal,
             const std::vector<ompl::base::State*>& nominalXs,
             const std::vector<ControlType>& nominalUs,
-            ActuationSystemPointer as): actuationSystem_(as)
+            const firm::SpaceInformation::SpaceInformationPtr si): si_(si)
 {
   //assert(_nominalXs.size() == _nominalUs.size()+1);
-
   //create vector of linear systems
-  ompl::base::StateSpacePtr space(new SpaceType);
-  ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
-  goal_ = space->allocState();
-  si->copyState(goal_, goal);
+  //ompl::base::StateSpacePtr space(new SpaceType);
+  //ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
+  goal_ = si_->allocState();
+  si_->copyState(goal_, goal);
 
   lss_.reserve(nominalXs.size());
 
   for(size_t i=0; i<nominalXs.size(); ++i)
   {
 
-    LinearSystem ls(nominalXs[i], nominalUs[i], actuationSystem_->getMotionModel(),
-                    actuationSystem_->getObservationModel());
+    LinearSystem ls(nominalXs[i], nominalUs[i], si_->getMotionModel(), si_->getObservationModel());
 
     lss_.push_back(ls);
   }
 
 
   //copy construct separated controller
-  SeparatedControllerType sepController(goal_, nominalXs, nominalUs, lss_,actuationSystem_->getMotionModel());
+  SeparatedControllerType sepController(goal_, nominalXs, nominalUs, lss_,si_->getMotionModel());
 
   separatedController_ = sepController;
 
-  FilterType filter(actuationSystem_->getMotionModel(), actuationSystem_->getObservationModel());
+  FilterType filter(si_->getMotionModel(), si_->getObservationModel());
   filter_ = filter;
 
   //lastNominalPoint = actuationSystem_->getMotionModel()->Evolve(_nominalXs.back(),
@@ -175,13 +176,13 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
   //cout << "\t belief: " << _h.m_belief << endl;
 
   //std::cout << "Do not forget is_reliable for feedback controls." << std::endl;
-  ControlType u = separatedController_.generateFeedbackControl(state, t);
+  ompl::control::Control* control = separatedController_.generateFeedbackControl(state, t);
 
   //cout << "Generated control: " << endl << u << endl;
 
-  actuationSystem_->applyControl(u);
+  si_->applyControl(control);
 
-  ObservationType z = actuationSystem_->getObservation();
+  ObservationType z = si_->getObservation();
 
   //---- WARNING---//
   //TODO: The singleobservationdim needs to be retrieved from the observation model
@@ -212,17 +213,17 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
   }
   */
 
-  ObservationType zCorrected = actuationSystem_->getObservationModel()->removeSpuriousObservations(z);
+  ObservationType zCorrected = si_->getObservationModel()->removeSpuriousObservations(z);
 
   //cout << "Observation Z: " << endl << Z << endl;
   LinearSystem current;// = lss_[_t];
   LinearSystem next; //= lss_[_t+1];
 
   current = next = LinearSystem(goal_,
-                                actuationSystem_->getMotionModel()->getZeroControl(),
+                                si_->getMotionModel()->getZeroControl(),
                                 zCorrected,
-                                actuationSystem_->getMotionModel(),
-                                actuationSystem_->getObservationModel());
+                                si_->getMotionModel(),
+                                si_->getObservationModel());
 
   if( (Length() > 0) && (t <= Length()-1) )
   {
@@ -241,37 +242,14 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
   ompl::base::StateSpacePtr space(new SpaceType());
   ompl::base::State *nextBelief = space->allocState();
 
-  nextBelief = filter_.Evolve(state, u, zCorrected, current, next, isConstructionMode);
+  nextBelief = filter_.Evolve(state, control, zCorrected, current, next, isConstructionMode);
 
-  actuationSystem_->setBelief(nextBelief);
+  si_->setBelief(nextBelief);
 
   //cout << "nextBelief: " << nextBelief << endl;
   //cout << "-----------***----***---***---------------" << endl;
   return nextBelief;
 
-}
-
-
-template <class SeparatedControllerType, class FilterType>
-bool Controller<SeparatedControllerType, FilterType>::isValid()
-{
-  /*
-  ValidityCheckerPointer vc = this->GetMPProblem()->GetValidityChecker(m_vcLabel);
-  Environment* env = this->GetMPProblem()->GetEnvironment();
-  StatClass* stats = this->GetMPProblem()->GetStatClass();
-  string callee = this->GetName();
-  CDInfo cdInfo;
-
-  for(size_t i = 0; i < lss_.size(); ++i) {
-    CfgType x = lss_[i].GetX();
-
-    if(!x.InBoundary(env) || !vc->IsValid(x, env, *stats, cdInfo, &callee)) {
-      return false;
-    }
-  }
-  */
-
-  return true;
 }
 
 template <class SeparatedControllerType, class FilterType>
@@ -310,7 +288,7 @@ ompl::base::State* Controller<SeparatedControllerType, FilterType>::Execute(cons
     //cout << "time: "<< k << endl;
     endState = this->Evolve(endState, k, constructionMode) ;
 
-    if( actuationSystem_->checkCollision())
+    if( si_->checkCollision())
     {
       //cout << k << " of " << m_maxExecTime << " steps used." << endl;
       isFailed = true;
@@ -445,5 +423,30 @@ bool Controller<SeparatedControllerType, FilterType>::isTerminated(const ompl::b
   return true;
 
 }
+
+
+/*
+template <class SeparatedControllerType, class FilterType>
+bool Controller<SeparatedControllerType, FilterType>::isValid()
+{
+
+  ValidityCheckerPointer vc = this->GetMPProblem()->GetValidityChecker(m_vcLabel);
+  Environment* env = this->GetMPProblem()->GetEnvironment();
+  StatClass* stats = this->GetMPProblem()->GetStatClass();
+  string callee = this->GetName();
+  CDInfo cdInfo;
+
+  for(size_t i = 0; i < lss_.size(); ++i) {
+    CfgType x = lss_[i].GetX();
+
+    if(!x.InBoundary(env) || !vc->IsValid(x, env, *stats, cdInfo, &callee)) {
+      return false;
+    }
+  }
+
+
+  return true;
+}
+*/
 
 #endif

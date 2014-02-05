@@ -23,7 +23,7 @@ bool isStateValid(const ob::State *state)
 
     return om->isStateObservable(state);
 }
-
+/**
 ob::ValidStateSamplerPtr allocGaussianValidBeliefSampler(const firm::SpaceInformation *si)
 {
     // we can perform any additional setup / configuration of a sampler here,
@@ -40,7 +40,7 @@ ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const firm::SpaceInforma
     //unisampler->setObservationModel(om);
     return ob::ValidStateSamplerPtr(unisampler);
 }
-
+*/
 void plan(void)
 {
     typedef SE2BeliefSpace::StateType StateType;
@@ -77,7 +77,7 @@ void plan(void)
     si->setMotionValidator(ob::MotionValidatorPtr(new ob::DiscreteMotionValidator(si)));
 
     //set the state sampler
-    si->setValidStateSamplerAllocator(allocUniformValidBeliefSampler);
+    //si->setValidStateSamplerAllocator(allocUniformValidBeliefSampler);
 
     //set the state propagator
     si->setStatePropagator(oc::StatePropagatorPtr(new UnicycleStatePropagator(si))) ;

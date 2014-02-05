@@ -47,7 +47,10 @@
 #include <vector>
 #include <map>
 #include "../Weight/FIRMWeight.h"
+#include "ompl/control/ControlSpace.h"
+#include "ompl/control/SpaceInformation.h"
 
+//#include "../SpaceInformation/SpaceInformation.h"
 
 namespace base
 {
@@ -144,7 +147,7 @@ public:
     typedef boost::function<bool(const Vertex&, const Vertex&)> ConnectionFilter;
 
     /** \brief Constructor */
-    FIRM(const ompl::base::SpaceInformationPtr &si, bool starStrategy = false);
+    FIRM(const ompl::control::SpaceInformationPtr &si, bool starStrategy = false);
 
     virtual ~FIRM(void);
 
@@ -385,6 +388,9 @@ protected:
 
     /** \brief Given two vertices, returns a heuristic on the cost of the path connecting them. This method wraps OptimizationObjective::motionCostHeuristic */
     ompl::base::Cost costHeuristic(Vertex u, Vertex v) const;
+
+    /** \brief The base::SpaceInformation cast as control::SpaceInformation, for convenience */
+    const ompl::control::SpaceInformation                        *siC_;
 };
 
 

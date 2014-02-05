@@ -102,8 +102,8 @@ class KalmanFilterMethod
 
 	protected:
 
-  	MotionModelPointer motionModel_;
-  	ObservationModelPointer observationModel_;
+        MotionModelPointer motionModel_;
+        ObservationModelPointer observationModel_;
 
 };
 

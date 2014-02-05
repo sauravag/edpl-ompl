@@ -54,6 +54,7 @@ namespace firm
     {
 
         public:
+            typedef typename ObservationModelMethod::ObservationType ObservationType;
             typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
             typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
             typedef boost::shared_ptr<SpaceInformation> SpaceInformationPtr;
@@ -79,6 +80,16 @@ namespace firm
                 motionModel_ = mm;
             }
 
+            void setBelief(const ompl::base::State *state)
+            {
+                this->copyState(belief_, state);
+            }
+
+            void setTrueState(const ompl::base::State *state)
+            {
+                this->copyState(trueState_, state);
+            }
+
             ObservationModelPointer getObservationModel(void)
             {
                 return observationModel_;
@@ -89,10 +100,27 @@ namespace firm
                 return motionModel_;
             }
 
+            void getTrueState(ompl::base::State *state)
+            {
+                this->copyState(state, trueState_);
+            }
+
+            bool checkCollision(void)
+            {
+                return this->isValid(trueState_);
+            }
+
+            void applyControl(const ompl::control::Control *control);
+
+            ObservationType getObservation() ;
+
+
         protected:
 
-            ObservationModelPointer observationModel_;
-            MotionModelPointer motionModel_;
+            ObservationModelPointer observationModel_; // a model of the robot's sensor
+            MotionModelPointer motionModel_; // a model of the robot's motion
+            ompl::base::State *trueState_; // The real state of the robot
+            ompl::base::State *belief_; // the estimated state of the robot
 
 
 

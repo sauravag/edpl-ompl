@@ -33,6 +33,8 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+
+
 #include "../../include/Spaces/SE2BeliefSpace.h"
 #include "../../include/MotionModels/UnicycleMotionModel.h"
 #include "../../tinyxml/tinyxml.h"
@@ -52,12 +54,21 @@ inline int signum(double& d)
 }
 
 //Produce the next state, given the current state, a control and a noise
-void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ControlType& u, const NoiseType& w, ompl::base::State *result)
+void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::control::Control *control, const NoiseType& w, ompl::base::State *result)
 {
 
   using namespace arma;
   typedef typename MotionModelMethod::StateType StateType;
   typedef std::vector<double> stdvec;
+
+   arma::colvec u(2);
+
+   const double *conVals = control->as<control::RealVectorControlSpace::ControlType>()->values;
+
+   for (unsigned int i = 0; i < motionModel_->controlDim(); i++)
+   {
+        u[i] = conVals[i];
+   }
   //Assume the cfg type is compatible with this motion model (this should have been checked in the constructor)
 
   //generate a column vector (arma::colvec) corresponding to the next state
@@ -86,18 +97,15 @@ void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ControlTy
 
   std::cout<<"The evolved state is   :"<<x<<std::endl;
 
-  SpaceType *space;
-  space =  new SpaceType();
-
   result->as<StateType>()->setXYYaw(x[0],x[1],x[2]);
 }
 
 
 
 //Generate open loop control between two specified Cfgs/states
-std::vector<typename UnicycleMotionModel::ControlType>
-UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *startState,
-                                                  const ompl::base::State *endState)
+void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *startState,
+                                                  const ompl::base::State *endState,
+                                                  std::vector<ompl::control::Control*> openLoopControls)
 {
 
   using namespace arma;
