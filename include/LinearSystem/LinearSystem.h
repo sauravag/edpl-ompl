@@ -69,11 +69,12 @@ class LinearSystem
 
   	LinearSystem() {}
 
-    LinearSystem (const ompl::base::State *state, const ControlType& u,
+    LinearSystem (const ompl::base::State *state, const ompl::control::Control* control,
       MotionModelPointer motionModel,
       ObservationModelPointer observationModel):
-      u_(u), motionModel_(motionModel),
-      observationModel_(observationModel) {
+      u_(control), motionModel_(motionModel),
+      observationModel_(observationModel)
+      {
 
       using namespace arma;
 
@@ -103,10 +104,10 @@ class LinearSystem
       //cout << "GetR: " << GetR() << endl;
     }
 
-    LinearSystem (const ompl::base::State *state, const ControlType& u, const ObservationType& obs,
+    LinearSystem (const ompl::base::State *state, const ompl::control::Control* control, const ObservationType& obs,
       MotionModelPointer motionModel,
       ObservationModelPointer observationModel):
-      u_(u), motionModel_(motionModel),
+      u_(control), motionModel_(motionModel),
       observationModel_(observationModel)
       {
 
@@ -154,7 +155,7 @@ class LinearSystem
   private:
 
     ompl::base::State *x_;
-    ControlType u_;
+    const ompl::control::Control* u_;
     MotionNoiseType w_;
     ObsNoiseType v_;
     ObservationType z_;

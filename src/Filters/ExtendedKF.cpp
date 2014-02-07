@@ -35,23 +35,22 @@
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #include "../../include/Filters/ExtendedKF.h"
-
+/*
 ExtendedKF::ExtendedKF(MotionModelPointer motionModel,
 ObservationModelPointer observationModel) :
 KalmanFilterMethod(motionModel, observationModel) {
 
 }
+*/
 
-
-ompl::base::State* ExtendedKF::Predict(const ompl::base::State *belief,
-  const ControlType& control, const LinearSystem& ls, const bool isConstruction)
+void ExtendedKF::Predict(const ompl::base::State *belief,
+  const ompl::control::Control* control,
+  const LinearSystem& ls, ompl::base::State *predictedState, const bool isConstruction)
 {
 
   using namespace arma;
-  SpaceType *space;
-  space =  new SpaceType();
-  ompl::base::State *predState = space->allocState();
-  this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predState);
+
+  this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predictedState);
 
   mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
     ls.getG() * ls.getQ() * trans(ls.getG());
@@ -72,28 +71,23 @@ ompl::base::State* ExtendedKF::Predict(const ompl::base::State *belief,
     myfile.close();
   }
   */
-  predState->as<StateType>()->setCovariance(covPred);
-
-  return predState;
+  predictedState->as<StateType>()->setCovariance(covPred);
 
 }
 
-ompl::base::State*
-ExtendedKF::Update(const ompl::base::State *belief, const typename ObservationModelMethod::ObservationType& obs,
-const LinearSystem& ls, const bool isConstruction) {
+void ExtendedKF::Update(const ompl::base::State *belief, const typename ObservationModelMethod::ObservationType& obs,
+const LinearSystem& ls, ompl::base::State *updatedState, const bool isConstruction)
+{
 
   using namespace arma;
 
   colvec innov = this->observationModel_->computeInnovation(belief, obs);
 
-  ompl::base::StateSpacePtr space(new SpaceType());
-  ompl::base::State  *estimatedState = space->allocState();
  // cout<<"innovation calculated"<<endl;
   if(!innov.n_rows || !innov.n_cols)
   {
-    ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
-    estimatedState = si->cloneState(belief);
-    return estimatedState; // return the prediction if you don't have any innovation
+    si_->copyState(updatedState, belief);
+    return; // return the prediction if you don't have any innovation
   }
 
   assert(innov.n_rows);
@@ -117,11 +111,11 @@ const LinearSystem& ls, const bool isConstruction) {
 
   //cout<<"New State estimated"<<endl;
 
-  estimatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
+  updatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
 
   mat covEst = covPred - KalmanGain* ls.getH() * covPred;
 
-  estimatedState->as<StateType>()->setCovariance(covEst);
+  updatedState->as<StateType>()->setCovariance(covEst);
 
   /*
   //------Printing Data to text file-----
@@ -145,16 +139,14 @@ const LinearSystem& ls, const bool isConstruction) {
   }
   */
 
-  return estimatedState;
-
 }
 
-ompl::base::State*
-ExtendedKF::Evolve(const ompl::base::State *belief,
-    const ControlType& control,
+void ExtendedKF::Evolve(const ompl::base::State *belief,
+    const ompl::control::Control* control,
     const ObservationType& obs,
     const LinearSystem& lsPred,
     const LinearSystem& lsUpdate,
+    ompl::base::State *evolvedState,
     const bool isConstruction)
 {
 
@@ -164,19 +156,18 @@ ExtendedKF::Evolve(const ompl::base::State *belief,
 
   LinearSystem lsPredicted(belief, control, this->motionModel_, this->observationModel_) ;
 
-  ompl::base::State *bPred = Predict(belief, control, lsPredicted, isConstruction);
+  ompl::base::State *bPred = si_->allocState();
 
+  Predict(belief, control, lsPredicted, bPred, isConstruction);
 
-  if(!obs.n_rows || !obs.n_cols) {
-    return bPred;
+  if(!obs.n_rows || !obs.n_cols)
+  {
+    si_->copyState(evolvedState, bPred);
+    return;
   }
 
   LinearSystem lsUpdated(bPred, control, obs, this->motionModel_, this->observationModel_) ;
 
-  ompl::base::State *bEst = Update(bPred, obs, lsUpdated, isConstruction);
-
-  //cout<<"Returning updated estimate form EKF"<<endl;
-
-  return bEst;
+  Update(bPred, obs, lsUpdated, evolvedState, isConstruction);
 
 }

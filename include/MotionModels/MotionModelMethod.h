@@ -46,6 +46,8 @@
 #include "armadillo"
 #include "../Spaces/SE2BeliefSpace.h"
 #include "ompl/control/Control.h"
+#include "ompl/control/spaces/RealVectorControlSpace.h"
+//#include "../control/SpaceInformation.h"
 
 class MotionModelMethod
 {
@@ -71,10 +73,16 @@ class MotionModelMethod
         //TODO: can the noise dimension actually be different from the control dimension?
 			stateDim_(sDim),
 			controlDim_(cDim),
-			zeroControl_(arma::zeros<ControlType>(controlDim_)),
 			noiseDim_(nDim),
-			zeroNoise_(arma::zeros<NoiseType>(noiseDim_)),
-			dt_(0.0) {}
+            zeroNoise_(arma::zeros<NoiseType>(noiseDim_)),
+			dt_(0.0)
+        {
+            for(int i = 0; i < cDim ; i++)
+            {
+                zeroControl_->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = 0;
+            }
+
+        }
 
         void setTimeStep(double timeStep){ dt_ = timeStep;}
 
@@ -96,23 +104,23 @@ class MotionModelMethod
 
 		//Generate noise according to specified state and control input
 		//Appears to be common to all motion models
-		virtual NoiseType generateNoise(const ompl::base::State *state, const ControlType& u) = 0;
+		virtual NoiseType generateNoise(const ompl::base::State *state, const ompl::control::Control* control) = 0;
 
 		// df/dx
 		virtual JacobianType
-		getStateJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w) = 0;
+		getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
 		// df/du
 		virtual JacobianType
-		getControlJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w) = 0;
+		getControlJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
 		// df/dw
 		virtual JacobianType
-		getNoiseJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w) = 0;
+		getNoiseJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
 
 		virtual arma::mat
-		processNoiseCovariance(const ompl::base::State *state, const ControlType& u) = 0;
+		processNoiseCovariance(const ompl::base::State *state, const ompl::control::Control* control) = 0;
 
         // Get zero control which affects no change on the robot
-		virtual const ControlType& getZeroControl() { return zeroControl_; }
+		virtual const ompl::control::Control* getZeroControl() { return zeroControl_; }
 
 		// Zero noise
 		virtual const NoiseType& getZeroNoise()     { return zeroNoise_; }
@@ -128,11 +136,11 @@ class MotionModelMethod
 
 		//control vector dimension is specific to each motion model subclass
 		const int controlDim_;
-		const ControlType zeroControl_;
+		const ompl::control::Control* zeroControl_;
 
 		//noise vector dimension is specific to each motion model subclass
 		const int noiseDim_;
-		const NoiseType zeroNoise_;
+		NoiseType zeroNoise_;
 
 		//timestep size, which is used to generate the next state by applying
 		//a control for that period of time

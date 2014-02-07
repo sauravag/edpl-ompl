@@ -36,27 +36,19 @@
 
 #include "../../include/Filters/LinearizedKF.h"
 
-LinearizedKF::LinearizedKF(MotionModelPointer motionModel,
-ObservationModelPointer observationModel) :
-KalmanFilterMethod(motionModel, observationModel) {
-
-
-}
-
-
-ompl::base::State* LinearizedKF::Predict(const ompl::base::State *belief,
-  const ControlType& control, const LinearSystem& ls, const bool isConstruction)
+void LinearizedKF::Predict(const ompl::base::State *belief,
+  const ControlType& control, const LinearSystem& ls, ompl::base::State *predictedState,const bool isConstruction)
 {
   using namespace arma;
   SpaceType *space;
   space =  new SpaceType();
   ompl::base::State *predState = space->allocState();
-  this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predState);
+  this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predictedState);
 
   mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
     ls.getG() * ls.getQ() * trans(ls.getG());
 
-  predState->as<StateType>()->setCovariance(covPred);
+  predictedState->as<StateType>()->setCovariance(covPred);
 
   return predState;
 

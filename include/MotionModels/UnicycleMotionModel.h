@@ -79,19 +79,19 @@ class UnicycleMotionModel : public MotionModelMethod
                                                   const ompl::base::State *endState,
                                                   std::vector<ompl::control::Control*> openLoopControls);
 
-    NoiseType generateNoise(const ompl::base::State *state, const ControlType& u);
+    NoiseType generateNoise(const ompl::base::State *state, const ompl::control::Control* control);
 
     // df/dx
     JacobianType
-    getStateJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w);
+    getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
     // df/du
     JacobianType
-    getControlJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w);
+    getControlJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
     // df/dw
     JacobianType
-    getNoiseJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w);
+    getNoiseJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
 
-    arma::mat processNoiseCovariance(const ompl::base::State *state, const ControlType& u);
+    arma::mat processNoiseCovariance(const ompl::base::State *state, const ompl::control::Control* control);
 
     /*
     bool GenerateOrbit(const CfgType& _start,

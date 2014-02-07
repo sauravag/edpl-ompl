@@ -41,6 +41,7 @@
 #include "../ObservationModels/ObservationModelMethod.h"
 #include "../LinearSystem/LinearSystem.h"
 #include "dare.h"
+#include "../SpaceInformation/SpaceInformation.h"
 //#include "HState.h"
 
 
@@ -58,9 +59,8 @@ class KalmanFilterMethod
 
   	KalmanFilterMethod() {}
 
-  	KalmanFilterMethod (MotionModelPointer motionModel, ObservationModelPointer observationModel ) :
-  	motionModel_(motionModel),
-  	observationModel_(observationModel) {}
+  	KalmanFilterMethod (firm::SpaceInformation::SpaceInformationPtr si):
+  	si_(si), observationModel_(si->getObservationModel()), motionModel_(si->getMotionModel()){}
 
   	//virtual ~KalmanFilterMethod() {}
 
@@ -75,33 +75,35 @@ class KalmanFilterMethod
 
   	void setObservationModelPointer(const ObservationModelPointer& om) { observationModel_ = om;}
 
-  	virtual
-  	ompl::base::State* Predict(const ompl::base::State *belief,
-  	const ControlType& control,
-  	const LinearSystem& ls,
-  	const bool isConstruction=false) = 0;
+  	virtual void Predict(const ompl::base::State *belief,
+                                const ompl::control::Control* control,
+                                const LinearSystem& ls,
+                                ompl::base::State *predictedState,
+                                const bool isConstruction=false)  = 0;
 
   	//gets a belief and observation, returns
   	virtual
-  	ompl::base::State* Update(const ompl::base::State *belief,
-  	const ObservationType& obs,
-    const	LinearSystem& ls,
-    const bool isConstruction=false) = 0;
+  	void Update(const ompl::base::State *belief,
+                                const ObservationType& obs,
+                                const	LinearSystem& ls,
+                                ompl::base::State *updatedState,
+                                const bool isConstruction=false) = 0;
 
     virtual
-  	ompl::base::State* Evolve(const ompl::base::State *belief,
-  	const ControlType& control,
-  	const ObservationType& obs,
-  	const LinearSystem& lsPred,
-  	const LinearSystem& lsUpdate,
-  	const bool isConstruction=false) = 0;
+  	void Evolve(const ompl::base::State *belief,
+                                const ompl::control::Control* control,
+                                const ObservationType& obs,
+                                const LinearSystem& lsPred,
+                                const LinearSystem& lsUpdate,
+                                ompl::base::State *evolvedState,
+                                const bool isConstruction=false) = 0;
 
   	virtual
   	arma::mat computeStationaryCovariance(const LinearSystem& ls) = 0;
 
 
 	protected:
-
+        firm::SpaceInformation::SpaceInformationPtr si_;
         MotionModelPointer motionModel_;
         ObservationModelPointer observationModel_;
 

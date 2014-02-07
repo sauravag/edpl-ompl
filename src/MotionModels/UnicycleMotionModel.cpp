@@ -53,6 +53,21 @@ inline int signum(double& d)
   if(d<0) return -1;
 }
 
+// Convert a control from OMPL format to armadillo vector
+arma::colvec OMPL2ARMA(ompl::control::Control *control)
+{
+    arma::colvec u(2);
+
+    const double *conVals = control->as<control::RealVectorControlSpace::ControlType>()->values;
+
+    for (unsigned int i = 0; i < motionModel_->controlDim(); i++)
+    {
+        u[i] = conVals[i];
+    }
+
+    return u;
+}
+
 //Produce the next state, given the current state, a control and a noise
 void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::control::Control *control, const NoiseType& w, ompl::base::State *result)
 {
@@ -61,14 +76,8 @@ void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::con
   typedef typename MotionModelMethod::StateType StateType;
   typedef std::vector<double> stdvec;
 
-   arma::colvec u(2);
+   arma::colvec u = OMPL2ARMA(control);
 
-   const double *conVals = control->as<control::RealVectorControlSpace::ControlType>()->values;
-
-   for (unsigned int i = 0; i < motionModel_->controlDim(); i++)
-   {
-        u[i] = conVals[i];
-   }
   //Assume the cfg type is compatible with this motion model (this should have been checked in the constructor)
 
   //generate a column vector (arma::colvec) corresponding to the next state
@@ -202,20 +211,19 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
 
 
   assert(ix == kf);
-
-  return controlSeq;
 }
 
 //Generate noise according to specified state and control input
 typename UnicycleMotionModel::NoiseType
-UnicycleMotionModel::generateNoise(const ompl::base::State *state, const ControlType& u)
+UnicycleMotionModel::generateNoise(const ompl::base::State *state, const ompl::control::Control* control)
 {
 
   using namespace arma;
+
   //TODO: confirm that this is the correct noise generation method
   NoiseType noise(this->noiseDim_);
   colvec indepUn = randn(this->controlDim_,1);
-  mat P_Un = controlNoiseCovariance(u);
+  mat P_Un = controlNoiseCovariance(control);
   colvec Un = indepUn % sqrt((P_Un.diag()));
 
   colvec Wg = sqrt(P_Wg_) * randn(this->stateDim_,1);
@@ -226,12 +234,14 @@ UnicycleMotionModel::generateNoise(const ompl::base::State *state, const Control
 
 // df/dx
 typename UnicycleMotionModel::JacobianType
-UnicycleMotionModel::getStateJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w)
+UnicycleMotionModel::getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w)
 {
 
   using namespace arma;
 
   typedef typename MotionModelMethod::StateType StateType;
+
+  arma::colvec u = OMPL2ARMA(control);
 
   //assert(!"UnicycleMotionModel<MPTraits>::GetStateJacobian not yet implemented!");
 
@@ -258,7 +268,7 @@ UnicycleMotionModel::getStateJacobian(const ompl::base::State *state, const Cont
 
 // df/du
 typename UnicycleMotionModel::JacobianType
-UnicycleMotionModel::getControlJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w)
+UnicycleMotionModel::getControlJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w)
 {
 
   using namespace arma;
@@ -282,7 +292,7 @@ UnicycleMotionModel::getControlJacobian(const ompl::base::State *state, const Co
 
 // df/dw
 typename UnicycleMotionModel::JacobianType
-UnicycleMotionModel::getNoiseJacobian(const ompl::base::State *state, const ControlType& u, const NoiseType& w)
+UnicycleMotionModel::getNoiseJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w)
 {
 
   using namespace arma;
@@ -310,7 +320,7 @@ UnicycleMotionModel::getNoiseJacobian(const ompl::base::State *state, const Cont
 }
 
 // Q matrix
-arma::mat UnicycleMotionModel::processNoiseCovariance(const ompl::base::State *state, const ControlType& u)
+arma::mat UnicycleMotionModel::processNoiseCovariance(const ompl::base::State *state, const ompl::control::Control* control)
 {
 
   using namespace arma;
@@ -323,7 +333,7 @@ arma::mat UnicycleMotionModel::processNoiseCovariance(const ompl::base::State *s
   ?? What is P_Wg?
   */
 
-  mat P_Un = controlNoiseCovariance(u);
+  mat P_Un = controlNoiseCovariance(control);
   mat Q_processNoise = zeros<mat>(P_Un.n_rows + P_Wg_.n_rows, P_Un.n_cols +
   P_Wg_.n_cols);
 
@@ -337,8 +347,7 @@ arma::mat UnicycleMotionModel::processNoiseCovariance(const ompl::base::State *s
 }
 
 
-arma::mat
-UnicycleMotionModel::controlNoiseCovariance(const ControlType& u)
+arma::mat UnicycleMotionModel::controlNoiseCovariance(const ompl::control::Control* control)
 {
 
   using namespace arma;
@@ -347,6 +356,7 @@ UnicycleMotionModel::controlNoiseCovariance(const ControlType& u)
     u_std=(Unicycle_robot.eta_u).*U+(Unicycle_robot.sigma_b_u);
     P_Un=diag(u_std.^2);
   */
+  arma::colvec u = OMPL2ARMA(control);
   colvec uStd = eta_ % u + sigma_;
   mat P_Un = diagmat(square(uStd));
   return P_Un;
@@ -441,3 +451,5 @@ void UnicycleMotionModel::loadParameters(const char *pathToSetupFile)
   std::cout<<"Motion Model parameters finished"<<std::endl;
 
 }
+
+

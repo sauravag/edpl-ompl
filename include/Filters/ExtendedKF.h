@@ -55,25 +55,30 @@ class ExtendedKF : public  KalmanFilterMethod
 
   	ExtendedKF() { }
 
-  	ExtendedKF(MotionModelPointer motionModel,	ObservationModelPointer observationModel);
+  	ExtendedKF(firm::SpaceInformation::SpaceInformationPtr si): KalmanFilterMethod(si) {}
 
   	//gets a belief and control, returns predicted belief if control
   	//were to be applied
-  	ompl::base::State* Predict(const ompl::base::State *belief,
-  	const ControlType& control,
-  	const LinearSystem& ls, const bool isConstruction=false);
+  	void Predict(const ompl::base::State *belief,
+                                const ompl::control::Control* control,
+                                const LinearSystem& ls,
+                                ompl::base::State *predictedState,
+                                const bool isConstruction=false) ;
 
   	//gets a belief and observation, returns
-  	ompl::base::State* Update(const ompl::base::State *belief,
-  	const ObservationType& obs,
-    const	LinearSystem& ls, const bool isConstruction=false);
+  	void Update(const ompl::base::State *belief,
+                const ObservationType& obs,
+                const	LinearSystem& ls,
+                ompl::base::State *updatedState,
+                const bool isConstruction=false) ;
 
-  	ompl::base::State* Evolve(const ompl::base::State *belief,
-  	const ControlType& control,
-  	const ObservationType& obs,
-  	const LinearSystem& lsPred,
-  	const LinearSystem& lsUpdate,
-  	const bool isConstruction=false);
+  	void Evolve(const ompl::base::State *belief,
+                const ompl::control::Control* control,
+                const ObservationType& obs,
+                const LinearSystem& lsPred,
+                const LinearSystem& lsUpdate,
+                ompl::base::State *evolvedState,
+                const bool isConstruction=false) ;
 
 
   	arma::mat computeStationaryCovariance (const LinearSystem& ls){}
