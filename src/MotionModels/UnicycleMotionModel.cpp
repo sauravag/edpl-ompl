@@ -53,21 +53,6 @@ inline int signum(double& d)
   if(d<0) return -1;
 }
 
-// Convert a control from OMPL format to armadillo vector
-arma::colvec OMPL2ARMA(ompl::control::Control *control)
-{
-    arma::colvec u(2);
-
-    const double *conVals = control->as<control::RealVectorControlSpace::ControlType>()->values;
-
-    for (unsigned int i = 0; i < motionModel_->controlDim(); i++)
-    {
-        u[i] = conVals[i];
-    }
-
-    return u;
-}
-
 //Produce the next state, given the current state, a control and a noise
 void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::control::Control *control, const NoiseType& w, ompl::base::State *result)
 {
@@ -169,7 +154,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
 
    //cout << "kf: " << kf << endl;
 
-    std::vector<ControlType> controlSeq(kf);
+    //std::vector<ControlType> controlSeq(kf);
 
     /////////////////////////Generating control signal for start rotation
     const double& rsi = rotation_steps_start;
@@ -179,10 +164,17 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
                 << maxAngularVelocity_*signum(delta_th_p_start) << endr;
     int ix = 0;
     for(int j=0; j<frsi; ++j, ++ix)
-      controlSeq[ix] = u_const_rot;
+    {
+      ompl::control::Control *tempControl = si_->allocControl();
+      ARMA2OMPL(u_const_rot, tempControl);
+      openLoopControls.push_back(tempControl);
+    }
     if(frsi < rsi)
-      controlSeq[ix++] = u_const_rot*(rsi-frsi);
-
+    {
+      ompl::control::Control *tempControl = si_->allocControl();
+      ARMA2OMPL(u_const_rot*(rsi-frsi), tempControl);
+      openLoopControls.push_back(tempControl);
+    }
     /////////////////////////Generating control signal for translation
     const double& tsi = translation_steps;
     const double ftsi = floor(tsi);
@@ -192,9 +184,17 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
                     << 0        << endr;
     }
     for(int j=0; j<ftsi; ++j, ++ix)
-      controlSeq[ix] = u_const_trans;
+    {
+      ompl::control::Control *tempControl = si_->allocControl();
+      ARMA2OMPL(u_const_trans, tempControl);
+      openLoopControls.push_back(tempControl);
+    }
     if(ftsi < tsi)
-      controlSeq[ix++] = u_const_trans*(tsi-ftsi);
+    {
+      ompl::control::Control *tempControl = si_->allocControl();
+      ARMA2OMPL(u_const_trans*(tsi-ftsi), tempControl);
+      openLoopControls.push_back(tempControl);
+    }
 
     /////////////////////////Generating control signal for end rotation
 
@@ -205,9 +205,17 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
                 << maxAngularVelocity_*signum(delta_th_p_end) << endr;
 
     for(int j=0; j<frsi_end; ++j, ++ix)
-      controlSeq[ix] = u_const_rot_end;
+    {
+      ompl::control::Control *tempControl = si_->allocControl();
+      ARMA2OMPL(u_const_rot_end, tempControl);
+      openLoopControls.push_back(tempControl);
+    }
     if(frsi_end < rsi_end)
-      controlSeq[ix++] = u_const_rot_end*(rsi_end-frsi_end);
+    {
+      ompl::control::Control *tempControl = si_->allocControl();
+      ARMA2OMPL(u_const_rot_end*(rsi_end-frsi_end), tempControl);
+      openLoopControls.push_back(tempControl);
+    }
 
 
   assert(ix == kf);

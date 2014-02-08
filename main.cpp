@@ -67,7 +67,7 @@ void plan(void)
     si->setObservationModel(om);
 
     // Provide the motion model to the space
-    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
+    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
     si->setMotionModel(mm);
 
     // set state validity checking for this space

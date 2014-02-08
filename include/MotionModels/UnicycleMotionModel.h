@@ -59,10 +59,11 @@ class UnicycleMotionModel : public MotionModelMethod
     //typedef boost::shared_ptr<UnicycleMotionModel> MotionModelPointer;
 
     //Default constructor
-    UnicycleMotionModel() {}
+    //UnicycleMotionModel() {}
 
     // XML-based constructor
-    UnicycleMotionModel(const char *pathToSetupFile) : MotionModelMethod(stateDim, controlDim, motionNoiseDim)
+    UnicycleMotionModel(ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) :
+    MotionModelMethod(si, motionNoiseDim)
     {
 
       //In here, should check if the cfg type is compatible with this
@@ -101,7 +102,7 @@ class UnicycleMotionModel : public MotionModelMethod
 
   private:
 
-    arma::mat controlNoiseCovariance(const ControlType& u);
+    arma::mat controlNoiseCovariance(const ompl::control::Control* control);
     void loadParameters(const char *pathToSetupFile);
 
     //mat EvolveContinuous(const ompl::base::State *state, const ControlType& _u, const NoiseType& _w);

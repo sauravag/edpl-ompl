@@ -37,12 +37,12 @@
 #include "../../include/Filters/LinearizedKF.h"
 
 void LinearizedKF::Predict(const ompl::base::State *belief,
-  const ControlType& control, const LinearSystem& ls, ompl::base::State *predictedState,const bool isConstruction)
+  const ompl::control::Control* control, const LinearSystem& ls, ompl::base::State *predictedState,const bool isConstruction)
 {
   using namespace arma;
-  SpaceType *space;
-  space =  new SpaceType();
-  ompl::base::State *predState = space->allocState();
+  //SpaceType *space;
+  //space =  new SpaceType();
+  //ompl::base::State *predState = space->allocState();
   this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predictedState);
 
   mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
@@ -50,28 +50,24 @@ void LinearizedKF::Predict(const ompl::base::State *belief,
 
   predictedState->as<StateType>()->setCovariance(covPred);
 
-  return predState;
-
 }
 
 
-ompl::base::State*
-LinearizedKF::Update(const ompl::base::State *belief, const typename ObservationModelMethod::ObservationType& obs,
-const LinearSystem& ls, const bool isConstruction)
+void LinearizedKF::Update(const ompl::base::State *belief, const typename ObservationModelMethod::ObservationType& obs,
+const LinearSystem& ls, ompl::base::State *updatedState, const bool isConstruction)
 {
 
   using namespace arma;
 
   colvec innov = this->observationModel_->computeInnovation(belief, obs);
 
-  ompl::base::StateSpacePtr space(new SpaceType());
-  ompl::base::State  *estimatedState = space->allocState();
+  //ompl::base::StateSpacePtr space(new SpaceType());
+  //ompl::base::State  *estimatedState = space->allocState();
  // cout<<"innovation calculated"<<endl;
   if(!innov.n_rows || !innov.n_cols)
   {
-    ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
-    estimatedState = si->cloneState(belief);
-    return estimatedState; // return the prediction if you don't have any innovation
+    updatedState = si_->cloneState(belief);
+    return; // return the prediction if you don't have any innovation
   }
 
   assert(innov.n_rows);
@@ -95,11 +91,11 @@ const LinearSystem& ls, const bool isConstruction)
 
   //cout<<"New State estimated"<<endl;
 
-  estimatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
+  updatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
 
   mat covEst = covPred - KalmanGain* ls.getH() * covPred;
 
-  estimatedState->as<StateType>()->setCovariance(covEst);
+  updatedState->as<StateType>()->setCovariance(covEst);
 
   /*
   //------Printing Data to text file-----
@@ -123,34 +119,31 @@ const LinearSystem& ls, const bool isConstruction)
   }
   */
 
-  return estimatedState;
-
 }
 
 
-ompl::base::State*
-LinearizedKF::Evolve(const ompl::base::State *belief,
-    const ControlType& control,
+void LinearizedKF::Evolve(const ompl::base::State *belief,
+    const ompl::control::Control* control,
     const ObservationType& obs,
     const LinearSystem& lsPred,
     const LinearSystem& lsUpdate,
+    ompl::base::State *evolvedState,
     const bool isConstruction)
 {
 
   using namespace arma;
 
-  ompl::base::State *bPred = Predict(belief, control, lsPred);
+  ompl::base::State *bPred = si_->allocState();
+
+  Predict(belief, control, lsPred, bPred);
 
   if(!obs.n_rows || !obs.n_cols) {
-    return bPred;
+    return;
   }
 
-  ompl::base::State *bEst = Update(bPred, obs, lsUpdate);
+  Update(bPred, obs, lsUpdate, evolvedState);
 
   //cout<<"Returning updated estimate from LKF"<<endl;
-
-  return bEst;
-
 }
 
 

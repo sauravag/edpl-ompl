@@ -58,6 +58,7 @@
 		<Unit filename="include/Controllers/Controller.h" />
 		<Unit filename="include/Filters/ExtendedKF.h" />
 		<Unit filename="include/Filters/KalmanFilterMethod.h" />
+		<Unit filename="include/Filters/LinearizedKF.h" />
 		<Unit filename="include/Filters/dare.h" />
 		<Unit filename="include/LinearSystem/LinearSystem.h" />
 		<Unit filename="include/LocalPlanners/MotionModelLP.h" />

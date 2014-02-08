@@ -49,7 +49,7 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
   if(openLoopControls_.size() == 0) {
     std::vector<ompl::control::Control*> openLoopControls;
 
-    openLoopControls = this->motionModel_->generateOpenLoopControls(state , this->goal_) ;
+    this->motionModel_->generateOpenLoopControls(state , this->goal_, openLoopControls) ;
 
     openLoopControls_ = std::deque<ControlType>(openLoopControls.begin(), openLoopControls.end());
     //if motion model cannot generate valid open loop controls from start to goal, return an empty vector signifying invalid control

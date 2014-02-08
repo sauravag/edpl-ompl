@@ -69,15 +69,16 @@ class MotionModelMethod
         //MotionModelMethod() : stateDim_(0), controlDim_(0), noiseDim_(0) {}
 
 
-		MotionModelMethod(int sDim=0, int cDim=0, int nDim=0):
+		MotionModelMethod(ompl::control::SpaceInformationPtr si, int nDim=0):
         //TODO: can the noise dimension actually be different from the control dimension?
-			stateDim_(sDim),
-			controlDim_(cDim),
+            si_(si),
+			stateDim_(si->getStateDimension()),
+			controlDim_((si->getControlSpace())->getDimension()),
 			noiseDim_(nDim),
             zeroNoise_(arma::zeros<NoiseType>(noiseDim_)),
 			dt_(0.0)
         {
-            for(int i = 0; i < cDim ; i++)
+            for(int i = 0; i < controlDim_ ; i++)
             {
                 zeroControl_->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = 0;
             }
@@ -130,7 +131,34 @@ class MotionModelMethod
 
         virtual double getTimestepSize() { return dt_; }
 
+        // Convert a control from OMPL format to armadillo vector
+        arma::colvec OMPL2ARMA(const ompl::control::Control *control)
+        {
+            arma::colvec u(2);
+
+            const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
+
+            for (unsigned int i = 0; i < controlDim_; i++)
+            {
+                u[i] = conVals[i];
+            }
+
+            return u;
+        }
+        void ARMA2OMPL(arma::colvec u, ompl::control::Control *control)
+        {
+            //const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
+
+            for (unsigned int i = 0; i < controlDim_; i++)
+            {
+                control->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = u[i];
+            }
+
+        }
+
 	protected:
+
+	    ompl::control::SpaceInformationPtr si_;
 
 		const int stateDim_;
 
