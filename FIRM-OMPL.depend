@@ -294,7 +294,7 @@
 1366325450 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/GreedyKCenters.h
 	"ompl/util/RandomNumbers.h"
 
-1391551003 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
+1391895858 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
 	<ompl/base/spaces/SE3StateSpace.h>
 	<ompl/geometric/SimpleSetup.h>
 	<ompl/config.h>
@@ -414,7 +414,7 @@
 	"include/Controllers/Controller.h"
 	"include/ValidityCheckers/FIRMValidityChecker.h"
 
-1391569726 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
+1391899030 /home/saurav/Research/Development/OMPL/FIRM-OMPL/Tests.h
 	"FIRMOMPL.h"
 	"tinyxml.h"
 
@@ -476,11 +476,12 @@
 	"tinyxml.h"
 	<windows.h>
 
-1391816522 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/MotionModels/MotionModelMethod.h
+1391899340 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/MotionModels/MotionModelMethod.h
 	"armadillo"
 	"../Spaces/SE2BeliefSpace.h"
 	"ompl/control/Control.h"
 	"ompl/control/spaces/RealVectorControlSpace.h"
+	"ompl/control/SpaceInformation.h"
 
 1391815769 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/MotionModels/UnicycleMotionModel.h
 	"MotionModelMethod.h"
@@ -512,15 +513,15 @@
 	<ompl/base/SpaceInformation.h>
 	"armadillo"
 
-1391730735 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Filters/ExtendedKF.h
+1391893986 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Filters/ExtendedKF.h
 	"KalmanFilterMethod.h"
 
-1391569902 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SeparatedControllers/SeparatedControllerMethod.h
+1391893601 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SeparatedControllers/SeparatedControllerMethod.h
 	"../MotionModels/MotionModelMethod.h"
 	"../LinearSystem/LinearSystem.h"
 	"ompl/control/Control.h"
 
-1391570484 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SeparatedControllers/RHCICreate.h
+1391893598 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/SeparatedControllers/RHCICreate.h
 	"SeparatedControllerMethod.h"
 	<deque>
 
@@ -562,7 +563,7 @@
 1391733750 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Filters/LinearizedKF.h
 	"KalmanFilterMethod.h"
 
-1391047101 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/MotionModels/UnicycleMotionModel.cpp
+1391898743 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/MotionModels/UnicycleMotionModel.cpp
 	"../../include/Spaces/SE2BeliefSpace.h"
 	"../../include/MotionModels/UnicycleMotionModel.h"
 	"../../tinyxml/tinyxml.h"
@@ -594,7 +595,7 @@
 	"ompl/base/SpaceInformation.h"
 	"ompl/tools/config/MagicConstants.h"
 
-1377548554 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SeparatedControllers/RHCICreate.cpp
+1391893756 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SeparatedControllers/RHCICreate.cpp
 	"../../include/SeparatedControllers/RHCICreate.h"
 
 1377882917 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Spaces/SE2BeliefSpace.cpp
@@ -690,7 +691,7 @@
 	"ompl/control/SpaceInformation.h"
 	"UnicycleMotionModel.h"
 
-1391568496 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/MotionModels/UnicycleStatePropagator.cpp
+1391892368 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/MotionModels/UnicycleStatePropagator.cpp
 	"../../include/MotionModels/UnicycleStatePropagator.h"
 	"ompl/control/spaces/RealVectorControlSpace.h"
 	"ompl/util/Exception.h"
@@ -713,4 +714,7 @@
 	"ompl/control/SpaceInformation.h"
 	"../MotionModels/MotionModelMethod.h"
 	"../ObservationModels/ObservationModelMethod.h"
+
+1391893846 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/SpaceInformation/SpaceInformation.cpp
+	"../../include/SpaceInformation/SpaceInformation.h"
 

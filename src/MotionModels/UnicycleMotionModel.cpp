@@ -218,7 +218,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
     }
 
 
-  assert(ix == kf);
+  //assert(ix == kf);
 }
 
 //Generate noise according to specified state and control input

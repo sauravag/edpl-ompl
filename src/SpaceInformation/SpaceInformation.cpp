@@ -39,7 +39,7 @@
 void firm::SpaceInformation::applyControl(const ompl::control::Control *control)
 {
 
-    typename MotionModelMethod::NoiseType noise = motionModel_->generateNoise(trueState_, u);
+    typename MotionModelMethod::NoiseType noise = motionModel_->generateNoise(trueState_, control);
 
     motionModel_->Evolve(trueState_, control, noise, trueState_);
 

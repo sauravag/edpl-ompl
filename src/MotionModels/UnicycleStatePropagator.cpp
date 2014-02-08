@@ -41,7 +41,7 @@ using namespace ompl;
 UnicycleStatePropagator::UnicycleStatePropagator(const control::SpaceInformationPtr &si) : StatePropagator(si)
 {
     // The path to this setup file must not be hardcopied, need a better way to do this
-    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel("/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
+    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
 
     motionModel_ = mm;
 }

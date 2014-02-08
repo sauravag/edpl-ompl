@@ -81,7 +81,7 @@ class ExtendedKF : public  KalmanFilterMethod
                 const bool isConstruction=false) ;
 
 
-  	arma::mat computeStationaryCovariance (const LinearSystem& ls){}
+  	arma::mat computeStationaryCovariance (const LinearSystem& ls) {}
 
 };
 

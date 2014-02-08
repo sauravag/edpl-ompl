@@ -47,7 +47,7 @@
 #include "../Spaces/SE2BeliefSpace.h"
 #include "ompl/control/Control.h"
 #include "ompl/control/spaces/RealVectorControlSpace.h"
-//#include "../control/SpaceInformation.h"
+#include "ompl/control/SpaceInformation.h"
 
 class MotionModelMethod
 {
@@ -78,6 +78,7 @@ class MotionModelMethod
             zeroNoise_(arma::zeros<NoiseType>(noiseDim_)),
 			dt_(0.0)
         {
+            zeroControl_ = si_->allocControl();
             for(int i = 0; i < controlDim_ ; i++)
             {
                 zeroControl_->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = 0;
@@ -121,7 +122,7 @@ class MotionModelMethod
 		processNoiseCovariance(const ompl::base::State *state, const ompl::control::Control* control) = 0;
 
         // Get zero control which affects no change on the robot
-		virtual const ompl::control::Control* getZeroControl() { return zeroControl_; }
+		virtual ompl::control::Control* getZeroControl() { return zeroControl_; }
 
 		// Zero noise
 		virtual const NoiseType& getZeroNoise()     { return zeroNoise_; }
@@ -134,8 +135,11 @@ class MotionModelMethod
         // Convert a control from OMPL format to armadillo vector
         arma::colvec OMPL2ARMA(const ompl::control::Control *control)
         {
-            arma::colvec u(2);
+            std::cout<<"OMPL2ARMA Printing the control :"<<std::endl;
+            si_->printControl(control, std::cout);
 
+            arma::colvec u(2);
+            if(!control) control = si_->allocControl();
             const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
 
             for (unsigned int i = 0; i < controlDim_; i++)
@@ -148,12 +152,13 @@ class MotionModelMethod
         void ARMA2OMPL(arma::colvec u, ompl::control::Control *control)
         {
             //const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
-
+            if(!control) control = si_->allocControl();
             for (unsigned int i = 0; i < controlDim_; i++)
             {
                 control->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = u[i];
             }
-
+            std::cout<<"ARMA2OMPL Printing the control :"<<std::endl;
+            si_->printControl(control, std::cout);
         }
 
 	protected:
@@ -164,7 +169,7 @@ class MotionModelMethod
 
 		//control vector dimension is specific to each motion model subclass
 		const int controlDim_;
-		const ompl::control::Control* zeroControl_;
+		ompl::control::Control* zeroControl_;
 
 		//noise vector dimension is specific to each motion model subclass
 		const int noiseDim_;

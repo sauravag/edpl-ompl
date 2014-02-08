@@ -1,4 +1,4 @@
-/*
+
 #ifndef FIRM_OMPL_TESTS_
 #define FIRM_OMPL_TESTS_
 
@@ -61,38 +61,45 @@ bool isTheStateValid(const ob::State *state)
 
     return om->isStateObservable(state);
 }
-
+/*
 void TestBeliefStateSampler()
 {
     //SE2BeliefSpace *space;
     //space =  new SE2BeliefSpace();
-    ompl::base::StateSpacePtr space(new SE2BeliefSpace());
+    ompl::base::StateSpacePtr statespace(new SE2BeliefSpace());
+
+    ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(statespace,2) ) ;
+
+    // construct an instance of space information from this state space
+    firm::SpaceInformation::SpaceInformationPtr si(new firm::SpaceInformation(statespace, controlspace));
 
     ob::RealVectorBounds bounds(2);
     bounds.setLow(-5);
     bounds.setHigh(5);
 
     //space->setBounds(bounds);
-    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
+    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
 
     ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
     //ActuationSystemMethod::ActuationSystemPointer as(new SimulatedActuationSystem(mm, om));
 
-    ompl::base::SpaceInformation *si(new ompl::base::SpaceInformation(space));
     si->setStateValidityChecker(boost::bind(&isTheStateValid, _1));
 
-    //GaussianValidBeliefSampler *sampler = new GaussianValidBeliefSampler(si);
+    GaussianValidBeliefSampler *sampler = new GaussianValidBeliefSampler(si);
 
-    ompl::base::State *sampleState = space->allocState();
+    ompl::base::State *sampleState = si->allocState();
 
-    //sampler->setStdDev(0.2);
+    sampler->setStdDev(0.2);
     //sampler->setActuationSystem(as);
 
-    //sampler->sample(sampleState);
+    sampler->sample(sampleState);
 
-    //space->as<SE2BeliefSpace>()->printBeliefState(sampleState);
+    space->as<SE2BeliefSpace>()->printBeliefState(sampleState);
 
 }
+*/
+
+
 void TestObservationModel()
 {
     CamAruco2DObservationModel om( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" );
@@ -131,6 +138,7 @@ void TestObservationModel()
     cout<<"Observation Model passed tests"<<endl;
 }
 
+/*
 void TestStatePropagator()
 {
     namespace ob = ompl::base;
@@ -178,34 +186,43 @@ void TestStatePropagator()
     space->as<SE2BeliefSpace>()->printBeliefState(to);
 
 }
+*/
+
+
 void TestMotionModel()
 {
-    UnicycleMotionModel mm( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" );
-
     typedef SE2BeliefSpace::StateType StateType;
-    SE2BeliefSpace *space;
-    space =  new SE2BeliefSpace();
 
-    ob::RealVectorBounds bounds(2);
-    bounds.setLow(-5);
-    bounds.setHigh(5);
+    //SE2BeliefSpace *space;
+    //space =  new SE2BeliefSpace();
+    ompl::base::StateSpacePtr statespace(new SE2BeliefSpace());
 
-    space->setBounds(bounds);
+    std::cout<<"Printing the dimension of statespace :"<<statespace->getDimension()<<std::endl;
 
-    ob::State *from = space->allocState();
+    ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(statespace,2) ) ;
+
+    // construct an instance of space information from this state space
+    firm::SpaceInformation::SpaceInformationPtr si(new firm::SpaceInformation(statespace, controlspace));
+
+    UnicycleMotionModel mm(si,  "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" );
+
+    ob::State *from = si->allocState();
 
     from->as<StateType>()->setXYYaw(1.3,3,0);
 
-    ob::State *to = space->allocState();
+    ob::State *to = si->allocState();
 
     to->as<StateType>()->setXYYaw(5,3,1.57);
 
     cout<<"The from State is: "<<from->as<StateType>()->getX()<<endl;
 
-    colvec u(2);
-    u[0] = 0.1;
-    u[1] = 0.1;
+    colvec uvec(2);
+    uvec[0] = 0.1;
+    uvec[1] = 0.1;
 
+    ompl::control::Control* u;
+
+    mm.ARMA2OMPL(uvec, u);
 
     colvec noise = mm.generateNoise(from, u);
 
@@ -219,16 +236,21 @@ void TestMotionModel()
 
     mat processNoiseCovariance = mm.processNoiseCovariance(from , u);
 
-    vector<colvec> openLoopControls = mm.generateOpenLoopControls(from, to);
+    vector<ompl::control::Control*> openLoopControls;
+
+    mm.generateOpenLoopControls(from, to, openLoopControls);
+
+    cout<<"The size of open loop controls is: "<<openLoopControls.size()<<endl;
 
     ompl::base::State *nextState =  from;
 
     for(unsigned int i=0; i< openLoopControls.size() ; i++)
     {
+        cout<<"The control is :"<<endl;
+        si->printControl(openLoopControls[i], std::cout);
         colvec w = mm.generateNoise(from, openLoopControls[i]);
         mm.Evolve(from, openLoopControls[i], w, nextState);
-        space->copyState(from, nextState);
-
+        statespace->copyState(from, nextState);
     }
 
     colvec diff = to->as<StateType>()->getArmaData() - nextState->as<StateType>()->getArmaData();
@@ -241,7 +263,7 @@ void TestMotionModel()
     cout<<"Motion Model passed tests"<<endl;
 
 }
-
+/*
 void TestKalmanFilter()
 {
 
@@ -521,5 +543,7 @@ void TestFIRMWeight()
     cout<<weight.getSuccessProbability()<<endl;
 
 }
-#endif
 */
+
+#endif
+
