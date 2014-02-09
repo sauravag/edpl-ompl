@@ -164,9 +164,9 @@ int main(int, char **)
   //TestSE2BeliefSpace();
   //TestBeliefStateSampler();
   //TestObservationModel();
-  TestMotionModel();
+  //TestMotionModel();
   //TestKalmanFilter();
-  //TestRHCICreate();
+  TestRHCICreate();
   //TestController();
   //TestFIRMWeight();
   //TestStatePropagator();

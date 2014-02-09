@@ -51,8 +51,8 @@ class RHCICreate : public SeparatedControllerMethod
     RHCICreate() {}
 
     RHCICreate(ompl::base::State *goal,
-        const std::vector<ompl::base::State*>& nominalXs,
-        const std::vector<ControlType>& nominalUs,
+        const std::vector<ompl::base::State*> &nominalXs,
+        const std::vector<ompl::control::Control*> &nominalUs,
         const std::vector<LinearSystem>& linearSystems,  // Linear systems are not used in this class but it is here to unify the interface
         const MotionModelPointer mm) :
         SeparatedControllerMethod(goal, nominalXs, nominalUs, linearSystems, mm)

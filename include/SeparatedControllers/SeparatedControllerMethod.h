@@ -58,7 +58,7 @@ class SeparatedControllerMethod
 
     SeparatedControllerMethod(ompl::base::State *goal,
         const std::vector<ompl::base::State*>& nominalXs,
-        const std::vector<ControlType>& nominalUs,
+        const std::vector<ompl::control::Control*>& nominalUs,
         const std::vector<LinearSystem>& linearSystems,
         const MotionModelPointer mm) :
         goal_(goal),
@@ -77,7 +77,7 @@ class SeparatedControllerMethod
 
     ompl::base::State *goal_;
     std::vector<ompl::base::State*> nominalXs_;
-    std::vector<ControlType> nominalUs_;
+    std::vector<ompl::control::Control*> nominalUs_;
     std::vector< LinearSystem > linearSystems_;
     MotionModelPointer motionModel_;
     //bool m_reachedFlag;

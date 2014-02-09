@@ -78,7 +78,7 @@ class UnicycleMotionModel : public MotionModelMethod
 
     void generateOpenLoopControls(const ompl::base::State *startState,
                                                   const ompl::base::State *endState,
-                                                  std::vector<ompl::control::Control*> openLoopControls);
+                                                  std::vector<ompl::control::Control*> &openLoopControls);
 
     NoiseType generateNoise(const ompl::base::State *state, const ompl::control::Control* control);
 

@@ -99,7 +99,7 @@ void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::con
 //Generate open loop control between two specified Cfgs/states
 void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *startState,
                                                   const ompl::base::State *endState,
-                                                  std::vector<ompl::control::Control*> openLoopControls)
+                                                  std::vector<ompl::control::Control*> &openLoopControls)
 {
 
   using namespace arma;
@@ -217,7 +217,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
       openLoopControls.push_back(tempControl);
     }
 
-
+    std::cout<<"size of openloopcontrol in ump :"<<openLoopControls.size()<<std::endl;
   //assert(ix == kf);
 }
 

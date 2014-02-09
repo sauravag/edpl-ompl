@@ -263,19 +263,28 @@ void TestMotionModel()
     cout<<"Motion Model passed tests"<<endl;
 
 }
-/*
+
 void TestKalmanFilter()
 {
+    typedef SE2BeliefSpace::StateType StateType;
 
-    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
+    ompl::base::StateSpacePtr statespace(new SE2BeliefSpace());
+
+    std::cout<<"Printing the dimension of statespace :"<<statespace->getDimension()<<std::endl;
+
+    ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(statespace,2) ) ;
+
+    // construct an instance of space information from this state space
+    firm::SpaceInformation::SpaceInformationPtr si(new firm::SpaceInformation(statespace, controlspace));
+
+    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
 
     ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
 
-    ExtendedKF kf(mm, om);
+    si->setMotionModel(mm);
+    si->setObservationModel(om);
 
-    typedef SE2BeliefSpace::StateType StateType;
-    ompl::base::StateSpacePtr space(new SE2BeliefSpace());
-    ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
+    ExtendedKF kf(si);
 
     ob::RealVectorBounds bounds(2);
     bounds.setLow(-5);
@@ -283,11 +292,11 @@ void TestKalmanFilter()
 
     //space->setBounds(bounds);
 
-    ob::State *from = space->allocState();
+    ompl::base::State *from = si->allocState();
 
     from->as<StateType>()->setXYYaw(1.3,3,0);
 
-    ob::State *to = space->allocState();
+    ompl::base::State *to = si->allocState();
 
     to->as<StateType>()->setXYYaw(5,3,1.57);
 
@@ -305,13 +314,14 @@ void TestKalmanFilter()
 
     from->as<StateType>()->setCovariance(testCov);
 
-    vector<colvec> openLoopControls = mm->generateOpenLoopControls(from, to);
+    vector<ompl::control::Control*> openLoopControls;
+    mm->generateOpenLoopControls(from, to, openLoopControls);
 
-    ompl::base::State *nextState = space->allocState();
+    ompl::base::State *nextState = si->allocState();
 
     si->copyState(nextState, from);
 
-    ompl::base::State *kfEstimate = space->allocState();
+    ompl::base::State *kfEstimate = si->allocState();
     si->copyState(kfEstimate, from);
     //corrupting the initial belief
     kfEstimate->as<StateType>()->setXYYaw(1.45,3.2,0.025);
@@ -323,15 +333,15 @@ void TestKalmanFilter()
         colvec w = mm->generateNoise(from, openLoopControls[i]);
         mm->Evolve(from, openLoopControls[i], w, nextState);
         colvec obs = om->getObservation(nextState, true);
-        kfEstimate = kf.Evolve(kfEstimate, openLoopControls[i], obs, dummy, dummy);
+        kf.Evolve(kfEstimate, openLoopControls[i], obs, dummy, dummy, kfEstimate);
         si->copyState(from, nextState);
-
 
     }
 
     colvec diff = to->as<StateType>()->getArmaData() - nextState->as<StateType>()->getArmaData();
-
-    assert(norm(diff.subvec(0,1),2) < 0.05); // the distance between final state and goal is less than eps
+    double error = norm(diff.subvec(0,1),2) ;
+    std::cout<<"The error in final estimate is : "<<diff<<std::endl;
+    assert(error<0.05); // the distance between final state and goal is less than eps
 
     cout<<"The final evolved State is :"<<nextState->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"The final filtered State is :"<<kfEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
@@ -344,16 +354,26 @@ void TestKalmanFilter()
 
 void TestRHCICreate()
 {
+    typedef SE2BeliefSpace::StateType StateType;
 
-    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
+    ompl::base::StateSpacePtr statespace(new SE2BeliefSpace());
+
+    std::cout<<"Printing the dimension of statespace :"<<statespace->getDimension()<<std::endl;
+
+    ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(statespace,2) ) ;
+
+    // construct an instance of space information from this state space
+    firm::SpaceInformation::SpaceInformationPtr si(new firm::SpaceInformation(statespace, controlspace));
+
+    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
 
     ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
 
-    ExtendedKF kf(mm, om);
 
-    typedef SE2BeliefSpace::StateType StateType;
-    ompl::base::StateSpacePtr space(new SE2BeliefSpace());
-    ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
+    si->setMotionModel(mm);
+    si->setObservationModel(om);
+
+    ExtendedKF kf(si);
 
     ob::RealVectorBounds bounds(2);
     bounds.setLow(-5);
@@ -361,11 +381,11 @@ void TestRHCICreate()
 
     //space->setBounds(bounds);
 
-    ob::State *from = space->allocState();
+    ob::State *from = si->allocState();
 
     from->as<StateType>()->setXYYaw(1.3,3,0);
 
-    ob::State *to = space->allocState();
+    ob::State *to = si->allocState();
 
     to->as<StateType>()->setXYYaw(5,3,1.57);
 
@@ -383,20 +403,21 @@ void TestRHCICreate()
 
     from->as<StateType>()->setCovariance(testCov);
 
-    vector<colvec> openLoopControls = mm->generateOpenLoopControls(from, to);
+    vector<ompl::control::Control*> openLoopControls;
+    mm->generateOpenLoopControls(from, to, openLoopControls);
 
-    ompl::base::State *nextState = space->allocState();;
+    ompl::base::State *nextState = si->allocState();;
 
     si->copyState(nextState, from);
 
-    ompl::base::State *kfEstimate = space->allocState();
+    ompl::base::State *kfEstimate = si->allocState();
     si->copyState(kfEstimate, from);
     kfEstimate->as<StateType>()->setXYYaw(1.0,3.2,0.1);
 
     LinearSystem dummy;
 
     std::vector<ompl::base::State*> nmx;
-    std::vector<colvec> nmu;
+    std::vector<ompl::control::Control*> nmu;
     std::vector<LinearSystem> lss;
 
     RHCICreate *sepController = new RHCICreate(to, nmx, nmu, lss, mm);
@@ -405,13 +426,13 @@ void TestRHCICreate()
     while(norm(diff.subvec(0,1), 2) > 0.08)
     {
         cout<<"KF Estimate"<<endl;
-        space->as<SE2BeliefSpace>()->printBeliefState(kfEstimate);
+        statespace->as<SE2BeliefSpace>()->printBeliefState(kfEstimate);
         cout<<"True State"<<endl;
-        space->as<SE2BeliefSpace>()->printBeliefState(nextState);
-        cin.get();
+        statespace->as<SE2BeliefSpace>()->printBeliefState(nextState);
+        //cin.get();
 
         // generate control based on belief
-        colvec rhcU = sepController->generateFeedbackControl(kfEstimate);
+        ompl::control::Control *rhcU = sepController->generateFeedbackControl(kfEstimate);
         // generate motion noise based on true state
         colvec w = mm->generateNoise(from, rhcU);
         // evolve true state
@@ -419,7 +440,7 @@ void TestRHCICreate()
         //get observation based on true state
         colvec obs = om->getObservation(nextState, true);
         //evolve kalman filter using control and obs
-        kfEstimate = kf.Evolve(kfEstimate, rhcU, obs, dummy, dummy);
+        kf.Evolve(kfEstimate, rhcU, obs, dummy, dummy, kfEstimate);
 
         si->copyState(from, nextState);
 
@@ -437,7 +458,7 @@ void TestRHCICreate()
     cout<<"RHC ICreate passed tests only if the values make sense to you!"<<endl;
 
 }
-
+/*
 void TestController()
 {
 

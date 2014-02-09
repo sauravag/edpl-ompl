@@ -100,7 +100,7 @@ class MotionModelMethod
 		//Implementation is specific to particular motion model
 		virtual void generateOpenLoopControls(const ompl::base::State *startState,
                                               const ompl::base::State *endState,
-                                              std::vector<ompl::control::Control*> openLoopControls) = 0;
+                                              std::vector<ompl::control::Control*> &openLoopControls) = 0;
 
 
 
@@ -135,8 +135,8 @@ class MotionModelMethod
         // Convert a control from OMPL format to armadillo vector
         arma::colvec OMPL2ARMA(const ompl::control::Control *control)
         {
-            std::cout<<"OMPL2ARMA Printing the control :"<<std::endl;
-            si_->printControl(control, std::cout);
+            //std::cout<<"OMPL2ARMA Printing the control :"<<std::endl;
+            //si_->printControl(control, std::cout);
 
             arma::colvec u(2);
             if(!control) control = si_->allocControl();
@@ -157,8 +157,8 @@ class MotionModelMethod
             {
                 control->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = u[i];
             }
-            std::cout<<"ARMA2OMPL Printing the control :"<<std::endl;
-            si_->printControl(control, std::cout);
+            //std::cout<<"ARMA2OMPL Printing the control :"<<std::endl;
+            //si_->printControl(control, std::cout);
         }
 
 	protected:
