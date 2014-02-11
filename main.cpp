@@ -131,7 +131,7 @@ void plan(void)
     // attempt to solve the problem within one second of planning time
     ob::PlannerStatus solved = planner->solve(10);
 
-    std::cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
+    cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 
     if (solved)
     {
@@ -150,13 +150,13 @@ void plan(void)
 
 int main(int, char **)
 {
-  std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
+  cout << "OMPL version: " << OMPL_VERSION << endl;
 
     // set static variables
   RHCICreate::setControlQueueSize(10);
-  RHCICreate::setTurnOnlyDistance(0.05);
-  Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(10); // degrees
-  Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
+  RHCICreate::setTurnOnlyDistance(0.1);
+  Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(1); // degrees
+  Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.02);// meters
   Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
 
   //plan();
@@ -166,8 +166,8 @@ int main(int, char **)
   //TestObservationModel();
   //TestMotionModel();
   //TestKalmanFilter();
-  TestRHCICreate();
-  //TestController();
+  //TestRHCICreate();
+  TestController();
   //TestFIRMWeight();
   //TestStatePropagator();
 

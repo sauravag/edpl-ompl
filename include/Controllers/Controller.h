@@ -55,13 +55,12 @@ class Controller
   	typedef ObservationModelMethod::ObservationType ObservationType;
   	typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
   	typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
-  	typedef ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
 
 	Controller() {};
 
   Controller(const ompl::base::State *goal,
 		     const std::vector<ompl::base::State*>& nominalXs,
-			 const std::vector<ControlType>& nominalUs,
+			 const std::vector<ompl::control::Control*>& nominalUs,
 			 const firm::SpaceInformation::SpaceInformationPtr si);
 
   ompl::base::State*  Execute(const ompl::base::State *startState, bool& isFailed,int& failureCode,
@@ -122,7 +121,7 @@ double Controller<SeparatedControllerType, FilterType>::maxTries_ = -1;
 template <class SeparatedControllerType, class FilterType>
 Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::State *goal,
             const std::vector<ompl::base::State*>& nominalXs,
-            const std::vector<ControlType>& nominalUs,
+            const std::vector<ompl::control::Control*>& nominalUs,
             const firm::SpaceInformation::SpaceInformationPtr si): si_(si)
 {
   //assert(_nominalXs.size() == _nominalUs.size()+1);
@@ -148,7 +147,7 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
 
   separatedController_ = sepController;
 
-  FilterType filter(si_->getMotionModel(), si_->getObservationModel());
+  FilterType filter(si);
   filter_ = filter;
 
   //lastNominalPoint = actuationSystem_->getMotionModel()->Evolve(_nominalXs.back(),
@@ -242,7 +241,7 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
   ompl::base::StateSpacePtr space(new SpaceType());
   ompl::base::State *nextBelief = space->allocState();
 
-  nextBelief = filter_.Evolve(state, control, zCorrected, current, next, isConstructionMode);
+  filter_.Evolve(state, control, zCorrected, current, next, nextBelief , isConstructionMode);
 
   si_->setBelief(nextBelief);
 
@@ -270,7 +269,7 @@ ompl::base::State* Controller<SeparatedControllerType, FilterType>::Execute(cons
   double cost = 0.01;
   //cout<<"!!-----Executing-----!!"<<endl;
 
-  if(!this->isValid())
+  if(false /*!si_->isValid( intermediate states)*/)
   {
     isFailed = true;
     failureCode = -2;
@@ -298,7 +297,7 @@ ompl::base::State* Controller<SeparatedControllerType, FilterType>::Execute(cons
 
     if(obstacleMarkerObserved_ == true && constructionMode)
     {
-      if(!this->isValid())
+      if(false/*!this->isValid()*/)
       {
         isFailed = true;
         failureCode = -2;

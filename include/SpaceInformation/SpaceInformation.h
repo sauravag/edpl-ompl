@@ -63,6 +63,8 @@ namespace firm
                                 const ompl::control::ControlSpacePtr &controlSpace) :
             ompl::control::SpaceInformation(stateSpace, controlSpace)
             {
+                trueState_ = this->allocState();
+                belief_    = this->allocState();
             }
 
 
@@ -107,7 +109,7 @@ namespace firm
 
             bool checkCollision(void)
             {
-                return this->isValid(trueState_);
+                return !this->isValid(trueState_);
             }
 
             void applyControl(const ompl::control::Control *control);

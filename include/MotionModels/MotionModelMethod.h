@@ -165,10 +165,10 @@ class MotionModelMethod
 
 	    ompl::control::SpaceInformationPtr si_;
 
-		const int stateDim_;
+		const unsigned int stateDim_;
 
 		//control vector dimension is specific to each motion model subclass
-		const int controlDim_;
+		const unsigned int controlDim_;
 		ompl::control::Control* zeroControl_;
 
 		//noise vector dimension is specific to each motion model subclass

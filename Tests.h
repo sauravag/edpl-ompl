@@ -358,8 +358,6 @@ void TestRHCICreate()
 
     ompl::base::StateSpacePtr statespace(new SE2BeliefSpace());
 
-    std::cout<<"Printing the dimension of statespace :"<<statespace->getDimension()<<std::endl;
-
     ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(statespace,2) ) ;
 
     // construct an instance of space information from this state space
@@ -397,9 +395,9 @@ void TestRHCICreate()
 
     arma::mat testCov(3,3);
 
-    testCov<<0.5<<0<<0<<endr
-           <<0<<0.5<<0<<endr
-           <<0<<0<<0.02<<endr;
+    testCov<<0.01<<0<<0<<endr
+           <<0<<0.01<<0<<endr
+           <<0<<0<<0.01<<endr;
 
     from->as<StateType>()->setCovariance(testCov);
 
@@ -411,8 +409,9 @@ void TestRHCICreate()
     si->copyState(nextState, from);
 
     ompl::base::State *kfEstimate = si->allocState();
+    ompl::base::State *kfUpdate = si->allocState();
     si->copyState(kfEstimate, from);
-    kfEstimate->as<StateType>()->setXYYaw(1.0,3.2,0.1);
+    //kfEstimate->as<StateType>()->setXYYaw(1.0,3.2,0.1);
 
     LinearSystem dummy;
 
@@ -429,6 +428,7 @@ void TestRHCICreate()
         statespace->as<SE2BeliefSpace>()->printBeliefState(kfEstimate);
         cout<<"True State"<<endl;
         statespace->as<SE2BeliefSpace>()->printBeliefState(nextState);
+
         //cin.get();
 
         // generate control based on belief
@@ -440,9 +440,10 @@ void TestRHCICreate()
         //get observation based on true state
         colvec obs = om->getObservation(nextState, true);
         //evolve kalman filter using control and obs
-        kf.Evolve(kfEstimate, rhcU, obs, dummy, dummy, kfEstimate);
+        kf.Evolve(kfEstimate, rhcU, obs, dummy, dummy, kfUpdate);
 
         si->copyState(from, nextState);
+        si->copyState(kfEstimate, kfUpdate);
 
         diff = to->as<StateType>()->getArmaData() - kfEstimate->as<StateType>()->getArmaData();
 
@@ -458,31 +459,37 @@ void TestRHCICreate()
     cout<<"RHC ICreate passed tests only if the values make sense to you!"<<endl;
 
 }
-/*
+
 void TestController()
 {
 
-    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
+    typedef SE2BeliefSpace::StateType StateType;
+
+    ompl::base::StateSpacePtr statespace(new SE2BeliefSpace());
+
+    ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(statespace,2) ) ;
+
+    // construct an instance of space information from this state space
+    firm::SpaceInformation::SpaceInformationPtr si(new firm::SpaceInformation(statespace, controlspace));
+
+    MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
 
     ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
 
-    ExtendedKF kf(mm, om);
+    si->setMotionModel(mm);
+    si->setObservationModel(om);
 
-    typedef SE2BeliefSpace::StateType StateType;
-    ompl::base::StateSpacePtr space(new SE2BeliefSpace());
-    ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
+    si->setStateValidityChecker(ompl::base::StateValidityCheckerPtr(new FIRMValidityChecker(si)));
 
-    ob::RealVectorBounds bounds(2);
-    bounds.setLow(-5);
-    bounds.setHigh(5);
+    ExtendedKF kf(si);
 
     //space->setBounds(bounds);
 
-    ob::State *from = space->allocState();
+    ob::State *from = si->allocState();
 
     from->as<StateType>()->setXYYaw(1.3,3,0);
 
-    ob::State *to = space->allocState();
+    ob::State *to = si->allocState();
 
     to->as<StateType>()->setXYYaw(5,3,1.57);
 
@@ -500,44 +507,44 @@ void TestController()
 
     from->as<StateType>()->setCovariance(testCov);
 
-    vector<colvec> openLoopControls = mm->generateOpenLoopControls(from, to);
-    vector<ompl::base::State*> intermediates;
+    std::vector<ompl::control::Control*> openLoopControls;
+    mm->generateOpenLoopControls(from, to, openLoopControls);
 
-    ompl::base::State *intermediate = space->allocState();
-    space->copyState(intermediate, from);
-    for(typename vector<colvec>::iterator c=openLoopControls.begin(), e=openLoopControls.end(); c!=e; ++c)
+    std::vector<ompl::base::State*> intermediates;
+
+    ompl::base::State *intermediate = si->allocState();
+
+    si->copyState(intermediate, from);
+    for(typename vector<ompl::control::Control*>::iterator c=openLoopControls.begin(), e=openLoopControls.end(); c!=e; ++c)
     {
-        ompl::base::State *x = space->allocState();
+        ompl::base::State *x = si->allocState();
         mm->Evolve(intermediate,*c,mm->getZeroNoise(), x);
         intermediates.push_back(x);
-        space->copyState(intermediate, x);
+        si->copyState(intermediate, x);
     }
 
-
-
-    ompl::base::State *nextState = space->allocState();;
+    ompl::base::State *nextState = si->allocState();;
 
     si->copyState(nextState, from);
 
-    ompl::base::State *kfEstimate = space->allocState();
+    ompl::base::State *kfEstimate = si->allocState();
+
     si->copyState(kfEstimate, from);
     kfEstimate->as<StateType>()->setXYYaw(1.0,3.2,0.1);
 
     LinearSystem dummy;
 
     std::vector<ompl::base::State*> nmx;
-    std::vector<MotionModelMethod::ControlType> nmu;
+    std::vector<ompl::control::Control*> nmu;
     std::vector<LinearSystem> lss;
 
     RHCICreate *sepController = new RHCICreate(to, nmx, nmu, lss, mm);
     colvec diff = to->as<StateType>()->getArmaData() - from->as<StateType>()->getArmaData();
 
-    ActuationSystemMethod::ActuationSystemPointer as(new SimulatedActuationSystem(mm, om));
-
-    as->setTrueState(from);
+    si->setTrueState(from);
 
     Controller<RHCICreate, ExtendedKF> *myController;
-    myController =  new Controller<RHCICreate,ExtendedKF>(to, intermediates, openLoopControls,as);
+    myController =  new Controller<RHCICreate,ExtendedKF>(to, intermediates, openLoopControls, si);
     bool isFailed = false;
     double cost=0;
     int failureCode=0;
@@ -554,6 +561,7 @@ void TestController()
 
 }
 
+/*
 void TestFIRMWeight()
 {
     FIRMWeight weight(2);
