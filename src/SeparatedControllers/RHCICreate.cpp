@@ -89,10 +89,10 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
     if(distance < turnOnlyDistance_){
 
       ompl::control::Control* newcontrol  = this->motionModel_->getZeroControl();
-      cout<<"Applying Only Turn Control !"<<endl;
+      //cout<<"Applying Only Turn Control !"<<endl;
       if (abs(relativeCfg[2]) > 1e-6)
       {
-        cout<<"control val:  "<<0.2 * relativeCfg[2]/abs(relativeCfg[2])<<endl;
+        //cout<<"control val:  "<<0.2 * relativeCfg[2]/abs(relativeCfg[2])<<endl;
         //SO std::cin.get();
         newcontrol->as<ompl::control::RealVectorControlSpace::ControlType>()->values[1] = 0.2 * relativeCfg[2]/abs(relativeCfg[2]);
       }

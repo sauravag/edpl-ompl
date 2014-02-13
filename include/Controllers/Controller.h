@@ -65,7 +65,7 @@ class Controller
 
         bool Execute(const ompl::base::State *startState,
                    ompl::base::State* endState,
-                   ompl::base::Cost executionCost,
+                   ompl::base::Cost &executionCost,
                    bool constructionMode=true);
 
         ompl::base::State*  Stabilize(const ompl::base::State *startState);
@@ -247,35 +247,25 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
 template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *startState,
                                                               ompl::base::State* endState,
-                                                              ompl::base::Cost executionCost,
+                                                              ompl::base::Cost &executionCost,
                                                               bool constructionMode)
 {
-
+    using namespace std;
   // assign the start state to the end state
-  //if(!endState) endState = si_->allocState();
   si_->copyState(endState, startState);
 
   unsigned int k = 0;
 
-  // HOW TO SET INITAL VALUE OF COST
-  //cost = 1 - > for time based only if time per execution is "1"
-  //cost = 0.01 -> for covariance based
+  /**HOW TO SET INITAL VALUE OF COST
+    cost = 1 - > for time based only if time per execution is "1"
+    cost = 0.01 -> for covariance based
+  */
   double cost = 0.01;
   //cout<<"!!-----Executing-----!!"<<endl;
-  /**
-  if(!si_->isValid(--the intermediate states--))
-  {
-    //failureCode = -2;
-    return false;
-  }
-  */
 
-  //cout<<"lss_ size is :" << lss_.size() <<endl;
-
-  //cout<<"The robot goal is:  "<<goal_<<endl;
   while(!this->isTerminated(endState, k))
   {
-    //cout << "time: "<< k << endl;
+    //std::cout << "time: "<< k << std::endl;
     endState = this->Evolve(endState, k, constructionMode) ;
 
     // if the propagated state is not valid, return
@@ -286,18 +276,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
       //failureCode = -1;
       return false;
     }
-    /**
-    if(obstacleMarkerObserved_ == true && constructionMode)
-    {
-      if(!this->isValid())
-      {
-        //isFailed = true;
-        //failureCode = -2;
-        return false;
-      }
 
-    }
-    */
     ompl::base::State  *nominalX_K = si_->allocState();
 
     if(k<lss_.size())
@@ -310,7 +289,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
 
     // This value of 4 should not be hard coded
-    if(debug_)
+    /**if(debug_)
     {
         std::cout<<"The nominal trajectory point is:" <<nomXVec<<std::endl;
         std::cout<<"The current state is           :"<<endStateVec<<std::endl;
@@ -318,7 +297,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         std::cout<<"The size of LSS is :"<<lss_.size()<<std::endl;
         std::cout<<"The k is : "<<k<<std::endl;
         //std::cin.get();
-    }
+    }*/
     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
       //isFailed = true;
@@ -327,24 +306,22 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     }
 
     k++;
-    /**
-    if(!constructionMode)
-    {
-      //this->GetMPProblem()->RemoveDecayedObstacles(); // check and remove decayed obstacles
-    }
-    */
+
     /**
      Increment cost by:
      -> 0.01 for time based
      -> trace(Covariance) for FIRM
     */
     cost += arma::trace(endState->as<StateType>()->getCovariance());
+    //std::cout<<"Trace of covariance: "<<arma::trace(endState->as<StateType>()->getCovariance())<<std::endl;
   }
   //cout<<"The Filter estimate currently is:  "<< b.GetArmaData()(0)<<" "<< b.GetArmaData()(1)<<" "<<b.GetArmaData()(2)*180/PI<<endl;
   //cout << "Going on edge" << endl;
   //cout<<"!!-----End Executing-----!!"<<endl;
   //obstacleMarkerObserved_ = false;
   executionCost.v = cost;
+  //std::cout<<"Press enter "<<std::endl;
+  //std::cin.get();
   return true ;
 }
 
@@ -393,7 +370,7 @@ bool Controller<SeparatedControllerType, FilterType>::isTerminated(const ompl::b
 
   double distance_to_goal = norm(diff.subvec(0,1),2);
 
-  std::cout<<"The distance to goal is: "<<distance_to_goal<<std::endl;
+  //std::cout<<"The distance to goal is: "<<distance_to_goal<<std::endl;
   //std::usleep(1e5);
 
   if( distance_to_goal > nodeReachedDistance_)   {

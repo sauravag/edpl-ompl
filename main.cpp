@@ -50,8 +50,8 @@ void plan(void)
 
     // set the bounds for the R^3 part of SE(3)
     ob::RealVectorBounds bounds(2);
-    bounds.setLow(-6);
-    bounds.setHigh(6);
+    bounds.setLow(0);
+    bounds.setHigh(20);
 
     statespace->as<SE2BeliefSpace>()->setBounds(bounds);
 
@@ -99,7 +99,7 @@ void plan(void)
 
     // create a random goal state
     ob::State *goal = statespace->allocState();
-    goal->as<StateType>()->setXYYaw(1,2,0);
+    goal->as<StateType>()->setXYYaw(19,19,0);
 
     cout<<"The goal state is:"<<endl;
     statespace->as<SE2BeliefSpace>()->printBeliefState(goal);
@@ -156,7 +156,7 @@ int main(int, char **)
   RHCICreate::setControlQueueSize(10);
   RHCICreate::setTurnOnlyDistance(0.05);
   Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(1); // degrees
-  Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.02);// meters
+  Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
   Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
 
   plan();

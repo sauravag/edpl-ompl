@@ -44,6 +44,7 @@ class FIRMValidityChecker : public ompl::base::StateValidityChecker
 {
   public:
     typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+    typedef SE2BeliefSpace::StateType StateType;
 
     FIRMValidityChecker(const ompl::base::SpaceInformationPtr &si/**, ObservationModelPointer om*/) :
     ompl::base::StateValidityChecker(si)/**, observationModel_(om)*/
@@ -52,6 +53,21 @@ class FIRMValidityChecker : public ompl::base::StateValidityChecker
 
     virtual bool isValid(const ompl::base::State *state) const
     {
+      // states within a box are invalid
+      int x_l =  5;
+      int x_r =  15;
+      int y_b =  5;
+      int y_t =  15;
+
+      arma::colvec pos = state->as<StateType>()->getArmaData();
+
+      if(pos[0] >= x_l && pos[0] <= x_r )
+      {
+        if(pos[1] >= y_b && pos[1] <= y_t)
+        {
+            return false;
+        }
+      }
       return true;
     }
 

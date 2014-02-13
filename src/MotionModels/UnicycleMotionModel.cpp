@@ -217,7 +217,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
       openLoopControls.push_back(tempControl);
     }
 
-    std::cout<<"size of openloopcontrol in ump :"<<openLoopControls.size()<<std::endl;
+    //std::cout<<"size of openloopcontrol in ump :"<<openLoopControls.size()<<std::endl;
   //assert(ix == kf);
 }
 

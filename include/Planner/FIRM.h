@@ -285,6 +285,7 @@ public:
         return nn_;
     }
 
+
 protected:
 
     /** \brief Free all the memory allocated by the planner */
@@ -331,7 +332,7 @@ protected:
                                                              unsigned int edgeID,
                                                              Vertex goalVertex);
 
-    virtual void generateEdgeController(ompl::base::State *start, ompl::base::State* target, EdgeControllerType edgeController);
+    virtual void generateEdgeController(ompl::base::State *start, ompl::base::State* target, EdgeControllerType &edgeController);
     /** \brief Flag indicating whether the default connection strategy is the Star strategy */
     bool                                                   starStrategy_;
 

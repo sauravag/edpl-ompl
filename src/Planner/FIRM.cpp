@@ -69,7 +69,7 @@ namespace ompl
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 0.2;
 
-        static const double NUM_MONTE_CARLO_PARTICLES = 10;
+        static const double NUM_MONTE_CARLO_PARTICLES = 4;
     }
 }
 
@@ -125,11 +125,10 @@ void FIRM::setup(void)
         opt_.reset(new ompl::base::PathLengthOptimizationObjective(si_));
         opt_->setCostThreshold(opt_->infiniteCost());
     }
-    if(!numParticles_)
-    {
-      int np = ompl::magic::NUM_MONTE_CARLO_PARTICLES;
-      numParticles_ = np;
-    }
+
+    int np = ompl::magic::NUM_MONTE_CARLO_PARTICLES;
+    numParticles_ = np;
+
 }
 
 void FIRM::setMaxNearestNeighbors(unsigned int k)
@@ -467,8 +466,8 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
     boost::mutex::scoped_lock _(graphMutex_);
 
     Vertex m = boost::add_vertex(g_);
-    std::cout<<"Putting out the vertex property :"<<m<<std::endl;
-    std::cin.get();
+    //std::cout<<"Putting out the vertex property :"<<m<<std::endl;
+    //std::cin.get();
     stateProperty_[m] = state;
     totalConnectionAttemptsProperty_[m] = 1;
     successfulConnectionAttemptsProperty_[m] = 0;
@@ -591,11 +590,17 @@ ompl::base::Cost FIRM::costHeuristic(Vertex u, Vertex v) const
 ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeState, ompl::base::State* targetNodeState, unsigned int edgeID, FIRM::Vertex goalVertex)
 {
 
-    double nodeWeight = 0;
+    std::cout<<"The 2 states to connect for edge are: "<<std::endl;
+    std::cout<<"Start  : \n"<<std::endl;
+    std::cout<<startNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
+    std::cout<<"End  : \n"<<std::endl;
+    std::cout<<targetNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
+    //std::cout<<"Press Enter and wait "<<std::endl;
+    //std::cin.get();
     double successCount = 0;
 
     ompl::base::Cost edgeCost(0);
-
+    ompl::base::Cost nodeStabilizationCost(0);
     EdgeControllerType edgeController;
 
     // Generate the edge controller for given start and end state
@@ -618,7 +623,6 @@ ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startN
 
         ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
         ompl::base::Cost pcost(0);
-        if(!startNodeState) std::cout<<"HEHEHEHEHEHEHEHEHE"<<std::endl;
 
         if(edgeController.Execute(startNodeState, endBelief, pcost))
         {
@@ -626,6 +630,8 @@ ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startN
            //CfgType stabilizedBelief;
            //nodeWeight = FIRMnodeController.Stabilize(endBelief, stabilizedBelief) ;
            edgeCost.v = edgeCost.v + pcost.v ;// + nodeWeight;
+           //std::cout<<"The cost at particle: "<<i<<"  is : "<<edgeCost.v<<std::endl;
+           //std::cin.get();
         }
 
     }
@@ -633,12 +639,16 @@ ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startN
     //cout<<"The Success Prob is :"<< successCount/ m_numParticles <<endl;
     edgeCost.v = edgeCost.v / successCount ;
     double transitionProbability = successCount / numParticles_ ;
+    std::cout<<"Edge Cost :"<<edgeCost.v<<std::endl;
+    std::cout<<"Transition Prob: "<<transitionProbability<<std::endl;
+    //std::cout<<"Press Enter"<<std::endl;
+    //std::cin.get();
     //_FIRMedgeController = FIRMedgeController ;
 
     return edgeCost;
 }
 
-void FIRM::generateEdgeController(ompl::base::State *start, ompl::base::State* target, FIRM::EdgeControllerType edgeController)
+void FIRM::generateEdgeController(ompl::base::State *start, ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
 {
     std::vector<ompl::base::State*> intermediates;
 
