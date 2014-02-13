@@ -70,7 +70,7 @@ void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::con
   //cout << "noise vector: " << endl << w << endl;
   //cout << "getting control noise " << endl;
   //cout << "controlDim_ = " << this->controlDim_ << endl;
-  std::cout<<"The input control is :"<<u<<std::endl;
+  //std::cout<<"The input control is :"<<u<<std::endl;
 
   const colvec& Un = w.subvec(0, this->controlDim_-1);
   //cout << "getting process noise " << endl;
@@ -78,7 +78,7 @@ void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::con
   const colvec& Wg = w.subvec(this->controlDim_, this->noiseDim_-1);
 
   colvec x = state->as<StateType>()->getArmaData();
-  std::cout<<"The input state is   :"<<x<<std::endl;
+  //std::cout<<"The input state is   :"<<x<<std::endl;
   const double c = cos(x[2]);
   const double s = sin(x[2]);
 
@@ -89,7 +89,7 @@ void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::con
 
   x += (u2*this->dt_) + (Un2*sqrt(this->dt_)) + (Wg*sqrt(this->dt_));
 
-  std::cout<<"The evolved state is   :"<<x<<std::endl;
+  //std::cout<<"The evolved state is   :"<<x<<std::endl;
 
   result->as<StateType>()->setXYYaw(x[0],x[1],x[2]);
 }

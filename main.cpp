@@ -154,12 +154,12 @@ int main(int, char **)
 
     // set static variables
   RHCICreate::setControlQueueSize(10);
-  RHCICreate::setTurnOnlyDistance(0.1);
+  RHCICreate::setTurnOnlyDistance(0.05);
   Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(1); // degrees
   Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.02);// meters
   Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
 
-  //plan();
+  plan();
 
   //TestSE2BeliefSpace();
   //TestBeliefStateSampler();
@@ -167,7 +167,7 @@ int main(int, char **)
   //TestMotionModel();
   //TestKalmanFilter();
   //TestRHCICreate();
-  TestController();
+  //TestController();
   //TestFIRMWeight();
   //TestStatePropagator();
 

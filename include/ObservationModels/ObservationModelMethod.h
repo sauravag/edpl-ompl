@@ -74,8 +74,7 @@ class ObservationModelMethod
     virtual
       ObservationType getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg) = 0;
 
-    virtual
-      ObservationType removeSpuriousObservations(const ObservationType& Zg) = 0;
+    //virtual ObservationType removeSpuriousObservations(const ObservationType& Zg) = 0;
 
     // Jx = dh/dx
     virtual

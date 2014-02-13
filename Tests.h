@@ -248,9 +248,9 @@ void TestMotionModel()
     {
         cout<<"The control is :"<<endl;
         si->printControl(openLoopControls[i], std::cout);
-        colvec w = mm.generateNoise(from, openLoopControls[i]);
+        colvec w = mm.getZeroNoise();
         mm.Evolve(from, openLoopControls[i], w, nextState);
-        statespace->copyState(from, nextState);
+        si->copyState(from, nextState);
     }
 
     colvec diff = to->as<StateType>()->getArmaData() - nextState->as<StateType>()->getArmaData();
@@ -332,21 +332,22 @@ void TestKalmanFilter()
     {
         colvec w = mm->generateNoise(from, openLoopControls[i]);
         mm->Evolve(from, openLoopControls[i], w, nextState);
+        si->copyState(from, nextState);
         colvec obs = om->getObservation(nextState, true);
         kf.Evolve(kfEstimate, openLoopControls[i], obs, dummy, dummy, kfEstimate);
-        si->copyState(from, nextState);
 
     }
 
-    colvec diff = to->as<StateType>()->getArmaData() - nextState->as<StateType>()->getArmaData();
+    colvec diff = kfEstimate->as<StateType>()->getArmaData() - nextState->as<StateType>()->getArmaData();
     double error = norm(diff.subvec(0,1),2) ;
-    std::cout<<"The error in final estimate is : "<<diff<<std::endl;
+
+    cout<<"========================================================================"<<endl;
+    cout<<"The final true State is       : \n"<<nextState->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
+    cout<<"The final filtered State is   : \n"<<kfEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
+    cout<<"The final commanded state was : \n"<<to->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
+    cout<<"The error in final estimate   : \n"<<diff<<std::endl;
+
     assert(error<0.05); // the distance between final state and goal is less than eps
-
-    cout<<"The final evolved State is :"<<nextState->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
-    cout<<"The final filtered State is :"<<kfEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
-    cout<<"the final commanded state was :"<<to->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
-
     cout<<"Kalman Filter passed tests, check if the values make sense to you!"<<endl;
 
 }
@@ -422,7 +423,7 @@ void TestRHCICreate()
     RHCICreate *sepController = new RHCICreate(to, nmx, nmu, lss, mm);
     colvec diff = to->as<StateType>()->getArmaData() - from->as<StateType>()->getArmaData();
 
-    while(norm(diff.subvec(0,1), 2) > 0.08)
+    while(norm(diff.subvec(0,1), 2) > 0.06 || abs(diff[2]) > 2*3.142/180 )
     {
         cout<<"KF Estimate"<<endl;
         statespace->as<SE2BeliefSpace>()->printBeliefState(kfEstimate);
@@ -452,13 +453,14 @@ void TestRHCICreate()
 
     assert(norm(diff.subvec(0,1),2) < 0.10);
 
-    cout<<"The final evolved State is :"<<nextState->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
+    cout<<"The final true State is :"<<nextState->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"The final filtered State is :"<<kfEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"the final commanded state was :"<<to->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
 
     cout<<"RHC ICreate passed tests only if the values make sense to you!"<<endl;
 
 }
+
 
 void TestController()
 {
@@ -546,13 +548,14 @@ void TestController()
     Controller<RHCICreate, ExtendedKF> *myController;
     myController =  new Controller<RHCICreate,ExtendedKF>(to, intermediates, openLoopControls, si);
     bool isFailed = false;
-    double cost=0;
+    ompl::base::Cost cost(0);
     int failureCode=0;
-    kfEstimate = myController->Execute(kfEstimate, isFailed, failureCode, cost);
+    ompl::base::State* finalEstimate = si->allocState();
+    myController->Execute(kfEstimate, finalEstimate, cost);
 
     diff = to->as<StateType>()->getArmaData() - kfEstimate->as<StateType>()->getArmaData();
     cout<<"The failure code of execution was :"<<failureCode<<endl;
-    cout<<"The final filtered State is :"<<kfEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
+    cout<<"The final filtered State from controller is :"<<kfEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"the final commanded state was :"<<to->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
 
     assert(norm(diff.subvec(0,1),2) < 0.10 && "Controller failed to take robot to goal");

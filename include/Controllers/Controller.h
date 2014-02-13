@@ -47,51 +47,46 @@ template <class SeparatedControllerType, class FilterType>
 class Controller
 {
 
-  public:
-    typedef MotionModelMethod::SpaceType SpaceType;
-    typedef MotionModelMethod::StateType StateType;
-    typedef firm::SpaceInformation::SpaceInformationPtr SpaceInformationPtr;
-    typedef MotionModelMethod::ControlType   ControlType;
-  	typedef ObservationModelMethod::ObservationType ObservationType;
-  	typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
-  	typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+    public:
+        typedef MotionModelMethod::SpaceType SpaceType;
+        typedef MotionModelMethod::StateType StateType;
+        typedef firm::SpaceInformation::SpaceInformationPtr SpaceInformationPtr;
+        typedef MotionModelMethod::ControlType   ControlType;
+        typedef ObservationModelMethod::ObservationType ObservationType;
+        typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
+        typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
 
-	Controller() {};
+        Controller() {};
 
-  Controller(const ompl::base::State *goal,
-		     const std::vector<ompl::base::State*>& nominalXs,
-			 const std::vector<ompl::control::Control*>& nominalUs,
-			 const firm::SpaceInformation::SpaceInformationPtr si);
+        Controller(const ompl::base::State *goal,
+                 const std::vector<ompl::base::State*>& nominalXs,
+                 const std::vector<ompl::control::Control*>& nominalUs,
+                 const firm::SpaceInformation::SpaceInformationPtr si);
 
-  ompl::base::State*  Execute(const ompl::base::State *startState, bool& isFailed,int& failureCode,
-                double& executionCost, bool constructionMode=true, double sleepTime=0.0);
+        bool Execute(const ompl::base::State *startState,
+                   ompl::base::State* endState,
+                   ompl::base::Cost executionCost,
+                   bool constructionMode=true);
 
-  ompl::base::State*  Stabilize(const ompl::base::State *startState);
+        ompl::base::State*  Stabilize(const ompl::base::State *startState);
 
-  bool isTerminated(const ompl::base::State *state, const size_t t);
+        bool isTerminated(const ompl::base::State *state, const size_t t);
 
-  ompl::base::State* Evolve(const ompl::base::State *state, size_t t, bool isConstructionMode);
+        ompl::base::State* Evolve(const ompl::base::State *state, size_t t, bool isConstructionMode);
 
-  ompl::base::State* getGoal() {return goal_; }
+        ompl::base::State* getGoal() {return goal_; }
 
-  void setSpaceInformation(SpaceInformationPtr si) { si_ = si; }
+        void setSpaceInformation(SpaceInformationPtr si) { si_ = si; }
 
-  bool isValid();
+        bool isValid();
 
+        static void setNodeReachedAngle(double angle) {nodeReachedAngle_ = angle; }
+        static void setNodeReachedDistance(double d) {nodeReachedDistance_ = d; }
+        static void setMaxTries(double maxtries) {maxTries_ = maxtries; }
 
-/*
-  double ControllerCost(const CfgType& _x, const size_t& _t) {
+        size_t Length() { return lss_.size(); }
 
-			assert(!"Not supported yet!");
-	}
-*/
-  static void setNodeReachedAngle(double angle) {nodeReachedAngle_ = angle; }
-  static void setNodeReachedDistance(double d) {nodeReachedDistance_ = d; }
-  static void setMaxTries(double maxtries) {maxTries_ = maxtries; }
-
-  size_t Length() { return lss_.size(); }
-
-  private:
+    private:
 
         SpaceInformationPtr si_; // Instead of the actuation system, in OMPL we have the spaceinformation
 		std::vector<LinearSystem> lss_;
@@ -181,8 +176,6 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
 
   si_->applyControl(control);
 
-  ObservationType z = si_->getObservation();
-
   //---- WARNING---//
   //TODO: The singleobservationdim needs to be retrieved from the observation model
   //---------------//
@@ -193,7 +186,7 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
 
   //Adding obstacle markers
   obstacleMarkerObserved_ = false;  // !!---Defaulting to false for development phase---!!
-  /*
+  /**
   if(!isConstructionMode)
   {
     for(int i=0; i<z.n_rows/singleobservationdim; i++)
@@ -212,7 +205,7 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
   }
   */
 
-  ObservationType zCorrected = si_->getObservationModel()->removeSpuriousObservations(z);
+  ObservationType zCorrected = si_->getObservation();
 
   //cout << "Observation Z: " << endl << Z << endl;
   LinearSystem current;// = lss_[_t];
@@ -252,14 +245,15 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
 }
 
 template <class SeparatedControllerType, class FilterType>
-ompl::base::State* Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *startState, bool& isFailed,
-                int& failureCode,double& executionCost, bool constructionMode, double sleepTime)
+bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *startState,
+                                                              ompl::base::State* endState,
+                                                              ompl::base::Cost executionCost,
+                                                              bool constructionMode)
 {
 
-  ompl::base::StateSpacePtr space(new SpaceType);
-  ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
-  ompl::base::State* endState = space->allocState();
-  si->copyState(endState, startState);
+  // assign the start state to the end state
+  //if(!endState) endState = si_->allocState();
+  si_->copyState(endState, startState);
 
   unsigned int k = 0;
 
@@ -268,44 +262,43 @@ ompl::base::State* Controller<SeparatedControllerType, FilterType>::Execute(cons
   //cost = 0.01 -> for covariance based
   double cost = 0.01;
   //cout<<"!!-----Executing-----!!"<<endl;
-
-  if(false /*!si_->isValid( intermediate states)*/)
+  /**
+  if(!si_->isValid(--the intermediate states--))
   {
-    isFailed = true;
-    failureCode = -2;
-    return endState;
-
+    //failureCode = -2;
+    return false;
   }
+  */
 
   //cout<<"lss_ size is :" << lss_.size() <<endl;
 
   //cout<<"The robot goal is:  "<<goal_<<endl;
   while(!this->isTerminated(endState, k))
   {
-
-    usleep(sleepTime*1e6);
     //cout << "time: "<< k << endl;
     endState = this->Evolve(endState, k, constructionMode) ;
 
-    if( si_->checkCollision())
+    // if the propagated state is not valid, return
+    if( !si_->checkTrueStateValidity())
     {
       //cout << k << " of " << m_maxExecTime << " steps used." << endl;
-      isFailed = true;
-      failureCode = -1;
-      return endState;
+      //isFailed = true;
+      //failureCode = -1;
+      return false;
     }
-
+    /**
     if(obstacleMarkerObserved_ == true && constructionMode)
     {
-      if(false/*!this->isValid()*/)
+      if(!this->isValid())
       {
-        isFailed = true;
-        failureCode = -2;
-        return endState;
+        //isFailed = true;
+        //failureCode = -2;
+        return false;
       }
 
     }
-    ompl::base::State  *nominalX_K = space->allocState();
+    */
+    ompl::base::State  *nominalX_K = si_->allocState();
 
     if(k<lss_.size())
       nominalX_K = lss_[k].getX();
@@ -328,17 +321,18 @@ ompl::base::State* Controller<SeparatedControllerType, FilterType>::Execute(cons
     }
     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
-      isFailed = true;
-      failureCode = -3;
-      return endState;
+      //isFailed = true;
+      //failureCode = -3;
+      return false;
     }
 
     k++;
-
+    /**
     if(!constructionMode)
     {
       //this->GetMPProblem()->RemoveDecayedObstacles(); // check and remove decayed obstacles
     }
+    */
     /**
      Increment cost by:
      -> 0.01 for time based
@@ -349,9 +343,9 @@ ompl::base::State* Controller<SeparatedControllerType, FilterType>::Execute(cons
   //cout<<"The Filter estimate currently is:  "<< b.GetArmaData()(0)<<" "<< b.GetArmaData()(1)<<" "<<b.GetArmaData()(2)*180/PI<<endl;
   //cout << "Going on edge" << endl;
   //cout<<"!!-----End Executing-----!!"<<endl;
-  obstacleMarkerObserved_ = false;
-  executionCost = cost;
-  return endState ;
+  //obstacleMarkerObserved_ = false;
+  executionCost.v = cost;
+  return true ;
 }
 
 template <class SeparatedControllerType, class FilterType>

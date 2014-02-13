@@ -107,9 +107,10 @@ namespace firm
                 this->copyState(state, trueState_);
             }
 
-            bool checkCollision(void)
+            /** \brief Checks whether the true system state is in valid or not*/
+            bool checkTrueStateValidity(void)
             {
-                return !this->isValid(trueState_);
+                return this->isValid(trueState_);
             }
 
             void applyControl(const ompl::control::Control *control);

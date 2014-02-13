@@ -49,7 +49,10 @@
 #include "../Weight/FIRMWeight.h"
 #include "ompl/control/ControlSpace.h"
 #include "ompl/control/SpaceInformation.h"
-
+#include "../Controllers/Controller.h"
+#include "../SeparatedControllers/RHCICreate.h"
+#include "../Filters/ExtendedKF.h"
+#include "../Filters/LinearizedKF.h"
 //#include "../SpaceInformation/SpaceInformation.h"
 
 namespace base
@@ -146,8 +149,12 @@ public:
      */
     typedef boost::function<bool(const Vertex&, const Vertex&)> ConnectionFilter;
 
+    /** Defining the edge and node controller types*/
+    typedef Controller<RHCICreate, ExtendedKF> EdgeControllerType;
+    typedef Controller<RHCICreate, LinearizedKF> NodeControllerType;
+
     /** \brief Constructor */
-    FIRM(const ompl::control::SpaceInformationPtr &si, bool starStrategy = false);
+    FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool starStrategy = false);
 
     virtual ~FIRM(void);
 
@@ -318,6 +325,13 @@ protected:
     /** \brief Given a solution represented as a vector of predecesors in the roadmap, construct a geometric path */
     virtual ompl::base::PathPtr constructGeometricPath(const boost::vector_property_map<Vertex> &prev, const Vertex &start, const Vertex &goal);
 
+    /** \brief Generates the cost of the edge */
+    virtual ompl::base::Cost generateControllersWithEdgeCost(ompl::base::State* startNodeState,
+                                                             ompl::base::State* targetNodeState,
+                                                             unsigned int edgeID,
+                                                             Vertex goalVertex);
+
+    virtual void generateEdgeController(ompl::base::State *start, ompl::base::State* target, EdgeControllerType edgeController);
     /** \brief Flag indicating whether the default connection strategy is the Star strategy */
     bool                                                   starStrategy_;
 
@@ -389,8 +403,18 @@ protected:
     /** \brief Given two vertices, returns a heuristic on the cost of the path connecting them. This method wraps OptimizationObjective::motionCostHeuristic */
     ompl::base::Cost costHeuristic(Vertex u, Vertex v) const;
 
-    /** \brief The base::SpaceInformation cast as control::SpaceInformation, for convenience */
-    const ompl::control::SpaceInformation                        *siC_;
+    /** \brief The base::SpaceInformation cast as firm::SpaceInformation, for convenience */
+    const firm::SpaceInformation::SpaceInformationPtr            siF_;
+
+    /** \brief A table that stores the edge controllers according to the edge ids */
+    std::map <int, EdgeControllerType > edgeControllers_;
+
+    /** \brief A table that stores the node controllers according to the node (vertex) ids */
+    std::map <Vertex, NodeControllerType > nodeControllers_;
+
+    /** \brief The number of particles to use for monte carlo simulations*/
+    unsigned int numParticles_;
+
 };
 
 

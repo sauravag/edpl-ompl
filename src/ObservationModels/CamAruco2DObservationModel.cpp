@@ -101,7 +101,7 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
     }
   }
 
-  return z;
+  return removeSpuriousObservations(z);
 
 }
 

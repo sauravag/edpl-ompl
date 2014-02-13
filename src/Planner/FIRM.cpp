@@ -68,11 +68,14 @@ namespace ompl
 
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 0.2;
+
+        static const double NUM_MONTE_CARLO_PARTICLES = 10;
     }
 }
 
-FIRM::FIRM(const ompl::control::SpaceInformationPtr &si, bool starStrategy) :
+FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool starStrategy) :
     ompl::base::Planner(si, "FIRM"),
+    siF_(si),
     starStrategy_(starStrategy),
     stateProperty_(boost::get(vertex_state_t(), g_)),
     totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), g_)),
@@ -85,7 +88,6 @@ FIRM::FIRM(const ompl::control::SpaceInformationPtr &si, bool starStrategy) :
     userSetConnectionStrategy_(false),
     addedSolution_(false)
 {
-    siC_ = si.get();
     specs_.recognizedGoal = ompl::base::GOAL_SAMPLEABLE_REGION;
     specs_.approximateSolutions = true;
     specs_.optimizingPaths = true;
@@ -122,6 +124,11 @@ void FIRM::setup(void)
     {
         opt_.reset(new ompl::base::PathLengthOptimizationObjective(si_));
         opt_->setCostThreshold(opt_->infiniteCost());
+    }
+    if(!numParticles_)
+    {
+      int np = ompl::magic::NUM_MONTE_CARLO_PARTICLES;
+      numParticles_ = np;
     }
 }
 
@@ -460,6 +467,8 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
     boost::mutex::scoped_lock _(graphMutex_);
 
     Vertex m = boost::add_vertex(g_);
+    std::cout<<"Putting out the vertex property :"<<m<<std::endl;
+    std::cin.get();
     stateProperty_[m] = state;
     totalConnectionAttemptsProperty_[m] = 1;
     successfulConnectionAttemptsProperty_[m] = 0;
@@ -481,9 +490,10 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
             {
                 successfulConnectionAttemptsProperty_[m]++;
                 successfulConnectionAttemptsProperty_[n]++;
-                // This where we perform MC simulation to get edge cost
-                const ompl::base::Cost weight = opt_->motionCost(stateProperty_[m], stateProperty_[n]);
                 const unsigned int id = maxEdgeID_++;
+                // This where we perform MC simulation to get edge cost
+                //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[m], stateProperty_[n]);
+                const ompl::base::Cost weight = generateControllersWithEdgeCost(stateProperty_[m], stateProperty_[n], id, n);
                 const Graph::edge_property_type properties(weight, id);
                 boost::add_edge(m, n, properties, g_);
                 uniteComponents(n, m);
@@ -575,4 +585,78 @@ void FIRM::getPlannerData(ompl::base::PlannerData &data) const
 ompl::base::Cost FIRM::costHeuristic(Vertex u, Vertex v) const
 {
     return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
+}
+
+
+ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeState, ompl::base::State* targetNodeState, unsigned int edgeID, FIRM::Vertex goalVertex)
+{
+
+    double nodeWeight = 0;
+    double successCount = 0;
+
+    ompl::base::Cost edgeCost(0);
+
+    EdgeControllerType edgeController;
+
+    // Generate the edge controller for given start and end state
+    generateEdgeController(startNodeState,targetNodeState,edgeController);
+
+    for(int i=0; i< numParticles_;i++)
+    {
+
+        bool isCollided = false;
+        //cout << "MonteCarlo Simulation particle number "<< i<<endl;
+        double tempWeight=0;
+
+        siF_->setTrueState(startNodeState);
+        siF_->setBelief(targetNodeState);
+
+        //cout << "initial belief for the edge: "<<endl<< _c1.GetArmaData()[0]<<endl<<_c1.GetArmaData()[1]<<endl<<_c1.GetArmaData()[2]*180/PI<< endl;
+        //cout << "goal belief for the edge: "<<endl<< _c2.GetArmaData()[0]<<endl<<_c2.GetArmaData()[1]<<endl<<_c2.GetArmaData()[2]*180/PI<< endl;
+        //cout<<"The goal node covariance is: "<<_c2.m_covariance<<endl;
+        //cin.get();
+
+        ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
+        ompl::base::Cost pcost(0);
+        if(!startNodeState) std::cout<<"HEHEHEHEHEHEHEHEHE"<<std::endl;
+
+        if(edgeController.Execute(startNodeState, endBelief, pcost))
+        {
+           successCount++;
+           //CfgType stabilizedBelief;
+           //nodeWeight = FIRMnodeController.Stabilize(endBelief, stabilizedBelief) ;
+           edgeCost.v = edgeCost.v + pcost.v ;// + nodeWeight;
+        }
+
+    }
+
+    //cout<<"The Success Prob is :"<< successCount/ m_numParticles <<endl;
+    edgeCost.v = edgeCost.v / successCount ;
+    double transitionProbability = successCount / numParticles_ ;
+    //_FIRMedgeController = FIRMedgeController ;
+
+    return edgeCost;
+}
+
+void FIRM::generateEdgeController(ompl::base::State *start, ompl::base::State* target, FIRM::EdgeControllerType edgeController)
+{
+    std::vector<ompl::base::State*> intermediates;
+
+    ompl::base::State *intermediate = si_->allocState();
+
+    si_->copyState(intermediate, start);
+
+    std::vector<ompl::control::Control*> openLoopControls;
+    siF_->getMotionModel()->generateOpenLoopControls(start, target, openLoopControls);
+
+    for(typename std::vector<ompl::control::Control*>::iterator c=openLoopControls.begin(), e=openLoopControls.end(); c!=e; ++c)
+    {
+        ompl::base::State *x = si_->allocState();
+        siF_->getMotionModel()->Evolve(intermediate,*c,siF_->getMotionModel()->getZeroNoise(), x);
+        intermediates.push_back(x);
+        si_->copyState(intermediate, x);
+    }
+
+    EdgeControllerType ctrlr(target, intermediates, openLoopControls, siF_);
+    edgeController =  ctrlr;
 }

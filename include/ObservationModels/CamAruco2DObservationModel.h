@@ -98,8 +98,6 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     ObservationType computeInnovation(const ompl::base::State *predictedState, const ObservationType& Zg);
 
-    ObservationType removeSpuriousObservations(const ObservationType& Zg);
-
     arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z);
 
     bool isLandmarkVisible(const arma::colvec xVec, const arma::colvec& landmark, double& range, double& bearing, double& viewingAngle);
@@ -109,6 +107,8 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     bool isStateObservable(const ompl::base::State *state);
 
   private:
+
+    ObservationType removeSpuriousObservations(const ObservationType& Zg);
 
     std::vector<arma::colvec> landmarks_;
 
