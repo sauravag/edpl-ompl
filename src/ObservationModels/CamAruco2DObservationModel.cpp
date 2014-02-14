@@ -48,8 +48,8 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
   //SE2BeliefSpace::StateType *tempState = static_cast<const SE2BeliefSpace::StateType*>(state);
   colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
-  std::cout<<"CamArucoObservationModel2D, in GetObservation, xVec(2) :"<<xVec(2)<<std::endl;
-  assert(abs(xVec(2)) <= boost::math::constants::pi<double>()+0.01);
+  //std::cout<<"CamArucoObservationModel2D, in GetObservation, xVec(2) :"<<xVec(2)<<std::endl;
+  //assert(abs(xVec(2)) <= boost::math::constants::pi<double>()+0.01);
 
   ObservationType z;
 
@@ -119,9 +119,9 @@ CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *st
   using namespace arma;
 
   colvec xVec =  state->as<SE2BeliefSpace::StateType>()->getArmaData();
-  std::cout<<"CamArucoObservationModel2D, in GetObservationPrediction, xVec(2) :"<<xVec(2)<<std::endl;
+  //std::cout<<"CamArucoObservationModel2D, in GetObservationPrediction, xVec(2) :"<<xVec(2)<<std::endl;
 
-  assert(abs(xVec(2)) <= boost::math::constants::pi<double>()+0.01); // making sure that the angles in Cfg are normalised between -boost::math::constants::pi<double>() and boost::math::constants::pi<double>()
+  //assert(abs(xVec(2)) <= boost::math::constants::pi<double>()+0.01); // making sure that the angles in Cfg are normalised between -boost::math::constants::pi<double>() and boost::math::constants::pi<double>()
 
   ObservationType z;
 

@@ -60,14 +60,14 @@ namespace ompl
 
         /** \brief The number of steps to take for a random bounce
             motion generated as part of the expansion step of PRM. */
-        static const unsigned int MAX_RANDOM_BOUNCE_STEPS   = 10;
+        static const unsigned int MAX_RANDOM_BOUNCE_STEPS   = 2;
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
         static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
 
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
-        static const double ROADMAP_BUILD_TIME = 0.2;
+        static const double ROADMAP_BUILD_TIME = 0.5;
 
         static const double NUM_MONTE_CARLO_PARTICLES = 4;
     }
@@ -227,8 +227,9 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 disjointSets_.make_set(m);
 
                 // add the edge to the parent vertex
-                const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
+                //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
                 const unsigned int id = maxEdgeID_++;
+                const ompl::base::Cost weight = generateControllersWithEdgeCost(stateProperty_[v], stateProperty_[m], id, m);
                 const Graph::edge_property_type properties(weight, id);
                 boost::add_edge(v, m, properties, g_);
                 uniteComponents(v, m);
@@ -243,8 +244,9 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
             if (s > 0 || !sameComponent(v, last))
             {
                 // add the edge to the parent vertex
-                const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
+                //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
                 const unsigned int id = maxEdgeID_++;
+                const ompl::base::Cost weight = generateControllersWithEdgeCost(stateProperty_[v], stateProperty_[last], id, last);
                 const Graph::edge_property_type properties(weight, id);
                 boost::add_edge(v, last, properties, g_);
                 uniteComponents(v, last);
