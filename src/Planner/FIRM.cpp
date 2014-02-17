@@ -69,7 +69,11 @@ namespace ompl
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 0.5;
 
-        static const double NUM_MONTE_CARLO_PARTICLES = 4;
+        static const double NUM_MONTE_CARLO_PARTICLES = 25;
+
+        static const double EXTREMELY_HIGH_EDGE_COST = 1e6;
+
+        static const double NON_OBSERVABLE_NODE_COVARIANCE = 1e3;
     }
 }
 
@@ -93,6 +97,7 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool starStrat
     specs_.optimizingPaths = true;
 
     Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
+    debug_ = true;
 }
 
 FIRM::~FIRM(void)
@@ -592,21 +597,33 @@ ompl::base::Cost FIRM::costHeuristic(Vertex u, Vertex v) const
 ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeState, ompl::base::State* targetNodeState, unsigned int edgeID, FIRM::Vertex goalVertex)
 {
 
-    std::cout<<"The 2 states to connect for edge are: "<<std::endl;
-    std::cout<<"Start  : \n"<<std::endl;
-    std::cout<<startNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
-    std::cout<<"End  : \n"<<std::endl;
-    std::cout<<targetNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
-    //std::cout<<"Press Enter and wait "<<std::endl;
-    //std::cin.get();
+    if(debug_)
+    {
+        std::cout<<"The 2 states to connect for edge are: "<<std::endl;
+        std::cout<<"Start  : \n"<<std::endl;
+        std::cout<<startNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
+        std::cout<<"End  : \n"<<std::endl;
+        std::cout<<targetNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
+        //std::cout<<"Press Enter and wait "<<std::endl;
+        //std::cin.get();
+    }
     double successCount = 0;
 
+    // initialize costs to 0
     ompl::base::Cost edgeCost(0);
     ompl::base::Cost nodeStabilizationCost(0);
-    EdgeControllerType edgeController;
 
     // Generate the edge controller for given start and end state
+    EdgeControllerType edgeController;
     generateEdgeController(startNodeState,targetNodeState,edgeController);
+    // Storing the geenrated edge controller
+    edgeControllers_[edgeID] = edgeController;
+
+    // Generate the node controller
+    NodeControllerType nodeController;
+    generateNodeController(targetNodeState, nodeController);
+    // Store the generated node controller
+    nodeControllers_[goalVertex] = nodeController;
 
     for(int i=0; i< numParticles_;i++)
     {
@@ -639,18 +656,23 @@ ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startN
     }
 
     //cout<<"The Success Prob is :"<< successCount/ m_numParticles <<endl;
-    edgeCost.v = edgeCost.v / successCount ;
+    if (successCount > 0)  edgeCost.v = edgeCost.v / successCount ;
+    else edgeCost.v = ompl::magic::EXTREMELY_HIGH_EDGE_COST; // extremely high cost if no particle could succeed, we can also simply not add this edge
+
     double transitionProbability = successCount / numParticles_ ;
-    std::cout<<"Edge Cost :"<<edgeCost.v<<std::endl;
-    std::cout<<"Transition Prob: "<<transitionProbability<<std::endl;
-    //std::cout<<"Press Enter"<<std::endl;
-    //std::cin.get();
-    //_FIRMedgeController = FIRMedgeController ;
+
+    if(debug_)
+    {
+        std::cout<<"Edge Cost :"<<edgeCost.v<<std::endl;
+        std::cout<<"Transition Prob: "<<transitionProbability<<std::endl;
+        //std::cout<<"Press Enter"<<std::endl;
+        //std::cin.get();
+    }
 
     return edgeCost;
 }
 
-void FIRM::generateEdgeController(ompl::base::State *start, ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
+void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
 {
     std::vector<ompl::base::State*> intermediates;
 
@@ -659,8 +681,11 @@ void FIRM::generateEdgeController(ompl::base::State *start, ompl::base::State* t
     si_->copyState(intermediate, start);
 
     std::vector<ompl::control::Control*> openLoopControls;
+
+    // get the open loop controls for this edge
     siF_->getMotionModel()->generateOpenLoopControls(start, target, openLoopControls);
 
+    // generate the intermediate states using the open loop controls
     for(typename std::vector<ompl::control::Control*>::iterator c=openLoopControls.begin(), e=openLoopControls.end(); c!=e; ++c)
     {
         ompl::base::State *x = si_->allocState();
@@ -669,6 +694,55 @@ void FIRM::generateEdgeController(ompl::base::State *start, ompl::base::State* t
         si_->copyState(intermediate, x);
     }
 
+    // create the edge controller
     EdgeControllerType ctrlr(target, intermediates, openLoopControls, siF_);
+
+    // assign the edge controller
     edgeController =  ctrlr;
+}
+
+void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeControllerType &nodeController)
+{
+    // Create a copy of the node state
+    ompl::base::State *node = si_->allocState();
+    siF_->copyState(node, state);
+
+   if(siF_->getObservationModel()->isStateObservable(node))
+   {
+        if(debug_) std::cout<<"The node is observable, constructing node controller \n"<<std::endl;
+        // Contruct a linear kalman filter
+        LinearizedKF linearizedKF(siF_);
+
+        //Construct a linear system
+        LinearSystem linearSystem(node, siF_->getMotionModel()->getZeroControl(),siF_->getObservationModel()->getObservation(state, false), siF_->getMotionModel(), siF_->getObservationModel());
+
+        // Compute the stationary cov at node state using LKF
+        arma::mat stationaryCovariance = linearizedKF.computeStationaryCovariance(linearSystem);
+
+        // set the covariance
+        node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+
+        // create a node controller
+        std::vector<ompl::control::Control*> dummyControl;
+        std::vector<ompl::base::State*> dummyStates;
+        NodeControllerType ctrlr(node, dummyStates, dummyControl, siF_);
+
+        // assign the node controller
+        nodeController = ctrlr;
+    }
+    else
+    {
+        if(debug_) std::cout<<"The node is NOT observable, constructing horrendous node controller \n"<<std::endl;
+        // Compute a high stationary cov at node state
+        int stateDim = si_->getStateDimension();
+        arma::mat stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
+
+        // create a node controller
+        std::vector<ompl::control::Control*> dummyControl;
+        std::vector<ompl::base::State*> dummyStates;
+        NodeControllerType ctrlr(node, dummyStates, dummyControl, siF_);
+
+        // assign the node controller
+        nodeController = ctrlr;
+    }
 }

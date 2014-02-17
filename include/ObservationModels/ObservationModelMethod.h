@@ -65,9 +65,11 @@ class ObservationModelMethod
 
     ObservationModelMethod(int nDim=0) : noiseDim_(nDim), zeroNoise_(nDim) {}
 
-    // z = h(x,v)
-    //get the observation for a given configuration,
-    //corrupted by noise from a given distribution
+    /**z = h(x,v)
+    get the observation for a given configuration.
+    1. isSimulation= true , corrupted by noise from a given distribution
+    2. isSimulation=false , noise free obs
+    */
     virtual
       ObservationType getObservation(const ompl::base::State *state, bool isSimulation) = 0;
 

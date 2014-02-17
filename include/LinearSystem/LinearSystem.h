@@ -70,10 +70,8 @@ class LinearSystem
   	LinearSystem() {}
 
     LinearSystem (const ompl::base::State *state, const ompl::control::Control* control,
-      MotionModelPointer motionModel,
-      ObservationModelPointer observationModel):
-      u_(control), motionModel_(motionModel),
-      observationModel_(observationModel)
+                  MotionModelPointer motionModel, ObservationModelPointer observationModel):
+                  u_(control), motionModel_(motionModel), observationModel_(observationModel)
       {
 
       using namespace arma;

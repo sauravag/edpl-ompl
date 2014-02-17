@@ -123,7 +123,7 @@ public:
         boost::property < vertex_flags_t, unsigned int,
         boost::property < boost::vertex_predecessor_t, unsigned long int,
         boost::property < boost::vertex_rank_t, unsigned long int > > > > > >,
-        boost::property < boost::edge_weight_t, ompl::base::Cost,
+        boost::property < boost::edge_weight_t, /** Update to "FIRMWeight" class */ompl::base::Cost,
         boost::property < boost::edge_index_t, unsigned int,
         boost::property < edge_flags_t, unsigned int > > >
     > Graph;
@@ -332,7 +332,12 @@ protected:
                                                              unsigned int edgeID,
                                                              Vertex goalVertex);
 
-    virtual void generateEdgeController(ompl::base::State *start, ompl::base::State* target, EdgeControllerType &edgeController);
+    /** \brief Generates the edge controller that drives the robot from start to end of edge */
+    virtual void generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, EdgeControllerType &edgeController);
+
+    /** \brief Generates the node controller that stabilizes the robot to the node */
+    virtual void generateNodeController(const ompl::base::State *state, NodeControllerType &nodeController);
+
     /** \brief Flag indicating whether the default connection strategy is the Star strategy */
     bool                                                   starStrategy_;
 
@@ -413,8 +418,13 @@ protected:
     /** \brief A table that stores the node controllers according to the node (vertex) ids */
     std::map <Vertex, NodeControllerType > nodeControllers_;
 
+    // for each edge we store its transition probability
+    std::map <int, double> transitionProbabilities_;
+
     /** \brief The number of particles to use for monte carlo simulations*/
     unsigned int numParticles_;
+
+    bool debug_;
 
 };
 
