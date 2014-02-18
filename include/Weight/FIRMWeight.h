@@ -28,13 +28,13 @@ class FIRMWeight {
       return *this;
     }
 
-    
-    FIRMWeight operator+(const FIRMWeight& w) const 
+
+    FIRMWeight operator+(const FIRMWeight& w) const
     {
       return FIRMWeight(cost_+w.cost_,successProbability_,controllerID_);
     }
-    
-    bool operator<(const FIRMWeight& w) const 
+
+    bool operator<(const FIRMWeight& w) const
     {
       return cost_ < w.cost_;
     }
@@ -42,7 +42,7 @@ class FIRMWeight {
     // Read/Write values of datamember to given input/output stream.
     //friend ostream& operator<< (ostream& _os, const FIRMWeight& _w);
     //friend istream& operator>> (istream& _is, FIRMWeight& _w);
-    
+
 
     double getCost(){return cost_;}
     void setCost(double c){ cost_ = c;}

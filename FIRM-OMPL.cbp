@@ -68,6 +68,7 @@
 		<Unit filename="include/ObservationModels/CamAruco2DObservationModel.h" />
 		<Unit filename="include/ObservationModels/ObservationModelMethod.h" />
 		<Unit filename="include/OptimizationObjectives/FIRMOptimizationObjective.h" />
+		<Unit filename="include/Path/FeedbackPath.h" />
 		<Unit filename="include/Planner/FIRM.h" />
 		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
 		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />

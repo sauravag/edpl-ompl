@@ -53,6 +53,7 @@
 #include "../SeparatedControllers/RHCICreate.h"
 #include "../Filters/ExtendedKF.h"
 #include "../Filters/LinearizedKF.h"
+#include "../Path/FeedbackPath.h"
 //#include "../SpaceInformation/SpaceInformation.h"
 
 namespace base
@@ -123,7 +124,7 @@ public:
         boost::property < vertex_flags_t, unsigned int,
         boost::property < boost::vertex_predecessor_t, unsigned long int,
         boost::property < boost::vertex_rank_t, unsigned long int > > > > > >,
-        boost::property < boost::edge_weight_t, /** Update to "FIRMWeight" class */ompl::base::Cost,
+        boost::property < boost::edge_weight_t, FIRMWeight /* ompl::base::Cost */,
         boost::property < boost::edge_index_t, unsigned int,
         boost::property < edge_flags_t, unsigned int > > >
     > Graph;
@@ -327,7 +328,7 @@ protected:
     virtual ompl::base::PathPtr constructGeometricPath(const boost::vector_property_map<Vertex> &prev, const Vertex &start, const Vertex &goal);
 
     /** \brief Generates the cost of the edge */
-    virtual ompl::base::Cost generateControllersWithEdgeCost(ompl::base::State* startNodeState,
+    virtual FIRMWeight generateControllersWithEdgeCost(ompl::base::State* startNodeState,
                                                              ompl::base::State* targetNodeState,
                                                              EdgeControllerType &edgeController,
                                                              NodeControllerType &nodeController);
@@ -340,6 +341,9 @@ protected:
 
     /** \brief Solves the dynamic program to return a feedback policy */
     virtual void solveDynamicProgram(Vertex goalVertex);
+
+    /** \brief Calculates the new cost to go from a node*/
+    std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(Vertex node);
 
     /** \brief Flag indicating whether the default connection strategy is the Star strategy */
     bool                                                   starStrategy_;
@@ -427,7 +431,7 @@ protected:
     std::map <Vertex, double> costToGo_;
 
     // This feedback will eventually be in a feedbackpath class
-    std::map <Vertex, double> feedback_;
+    std::map <Vertex, Edge> feedback_;
     /** \brief The number of particles to use for monte carlo simulations*/
     unsigned int numParticles_;
 
