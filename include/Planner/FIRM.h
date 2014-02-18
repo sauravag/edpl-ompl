@@ -329,14 +329,17 @@ protected:
     /** \brief Generates the cost of the edge */
     virtual ompl::base::Cost generateControllersWithEdgeCost(ompl::base::State* startNodeState,
                                                              ompl::base::State* targetNodeState,
-                                                             unsigned int edgeID,
-                                                             Vertex goalVertex);
+                                                             EdgeControllerType &edgeController,
+                                                             NodeControllerType &nodeController);
 
     /** \brief Generates the edge controller that drives the robot from start to end of edge */
     virtual void generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, EdgeControllerType &edgeController);
 
     /** \brief Generates the node controller that stabilizes the robot to the node */
     virtual void generateNodeController(const ompl::base::State *state, NodeControllerType &nodeController);
+
+    /** \brief Solves the dynamic program to return a feedback policy */
+    virtual void solveDynamicProgram(Vertex goalVertex);
 
     /** \brief Flag indicating whether the default connection strategy is the Star strategy */
     bool                                                   starStrategy_;
@@ -412,15 +415,19 @@ protected:
     /** \brief The base::SpaceInformation cast as firm::SpaceInformation, for convenience */
     const firm::SpaceInformation::SpaceInformationPtr            siF_;
 
-    /** \brief A table that stores the edge controllers according to the edge ids */
-    std::map <int, EdgeControllerType > edgeControllers_;
+    /** \brief A table that stores the edge controllers according to the edges */
+    std::map <Edge, EdgeControllerType > edgeControllers_;
 
     /** \brief A table that stores the node controllers according to the node (vertex) ids */
     std::map <Vertex, NodeControllerType > nodeControllers_;
 
     // for each edge we store its transition probability
-    std::map <int, double> transitionProbabilities_;
+    std::map <Edge, double> transitionProbabilities_;
 
+    std::map <Vertex, double> costToGo_;
+
+    // This feedback will eventually be in a feedbackpath class
+    std::map <Vertex, double> feedback_;
     /** \brief The number of particles to use for monte carlo simulations*/
     unsigned int numParticles_;
 

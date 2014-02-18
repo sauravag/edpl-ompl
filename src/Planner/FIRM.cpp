@@ -69,11 +69,21 @@ namespace ompl
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 0.5;
 
-        static const double NUM_MONTE_CARLO_PARTICLES = 25;
+        static const double NUM_MONTE_CARLO_PARTICLES = 4;
 
         static const double EXTREMELY_HIGH_EDGE_COST = 1e6;
 
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 1e3;
+
+        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1;
+
+        static const double GOAL_COST_TO_GO = 0;
+
+        static const double INIT_COST_TO_GO = 0;
+
+        static const double OBSTACLE_COST_TO_GO = 500;
+
+        static const double DP_CONVERGENCE_THRESHOLD = 1e-4;
     }
 }
 
@@ -233,10 +243,15 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
 
                 // add the edge to the parent vertex
                 //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
+                EdgeControllerType edgeController;
+                NodeControllerType nodeController;
+                const ompl::base::Cost weight = generateControllersWithEdgeCost(stateProperty_[v], stateProperty_[m], edgeController, nodeController);
                 const unsigned int id = maxEdgeID_++;
-                const ompl::base::Cost weight = generateControllersWithEdgeCost(stateProperty_[v], stateProperty_[m], id, m);
                 const Graph::edge_property_type properties(weight, id);
-                boost::add_edge(v, m, properties, g_);
+                std::pair<Edge, bool> newEdge = boost::add_edge(v, m, properties, g_);
+                edgeControllers_[newEdge.first] = edgeController;
+                nodeControllers_[m] = nodeController;
+                transitionProbabilities_[newEdge.first] = 1;
                 uniteComponents(v, m);
 
                 // add the vertex to the nearest neighbors data structure
@@ -250,10 +265,15 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
             {
                 // add the edge to the parent vertex
                 //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
+                EdgeControllerType edgeController;
+                NodeControllerType nodeController;
+                const ompl::base::Cost weight = generateControllersWithEdgeCost(stateProperty_[v], stateProperty_[last], edgeController, nodeController);
                 const unsigned int id = maxEdgeID_++;
-                const ompl::base::Cost weight = generateControllersWithEdgeCost(stateProperty_[v], stateProperty_[last], id, last);
                 const Graph::edge_property_type properties(weight, id);
-                boost::add_edge(v, last, properties, g_);
+                std::pair<Edge, bool> newEdge = boost::add_edge(v, last, properties, g_);
+                edgeControllers_[newEdge.first] = edgeController;
+                nodeControllers_[last] = nodeController; // should this be last or v ???
+                transitionProbabilities_[newEdge.first] = 1;
                 uniteComponents(v, last);
             }
             graphMutex_.unlock();
@@ -496,13 +516,19 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
             {
                 successfulConnectionAttemptsProperty_[m]++;
                 successfulConnectionAttemptsProperty_[n]++;
-                const unsigned int id = maxEdgeID_++;
                 // This where we perform MC simulation to get edge cost
                 //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[m], stateProperty_[n]);
-                const ompl::base::Cost weight = generateControllersWithEdgeCost(stateProperty_[m], stateProperty_[n], id, n);
+                EdgeControllerType edgeController;
+                NodeControllerType nodeController;
+                const ompl::base::Cost weight = generateControllersWithEdgeCost(stateProperty_[m], stateProperty_[n], edgeController, nodeController);
+                const unsigned int id = maxEdgeID_++;
                 const Graph::edge_property_type properties(weight, id);
-                boost::add_edge(m, n, properties, g_);
+                std::pair<Edge, bool> newEdge = boost::add_edge(m, n, properties, g_);
+                edgeControllers_[newEdge.first] = edgeController;
+                nodeControllers_[m] = nodeController;
+                transitionProbabilities_[newEdge.first] = 1;
                 uniteComponents(n, m);
+
             }
         }
 
@@ -594,7 +620,7 @@ ompl::base::Cost FIRM::costHeuristic(Vertex u, Vertex v) const
 }
 
 
-ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeState, ompl::base::State* targetNodeState, unsigned int edgeID, FIRM::Vertex goalVertex)
+ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeState, ompl::base::State* targetNodeState, EdgeControllerType &edgeController, NodeControllerType &nodeController)
 {
 
     if(debug_)
@@ -614,16 +640,14 @@ ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startN
     ompl::base::Cost nodeStabilizationCost(0);
 
     // Generate the edge controller for given start and end state
-    EdgeControllerType edgeController;
     generateEdgeController(startNodeState,targetNodeState,edgeController);
     // Storing the geenrated edge controller
-    edgeControllers_[edgeID] = edgeController;
+    //edgeControllers_[edgeID] = edgeController;
 
     // Generate the node controller
-    NodeControllerType nodeController;
     generateNodeController(targetNodeState, nodeController);
     // Store the generated node controller
-    nodeControllers_[goalVertex] = nodeController;
+    //nodeControllers_[goalVertex] = nodeController;
 
     for(int i=0; i< numParticles_;i++)
     {
@@ -635,31 +659,36 @@ ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startN
         siF_->setTrueState(startNodeState);
         siF_->setBelief(targetNodeState);
 
-        //cout << "initial belief for the edge: "<<endl<< _c1.GetArmaData()[0]<<endl<<_c1.GetArmaData()[1]<<endl<<_c1.GetArmaData()[2]*180/PI<< endl;
-        //cout << "goal belief for the edge: "<<endl<< _c2.GetArmaData()[0]<<endl<<_c2.GetArmaData()[1]<<endl<<_c2.GetArmaData()[2]*180/PI<< endl;
-        //cout<<"The goal node covariance is: "<<_c2.m_covariance<<endl;
-        //cin.get();
-
+        if(debug_)
+        {
+            //cout << "initial belief for the edge: "<<endl<< _c1.GetArmaData()[0]<<endl<<_c1.GetArmaData()[1]<<endl<<_c1.GetArmaData()[2]*180/PI<< endl;
+            //cout << "goal belief for the edge: "<<endl<< _c2.GetArmaData()[0]<<endl<<_c2.GetArmaData()[1]<<endl<<_c2.GetArmaData()[2]*180/PI<< endl;
+            //cout<<"The goal node covariance is: "<<_c2.m_covariance<<endl;
+            //cin.get();
+        }
         ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
         ompl::base::Cost pcost(0);
 
         if(edgeController.Execute(startNodeState, endBelief, pcost))
         {
            successCount++;
-           //CfgType stabilizedBelief;
-           //nodeWeight = FIRMnodeController.Stabilize(endBelief, stabilizedBelief) ;
-           edgeCost.v = edgeCost.v + pcost.v ;// + nodeWeight;
-           //std::cout<<"The cost at particle: "<<i<<"  is : "<<edgeCost.v<<std::endl;
-           //std::cin.get();
+
+           edgeCost.v = edgeCost.v + pcost.v ;
+
+            if(debug_)
+            {
+                //std::cout<<"The cost at particle: "<<i<<"  is : "<<edgeCost.v<<std::endl;
+                //std::cin.get();
+            }
         }
 
     }
 
-    //cout<<"The Success Prob is :"<< successCount/ m_numParticles <<endl;
     if (successCount > 0)  edgeCost.v = edgeCost.v / successCount ;
     else edgeCost.v = ompl::magic::EXTREMELY_HIGH_EDGE_COST; // extremely high cost if no particle could succeed, we can also simply not add this edge
 
     double transitionProbability = successCount / numParticles_ ;
+    //transitionProbabilities_[edgeID] = transitionProbability;
 
     if(debug_)
     {
@@ -669,6 +698,8 @@ ompl::base::Cost FIRM::generateControllersWithEdgeCost(ompl::base::State* startN
         //std::cin.get();
     }
 
+    // store it in the property map for edge weights
+    //weightProperty_[edgeID] = edgeCost;
     return edgeCost;
 }
 
@@ -746,3 +777,169 @@ void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeCont
         nodeController = ctrlr;
     }
 }
+
+template<typename Map>
+arma::colvec MapToColvec(const Map& _m) {
+  arma::colvec mapData(_m.size());
+  int ix = 0;
+  for(typename Map::const_iterator i= _m.begin(), e= _m.end(); i!=e; ++i, ++ix)
+    mapData[ix] = i->second;
+  return mapData;
+}
+
+void FIRM::solveDynamicProgram(FIRM::Vertex goalVertex)
+{
+
+    using namespace arma;
+
+    if(debug_) std::cout << "Started solving Dynamic Optimization (Programming)" << std::endl;
+
+    float discountFactor = ompl::magic::DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR;
+
+    std::map<Vertex, double> newCostToGo;
+
+    costToGo_ = std::map<Vertex, double>();
+
+
+    //--NOTES FROM PMPL--
+    //For nodes that are not in the goal CC we should assign a high cost to go to all nodes initially,
+    //twe assign goalcosttogo and initcosttogo for those nodes that are in the CC of the goal
+    //We do this to take care of those nodes that are not in GOAL CC (for replanning purposes)
+
+    foreach (Vertex v, boost::vertices(g_))
+    {
+        if(v == goalVertex)
+        {
+            costToGo_[v] = ompl::magic::GOAL_COST_TO_GO;
+            newCostToGo[v] = ompl::magic::GOAL_COST_TO_GO;
+        }
+        else
+        {
+            costToGo_[v] = ompl::magic::INIT_COST_TO_GO;
+            newCostToGo[v] = ompl::magic::INIT_COST_TO_GO;
+        }
+    }
+
+    feedback_.clear();
+
+    int numIters = 1;
+    //double convergenceDiff = norm(newValues - m_values,"inf");
+    bool convergenceCondition = false;
+
+    //typedef typename map<VID, double>::iterator CostToGoIT;
+    int nIter=0;
+    while(!convergenceCondition)
+    {
+        nIter++;
+
+        if(debug_) cout<<" Iteration in DP :"<<nIter<<endl;
+
+        foreach(Vertex v, boost::vertices(g_))
+        {
+            //value for goal node stays the same
+            if( v == goalVertex)
+            {
+                continue;
+            }
+
+            // Update the costToGo of vertex
+            //pair<EID,double> candidate = this->GetUpdatedNodeCostToGo(v);
+
+            //feedback_[v] = candidate.first;
+            //newCostToGo[v] = candidate.second * discountFactor;
+        }
+
+        convergenceCondition = (norm(MapToColvec(costToGo_)-MapToColvec(newCostToGo), "inf") <= ompl::magic::DP_CONVERGENCE_THRESHOLD);
+
+        if(debug_)
+        {
+            cout<<" The new computed costToGo  :"<<endl<<MapToColvec(newCostToGo)<<endl;
+            cout<<"Press Enter"<<endl;
+            std::cin.get();
+        }
+
+        costToGo_.swap(newCostToGo);   // Equivalent to "m_costToGo = newCostToGo"
+
+    }
+
+    if(debug_) cout<<"DP Solved "<<endl;
+}
+
+/**
+// We need the following comparison function defined over "map keys" to construct map.
+// Note this is NOT used in finding the best edge.
+struct EIDComp {
+  template<typename EID1, typename EID2>
+  bool operator()(const EID1& e1, const EID2& e2) const {
+    if(e1.target() < e2.target())
+      return true;
+    if(e1.target() > e2.target())
+      return false;
+    return e1.source() < e2.source();
+  }
+};
+
+struct DoubleValueComp {
+  template<typename KVP1, typename KVP2>
+  bool operator()(const KVP1& kvp1, const KVP2& kvp2) const {
+    return kvp1.second < kvp2.second;
+  }
+};
+*/
+
+std::pair<typename EID,double> FIRM::getUpdatedNodeCostToGo(FIRM::Vertex node)
+{
+
+  //GraphType* graph = this->GetMPProblem()->GetRoadmap()->GetGraph();
+
+  //typename GraphType::VI vi = graph->find_vertex(_nodeID);
+
+  std::map<Edge,double,EIDComp> candidateCostToGo;
+
+  //for (typename GraphType::EI ei = (*vi).begin(); ei!= (*vi).end(); ei++ )
+  //{
+  // iterate through all the outgoing edges from this node
+  foreach(Edge e, boost::out_edges(node, g_))
+  {
+    // the target of given edge "e"
+    Vertex targetNode = boost::target(e, g_);
+
+
+
+      //pair<pair<VID,VID>,WeightType> single_edge;
+      //VID sourceNodeID = (*ei).source();
+      //VID nextNodeID = (*ei).target();
+      //assert(sourceNodeID == _nodeID);
+      //EID edgeID(sourceNodeID, nextNodeID);
+
+      double nextNodeCostToGo = costToGo_[targetNode];
+
+      WeightType edgeProperty =  (*ei).property();
+
+      double transitionProbability  = edgeProperty.GetSuccessProbability();
+
+      //assert(transitionProbability==1); // for PRM , remove for FIRM
+
+      double edgeCost = edgeProperty.GetWeight();
+
+      double singleCostToGo = ( transitionProbability*nextNodeCostToGo + (1-transitionProbability)*ompl::magic::OBSTACLE_COST_TO_GO) + edgeCost ;
+
+      candidateCostToGo[edgeID] =  singleCostToGo ;
+
+  }
+
+  //for(typename map<EID,double,EIDComp>::iterator it = candidateCostToGo.begin() ;  it != candidateCostToGo.end() ; ++it){
+
+   //  cout<<"the candidate cost to go map is : "<< (*it).second <<endl;
+  //}
+
+
+  DoubleValueComp dvc;
+  pair<EID,double> bestCandidate =   *min_element(candidateCostToGo.begin(), candidateCostToGo.end(), dvc );
+
+  //cout<<" The best candidate cost is: "<<bestCandidate.second<<endl;
+  //cin.get();
+  return bestCandidate;
+
+}
+

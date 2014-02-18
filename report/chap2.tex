@@ -103,6 +103,21 @@ We can create the controller class inside the planner. Would make sense.
 We can define a new \textbf{InformationOptimizationObjective} whose job is to calculate the cost-to-go. This way we can minimize the changes required to the PRM
 class.
 
+\subsection{Find the solution path}
+
+\subsubsection{What was happening in ompl::PRM}
+Function \textit{constructSolution} calls the Boost A* search to find the list of nodes. Then it calls \textit{constructGeometricPath} to add the list of nodes
+to a geometric path.
+
+
+\subsubsection{What we need to do in FIRM}
+
+\begin{itemize}
+ \item Create a new \textbf{FeedbackPath} class
+ \item Add a DP solver to FIRM, which tells you the feedback path
+ \item Will need to add 
+\end{itemize}
+
 
 \section{Issues}
 Log of issues faced and discussions on their solutions.
