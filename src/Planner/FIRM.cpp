@@ -75,11 +75,11 @@ namespace ompl
 
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 1e2;
 
-        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1;
+        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 0.9;
 
-        static const double GOAL_COST_TO_GO = 0;
+        static const double GOAL_COST_TO_GO = 0.0;
 
-        static const double INIT_COST_TO_GO = 0;
+        static const double INIT_COST_TO_GO = 0.0;
 
         static const double OBSTACLE_COST_TO_GO = 500;
 
@@ -243,6 +243,9 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
 
                 // add the edge to the parent vertex
                 //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
+                addEdgeToGraph(v,m);
+                addEdgeToGraph(m,v);
+                /**
                 EdgeControllerType edgeController;
                 NodeControllerType nodeController;
                 const FIRMWeight weight = generateControllersWithEdgeCost(stateProperty_[v], stateProperty_[m], edgeController, nodeController);
@@ -251,9 +254,8 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 std::pair<Edge, bool> newEdge = boost::add_edge(v, m, properties, g_);
                 edgeControllers_[newEdge.first] = edgeController;
                 nodeControllers_[m] = nodeController;
-                //transitionProbabilities_[newEdge.first] = 1;
                 uniteComponents(v, m);
-
+                */
                 // add the vertex to the nearest neighbors data structure
                 nn_->add(m);
                 v = m;
@@ -265,6 +267,9 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
             {
                 // add the edge to the parent vertex
                 //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
+                addEdgeToGraph(v, last);
+                addEdgeToGraph(last,v);
+                /**
                 EdgeControllerType edgeController;
                 NodeControllerType nodeController;
                 const FIRMWeight weight = generateControllersWithEdgeCost(stateProperty_[v], stateProperty_[last], edgeController, nodeController);
@@ -273,8 +278,8 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 std::pair<Edge, bool> newEdge = boost::add_edge(v, last, properties, g_);
                 edgeControllers_[newEdge.first] = edgeController;
                 nodeControllers_[last] = nodeController; // should this be last or v ???
-                transitionProbabilities_[newEdge.first] = 1;
                 uniteComponents(v, last);
+                */
             }
             graphMutex_.unlock();
         }
@@ -526,6 +531,13 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
             {
                 successfulConnectionAttemptsProperty_[m]++;
                 successfulConnectionAttemptsProperty_[n]++;
+                addEdgeToGraph(m, n);
+                successfulConnectionAttemptsProperty_[m]++;
+                successfulConnectionAttemptsProperty_[n]++;
+                addEdgeToGraph(n, m);
+                /**
+                successfulConnectionAttemptsProperty_[m]++;
+                successfulConnectionAttemptsProperty_[n]++;
                 // This where we perform MC simulation to get edge cost
                 //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[m], stateProperty_[n]);
                 EdgeControllerType edgeController;
@@ -535,9 +547,9 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
                 const Graph::edge_property_type properties(weight, id);
                 std::pair<Edge, bool> newEdge = boost::add_edge(m, n, properties, g_);
                 edgeControllers_[newEdge.first] = edgeController;
-                nodeControllers_[m] = nodeController;
-                transitionProbabilities_[newEdge.first] = 1; // TODO: these probabilities should come from Monte Carlo
+                nodeControllers_[n] = nodeController;
                 uniteComponents(n, m);
+                */
 
             }
         }
@@ -633,6 +645,26 @@ ompl::base::Cost FIRM::costHeuristic(Vertex u, Vertex v) const
     return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
 }
 
+void FIRM::addEdgeToGraph(FIRM::Vertex a, FIRM::Vertex b)
+{
+    EdgeControllerType edgeController;
+
+    NodeControllerType nodeController;
+
+    const FIRMWeight weight = generateControllersWithEdgeCost(stateProperty_[a], stateProperty_[b], edgeController, nodeController);
+
+    const unsigned int id = maxEdgeID_++;
+
+    const Graph::edge_property_type properties(weight, id);
+
+    std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
+
+    edgeControllers_[newEdge.first] = edgeController;
+
+    nodeControllers_[b] = nodeController;
+
+    uniteComponents(b, a);
+}
 
 FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeState, ompl::base::State* targetNodeState, EdgeControllerType &edgeController, NodeControllerType &nodeController)
 {
@@ -933,6 +965,14 @@ void FIRM::executeFeedback(void)
     Vertex start = startM_[0];
     Vertex goal  = goalM_[0] ;
 
+    if(debug_)
+    {
+      ompl::base::State *goalState = siF_->allocState();
+      goalState = stateProperty_[goal];
+      std::cout<<"The goal state is : \n"<<goalState->as<SE2BeliefSpace::StateType>()->getArmaData();
+      std::cin.get();
+    }
+
     Vertex currentVertex =  start;
 
     EdgeControllerType controller;
@@ -947,11 +987,21 @@ void FIRM::executeFeedback(void)
         controller = edgeControllers_[e];
         ompl::base::Cost cost;
 
+        if(debug_)
+        {
+            std::cout<<"The controller's goal state is: \n"<<(controller.getGoal())->as<SE2BeliefSpace::StateType>()->getArmaData();
+            //std::cin.get();
+        }
+
         if(controller.Execute(stateProperty_[currentVertex], endState, cost, false))
         {
+            if(debug_) std::cout<<"Controller was successful in execution \n";
             currentVertex = boost::target(e, g_);
-            sleep(1);
-
+        }
+        else
+        {
+            currentVertex = addMilestone(endState);
+            solveDynamicProgram(goal);
         }
 
     }
@@ -961,7 +1011,6 @@ void FIRM::executeFeedback(void)
         using namespace std;
 
         cout<<"The final filtered State from controller is :"<<endState->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
-        //cout<<"the final commanded state was :"<<stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
-
+        cout<<"the final commanded state was :"<<stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
     }
 }

@@ -153,7 +153,7 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
   //Otherwise may not get good performance
   maxExecTime_ = ceil(nominalXs.size()*3);
   obstacleMarkerObserved_ = false;
-  debug_ = true;
+  debug_ = false;
   nominalTrajDeviationThreshold_ = 4.0;
 
 }
@@ -289,15 +289,15 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
 
     // This value of 4 should not be hard coded
-    //if(debug_)
-    //{
-        std::cout<<"The nominal trajectory point is:" <<nomXVec<<std::endl;
-        std::cout<<"The current state is           :"<<endStateVec<<std::endl;
-        std::cout<<"The deviation from nominal trajectory is: "<<abs(norm(deviation,2))<<std::endl;
-        std::cout<<"The size of LSS is :"<<lss_.size()<<std::endl;
-        std::cout<<"The k is : "<<k<<std::endl;
+    if(debug_)
+    {
+        //std::cout<<"The nominal trajectory point is:" <<nomXVec<<std::endl;
+        //std::cout<<"The current state is           :"<<endStateVec<<std::endl;
+        //std::cout<<"The deviation from nominal trajectory is: "<<abs(norm(deviation,2))<<std::endl;
+        //std::cout<<"The size of LSS is :"<<lss_.size()<<std::endl;
+        //std::cout<<"The k is : "<<k<<std::endl;
         //std::cin.get();
-    //}
+    }
     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
       //isFailed = true;

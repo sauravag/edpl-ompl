@@ -114,10 +114,10 @@ public:
      If boost::vecS is not used for vertex storage, then there must also
      be a boost:vertex_index_t property manually added.
 
-     @par Edges should be undirected and have a weight property.
+     @par Edges are directed and have a weight property.
      */
     typedef boost::adjacency_list <
-        boost::vecS, boost::vecS, boost::undirectedS,
+        boost::vecS, boost::vecS, boost::bidirectionalS,
         boost::property < vertex_state_t, ompl::base::State*,
         boost::property < vertex_total_connection_attempts_t, unsigned int,
         boost::property < vertex_successful_connection_attempts_t, unsigned int,
@@ -326,6 +326,9 @@ protected:
 
     /** \brief Given a solution represented as a vector of predecesors in the roadmap, construct a geometric path */
     virtual ompl::base::PathPtr constructGeometricPath(const boost::vector_property_map<Vertex> &prev, const Vertex &start, const Vertex &goal);
+
+    /** \brief Add an edge from vertex a to b in graph */
+    virtual void addEdgeToGraph(Vertex a, Vertex b);
 
     /** \brief Generates the cost of the edge */
     virtual FIRMWeight generateControllersWithEdgeCost(ompl::base::State* startNodeState,
