@@ -75,7 +75,7 @@ namespace ompl
 
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 1e2;
 
-        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 0.9;
+        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1;
 
         static const double GOAL_COST_TO_GO = 0.0;
 

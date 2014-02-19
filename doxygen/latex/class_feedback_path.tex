@@ -1,0 +1,38 @@
+\hypertarget{class_feedback_path}{\section{\-Feedback\-Path \-Class \-Reference}
+\label{class_feedback_path}\index{\-Feedback\-Path@{\-Feedback\-Path}}
+}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_feedback_path_aac87c9c760ee3583c7a79bc964b3a156}{{\bfseries \-Feedback\-Path} (const firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \&si)}\label{class_feedback_path_aac87c9c760ee3583c7a79bc964b3a156}
+
+\item 
+\hypertarget{class_feedback_path_a5ccf91587a1e62d1237db427e1fe9419}{virtual void \hyperlink{class_feedback_path_a5ccf91587a1e62d1237db427e1fe9419}{append} (const ompl\-::base\-::\-State $\ast$state)}\label{class_feedback_path_a5ccf91587a1e62d1237db427e1fe9419}
+
+\begin{DoxyCompactList}\small\item\em \-Append a state to the path, these states are the nodes to be visited. \end{DoxyCompactList}\item 
+\hypertarget{class_feedback_path_a80ea993f1c341ab15985e820b00997bc}{virtual void \hyperlink{class_feedback_path_a80ea993f1c341ab15985e820b00997bc}{append} (const ompl\-::base\-::\-State $\ast$state, \hyperlink{class_controller}{\-Controller}$<$ \hyperlink{class_r_h_c_i_create}{\-R\-H\-C\-I\-Create}, \hyperlink{class_extended_k_f}{\-Extended\-K\-F} $>$ controller)}\label{class_feedback_path_a80ea993f1c341ab15985e820b00997bc}
+
+\begin{DoxyCompactList}\small\item\em \-Append a controller and its goal node to the path. \end{DoxyCompactList}\item 
+\hypertarget{class_feedback_path_a036ec9e8dffad9b2c99401b4e54adc64}{virtual std\-::vector\*
+$<$ \hyperlink{class_controller}{\-Controller}$<$ \hyperlink{class_r_h_c_i_create}{\-R\-H\-C\-I\-Create}, \*
+\hyperlink{class_extended_k_f}{\-Extended\-K\-F} $>$ $>$ \hyperlink{class_feedback_path_a036ec9e8dffad9b2c99401b4e54adc64}{get\-Controllers} (void)}\label{class_feedback_path_a036ec9e8dffad9b2c99401b4e54adc64}
+
+\begin{DoxyCompactList}\small\item\em \-Returns the sequence of controllers to follow in the path. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_feedback_path_a4117bfb07f93580234f5d5bc722a2da1}{std\-::vector$<$ \hyperlink{class_controller}{\-Controller}\*
+$<$ \hyperlink{class_r_h_c_i_create}{\-R\-H\-C\-I\-Create}, \hyperlink{class_extended_k_f}{\-Extended\-K\-F} $>$ $>$ \hyperlink{class_feedback_path_a4117bfb07f93580234f5d5bc722a2da1}{feedback\-Controllers\-\_\-}}\label{class_feedback_path_a4117bfb07f93580234f5d5bc722a2da1}
+
+\begin{DoxyCompactList}\small\item\em \-A vector containing the feedback controllers, which define the path in belief space. \end{DoxyCompactList}\item 
+\hypertarget{class_feedback_path_a6efa9a9ed1e8bf5b784308308feceec7}{std\-::vector$<$ ompl\-::base\-::\-State $\ast$ $>$ {\bfseries nodes\-To\-Visit\-\_\-}}\label{class_feedback_path_a6efa9a9ed1e8bf5b784308308feceec7}
+
+\item 
+\hypertarget{class_feedback_path_a46025a3de9b291abfad72ddc37a621f2}{firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr {\bfseries si\-F\-\_\-}}\label{class_feedback_path_a46025a3de9b291abfad72ddc37a621f2}
+
+\end{DoxyCompactItemize}
+
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Path/\-Feedback\-Path.\-h\end{DoxyCompactItemize}

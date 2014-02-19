@@ -1,0 +1,313 @@
+\hypertarget{class_ti_xml_base}{\section{\-Ti\-Xml\-Base \-Class \-Reference}
+\label{class_ti_xml_base}\index{\-Ti\-Xml\-Base@{\-Ti\-Xml\-Base}}
+}
+
+
+{\ttfamily \#include $<$tinyxml.\-h$>$}
+
+
+
+\-Inheritance diagram for \-Ti\-Xml\-Base\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_ti_xml_base__inherit__graph}
+\end{center}
+\end{figure}
+
+
+\-Collaboration diagram for \-Ti\-Xml\-Base\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=152pt]{class_ti_xml_base__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bfseries \-Entity}
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \*
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-N\-O\-\_\-\-E\-R\-R\-O\-R} =  0, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-O\-P\-E\-N\-I\-N\-G\-\_\-\-F\-I\-L\-E}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-P\-A\-R\-S\-I\-N\-G\-\_\-\-E\-L\-E\-M\-E\-N\-T}, 
+\*
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-F\-A\-I\-L\-E\-D\-\_\-\-T\-O\-\_\-\-R\-E\-A\-D\-\_\-\-E\-L\-E\-M\-E\-N\-T\-\_\-\-N\-A\-M\-E}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-R\-E\-A\-D\-I\-N\-G\-\_\-\-E\-L\-E\-M\-E\-N\-T\-\_\-\-V\-A\-L\-U\-E}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-R\-E\-A\-D\-I\-N\-G\-\_\-\-A\-T\-T\-R\-I\-B\-U\-T\-E\-S}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-P\-A\-R\-S\-I\-N\-G\-\_\-\-E\-M\-P\-T\-Y}, 
+\*
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-R\-E\-A\-D\-I\-N\-G\-\_\-\-E\-N\-D\-\_\-\-T\-A\-G}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-P\-A\-R\-S\-I\-N\-G\-\_\-\-U\-N\-K\-N\-O\-W\-N}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-P\-A\-R\-S\-I\-N\-G\-\_\-\-C\-O\-M\-M\-E\-N\-T}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-P\-A\-R\-S\-I\-N\-G\-\_\-\-D\-E\-C\-L\-A\-R\-A\-T\-I\-O\-N}, 
+\*
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-D\-O\-C\-U\-M\-E\-N\-T\-\_\-\-E\-M\-P\-T\-Y}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-E\-M\-B\-E\-D\-D\-E\-D\-\_\-\-N\-U\-L\-L}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-P\-A\-R\-S\-I\-N\-G\-\_\-\-C\-D\-A\-T\-A}, 
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-D\-O\-C\-U\-M\-E\-N\-T\-\_\-\-T\-O\-P\-\_\-\-O\-N\-L\-Y}, 
+\*
+{\bfseries \-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-I\-N\-G\-\_\-\-C\-O\-U\-N\-T}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \hyperlink{class_ti_xml_base_a0de56b3f2ef14c65091a3b916437b512}{\-Print} (\-F\-I\-L\-E $\ast$cfile, int depth) const =0
+\item 
+int \hyperlink{class_ti_xml_base_a024bceb070188df92c2a8d8852dd0853}{\-Row} () const 
+\item 
+\hypertarget{class_ti_xml_base_ab54bfb9b70fe6dd276e7b279cab7f003}{int \hyperlink{class_ti_xml_base_ab54bfb9b70fe6dd276e7b279cab7f003}{\-Column} () const }\label{class_ti_xml_base_ab54bfb9b70fe6dd276e7b279cab7f003}
+
+\begin{DoxyCompactList}\small\item\em \-See \hyperlink{class_ti_xml_base_a024bceb070188df92c2a8d8852dd0853}{\-Row()} \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_base_ac6b3e0f790930d4970ec30764e937b5d}{void \hyperlink{class_ti_xml_base_ac6b3e0f790930d4970ec30764e937b5d}{\-Set\-User\-Data} (void $\ast$user)}\label{class_ti_xml_base_ac6b3e0f790930d4970ec30764e937b5d}
+
+\begin{DoxyCompactList}\small\item\em \-Set a pointer to arbitrary user data. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_base_a6559a530ca6763fc301a14d77ed28c17}{void $\ast$ \hyperlink{class_ti_xml_base_a6559a530ca6763fc301a14d77ed28c17}{\-Get\-User\-Data} ()}\label{class_ti_xml_base_a6559a530ca6763fc301a14d77ed28c17}
+
+\begin{DoxyCompactList}\small\item\em \-Get a pointer to arbitrary user data. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_base_ad0120210e4680ef2088601753ce0ede4}{const void $\ast$ \hyperlink{class_ti_xml_base_ad0120210e4680ef2088601753ce0ede4}{\-Get\-User\-Data} () const }\label{class_ti_xml_base_ad0120210e4680ef2088601753ce0ede4}
+
+\begin{DoxyCompactList}\small\item\em \-Get a pointer to arbitrary user data. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_base_a00e4edb0219d00a1379c856e5a1d2025}{virtual const char $\ast$ {\bfseries \-Parse} (const char $\ast$p, \hyperlink{class_ti_xml_parsing_data}{\-Ti\-Xml\-Parsing\-Data} $\ast$data, \-Ti\-Xml\-Encoding encoding)=0}\label{class_ti_xml_base_a00e4edb0219d00a1379c856e5a1d2025}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Static \-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \hyperlink{class_ti_xml_base_a0f799ec645bfb8d8a969e83478f379c1}{\-Set\-Condense\-White\-Space} (bool condense)
+\item 
+\hypertarget{class_ti_xml_base_ad4b1472531c647a25b1840a87ae42438}{static bool \hyperlink{class_ti_xml_base_ad4b1472531c647a25b1840a87ae42438}{\-Is\-White\-Space\-Condensed} ()}\label{class_ti_xml_base_ad4b1472531c647a25b1840a87ae42438}
+
+\begin{DoxyCompactList}\small\item\em \-Return the current white space setting. \end{DoxyCompactList}\item 
+static void \hyperlink{class_ti_xml_base_a32ed202562b58de64c7d799ca3c9db98}{\-Encode\-String} (const \-T\-I\-X\-M\-L\-\_\-\-S\-T\-R\-I\-N\-G \&str, \-T\-I\-X\-M\-L\-\_\-\-S\-T\-R\-I\-N\-G $\ast$out)
+\end{DoxyCompactItemize}
+\subsection*{\-Static \-Public \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const int {\bfseries utf8\-Byte\-Table} \mbox{[}256\mbox{]}
+\end{DoxyCompactItemize}
+\subsection*{\-Static \-Protected \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_ti_xml_base_ac0c3d66d8a9e6996a1fa016275e16875}{static const char $\ast$ {\bfseries \-Skip\-White\-Space} (const char $\ast$, \-Ti\-Xml\-Encoding encoding)}\label{class_ti_xml_base_ac0c3d66d8a9e6996a1fa016275e16875}
+
+\item 
+\hypertarget{class_ti_xml_base_af56296d561c0bab4bc8e198cdcf5c48e}{static bool {\bfseries \-Is\-White\-Space} (char c)}\label{class_ti_xml_base_af56296d561c0bab4bc8e198cdcf5c48e}
+
+\item 
+\hypertarget{class_ti_xml_base_a3de391ea9f4c4a8aa10d04480b048795}{static bool {\bfseries \-Is\-White\-Space} (int c)}\label{class_ti_xml_base_a3de391ea9f4c4a8aa10d04480b048795}
+
+\item 
+\hypertarget{class_ti_xml_base_a1c21a6ab5f7b503acd91f35f183734b3}{static const char $\ast$ {\bfseries \-Read\-Name} (const char $\ast$p, \-T\-I\-X\-M\-L\-\_\-\-S\-T\-R\-I\-N\-G $\ast$name, \-Ti\-Xml\-Encoding encoding)}\label{class_ti_xml_base_a1c21a6ab5f7b503acd91f35f183734b3}
+
+\item 
+\hypertarget{class_ti_xml_base_aa646c74921aa33156968b802bbf5566e}{static const char $\ast$ {\bfseries \-Read\-Text} (const char $\ast$in, \-T\-I\-X\-M\-L\-\_\-\-S\-T\-R\-I\-N\-G $\ast$text, bool ignore\-White\-Space, const char $\ast$end\-Tag, bool ignore\-Case, \-Ti\-Xml\-Encoding encoding)}\label{class_ti_xml_base_aa646c74921aa33156968b802bbf5566e}
+
+\item 
+\hypertarget{class_ti_xml_base_ac5c08bf3deffcda0bf8ce2958372b584}{static const char $\ast$ {\bfseries \-Get\-Entity} (const char $\ast$in, char $\ast$value, int $\ast$length, \-Ti\-Xml\-Encoding encoding)}\label{class_ti_xml_base_ac5c08bf3deffcda0bf8ce2958372b584}
+
+\item 
+\hypertarget{class_ti_xml_base_a5b0fde72d6f662ae1fd6303195d2159b}{static const char $\ast$ {\bfseries \-Get\-Char} (const char $\ast$p, char $\ast$\-\_\-value, int $\ast$length, \-Ti\-Xml\-Encoding encoding)}\label{class_ti_xml_base_a5b0fde72d6f662ae1fd6303195d2159b}
+
+\item 
+\hypertarget{class_ti_xml_base_a51631e6986179558b9e5850723ed165a}{static bool {\bfseries \-String\-Equal} (const char $\ast$p, const char $\ast$end\-Tag, bool ignore\-Case, \-Ti\-Xml\-Encoding encoding)}\label{class_ti_xml_base_a51631e6986179558b9e5850723ed165a}
+
+\item 
+\hypertarget{class_ti_xml_base_ae22522b2e8e1ac43102d16394f639fc8}{static int {\bfseries \-Is\-Alpha} (unsigned char any\-Byte, \-Ti\-Xml\-Encoding encoding)}\label{class_ti_xml_base_ae22522b2e8e1ac43102d16394f639fc8}
+
+\item 
+\hypertarget{class_ti_xml_base_a321919055c115c78ded17f85a793f368}{static int {\bfseries \-Is\-Alpha\-Num} (unsigned char any\-Byte, \-Ti\-Xml\-Encoding encoding)}\label{class_ti_xml_base_a321919055c115c78ded17f85a793f368}
+
+\item 
+\hypertarget{class_ti_xml_base_a799f17405a86a5c2029618e85f11a097}{static int {\bfseries \-To\-Lower} (int v, \-Ti\-Xml\-Encoding encoding)}\label{class_ti_xml_base_a799f17405a86a5c2029618e85f11a097}
+
+\item 
+\hypertarget{class_ti_xml_base_a07c765e3a7f979d343e646ea797b180b}{static void {\bfseries \-Convert\-U\-T\-F32\-To\-U\-T\-F8} (unsigned long input, char $\ast$output, int $\ast$length)}\label{class_ti_xml_base_a07c765e3a7f979d343e646ea797b180b}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_ti_xml_base_a0d992580f3bc264909f898e942677a3c}{\hyperlink{struct_ti_xml_cursor}{\-Ti\-Xml\-Cursor} {\bfseries location}}\label{class_ti_xml_base_a0d992580f3bc264909f898e942677a3c}
+
+\item 
+\hypertarget{class_ti_xml_base_ab242c01590191f644569fa89a080d97c}{void $\ast$ \hyperlink{class_ti_xml_base_ab242c01590191f644569fa89a080d97c}{user\-Data}}\label{class_ti_xml_base_ab242c01590191f644569fa89a080d97c}
+
+\begin{DoxyCompactList}\small\item\em \-Field containing a generic user pointer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Static \-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const char $\ast$ {\bfseries error\-String} \mbox{[}\-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-I\-N\-G\-\_\-\-C\-O\-U\-N\-T\mbox{]}
+\end{DoxyCompactItemize}
+\subsection*{\-Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_ti_xml_base_a218872a0d985ae30e78c55adc4bdb196}{class {\bfseries \-Ti\-Xml\-Node}}\label{class_ti_xml_base_a218872a0d985ae30e78c55adc4bdb196}
+
+\item 
+\hypertarget{class_ti_xml_base_ab6592e32cb9132be517cc12a70564c4b}{class {\bfseries \-Ti\-Xml\-Element}}\label{class_ti_xml_base_ab6592e32cb9132be517cc12a70564c4b}
+
+\item 
+\hypertarget{class_ti_xml_base_a173617f6dfe902cf484ce5552b950475}{class {\bfseries \-Ti\-Xml\-Document}}\label{class_ti_xml_base_a173617f6dfe902cf484ce5552b950475}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\hyperlink{class_ti_xml_base}{\-Ti\-Xml\-Base} is a base class for every class in \-Tiny\-Xml. \-It does little except to establish that \-Tiny\-Xml classes can be printed and provide some utility functions.
+
+\-In \-X\-M\-L, the document and elements can contain other elements and other types of nodes.
+
+\begin{DoxyVerb}
+	A Document can contain:	Element	(container or leaf)
+							Comment (leaf)
+							Unknown (leaf)
+							Declaration( leaf )
+
+	An Element can contain:	Element (container or leaf)
+							Text	(leaf)
+							Attributes (not on tree)
+							Comment (leaf)
+							Unknown (leaf)
+
+	A Decleration contains: Attributes (not on tree)
+	\end{DoxyVerb}
+ 
+
+\subsection{\-Member \-Function \-Documentation}
+\hypertarget{class_ti_xml_base_a32ed202562b58de64c7d799ca3c9db98}{\index{\-Ti\-Xml\-Base@{\-Ti\-Xml\-Base}!\-Encode\-String@{\-Encode\-String}}
+\index{\-Encode\-String@{\-Encode\-String}!TiXmlBase@{\-Ti\-Xml\-Base}}
+\subsubsection[{\-Encode\-String}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Ti\-Xml\-Base\-::\-Encode\-String} (
+\begin{DoxyParamCaption}
+\item[{const \-T\-I\-X\-M\-L\-\_\-\-S\-T\-R\-I\-N\-G \&}]{str, }
+\item[{\-T\-I\-X\-M\-L\-\_\-\-S\-T\-R\-I\-N\-G $\ast$}]{out}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}\label{class_ti_xml_base_a32ed202562b58de64c7d799ca3c9db98}
+\-Expands entities in a string. \-Note this should not contian the tag's '$<$', '$>$', etc, or they will be transformed into entities! \hypertarget{class_ti_xml_base_a0de56b3f2ef14c65091a3b916437b512}{\index{\-Ti\-Xml\-Base@{\-Ti\-Xml\-Base}!\-Print@{\-Print}}
+\index{\-Print@{\-Print}!TiXmlBase@{\-Ti\-Xml\-Base}}
+\subsubsection[{\-Print}]{\setlength{\rightskip}{0pt plus 5cm}virtual void {\bf \-Ti\-Xml\-Base\-::\-Print} (
+\begin{DoxyParamCaption}
+\item[{\-F\-I\-L\-E $\ast$}]{cfile, }
+\item[{int}]{depth}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}pure virtual\mbox{]}}}}\label{class_ti_xml_base_a0de56b3f2ef14c65091a3b916437b512}
+\-All \-Tiny\-Xml classes can print themselves to a filestream or the string class (\hyperlink{class_ti_xml_string}{\-Ti\-Xml\-String} in non-\/\-S\-T\-L mode, std\-::string in \-S\-T\-L mode.) \-Either or both cfile and str can be null.
+
+\-This is a formatted print, and will insert tabs and newlines.
+
+(\-For an unformatted stream, use the $<$$<$ operator.) 
+
+\-Implemented in \hyperlink{class_ti_xml_document_a7b1aea204fee266b70b9c105c8bf2ada}{\-Ti\-Xml\-Document}, \hyperlink{class_ti_xml_unknown_a025f19c21ef01ea9be50febb8fe0ba06}{\-Ti\-Xml\-Unknown}, \hyperlink{class_ti_xml_declaration_abf6303db4bd05b5be554036817ff1cb4}{\-Ti\-Xml\-Declaration}, \hyperlink{class_ti_xml_text_ae74d56c5b3ddec6cc3103dd51821af92}{\-Ti\-Xml\-Text}, \hyperlink{class_ti_xml_comment_a17398061d62c470f57801ce28fa33ad4}{\-Ti\-Xml\-Comment}, \hyperlink{class_ti_xml_element_ad9d0c008866982ab8d9aafae7e14d692}{\-Ti\-Xml\-Element}, and \hyperlink{class_ti_xml_attribute_acc04956c1d5c4c31fe74f7a7528d109a}{\-Ti\-Xml\-Attribute}.
+
+\hypertarget{class_ti_xml_base_a024bceb070188df92c2a8d8852dd0853}{\index{\-Ti\-Xml\-Base@{\-Ti\-Xml\-Base}!\-Row@{\-Row}}
+\index{\-Row@{\-Row}!TiXmlBase@{\-Ti\-Xml\-Base}}
+\subsubsection[{\-Row}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf \-Ti\-Xml\-Base\-::\-Row} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}\label{class_ti_xml_base_a024bceb070188df92c2a8d8852dd0853}
+\-Return the position, in the original source file, of this node or attribute. \-The row and column are 1-\/based. (\-That is the first row and first column is 1,1). \-If the returns values are 0 or less, then the parser does not have a row and column value.
+
+\-Generally, the row and column value will be set when the \-Ti\-Xml\-Document\-::\-Load(), \hyperlink{class_ti_xml_document_a4c852a889c02cf251117fd1d9fe1845f}{\-Ti\-Xml\-Document\-::\-Load\-File()}, or any \-Ti\-Xml\-Node\-::\-Parse() is called. \-It will \-N\-O\-T be set when the \-D\-O\-M was created from operator$>$$>$.
+
+\-The values reflect the initial load. \-Once the \-D\-O\-M is modified programmatically (by adding or changing nodes and attributes) the new values will \-N\-O\-T update to reflect changes in the document.
+
+\-There is a minor performance cost to computing the row and column. \-Computation can be disabled if \hyperlink{class_ti_xml_document_a51dac56316f89b35bdb7d0d433ba988e}{\-Ti\-Xml\-Document\-::\-Set\-Tab\-Size()} is called with 0 as the value.
+
+\begin{DoxySeeAlso}{\-See also}
+\hyperlink{class_ti_xml_document_a51dac56316f89b35bdb7d0d433ba988e}{\-Ti\-Xml\-Document\-::\-Set\-Tab\-Size()} 
+\end{DoxySeeAlso}
+\hypertarget{class_ti_xml_base_a0f799ec645bfb8d8a969e83478f379c1}{\index{\-Ti\-Xml\-Base@{\-Ti\-Xml\-Base}!\-Set\-Condense\-White\-Space@{\-Set\-Condense\-White\-Space}}
+\index{\-Set\-Condense\-White\-Space@{\-Set\-Condense\-White\-Space}!TiXmlBase@{\-Ti\-Xml\-Base}}
+\subsubsection[{\-Set\-Condense\-White\-Space}]{\setlength{\rightskip}{0pt plus 5cm}static void {\bf \-Ti\-Xml\-Base\-::\-Set\-Condense\-White\-Space} (
+\begin{DoxyParamCaption}
+\item[{bool}]{condense}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, static\mbox{]}}}}\label{class_ti_xml_base_a0f799ec645bfb8d8a969e83478f379c1}
+\-The world does not agree on whether white space should be kept or not. \-In order to make everyone happy, these global, static functions are provided to set whether or not \-Tiny\-Xml will condense all white space into a single space or not. \-The default is to condense. \-Note changing this value is not thread safe. 
+
+\subsection{\-Member \-Data \-Documentation}
+\hypertarget{class_ti_xml_base_a7ac8feec4100e446b3d78e1ac0659700}{\index{\-Ti\-Xml\-Base@{\-Ti\-Xml\-Base}!error\-String@{error\-String}}
+\index{error\-String@{error\-String}!TiXmlBase@{\-Ti\-Xml\-Base}}
+\subsubsection[{error\-String}]{\setlength{\rightskip}{0pt plus 5cm}const char $\ast$ \-Ti\-Xml\-Base\-::error\-String\hspace{0.3cm}{\ttfamily  \mbox{[}static, protected\mbox{]}}}}\label{class_ti_xml_base_a7ac8feec4100e446b3d78e1ac0659700}
+{\bfseries \-Initial value\-:}
+\begin{DoxyCode}
+
+{
+        "No error",
+        "Error",
+        "Failed to open file",
+        "Error parsing Element.",
+        "Failed to read Element name",
+        "Error reading Element value.",
+        "Error reading Attributes.",
+        "Error: empty tag.",
+        "Error reading end tag.",
+        "Error parsing Unknown.",
+        "Error parsing Comment.",
+        "Error parsing Declaration.",
+        "Error document empty.",
+        "Error null (0) or unexpected EOF found in input stream.",
+        "Error parsing CDATA.",
+        "Error when TiXmlDocument added to document, because TiXmlDocument can
+       only be at the root.",
+}
+\end{DoxyCode}
+\hypertarget{class_ti_xml_base_ac8c86058137bdb4b413c3eca58f2d467}{\index{\-Ti\-Xml\-Base@{\-Ti\-Xml\-Base}!utf8\-Byte\-Table@{utf8\-Byte\-Table}}
+\index{utf8\-Byte\-Table@{utf8\-Byte\-Table}!TiXmlBase@{\-Ti\-Xml\-Base}}
+\subsubsection[{utf8\-Byte\-Table}]{\setlength{\rightskip}{0pt plus 5cm}const int \-Ti\-Xml\-Base\-::utf8\-Byte\-Table\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}\label{class_ti_xml_base_ac8c86058137bdb4b413c3eca58f2d467}
+{\bfseries \-Initial value\-:}
+\begin{DoxyCode}
+ 
+{
+        
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      1,      1,      1,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1,      
+                1,      1,      2,      2,      2,      2,      2,      2,      
+      2,       2,      2,      2,      2,      2,      2,      2,      
+                2,      2,      2,      2,      2,      2,      2,      2,      
+      2,       2,      2,      2,      2,      2,      2,      2,      
+                3,      3,      3,      3,      3,      3,      3,      3,      
+      3,       3,      3,      3,      3,      3,      3,      3,      
+                4,      4,      4,      4,      4,      1,      1,      1,      
+      1,       1,      1,      1,      1,      1,      1,      1       
+}
+\end{DoxyCode}
+
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+tinyxml/tinyxml.\-h\item 
+tinyxml/tinyxml.\-cpp\item 
+tinyxml/tinyxmlerror.\-cpp\item 
+tinyxml/tinyxmlparser.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,112 @@
+\hypertarget{class_motion_model_method}{\section{\-Motion\-Model\-Method \-Class \-Reference}
+\label{class_motion_model_method}\index{\-Motion\-Model\-Method@{\-Motion\-Model\-Method}}
+}
+
+
+\-Inheritance diagram for \-Motion\-Model\-Method\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{class_motion_model_method__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_motion_model_method_a3d2d250cadace8b47d5eca028a2220e4}{typedef arma\-::colvec {\bfseries \-Control\-Type}}\label{class_motion_model_method_a3d2d250cadace8b47d5eca028a2220e4}
+
+\item 
+\hypertarget{class_motion_model_method_aecf04875853e2ecbebc66eb720adc63b}{typedef arma\-::colvec {\bfseries \-Noise\-Type}}\label{class_motion_model_method_aecf04875853e2ecbebc66eb720adc63b}
+
+\item 
+\hypertarget{class_motion_model_method_ada60008f50c4ec1f48956bf99fa846ed}{typedef \hyperlink{class_s_e2_belief_space}{\-S\-E2\-Belief\-Space} {\bfseries \-Space\-Type}}\label{class_motion_model_method_ada60008f50c4ec1f48956bf99fa846ed}
+
+\item 
+\hypertarget{class_motion_model_method_a15b3c3801cb64f85bfff7d088d276d91}{typedef \hyperlink{class_s_e2_belief_space_1_1_state_type}{\-Space\-Type\-::\-State\-Type} {\bfseries \-State\-Type}}\label{class_motion_model_method_a15b3c3801cb64f85bfff7d088d276d91}
+
+\item 
+\hypertarget{class_motion_model_method_a2c6d9dc15fc37a1d5079f72c4114ebed}{typedef arma\-::mat {\bfseries \-Jacobian\-Type}}\label{class_motion_model_method_a2c6d9dc15fc37a1d5079f72c4114ebed}
+
+\item 
+\hypertarget{class_motion_model_method_a94a8bd757d2cfb258a47cdd69079e506}{typedef boost\-::shared\-\_\-ptr\*
+$<$ \hyperlink{class_motion_model_method}{\-Motion\-Model\-Method} $>$ {\bfseries \-Motion\-Model\-Pointer}}\label{class_motion_model_method_a94a8bd757d2cfb258a47cdd69079e506}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_motion_model_method_ae5ef4bfae24bc1674db07f785eb7d6f4}{{\bfseries \-Motion\-Model\-Method} (ompl\-::control\-::\-Space\-Information\-Ptr si, int n\-Dim=0)}\label{class_motion_model_method_ae5ef4bfae24bc1674db07f785eb7d6f4}
+
+\item 
+\hypertarget{class_motion_model_method_aa15c21f81b71cfe8c65224bbdfba61d8}{void {\bfseries set\-Time\-Step} (double time\-Step)}\label{class_motion_model_method_aa15c21f81b71cfe8c65224bbdfba61d8}
+
+\item 
+\hypertarget{class_motion_model_method_a9fafbf79b4ea570819e01050dadf4826}{virtual void {\bfseries \-Evolve} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const \-Noise\-Type \&w, ompl\-::base\-::\-State $\ast$result)=0}\label{class_motion_model_method_a9fafbf79b4ea570819e01050dadf4826}
+
+\item 
+\hypertarget{class_motion_model_method_a6ec853871652bfa2c4fdad2c46e81e44}{virtual void {\bfseries generate\-Open\-Loop\-Controls} (const ompl\-::base\-::\-State $\ast$start\-State, const ompl\-::base\-::\-State $\ast$end\-State, std\-::vector$<$ ompl\-::control\-::\-Control $\ast$ $>$ \&open\-Loop\-Controls)=0}\label{class_motion_model_method_a6ec853871652bfa2c4fdad2c46e81e44}
+
+\item 
+\hypertarget{class_motion_model_method_a036e2254bcae3730fe157419f9cf9c19}{virtual \-Noise\-Type {\bfseries generate\-Noise} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control)=0}\label{class_motion_model_method_a036e2254bcae3730fe157419f9cf9c19}
+
+\item 
+\hypertarget{class_motion_model_method_af1429b7c54c0b6bdde9e6b8272bbb50e}{virtual \-Jacobian\-Type {\bfseries get\-State\-Jacobian} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const \-Noise\-Type \&w)=0}\label{class_motion_model_method_af1429b7c54c0b6bdde9e6b8272bbb50e}
+
+\item 
+\hypertarget{class_motion_model_method_aac2be89931926f5883fd4e0ec0b7a073}{virtual \-Jacobian\-Type {\bfseries get\-Control\-Jacobian} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const \-Noise\-Type \&w)=0}\label{class_motion_model_method_aac2be89931926f5883fd4e0ec0b7a073}
+
+\item 
+\hypertarget{class_motion_model_method_adefbf482a8d6d409b262cb1af014026a}{virtual \-Jacobian\-Type {\bfseries get\-Noise\-Jacobian} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const \-Noise\-Type \&w)=0}\label{class_motion_model_method_adefbf482a8d6d409b262cb1af014026a}
+
+\item 
+\hypertarget{class_motion_model_method_a559dc48932d5aca3215e3f24e29680ce}{virtual arma\-::mat {\bfseries process\-Noise\-Covariance} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control)=0}\label{class_motion_model_method_a559dc48932d5aca3215e3f24e29680ce}
+
+\item 
+\hypertarget{class_motion_model_method_a4002e8e3bb3af13d56bc162b655a1543}{virtual ompl\-::control\-::\-Control $\ast$ {\bfseries get\-Zero\-Control} ()}\label{class_motion_model_method_a4002e8e3bb3af13d56bc162b655a1543}
+
+\item 
+\hypertarget{class_motion_model_method_a56d9a853b4ec8158c4c9016614c86a9f}{virtual const \-Noise\-Type \& {\bfseries get\-Zero\-Noise} ()}\label{class_motion_model_method_a56d9a853b4ec8158c4c9016614c86a9f}
+
+\item 
+\hypertarget{class_motion_model_method_ad0012e93feba030fa8e9a47a18c6ff0e}{virtual const size\-\_\-t {\bfseries control\-Dim} ()}\label{class_motion_model_method_ad0012e93feba030fa8e9a47a18c6ff0e}
+
+\item 
+\hypertarget{class_motion_model_method_a86ef6178a4d438fde83f1c3f110ad2b4}{virtual double {\bfseries get\-Timestep\-Size} ()}\label{class_motion_model_method_a86ef6178a4d438fde83f1c3f110ad2b4}
+
+\item 
+\hypertarget{class_motion_model_method_a924d7bb8eb665d12181c3755e831bc50}{arma\-::colvec {\bfseries \-O\-M\-P\-L2\-A\-R\-M\-A} (const ompl\-::control\-::\-Control $\ast$control)}\label{class_motion_model_method_a924d7bb8eb665d12181c3755e831bc50}
+
+\item 
+\hypertarget{class_motion_model_method_af473fd665c4fa562143beef5733db523}{void {\bfseries \-A\-R\-M\-A2\-O\-M\-P\-L} (arma\-::colvec u, ompl\-::control\-::\-Control $\ast$control)}\label{class_motion_model_method_af473fd665c4fa562143beef5733db523}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_motion_model_method_a7410df94d1231268c431dd73f2e5338d}{ompl\-::control\-::\-Space\-Information\-Ptr {\bfseries si\-\_\-}}\label{class_motion_model_method_a7410df94d1231268c431dd73f2e5338d}
+
+\item 
+\hypertarget{class_motion_model_method_a6d76506c342c3bf089eb548c531e2105}{const unsigned int {\bfseries state\-Dim\-\_\-}}\label{class_motion_model_method_a6d76506c342c3bf089eb548c531e2105}
+
+\item 
+\hypertarget{class_motion_model_method_ab9b45acbafce1f4c873ee7095bc49964}{const unsigned int {\bfseries control\-Dim\-\_\-}}\label{class_motion_model_method_ab9b45acbafce1f4c873ee7095bc49964}
+
+\item 
+\hypertarget{class_motion_model_method_ae5e55aa39c0d819c3e9afffefa3d5b08}{ompl\-::control\-::\-Control $\ast$ {\bfseries zero\-Control\-\_\-}}\label{class_motion_model_method_ae5e55aa39c0d819c3e9afffefa3d5b08}
+
+\item 
+\hypertarget{class_motion_model_method_a47725ad490fdc510cdc38838165b27c6}{const int {\bfseries noise\-Dim\-\_\-}}\label{class_motion_model_method_a47725ad490fdc510cdc38838165b27c6}
+
+\item 
+\hypertarget{class_motion_model_method_ac5b0a8829ec75b20d78deff84f71cbb5}{\-Noise\-Type {\bfseries zero\-Noise\-\_\-}}\label{class_motion_model_method_ac5b0a8829ec75b20d78deff84f71cbb5}
+
+\item 
+\hypertarget{class_motion_model_method_a482972cd2ec0bec4b42137811e1d0446}{double {\bfseries dt\-\_\-}}\label{class_motion_model_method_a482972cd2ec0bec4b42137811e1d0446}
+
+\end{DoxyCompactItemize}
+
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Motion\-Models/\-Motion\-Model\-Method.\-h\end{DoxyCompactItemize}

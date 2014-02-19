@@ -1,0 +1,60 @@
+\hypertarget{class_kalman_filter_method}{\section{\-Kalman\-Filter\-Method \-Class \-Reference}
+\label{class_kalman_filter_method}\index{\-Kalman\-Filter\-Method@{\-Kalman\-Filter\-Method}}
+}
+
+
+\-Inheritance diagram for \-Kalman\-Filter\-Method\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{class_kalman_filter_method__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_kalman_filter_method_afbea7fdb6e6faffd74de8ee647b97a02}{{\bfseries \-Kalman\-Filter\-Method} (firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_kalman_filter_method_afbea7fdb6e6faffd74de8ee647b97a02}
+
+\item 
+\hypertarget{class_kalman_filter_method_aed467f00719c58d7be5458f8f99511d9}{\-Motion\-Model\-Pointer {\bfseries get\-Motion\-Model\-Pointer} ()}\label{class_kalman_filter_method_aed467f00719c58d7be5458f8f99511d9}
+
+\item 
+\hypertarget{class_kalman_filter_method_a7f2542d72d92f1e44cf4d0cdcaec02b8}{void {\bfseries set\-Motion\-Model\-Pointeer} (const \-Motion\-Model\-Pointer \&mm)}\label{class_kalman_filter_method_a7f2542d72d92f1e44cf4d0cdcaec02b8}
+
+\item 
+\hypertarget{class_kalman_filter_method_aa93f7e7e297eb337cc1fda8ae46763cc}{\-Observation\-Model\-Pointer {\bfseries get\-Observation\-Model\-Pointer} ()}\label{class_kalman_filter_method_aa93f7e7e297eb337cc1fda8ae46763cc}
+
+\item 
+\hypertarget{class_kalman_filter_method_a4b966a487acbbdda0f145be9a1da03d5}{void {\bfseries set\-Observation\-Model\-Pointer} (const \-Observation\-Model\-Pointer \&om)}\label{class_kalman_filter_method_a4b966a487acbbdda0f145be9a1da03d5}
+
+\item 
+\hypertarget{class_kalman_filter_method_ae8d8c8f2eeaca1a556cfc655d1897ce5}{virtual void {\bfseries \-Predict} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$predicted\-State, const bool is\-Construction=false)=0}\label{class_kalman_filter_method_ae8d8c8f2eeaca1a556cfc655d1897ce5}
+
+\item 
+\hypertarget{class_kalman_filter_method_aac4f9c1f1a79821898891f2c13aa5cfc}{virtual void {\bfseries \-Update} (const ompl\-::base\-::\-State $\ast$belief, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$updated\-State, const bool is\-Construction=false)=0}\label{class_kalman_filter_method_aac4f9c1f1a79821898891f2c13aa5cfc}
+
+\item 
+\hypertarget{class_kalman_filter_method_a8a13cf9a962588fbd3441726b7b95e77}{virtual void {\bfseries \-Evolve} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Pred, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Update, ompl\-::base\-::\-State $\ast$evolved\-State, const bool is\-Construction=false)=0}\label{class_kalman_filter_method_a8a13cf9a962588fbd3441726b7b95e77}
+
+\item 
+\hypertarget{class_kalman_filter_method_a8f9d8ae8cf4e3bd0138d731bd2539441}{virtual arma\-::mat {\bfseries compute\-Stationary\-Covariance} (const \hyperlink{class_linear_system}{\-Linear\-System} \&ls)=0}\label{class_kalman_filter_method_a8f9d8ae8cf4e3bd0138d731bd2539441}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_kalman_filter_method_a9a2355339d83656f5db7c86a60d12822}{firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr {\bfseries si\-\_\-}}\label{class_kalman_filter_method_a9a2355339d83656f5db7c86a60d12822}
+
+\item 
+\hypertarget{class_kalman_filter_method_a5969ade2e4d4f70a1cccc2f2f2bf4bb3}{\-Motion\-Model\-Pointer {\bfseries motion\-Model\-\_\-}}\label{class_kalman_filter_method_a5969ade2e4d4f70a1cccc2f2f2bf4bb3}
+
+\item 
+\hypertarget{class_kalman_filter_method_a43191b745846715c66854634ba58e85c}{\-Observation\-Model\-Pointer {\bfseries observation\-Model\-\_\-}}\label{class_kalman_filter_method_a43191b745846715c66854634ba58e85c}
+
+\end{DoxyCompactItemize}
+
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Filters/\-Kalman\-Filter\-Method.\-h\end{DoxyCompactItemize}

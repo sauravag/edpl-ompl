@@ -1,0 +1,70 @@
+\hypertarget{class_gaussian_valid_belief_sampler}{\section{\-Gaussian\-Valid\-Belief\-Sampler \-Class \-Reference}
+\label{class_gaussian_valid_belief_sampler}\index{\-Gaussian\-Valid\-Belief\-Sampler@{\-Gaussian\-Valid\-Belief\-Sampler}}
+}
+
+
+\-Generate valid samples using the \-Gaussian sampling strategy.  
+
+
+
+
+{\ttfamily \#include $<$\-Gaussian\-Valid\-Belief\-Sampler.\-h$>$}
+
+\subsection*{\-Public \-Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_gaussian_valid_belief_sampler_a61a22b17254765f0c32940bb1d118473}{typedef \*
+\-Observation\-Model\-Method\-::\-Observation\-Model\-Pointer {\bfseries \-Observation\-Model\-Pointer}}\label{class_gaussian_valid_belief_sampler_a61a22b17254765f0c32940bb1d118473}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_gaussian_valid_belief_sampler_ae3c0e5503ddc85cc2943d3fda5ca1247}{\hyperlink{class_gaussian_valid_belief_sampler_ae3c0e5503ddc85cc2943d3fda5ca1247}{\-Gaussian\-Valid\-Belief\-Sampler} (const \hyperlink{classfirm_1_1_space_information}{firm\-::\-Space\-Information} $\ast$si)}\label{class_gaussian_valid_belief_sampler_ae3c0e5503ddc85cc2943d3fda5ca1247}
+
+\begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_gaussian_valid_belief_sampler_a70901adff599cc2219f7269568bad91d}{virtual bool {\bfseries sample} (ompl\-::base\-::\-State $\ast$state)}\label{class_gaussian_valid_belief_sampler_a70901adff599cc2219f7269568bad91d}
+
+\item 
+\hypertarget{class_gaussian_valid_belief_sampler_a0e08191a299ce7ddc48f2e316c9fdd65}{virtual bool {\bfseries sample\-Near} (ompl\-::base\-::\-State $\ast$state, const ompl\-::base\-::\-State $\ast$near, const double distance)}\label{class_gaussian_valid_belief_sampler_a0e08191a299ce7ddc48f2e316c9fdd65}
+
+\item 
+\hypertarget{class_gaussian_valid_belief_sampler_a3e6bb843f415b78742efcebbc9657ed0}{double \hyperlink{class_gaussian_valid_belief_sampler_a3e6bb843f415b78742efcebbc9657ed0}{get\-Std\-Dev} (void) const }\label{class_gaussian_valid_belief_sampler_a3e6bb843f415b78742efcebbc9657ed0}
+
+\begin{DoxyCompactList}\small\item\em \-Get the standard deviation used when sampling. \end{DoxyCompactList}\item 
+\hypertarget{class_gaussian_valid_belief_sampler_ab0beca356924545e0cb27292495995a5}{void \hyperlink{class_gaussian_valid_belief_sampler_ab0beca356924545e0cb27292495995a5}{set\-Std\-Dev} (double stddev)}\label{class_gaussian_valid_belief_sampler_ab0beca356924545e0cb27292495995a5}
+
+\begin{DoxyCompactList}\small\item\em \-Set the standard deviation to use when sampling. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{class_gaussian_valid_belief_sampler_a87de26ec14b44eb5946d6c27b06416c6}{is\-Observable} (ompl\-::base\-::\-State $\ast$state)
+\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_gaussian_valid_belief_sampler_ac479e9335daee424ce105648b068a018}{ompl\-::base\-::\-State\-Sampler\-Ptr \hyperlink{class_gaussian_valid_belief_sampler_ac479e9335daee424ce105648b068a018}{sampler\-\_\-}}\label{class_gaussian_valid_belief_sampler_ac479e9335daee424ce105648b068a018}
+
+\begin{DoxyCompactList}\small\item\em \-The sampler to build upon. \end{DoxyCompactList}\item 
+\hypertarget{class_gaussian_valid_belief_sampler_a46c46db4485e69a1c6ba5c65e175a8d3}{double \hyperlink{class_gaussian_valid_belief_sampler_a46c46db4485e69a1c6ba5c65e175a8d3}{stddev\-\_\-}}\label{class_gaussian_valid_belief_sampler_a46c46db4485e69a1c6ba5c65e175a8d3}
+
+\begin{DoxyCompactList}\small\item\em \-The standard deviation to use in the sampling process. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\-Generate valid samples using the \-Gaussian sampling strategy. 
+
+\subsection{\-Member \-Function \-Documentation}
+\hypertarget{class_gaussian_valid_belief_sampler_a87de26ec14b44eb5946d6c27b06416c6}{\index{\-Gaussian\-Valid\-Belief\-Sampler@{\-Gaussian\-Valid\-Belief\-Sampler}!is\-Observable@{is\-Observable}}
+\index{is\-Observable@{is\-Observable}!GaussianValidBeliefSampler@{\-Gaussian\-Valid\-Belief\-Sampler}}
+\subsubsection[{is\-Observable}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf \-Gaussian\-Valid\-Belief\-Sampler\-::is\-Observable} (
+\begin{DoxyParamCaption}
+\item[{ompl\-::base\-::\-State $\ast$}]{state}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}\label{class_gaussian_valid_belief_sampler_a87de26ec14b44eb5946d6c27b06416c6}
+void set\-Observation\-Model(\-Observation\-Model\-Pointer om) \{ observation\-Model\-\_\- = om; \} brief \-Checks if the sample is observable i.\-e. \-If it can observe sufficient landmarks \-Ideally, observability check should be performed in the filter instead of obs model 
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Samplers/\-Gaussian\-Valid\-Belief\-Sampler.\-h\item 
+src/\-Samplers/\-Gaussian\-Valid\-Belief\-Sampler.\-cpp\end{DoxyCompactItemize}

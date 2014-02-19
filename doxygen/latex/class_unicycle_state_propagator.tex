@@ -1,0 +1,57 @@
+\hypertarget{class_unicycle_state_propagator}{\section{\-Unicycle\-State\-Propagator \-Class \-Reference}
+\label{class_unicycle_state_propagator}\index{\-Unicycle\-State\-Propagator@{\-Unicycle\-State\-Propagator}}
+}
+
+
+\-State propagation for a unicycle motion model.  
+
+
+
+
+{\ttfamily \#include $<$\-Unicycle\-State\-Propagator.\-h$>$}
+
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_unicycle_state_propagator_a9b1d547c131b9a95ec25b01ab9f77fa1}{\hyperlink{class_unicycle_state_propagator_a9b1d547c131b9a95ec25b01ab9f77fa1}{\-Unicycle\-State\-Propagator} (const ompl\-::control\-::\-Space\-Information\-Ptr \&si)}\label{class_unicycle_state_propagator_a9b1d547c131b9a95ec25b01ab9f77fa1}
+
+\begin{DoxyCompactList}\small\item\em \-Construct representation of a unicycle state propagator. \end{DoxyCompactList}\item 
+\hypertarget{class_unicycle_state_propagator_a7cfd8b23df04636daacc5a21162ea950}{virtual bool \hyperlink{class_unicycle_state_propagator_a7cfd8b23df04636daacc5a21162ea950}{can\-Propagate\-Backward} (void) const }\label{class_unicycle_state_propagator_a7cfd8b23df04636daacc5a21162ea950}
+
+\begin{DoxyCompactList}\small\item\em \-Will always return false, as the simulation can only proceed forward in time. \end{DoxyCompactList}\item 
+virtual void \hyperlink{class_unicycle_state_propagator_a8fd2854e51c8dc14ba21e40e45b14736}{propagate} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const double duration, ompl\-::base\-::\-State $\ast$result) const 
+\begin{DoxyCompactList}\small\item\em \-Propagate from a state, under a given control, for some specified amount of time. \-We use the motion model to do the actual number crunching. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_unicycle_state_propagator_aa7d52a6fb2ede1797badb5d6654061a3}{\-Motion\-Model\-Method\-::\-Motion\-Model\-Pointer {\bfseries motion\-Model\-\_\-}}\label{class_unicycle_state_propagator_aa7d52a6fb2ede1797badb5d6654061a3}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\-State propagation for a unicycle motion model. 
+
+
+
+\subsection{\-Member \-Function \-Documentation}
+\hypertarget{class_unicycle_state_propagator_a8fd2854e51c8dc14ba21e40e45b14736}{\index{\-Unicycle\-State\-Propagator@{\-Unicycle\-State\-Propagator}!propagate@{propagate}}
+\index{propagate@{propagate}!UnicycleStatePropagator@{\-Unicycle\-State\-Propagator}}
+\subsubsection[{propagate}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Unicycle\-State\-Propagator\-::propagate} (
+\begin{DoxyParamCaption}
+\item[{const ompl\-::base\-::\-State $\ast$}]{state, }
+\item[{const ompl\-::control\-::\-Control $\ast$}]{control, }
+\item[{const double}]{duration, }
+\item[{ompl\-::base\-::\-State $\ast$}]{result}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{class_unicycle_state_propagator_a8fd2854e51c8dc14ba21e40e45b14736}
+
+
+\-Propagate from a state, under a given control, for some specified amount of time. \-We use the motion model to do the actual number crunching. 
+
+
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Motion\-Models/\-Unicycle\-State\-Propagator.\-h\item 
+src/\-Motion\-Models/\-Unicycle\-State\-Propagator.\-cpp\end{DoxyCompactItemize}

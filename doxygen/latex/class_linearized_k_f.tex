@@ -1,0 +1,74 @@
+\hypertarget{class_linearized_k_f}{\section{\-Linearized\-K\-F \-Class \-Reference}
+\label{class_linearized_k_f}\index{\-Linearized\-K\-F@{\-Linearized\-K\-F}}
+}
+
+
+\-Inheritance diagram for \-Linearized\-K\-F\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{class_linearized_k_f__inherit__graph}
+\end{center}
+\end{figure}
+
+
+\-Collaboration diagram for \-Linearized\-K\-F\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{class_linearized_k_f__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_linearized_k_f_a7c538be0fa27f880c2272d6b1fbe8729}{typedef \*
+\-Motion\-Model\-Method\-::\-Control\-Type {\bfseries \-Control\-Type}}\label{class_linearized_k_f_a7c538be0fa27f880c2272d6b1fbe8729}
+
+\item 
+\hypertarget{class_linearized_k_f_a068ecc6782388590cba62370670585d1}{typedef \*
+\hyperlink{class_s_e2_belief_space}{\-Motion\-Model\-Method\-::\-Space\-Type} {\bfseries \-Space\-Type}}\label{class_linearized_k_f_a068ecc6782388590cba62370670585d1}
+
+\item 
+\hypertarget{class_linearized_k_f_aab4a87264c8e70b665298697e4a49a02}{typedef \*
+\hyperlink{class_s_e2_belief_space_1_1_state_type}{\-Motion\-Model\-Method\-::\-State\-Type} {\bfseries \-State\-Type}}\label{class_linearized_k_f_aab4a87264c8e70b665298697e4a49a02}
+
+\item 
+\hypertarget{class_linearized_k_f_a66feb5ecffc79354460e8bd3d431ff12}{typedef \*
+\-Observation\-Model\-Method\-::\-Observation\-Type {\bfseries \-Observation\-Type}}\label{class_linearized_k_f_a66feb5ecffc79354460e8bd3d431ff12}
+
+\item 
+\hypertarget{class_linearized_k_f_a2673ebedf419ec686789f03d94c3307f}{typedef \*
+\-Motion\-Model\-Method\-::\-Motion\-Model\-Pointer {\bfseries \-Motion\-Model\-Pointer}}\label{class_linearized_k_f_a2673ebedf419ec686789f03d94c3307f}
+
+\item 
+\hypertarget{class_linearized_k_f_a885fd5b62c570da6e5eaf1f1fc33d542}{typedef \*
+\-Observation\-Model\-Method\-::\-Observation\-Model\-Pointer {\bfseries \-Observation\-Model\-Pointer}}\label{class_linearized_k_f_a885fd5b62c570da6e5eaf1f1fc33d542}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_linearized_k_f_af38864b2bbb3759c48011f152541ac93}{{\bfseries \-Linearized\-K\-F} (firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_linearized_k_f_af38864b2bbb3759c48011f152541ac93}
+
+\item 
+\hypertarget{class_linearized_k_f_ac52dd09de6f36532f00427c3aba323c4}{void {\bfseries \-Predict} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$predicted\-State, const bool is\-Construction=false)}\label{class_linearized_k_f_ac52dd09de6f36532f00427c3aba323c4}
+
+\item 
+\hypertarget{class_linearized_k_f_ab72b644fe84fc44263effe2e0fb3b8da}{void {\bfseries \-Update} (const ompl\-::base\-::\-State $\ast$belief, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$updated\-State, const bool is\-Construction=false)}\label{class_linearized_k_f_ab72b644fe84fc44263effe2e0fb3b8da}
+
+\item 
+\hypertarget{class_linearized_k_f_a087bc963cbbd4b0291c9d628b627829d}{void {\bfseries \-Evolve} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Pred, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Update, ompl\-::base\-::\-State $\ast$evolved\-State, const bool is\-Construction=false)}\label{class_linearized_k_f_a087bc963cbbd4b0291c9d628b627829d}
+
+\item 
+\hypertarget{class_linearized_k_f_addb9369d36e6d9fcb49668f8ca19ad97}{arma\-::mat {\bfseries compute\-Stationary\-Covariance} (const \hyperlink{class_linear_system}{\-Linear\-System} \&ls)}\label{class_linearized_k_f_addb9369d36e6d9fcb49668f8ca19ad97}
+
+\end{DoxyCompactItemize}
+
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Filters/\-Linearized\-K\-F.\-h\item 
+src/\-Filters/\-Linearized\-K\-F.\-cpp\end{DoxyCompactItemize}

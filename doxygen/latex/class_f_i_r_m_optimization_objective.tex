@@ -1,0 +1,42 @@
+\hypertarget{class_f_i_r_m_optimization_objective}{\section{\-F\-I\-R\-M\-Optimization\-Objective \-Class \-Reference}
+\label{class_f_i_r_m_optimization_objective}\index{\-F\-I\-R\-M\-Optimization\-Objective@{\-F\-I\-R\-M\-Optimization\-Objective}}
+}
+
+
+{\ttfamily \#include $<$\-F\-I\-R\-M\-Optimization\-Objective.\-h$>$}
+
+
+
+\-Collaboration diagram for \-F\-I\-R\-M\-Optimization\-Objective\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{class_f_i_r_m_optimization_objective__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_f_i_r_m_optimization_objective_a230cd65e9c2c9d9d668eca55b9a9c537}{{\bfseries \-F\-I\-R\-M\-Optimization\-Objective} (const ompl\-::control\-::\-Space\-Information\-Ptr \&si)}\label{class_f_i_r_m_optimization_objective_a230cd65e9c2c9d9d668eca55b9a9c537}
+
+\item 
+\hypertarget{class_f_i_r_m_optimization_objective_a161f7e9f76e46cfb65a80109535c0bd1}{virtual ompl\-::base\-::\-Cost \hyperlink{class_f_i_r_m_optimization_objective_a161f7e9f76e46cfb65a80109535c0bd1}{motion\-Cost} (const ompl\-::base\-::\-State $\ast$s1, const ompl\-::base\-::\-State $\ast$s2)}\label{class_f_i_r_m_optimization_objective_a161f7e9f76e46cfb65a80109535c0bd1}
+
+\begin{DoxyCompactList}\small\item\em \-Motion cost for this objective is defined as the sum of trace(covariance)for all intermediate states between {\itshape s1\/} and {\itshape s2\/}, using the method \-Space\-Information\-::distance(). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_f_i_r_m_optimization_objective_ac8f288ac2a63ec1830889e2f146acbe6}{\hyperlink{class_controller}{\-Controller}$<$ \hyperlink{class_r_h_c_i_create}{\-R\-H\-C\-I\-Create}, \*
+\hyperlink{class_extended_k_f}{\-Extended\-K\-F} $>$ {\bfseries controller\-\_\-}}\label{class_f_i_r_m_optimization_objective_ac8f288ac2a63ec1830889e2f146acbe6}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\-The cost to execute an edge i.\-e. going from some node \-A to some node \-B is defined as the \hyperlink{class_f_i_r_m}{\-F\-I\-R\-M} optimization objective. \-The cost is a measure of the uncertainty in the system (e.\-g. trace(covariance) for all intermediate states on the edge). \hyperlink{class_f_i_r_m}{\-F\-I\-R\-M} gives us paths that have the least uncertainty. 
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Optimization\-Objectives/\-F\-I\-R\-M\-Optimization\-Objective.\-h\item 
+src/\-Optimization\-Objectives/\-F\-I\-R\-M\-Optimization\-Objective.\-cpp\end{DoxyCompactItemize}

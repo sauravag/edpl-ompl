@@ -1,0 +1,245 @@
+\hypertarget{class_ti_xml_document}{\section{\-Ti\-Xml\-Document \-Class \-Reference}
+\label{class_ti_xml_document}\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}}
+}
+
+
+{\ttfamily \#include $<$tinyxml.\-h$>$}
+
+
+
+\-Inheritance diagram for \-Ti\-Xml\-Document\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=166pt]{class_ti_xml_document__inherit__graph}
+\end{center}
+\end{figure}
+
+
+\-Collaboration diagram for \-Ti\-Xml\-Document\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=213pt]{class_ti_xml_document__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_ti_xml_document_a9f5e84335708fde98400230f9f12659c}{\hyperlink{class_ti_xml_document_a9f5e84335708fde98400230f9f12659c}{\-Ti\-Xml\-Document} ()}\label{class_ti_xml_document_a9f5e84335708fde98400230f9f12659c}
+
+\begin{DoxyCompactList}\small\item\em \-Create an empty document, that has no name. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_document_ae4508b452d0c3061db085f3db27b8396}{\hyperlink{class_ti_xml_document_ae4508b452d0c3061db085f3db27b8396}{\-Ti\-Xml\-Document} (const char $\ast$document\-Name)}\label{class_ti_xml_document_ae4508b452d0c3061db085f3db27b8396}
+
+\begin{DoxyCompactList}\small\item\em \-Create a document with a name. \-The name of the document is also the filename of the xml. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_document_a323a7486e7da6099cdc19a5ff7e74b07}{{\bfseries \-Ti\-Xml\-Document} (const \hyperlink{class_ti_xml_document}{\-Ti\-Xml\-Document} \&copy)}\label{class_ti_xml_document_a323a7486e7da6099cdc19a5ff7e74b07}
+
+\item 
+\hypertarget{class_ti_xml_document_aa56fd4dbe8917d2033d865909e2d737e}{\hyperlink{class_ti_xml_document}{\-Ti\-Xml\-Document} \& {\bfseries operator=} (const \hyperlink{class_ti_xml_document}{\-Ti\-Xml\-Document} \&copy)}\label{class_ti_xml_document_aa56fd4dbe8917d2033d865909e2d737e}
+
+\item 
+bool \hyperlink{class_ti_xml_document_a4c852a889c02cf251117fd1d9fe1845f}{\-Load\-File} (\-Ti\-Xml\-Encoding encoding=\-T\-I\-X\-M\-L\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-N\-C\-O\-D\-I\-N\-G)
+\item 
+\hypertarget{class_ti_xml_document_a21c0aeb0d0a720169ad4ac89523ebe93}{bool \hyperlink{class_ti_xml_document_a21c0aeb0d0a720169ad4ac89523ebe93}{\-Save\-File} () const }\label{class_ti_xml_document_a21c0aeb0d0a720169ad4ac89523ebe93}
+
+\begin{DoxyCompactList}\small\item\em \-Save a file using the current document value. \-Returns true if successful. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_document_a879cdf5e981b8b2d2ef82f2546dd28fb}{bool \hyperlink{class_ti_xml_document_a879cdf5e981b8b2d2ef82f2546dd28fb}{\-Load\-File} (const char $\ast$filename, \-Ti\-Xml\-Encoding encoding=\-T\-I\-X\-M\-L\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-N\-C\-O\-D\-I\-N\-G)}\label{class_ti_xml_document_a879cdf5e981b8b2d2ef82f2546dd28fb}
+
+\begin{DoxyCompactList}\small\item\em \-Load a file using the given filename. \-Returns true if successful. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_document_ae869f5ebf7fc54c4a1d737fb4689fd44}{bool \hyperlink{class_ti_xml_document_ae869f5ebf7fc54c4a1d737fb4689fd44}{\-Save\-File} (const char $\ast$filename) const }\label{class_ti_xml_document_ae869f5ebf7fc54c4a1d737fb4689fd44}
+
+\begin{DoxyCompactList}\small\item\em \-Save a file using the given filename. \-Returns true if successful. \end{DoxyCompactList}\item 
+bool \hyperlink{class_ti_xml_document_a41f6fe7200864d1dca663d230caf8db6}{\-Load\-File} (\-F\-I\-L\-E $\ast$, \-Ti\-Xml\-Encoding encoding=\-T\-I\-X\-M\-L\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-N\-C\-O\-D\-I\-N\-G)
+\item 
+\hypertarget{class_ti_xml_document_acf1672b4538c6d1d441f9f108aea2bf4}{bool \hyperlink{class_ti_xml_document_acf1672b4538c6d1d441f9f108aea2bf4}{\-Save\-File} (\-F\-I\-L\-E $\ast$) const }\label{class_ti_xml_document_acf1672b4538c6d1d441f9f108aea2bf4}
+
+\begin{DoxyCompactList}\small\item\em \-Save a file using the given \-F\-I\-L\-E$\ast$. \-Returns true if successful. \end{DoxyCompactList}\item 
+virtual const char $\ast$ \hyperlink{class_ti_xml_document_a789ad2f06f93d52bdb5570b2f3670289}{\-Parse} (const char $\ast$p, \hyperlink{class_ti_xml_parsing_data}{\-Ti\-Xml\-Parsing\-Data} $\ast$data=0, \-Ti\-Xml\-Encoding encoding=\-T\-I\-X\-M\-L\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-N\-C\-O\-D\-I\-N\-G)
+\item 
+const \hyperlink{class_ti_xml_element}{\-Ti\-Xml\-Element} $\ast$ \hyperlink{class_ti_xml_document_ad09d17927f908f40efb406af2fb873be}{\-Root\-Element} () const 
+\item 
+\hypertarget{class_ti_xml_document_a0b43e762a23f938b06651bc90b8a1013}{\hyperlink{class_ti_xml_element}{\-Ti\-Xml\-Element} $\ast$ {\bfseries \-Root\-Element} ()}\label{class_ti_xml_document_a0b43e762a23f938b06651bc90b8a1013}
+
+\item 
+bool \hyperlink{class_ti_xml_document_a6dfc01a6e5d58e56acd537dfd3bdeb29}{\-Error} () const 
+\item 
+\hypertarget{class_ti_xml_document_a9d0f689f6e09ea494ea547be8d79c25e}{const char $\ast$ \hyperlink{class_ti_xml_document_a9d0f689f6e09ea494ea547be8d79c25e}{\-Error\-Desc} () const }\label{class_ti_xml_document_a9d0f689f6e09ea494ea547be8d79c25e}
+
+\begin{DoxyCompactList}\small\item\em \-Contains a textual (english) description of the error if one occurs. \end{DoxyCompactList}\item 
+int \hyperlink{class_ti_xml_document_af96fc2f3f9ec6422782bfe916c9e778f}{\-Error\-Id} () const 
+\item 
+int \hyperlink{class_ti_xml_document_af30efc75e804aa2e92fb8be3a8cb676e}{\-Error\-Row} () const 
+\item 
+\hypertarget{class_ti_xml_document_aa90bc630ee5203c6109ca5fad3323649}{int \hyperlink{class_ti_xml_document_aa90bc630ee5203c6109ca5fad3323649}{\-Error\-Col} () const }\label{class_ti_xml_document_aa90bc630ee5203c6109ca5fad3323649}
+
+\begin{DoxyCompactList}\small\item\em \-The column where the error occured. \-See \hyperlink{class_ti_xml_document_af30efc75e804aa2e92fb8be3a8cb676e}{\-Error\-Row()} \end{DoxyCompactList}\item 
+void \hyperlink{class_ti_xml_document_a51dac56316f89b35bdb7d0d433ba988e}{\-Set\-Tab\-Size} (int \-\_\-tabsize)
+\item 
+\hypertarget{class_ti_xml_document_a612360241b85bad0826b2a9ae9cda561}{int {\bfseries \-Tab\-Size} () const }\label{class_ti_xml_document_a612360241b85bad0826b2a9ae9cda561}
+
+\item 
+void \hyperlink{class_ti_xml_document_ac66b8c28db86363315712a3574e87c35}{\-Clear\-Error} ()
+\item 
+void \hyperlink{class_ti_xml_document_af08389ec70ee9b2de7f800e206a18510}{\-Print} () const 
+\item 
+\hypertarget{class_ti_xml_document_a7b1aea204fee266b70b9c105c8bf2ada}{virtual void \hyperlink{class_ti_xml_document_a7b1aea204fee266b70b9c105c8bf2ada}{\-Print} (\-F\-I\-L\-E $\ast$cfile, int depth=0) const }\label{class_ti_xml_document_a7b1aea204fee266b70b9c105c8bf2ada}
+
+\begin{DoxyCompactList}\small\item\em \-Print this \-Document to a \-F\-I\-L\-E stream. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_document_a735c23e318597b920c94eae77fa206de}{void {\bfseries \-Set\-Error} (int err, const char $\ast$error\-Location, \hyperlink{class_ti_xml_parsing_data}{\-Ti\-Xml\-Parsing\-Data} $\ast$prev\-Data, \-Ti\-Xml\-Encoding encoding)}\label{class_ti_xml_document_a735c23e318597b920c94eae77fa206de}
+
+\item 
+\hypertarget{class_ti_xml_document_a1dc977bde3e4fe85a8eb9d88a35ef5a4}{virtual const \hyperlink{class_ti_xml_document}{\-Ti\-Xml\-Document} $\ast$ \hyperlink{class_ti_xml_document_a1dc977bde3e4fe85a8eb9d88a35ef5a4}{\-To\-Document} () const }\label{class_ti_xml_document_a1dc977bde3e4fe85a8eb9d88a35ef5a4}
+
+\begin{DoxyCompactList}\small\item\em \-Cast to a more defined type. \-Will return null not of the requested type. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_document_a1025d942a1f328fd742d545e37efdd42}{virtual \hyperlink{class_ti_xml_document}{\-Ti\-Xml\-Document} $\ast$ \hyperlink{class_ti_xml_document_a1025d942a1f328fd742d545e37efdd42}{\-To\-Document} ()}\label{class_ti_xml_document_a1025d942a1f328fd742d545e37efdd42}
+
+\begin{DoxyCompactList}\small\item\em \-Cast to a more defined type. \-Will return null not of the requested type. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{class_ti_xml_document_a3daab2f472418ef66315750202f762ae}{\-Accept} (\hyperlink{class_ti_xml_visitor}{\-Ti\-Xml\-Visitor} $\ast$content) const 
+\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \hyperlink{class_ti_xml_node}{\-Ti\-Xml\-Node} $\ast$ \hyperlink{class_ti_xml_document_ac9e8f09b23454d953b32d1b65cd1409e}{\-Clone} () const 
+\end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\-Always the top level node. \-A document binds together all the \-X\-M\-L pieces. \-It can be saved, loaded, and printed to the screen. \-The 'value' of a document node is the xml file name. 
+
+\subsection{\-Member \-Function \-Documentation}
+\hypertarget{class_ti_xml_document_a3daab2f472418ef66315750202f762ae}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Accept@{\-Accept}}
+\index{\-Accept@{\-Accept}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Accept}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf \-Ti\-Xml\-Document\-::\-Accept} (
+\begin{DoxyParamCaption}
+\item[{{\bf \-Ti\-Xml\-Visitor} $\ast$}]{content}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{class_ti_xml_document_a3daab2f472418ef66315750202f762ae}
+\-Walk the \-X\-M\-L tree visiting this node and all of its children. 
+
+\-Implements \hyperlink{class_ti_xml_node_acc0f88b7462c6cb73809d410a4f5bb86}{\-Ti\-Xml\-Node}.
+
+\hypertarget{class_ti_xml_document_ac66b8c28db86363315712a3574e87c35}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Clear\-Error@{\-Clear\-Error}}
+\index{\-Clear\-Error@{\-Clear\-Error}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Clear\-Error}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Ti\-Xml\-Document\-::\-Clear\-Error} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}\label{class_ti_xml_document_ac66b8c28db86363315712a3574e87c35}
+\-If you have handled the error, it can be reset with this call. \-The error state is automatically cleared if you \-Parse a new \-X\-M\-L block. \hypertarget{class_ti_xml_document_ac9e8f09b23454d953b32d1b65cd1409e}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Clone@{\-Clone}}
+\index{\-Clone@{\-Clone}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Clone}]{\setlength{\rightskip}{0pt plus 5cm}{\bf \-Ti\-Xml\-Node} $\ast$ {\bf \-Ti\-Xml\-Document\-::\-Clone} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}protected, virtual\mbox{]}}}}\label{class_ti_xml_document_ac9e8f09b23454d953b32d1b65cd1409e}
+\-Create an exact duplicate of this node and return it. \-The memory must be deleted by the caller. 
+
+\-Implements \hyperlink{class_ti_xml_node_a4508cc3a2d7a98e96a54cc09c37a78a4}{\-Ti\-Xml\-Node}.
+
+\hypertarget{class_ti_xml_document_a6dfc01a6e5d58e56acd537dfd3bdeb29}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Error@{\-Error}}
+\index{\-Error@{\-Error}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Error}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf \-Ti\-Xml\-Document\-::\-Error} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}\label{class_ti_xml_document_a6dfc01a6e5d58e56acd537dfd3bdeb29}
+\-If an error occurs, \-Error will be set to true. \-Also,
+\begin{DoxyItemize}
+\item \-The \hyperlink{class_ti_xml_document_af96fc2f3f9ec6422782bfe916c9e778f}{\-Error\-Id()} will contain the integer identifier of the error (not generally useful)
+\item \-The \hyperlink{class_ti_xml_document_a9d0f689f6e09ea494ea547be8d79c25e}{\-Error\-Desc()} method will return the name of the error. (very useful)
+\item \-The \hyperlink{class_ti_xml_document_af30efc75e804aa2e92fb8be3a8cb676e}{\-Error\-Row()} and \hyperlink{class_ti_xml_document_aa90bc630ee5203c6109ca5fad3323649}{\-Error\-Col()} will return the location of the error (if known) 
+\end{DoxyItemize}\hypertarget{class_ti_xml_document_af96fc2f3f9ec6422782bfe916c9e778f}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Error\-Id@{\-Error\-Id}}
+\index{\-Error\-Id@{\-Error\-Id}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Error\-Id}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf \-Ti\-Xml\-Document\-::\-Error\-Id} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}\label{class_ti_xml_document_af96fc2f3f9ec6422782bfe916c9e778f}
+\-Generally, you probably want the error string ( \hyperlink{class_ti_xml_document_a9d0f689f6e09ea494ea547be8d79c25e}{\-Error\-Desc()} ). \-But if you prefer the \-Error\-Id, this function will fetch it. \hypertarget{class_ti_xml_document_af30efc75e804aa2e92fb8be3a8cb676e}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Error\-Row@{\-Error\-Row}}
+\index{\-Error\-Row@{\-Error\-Row}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Error\-Row}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf \-Ti\-Xml\-Document\-::\-Error\-Row} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}\label{class_ti_xml_document_af30efc75e804aa2e92fb8be3a8cb676e}
+\-Returns the location (if known) of the error. \-The first column is column 1, and the first row is row 1. \-A value of 0 means the row and column wasn't applicable (memory errors, for example, have no row/column) or the parser lost the error. (\-An error in the error reporting, in that case.)
+
+\begin{DoxySeeAlso}{\-See also}
+\hyperlink{class_ti_xml_document_a51dac56316f89b35bdb7d0d433ba988e}{\-Set\-Tab\-Size}, \hyperlink{class_ti_xml_base_a024bceb070188df92c2a8d8852dd0853}{\-Row}, \hyperlink{class_ti_xml_base_ab54bfb9b70fe6dd276e7b279cab7f003}{\-Column} 
+\end{DoxySeeAlso}
+\hypertarget{class_ti_xml_document_a4c852a889c02cf251117fd1d9fe1845f}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Load\-File@{\-Load\-File}}
+\index{\-Load\-File@{\-Load\-File}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Load\-File}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf \-Ti\-Xml\-Document\-::\-Load\-File} (
+\begin{DoxyParamCaption}
+\item[{\-Ti\-Xml\-Encoding}]{encoding = {\ttfamily \-T\-I\-X\-M\-L\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-N\-C\-O\-D\-I\-N\-G}}
+\end{DoxyParamCaption}
+)}}\label{class_ti_xml_document_a4c852a889c02cf251117fd1d9fe1845f}
+\-Load a file using the current document value. \-Returns true if successful. \-Will delete any existing document data before loading. \hypertarget{class_ti_xml_document_a41f6fe7200864d1dca663d230caf8db6}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Load\-File@{\-Load\-File}}
+\index{\-Load\-File@{\-Load\-File}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Load\-File}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf \-Ti\-Xml\-Document\-::\-Load\-File} (
+\begin{DoxyParamCaption}
+\item[{\-F\-I\-L\-E $\ast$}]{file, }
+\item[{\-Ti\-Xml\-Encoding}]{encoding = {\ttfamily \-T\-I\-X\-M\-L\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-N\-C\-O\-D\-I\-N\-G}}
+\end{DoxyParamCaption}
+)}}\label{class_ti_xml_document_a41f6fe7200864d1dca663d230caf8db6}
+\-Load a file using the given \-F\-I\-L\-E$\ast$. \-Returns true if successful. \-Note that this method doesn't stream -\/ the entire object pointed at by the \-F\-I\-L\-E$\ast$ will be interpreted as an \-X\-M\-L file. \-Tiny\-X\-M\-L doesn't stream in \-X\-M\-L from the current file location. \-Streaming may be added in the future. \hypertarget{class_ti_xml_document_a789ad2f06f93d52bdb5570b2f3670289}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Parse@{\-Parse}}
+\index{\-Parse@{\-Parse}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Parse}]{\setlength{\rightskip}{0pt plus 5cm}const char $\ast$ {\bf \-Ti\-Xml\-Document\-::\-Parse} (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{p, }
+\item[{{\bf \-Ti\-Xml\-Parsing\-Data} $\ast$}]{data = {\ttfamily 0}, }
+\item[{\-Ti\-Xml\-Encoding}]{encoding = {\ttfamily \-T\-I\-X\-M\-L\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-N\-C\-O\-D\-I\-N\-G}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{class_ti_xml_document_a789ad2f06f93d52bdb5570b2f3670289}
+\-Parse the given null terminated block of xml data. \-Passing in an encoding to this method (either \-T\-I\-X\-M\-L\-\_\-\-E\-N\-C\-O\-D\-I\-N\-G\-\_\-\-L\-E\-G\-A\-C\-Y or \-T\-I\-X\-M\-L\-\_\-\-E\-N\-C\-O\-D\-I\-N\-G\-\_\-\-U\-T\-F8 will force \-Tiny\-Xml to use that encoding, regardless of what \-Tiny\-Xml might otherwise try to detect. 
+
+\-Implements \hyperlink{class_ti_xml_base}{\-Ti\-Xml\-Base}.
+
+\hypertarget{class_ti_xml_document_af08389ec70ee9b2de7f800e206a18510}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Print@{\-Print}}
+\index{\-Print@{\-Print}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Print}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Ti\-Xml\-Document\-::\-Print} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}\label{class_ti_xml_document_af08389ec70ee9b2de7f800e206a18510}
+\-Write the document to standard out using formatted printing (\char`\"{}pretty print\char`\"{}). \hypertarget{class_ti_xml_document_ad09d17927f908f40efb406af2fb873be}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Root\-Element@{\-Root\-Element}}
+\index{\-Root\-Element@{\-Root\-Element}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Root\-Element}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf \-Ti\-Xml\-Element}$\ast$ {\bf \-Ti\-Xml\-Document\-::\-Root\-Element} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}\label{class_ti_xml_document_ad09d17927f908f40efb406af2fb873be}
+\-Get the root element -\/-\/ the only top level element -\/-\/ of the document. \-In well formed \-X\-M\-L, there should only be one. \-Tiny\-Xml is tolerant of multiple elements at the document level. \hypertarget{class_ti_xml_document_a51dac56316f89b35bdb7d0d433ba988e}{\index{\-Ti\-Xml\-Document@{\-Ti\-Xml\-Document}!\-Set\-Tab\-Size@{\-Set\-Tab\-Size}}
+\index{\-Set\-Tab\-Size@{\-Set\-Tab\-Size}!TiXmlDocument@{\-Ti\-Xml\-Document}}
+\subsubsection[{\-Set\-Tab\-Size}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-Ti\-Xml\-Document\-::\-Set\-Tab\-Size} (
+\begin{DoxyParamCaption}
+\item[{int}]{\-\_\-tabsize}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}\label{class_ti_xml_document_a51dac56316f89b35bdb7d0d433ba988e}
+\hyperlink{class_ti_xml_document_a51dac56316f89b35bdb7d0d433ba988e}{\-Set\-Tab\-Size()} allows the error reporting functions (\hyperlink{class_ti_xml_document_af30efc75e804aa2e92fb8be3a8cb676e}{\-Error\-Row()} and \hyperlink{class_ti_xml_document_aa90bc630ee5203c6109ca5fad3323649}{\-Error\-Col()}) to report the correct values for row and column. \-It does not change the output or input in any way.
+
+\-By calling this method, with a tab size greater than 0, the row and column of each node and attribute is stored when the file is loaded. \-Very useful for tracking the \-D\-O\-M back in to the source file.
+
+\-The tab size is required for calculating the location of nodes. \-If not set, the default of 4 is used. \-The tabsize is set per document. \-Setting the tabsize to 0 disables row/column tracking.
+
+\-Note that row and column tracking is not supported when using operator$>$$>$.
+
+\-The tab size needs to be enabled before the parse or load. \-Correct usage\-: \begin{DoxyVerb}
+		TiXmlDocument doc;
+		doc.SetTabSize( 8 );
+		doc.Load( "myfile.xml" );
+		\end{DoxyVerb}
+
+
+\begin{DoxySeeAlso}{\-See also}
+\hyperlink{class_ti_xml_base_a024bceb070188df92c2a8d8852dd0853}{\-Row}, \hyperlink{class_ti_xml_base_ab54bfb9b70fe6dd276e7b279cab7f003}{\-Column} 
+\end{DoxySeeAlso}
+
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+tinyxml/tinyxml.\-h\item 
+tinyxml/tinyxml.\-cpp\item 
+tinyxml/tinyxmlparser.\-cpp\end{DoxyCompactItemize}

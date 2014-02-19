@@ -1,0 +1,74 @@
+\hypertarget{class_extended_k_f}{\section{\-Extended\-K\-F \-Class \-Reference}
+\label{class_extended_k_f}\index{\-Extended\-K\-F@{\-Extended\-K\-F}}
+}
+
+
+\-Inheritance diagram for \-Extended\-K\-F\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{class_extended_k_f__inherit__graph}
+\end{center}
+\end{figure}
+
+
+\-Collaboration diagram for \-Extended\-K\-F\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{class_extended_k_f__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_extended_k_f_a14edd0da9fb8029c87fb0206490e10b3}{typedef \*
+\-Motion\-Model\-Method\-::\-Control\-Type {\bfseries \-Control\-Type}}\label{class_extended_k_f_a14edd0da9fb8029c87fb0206490e10b3}
+
+\item 
+\hypertarget{class_extended_k_f_a577b350233488edad44145be188b8838}{typedef \*
+\hyperlink{class_s_e2_belief_space}{\-Motion\-Model\-Method\-::\-Space\-Type} {\bfseries \-Space\-Type}}\label{class_extended_k_f_a577b350233488edad44145be188b8838}
+
+\item 
+\hypertarget{class_extended_k_f_a390468694f87826805dc6b97e37da8ea}{typedef \*
+\hyperlink{class_s_e2_belief_space_1_1_state_type}{\-Motion\-Model\-Method\-::\-State\-Type} {\bfseries \-State\-Type}}\label{class_extended_k_f_a390468694f87826805dc6b97e37da8ea}
+
+\item 
+\hypertarget{class_extended_k_f_a77ebe1a32d7ec95c8cda310ad4623e8e}{typedef \*
+\-Observation\-Model\-Method\-::\-Observation\-Type {\bfseries \-Observation\-Type}}\label{class_extended_k_f_a77ebe1a32d7ec95c8cda310ad4623e8e}
+
+\item 
+\hypertarget{class_extended_k_f_a0c9bb13d2de00dd93f574d6387840441}{typedef \*
+\-Motion\-Model\-Method\-::\-Motion\-Model\-Pointer {\bfseries \-Motion\-Model\-Pointer}}\label{class_extended_k_f_a0c9bb13d2de00dd93f574d6387840441}
+
+\item 
+\hypertarget{class_extended_k_f_aa60b08c63627ba5ddedd2a51b573718d}{typedef \*
+\-Observation\-Model\-Method\-::\-Observation\-Model\-Pointer {\bfseries \-Observation\-Model\-Pointer}}\label{class_extended_k_f_aa60b08c63627ba5ddedd2a51b573718d}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_extended_k_f_a4fd20fe66ee89ad9c4103557afc9836c}{{\bfseries \-Extended\-K\-F} (firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_extended_k_f_a4fd20fe66ee89ad9c4103557afc9836c}
+
+\item 
+\hypertarget{class_extended_k_f_a170d462f09601f768565093d0b3de1e9}{void {\bfseries \-Predict} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$predicted\-State, const bool is\-Construction=false)}\label{class_extended_k_f_a170d462f09601f768565093d0b3de1e9}
+
+\item 
+\hypertarget{class_extended_k_f_a45f05b17a5fa6ee44988d18839c2ae33}{void {\bfseries \-Update} (const ompl\-::base\-::\-State $\ast$belief, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$updated\-State, const bool is\-Construction=false)}\label{class_extended_k_f_a45f05b17a5fa6ee44988d18839c2ae33}
+
+\item 
+\hypertarget{class_extended_k_f_a54925e8fbd7109f4d72cfbc8e59d420d}{void {\bfseries \-Evolve} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Pred, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Update, ompl\-::base\-::\-State $\ast$evolved\-State, const bool is\-Construction=false)}\label{class_extended_k_f_a54925e8fbd7109f4d72cfbc8e59d420d}
+
+\item 
+\hypertarget{class_extended_k_f_a2aaf37aae5d4105c384f88b6c948e4cb}{arma\-::mat {\bfseries compute\-Stationary\-Covariance} (const \hyperlink{class_linear_system}{\-Linear\-System} \&ls)}\label{class_extended_k_f_a2aaf37aae5d4105c384f88b6c948e4cb}
+
+\end{DoxyCompactItemize}
+
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Filters/\-Extended\-K\-F.\-h\item 
+src/\-Filters/\-Extended\-K\-F.\-cpp\end{DoxyCompactItemize}

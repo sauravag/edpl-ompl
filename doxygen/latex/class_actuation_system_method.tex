@@ -1,0 +1,88 @@
+\hypertarget{class_actuation_system_method}{\section{\-Actuation\-System\-Method \-Class \-Reference}
+\label{class_actuation_system_method}\index{\-Actuation\-System\-Method@{\-Actuation\-System\-Method}}
+}
+
+
+\-Inheritance diagram for \-Actuation\-System\-Method\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{class_actuation_system_method__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_actuation_system_method_ab79e392d3f9966254b2e210b50c185c5}{typedef \*
+\hyperlink{class_s_e2_belief_space}{\-Motion\-Model\-Method\-::\-Space\-Type} {\bfseries \-Space\-Type}}\label{class_actuation_system_method_ab79e392d3f9966254b2e210b50c185c5}
+
+\item 
+\hypertarget{class_actuation_system_method_a9d369d1bb1183b3d312ad6ea637d247d}{typedef \*
+\hyperlink{class_s_e2_belief_space_1_1_state_type}{\-Motion\-Model\-Method\-::\-State\-Type} {\bfseries \-State\-Type}}\label{class_actuation_system_method_a9d369d1bb1183b3d312ad6ea637d247d}
+
+\item 
+\hypertarget{class_actuation_system_method_afa097c36486db5da11865e8b4d19a019}{typedef \*
+\-Motion\-Model\-Method\-::\-Control\-Type {\bfseries \-Control\-Type}}\label{class_actuation_system_method_afa097c36486db5da11865e8b4d19a019}
+
+\item 
+\hypertarget{class_actuation_system_method_abe58ca32071c91cf6ed98250c23c6891}{typedef \*
+\-Observation\-Model\-Method\-::\-Observation\-Type {\bfseries \-Observation\-Type}}\label{class_actuation_system_method_abe58ca32071c91cf6ed98250c23c6891}
+
+\item 
+\hypertarget{class_actuation_system_method_a8c0f4c72ee875c8a1de4e2f5da3f1921}{typedef boost\-::shared\-\_\-ptr\*
+$<$ \hyperlink{class_actuation_system_method}{\-Actuation\-System\-Method} $>$ {\bfseries \-Actuation\-System\-Pointer}}\label{class_actuation_system_method_a8c0f4c72ee875c8a1de4e2f5da3f1921}
+
+\item 
+\hypertarget{class_actuation_system_method_adcac81ce42938d3c0532b5d995168503}{typedef \*
+\-Observation\-Model\-Method\-::\-Observation\-Model\-Pointer {\bfseries \-Observation\-Model\-Pointer}}\label{class_actuation_system_method_adcac81ce42938d3c0532b5d995168503}
+
+\item 
+\hypertarget{class_actuation_system_method_a9c74f0393051387d16387c63ca78834a}{typedef \*
+\-Motion\-Model\-Method\-::\-Motion\-Model\-Pointer {\bfseries \-Motion\-Model\-Pointer}}\label{class_actuation_system_method_a9c74f0393051387d16387c63ca78834a}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_actuation_system_method_a140d1929d9ba39eeda45233ede7291f5}{{\bfseries \-Actuation\-System\-Method} (\-Motion\-Model\-Pointer mm, \-Observation\-Model\-Pointer om)}\label{class_actuation_system_method_a140d1929d9ba39eeda45233ede7291f5}
+
+\item 
+\hypertarget{class_actuation_system_method_a8380694aec22c19388bc463af9d0c12d}{virtual void {\bfseries apply\-Control} (\-Control\-Type \&u)=0}\label{class_actuation_system_method_a8380694aec22c19388bc463af9d0c12d}
+
+\item 
+\hypertarget{class_actuation_system_method_a68d37d0f01992b30a014adbd971d7d6f}{virtual \-Observation\-Type {\bfseries get\-Observation} ()=0}\label{class_actuation_system_method_a68d37d0f01992b30a014adbd971d7d6f}
+
+\item 
+\hypertarget{class_actuation_system_method_aac1d548e63d19bde0dcf6b44bf3b644f}{virtual bool {\bfseries check\-Collision} ()=0}\label{class_actuation_system_method_aac1d548e63d19bde0dcf6b44bf3b644f}
+
+\item 
+\hypertarget{class_actuation_system_method_a96352d97bd055a0cc33871f9afde9456}{virtual void {\bfseries set\-Belief} (const ompl\-::base\-::\-State $\ast$state)=0}\label{class_actuation_system_method_a96352d97bd055a0cc33871f9afde9456}
+
+\item 
+\hypertarget{class_actuation_system_method_a85738bc14a387b5c04c266b046768c34}{virtual void {\bfseries set\-True\-State} (const ompl\-::base\-::\-State $\ast$state)=0}\label{class_actuation_system_method_a85738bc14a387b5c04c266b046768c34}
+
+\item 
+\hypertarget{class_actuation_system_method_a20ef48b160e9072fd28aadc992fd66d5}{virtual ompl\-::base\-::\-State $\ast$ {\bfseries get\-True\-State} ()=0}\label{class_actuation_system_method_a20ef48b160e9072fd28aadc992fd66d5}
+
+\item 
+\hypertarget{class_actuation_system_method_a75449aaf949ef6fbe19b3ef0d2a60d27}{virtual \-Motion\-Model\-Pointer {\bfseries get\-Motion\-Model} ()=0}\label{class_actuation_system_method_a75449aaf949ef6fbe19b3ef0d2a60d27}
+
+\item 
+\hypertarget{class_actuation_system_method_a229e5c520570c541218640e5ff25ae5c}{virtual \-Observation\-Model\-Pointer {\bfseries get\-Observation\-Model} ()=0}\label{class_actuation_system_method_a229e5c520570c541218640e5ff25ae5c}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_actuation_system_method_a64ced37059fb1bb538f9b2a26ea018f4}{\-Motion\-Model\-Pointer {\bfseries motion\-Model\-\_\-}}\label{class_actuation_system_method_a64ced37059fb1bb538f9b2a26ea018f4}
+
+\item 
+\hypertarget{class_actuation_system_method_a30d8ec99ae45fd0c3233b85e9ef4093d}{\-Observation\-Model\-Pointer {\bfseries observation\-Model\-\_\-}}\label{class_actuation_system_method_a30d8ec99ae45fd0c3233b85e9ef4093d}
+
+\end{DoxyCompactItemize}
+
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Actuation\-Systems/\-Actuation\-System\-Method.\-h\end{DoxyCompactItemize}

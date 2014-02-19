@@ -1,0 +1,71 @@
+\hypertarget{class_unicycle_motion_model}{\section{\-Unicycle\-Motion\-Model \-Class \-Reference}
+\label{class_unicycle_motion_model}\index{\-Unicycle\-Motion\-Model@{\-Unicycle\-Motion\-Model}}
+}
+
+
+\-Inheritance diagram for \-Unicycle\-Motion\-Model\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{class_unicycle_motion_model__inherit__graph}
+\end{center}
+\end{figure}
+
+
+\-Collaboration diagram for \-Unicycle\-Motion\-Model\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{class_unicycle_motion_model__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_unicycle_motion_model_add1e93839ad31a6b054551b31c6747ea}{typedef \*
+\-Motion\-Model\-Method\-::\-Control\-Type {\bfseries \-Control\-Type}}\label{class_unicycle_motion_model_add1e93839ad31a6b054551b31c6747ea}
+
+\item 
+\hypertarget{class_unicycle_motion_model_a08ee5aeadfc71eaa00720bd56af71dfd}{typedef \*
+\-Motion\-Model\-Method\-::\-Noise\-Type {\bfseries \-Noise\-Type}}\label{class_unicycle_motion_model_a08ee5aeadfc71eaa00720bd56af71dfd}
+
+\item 
+\hypertarget{class_unicycle_motion_model_aa7338364013e6001f926aa2a77f41df6}{typedef \*
+\-Motion\-Model\-Method\-::\-Jacobian\-Type {\bfseries \-Jacobian\-Type}}\label{class_unicycle_motion_model_aa7338364013e6001f926aa2a77f41df6}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_unicycle_motion_model_ab88a5c1f2bb7be9770dd6dd578418c39}{{\bfseries \-Unicycle\-Motion\-Model} (ompl\-::control\-::\-Space\-Information\-Ptr si, const char $\ast$path\-To\-Setup\-File)}\label{class_unicycle_motion_model_ab88a5c1f2bb7be9770dd6dd578418c39}
+
+\item 
+\hypertarget{class_unicycle_motion_model_a7d78a6e7de4ad59dbd8aa0e6fd338ca7}{void {\bfseries \-Evolve} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const \-Noise\-Type \&w, ompl\-::base\-::\-State $\ast$result)}\label{class_unicycle_motion_model_a7d78a6e7de4ad59dbd8aa0e6fd338ca7}
+
+\item 
+\hypertarget{class_unicycle_motion_model_adf6f10302c29b5a196628af789e80739}{void {\bfseries generate\-Open\-Loop\-Controls} (const ompl\-::base\-::\-State $\ast$start\-State, const ompl\-::base\-::\-State $\ast$end\-State, std\-::vector$<$ ompl\-::control\-::\-Control $\ast$ $>$ \&open\-Loop\-Controls)}\label{class_unicycle_motion_model_adf6f10302c29b5a196628af789e80739}
+
+\item 
+\hypertarget{class_unicycle_motion_model_aff0d7239670e191b7d6ac518952b0428}{\-Noise\-Type {\bfseries generate\-Noise} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control)}\label{class_unicycle_motion_model_aff0d7239670e191b7d6ac518952b0428}
+
+\item 
+\hypertarget{class_unicycle_motion_model_adb849fef38055401851adf4e87e8ec23}{\-Jacobian\-Type {\bfseries get\-State\-Jacobian} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const \-Noise\-Type \&w)}\label{class_unicycle_motion_model_adb849fef38055401851adf4e87e8ec23}
+
+\item 
+\hypertarget{class_unicycle_motion_model_a422cbf49ce1b509e7f031008483bd6ff}{\-Jacobian\-Type {\bfseries get\-Control\-Jacobian} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const \-Noise\-Type \&w)}\label{class_unicycle_motion_model_a422cbf49ce1b509e7f031008483bd6ff}
+
+\item 
+\hypertarget{class_unicycle_motion_model_a62aa73b58447613c0745dab9453760b7}{\-Jacobian\-Type {\bfseries get\-Noise\-Jacobian} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const \-Noise\-Type \&w)}\label{class_unicycle_motion_model_a62aa73b58447613c0745dab9453760b7}
+
+\item 
+\hypertarget{class_unicycle_motion_model_a1ae47461abed522cc1d611a1f60b6f7c}{arma\-::mat {\bfseries process\-Noise\-Covariance} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control)}\label{class_unicycle_motion_model_a1ae47461abed522cc1d611a1f60b6f7c}
+
+\end{DoxyCompactItemize}
+
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Motion\-Models/\-Unicycle\-Motion\-Model.\-h\item 
+src/\-Motion\-Models/\-Unicycle\-Motion\-Model.\-cpp\end{DoxyCompactItemize}

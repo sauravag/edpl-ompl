@@ -1,0 +1,105 @@
+\hypertarget{class_controller}{\section{\-Controller$<$ \-Separated\-Controller\-Type, \-Filter\-Type $>$ \-Class \-Template \-Reference}
+\label{class_controller}\index{\-Controller$<$ Separated\-Controller\-Type, Filter\-Type $>$@{\-Controller$<$ Separated\-Controller\-Type, Filter\-Type $>$}}
+}
+\subsection*{\-Public \-Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_controller_aa08894881f64205d60cf7569370af8e1}{typedef \*
+\hyperlink{class_s_e2_belief_space}{\-Motion\-Model\-Method\-::\-Space\-Type} {\bfseries \-Space\-Type}}\label{class_controller_aa08894881f64205d60cf7569370af8e1}
+
+\item 
+\hypertarget{class_controller_a8fc267f97b0a2a3e1c2b97d791805b5c}{typedef \*
+\hyperlink{class_s_e2_belief_space_1_1_state_type}{\-Motion\-Model\-Method\-::\-State\-Type} {\bfseries \-State\-Type}}\label{class_controller_a8fc267f97b0a2a3e1c2b97d791805b5c}
+
+\item 
+\hypertarget{class_controller_a0ae807c4f455600c8ca827b816bbd40d}{typedef \*
+firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr {\bfseries \-Space\-Information\-Ptr}}\label{class_controller_a0ae807c4f455600c8ca827b816bbd40d}
+
+\item 
+\hypertarget{class_controller_ab388284a58474044cc503e876cf0bc7f}{typedef \*
+\-Motion\-Model\-Method\-::\-Control\-Type {\bfseries \-Control\-Type}}\label{class_controller_ab388284a58474044cc503e876cf0bc7f}
+
+\item 
+\hypertarget{class_controller_a734aecb1a1538fb2154f238796b26d0d}{typedef \*
+\-Observation\-Model\-Method\-::\-Observation\-Type {\bfseries \-Observation\-Type}}\label{class_controller_a734aecb1a1538fb2154f238796b26d0d}
+
+\item 
+\hypertarget{class_controller_a5b6a5e6d71e96c200e57a52542a4a493}{typedef \*
+\-Motion\-Model\-Method\-::\-Motion\-Model\-Pointer {\bfseries \-Motion\-Model\-Pointer}}\label{class_controller_a5b6a5e6d71e96c200e57a52542a4a493}
+
+\item 
+\hypertarget{class_controller_a3c4329f9c227302f331c3c2b78cda5d7}{typedef \*
+\-Observation\-Model\-Method\-::\-Observation\-Model\-Pointer {\bfseries \-Observation\-Model\-Pointer}}\label{class_controller_a3c4329f9c227302f331c3c2b78cda5d7}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_controller_a50a65edd2cf9fcce0cca465cbc3d527d}{{\bfseries \-Controller} (const ompl\-::base\-::\-State $\ast$goal, const std\-::vector$<$ ompl\-::base\-::\-State $\ast$ $>$ \&nominal\-Xs, const std\-::vector$<$ ompl\-::control\-::\-Control $\ast$ $>$ \&nominal\-Us, const firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_controller_a50a65edd2cf9fcce0cca465cbc3d527d}
+
+\item 
+bool \hyperlink{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\-Execute} (const ompl\-::base\-::\-State $\ast$start\-State, ompl\-::base\-::\-State $\ast$end\-State, ompl\-::base\-::\-Cost \&execution\-Cost, bool construction\-Mode=true)
+\item 
+\hypertarget{class_controller_aba227cad46f73fab5fcf37b41cae71a9}{ompl\-::base\-::\-State $\ast$ {\bfseries \-Stabilize} (const ompl\-::base\-::\-State $\ast$start\-State)}\label{class_controller_aba227cad46f73fab5fcf37b41cae71a9}
+
+\item 
+\hypertarget{class_controller_ab80efffa3b03aa4d1d10c0bf82675201}{bool {\bfseries is\-Terminated} (const ompl\-::base\-::\-State $\ast$state, const size\-\_\-t t)}\label{class_controller_ab80efffa3b03aa4d1d10c0bf82675201}
+
+\item 
+ompl\-::base\-::\-State $\ast$ \hyperlink{class_controller_ad7c50856efc6fa7855c7cad4c9bb2352}{\-Evolve} (const ompl\-::base\-::\-State $\ast$state, size\-\_\-t t, bool is\-Construction\-Mode)
+\item 
+\hypertarget{class_controller_a848b1e5a3dc6d36c3ede121b7461d896}{ompl\-::base\-::\-State $\ast$ {\bfseries get\-Goal} ()}\label{class_controller_a848b1e5a3dc6d36c3ede121b7461d896}
+
+\item 
+\hypertarget{class_controller_ac0b9c339df7157c73d61b7064f88483c}{void {\bfseries set\-Space\-Information} (\-Space\-Information\-Ptr si)}\label{class_controller_ac0b9c339df7157c73d61b7064f88483c}
+
+\item 
+\hypertarget{class_controller_acd39b9995176be2ac40b286c0cdaeabd}{bool {\bfseries is\-Valid} ()}\label{class_controller_acd39b9995176be2ac40b286c0cdaeabd}
+
+\item 
+\hypertarget{class_controller_a2aa89a4cd76ba7fb6ad717d608b8c355}{size\-\_\-t {\bfseries \-Length} ()}\label{class_controller_a2aa89a4cd76ba7fb6ad717d608b8c355}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Static \-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_controller_a665b0a9cab38c11e575681944e2c8d8a}{static void {\bfseries set\-Node\-Reached\-Angle} (double angle)}\label{class_controller_a665b0a9cab38c11e575681944e2c8d8a}
+
+\item 
+\hypertarget{class_controller_a5d394a75a6d1cf325fda099b23c91a2f}{static void {\bfseries set\-Node\-Reached\-Distance} (double d)}\label{class_controller_a5d394a75a6d1cf325fda099b23c91a2f}
+
+\item 
+\hypertarget{class_controller_a2e27a2fbd5d1c83d918e05da91302863}{static void {\bfseries set\-Max\-Tries} (double maxtries)}\label{class_controller_a2e27a2fbd5d1c83d918e05da91302863}
+
+\end{DoxyCompactItemize}
+\subsubsection*{template$<$class \-Separated\-Controller\-Type, class \-Filter\-Type$>$ class Controller$<$ Separated\-Controller\-Type, Filter\-Type $>$}
+
+
+
+\subsection{\-Member \-Function \-Documentation}
+\hypertarget{class_controller_ad7c50856efc6fa7855c7cad4c9bb2352}{\index{\-Controller@{\-Controller}!\-Evolve@{\-Evolve}}
+\index{\-Evolve@{\-Evolve}!Controller@{\-Controller}}
+\subsubsection[{\-Evolve}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Separated\-Controller\-Type , class Filter\-Type $>$ ompl\-::base\-::\-State $\ast$ {\bf \-Controller}$<$ \-Separated\-Controller\-Type, \-Filter\-Type $>$\-::{\bf \-Evolve} (
+\begin{DoxyParamCaption}
+\item[{const ompl\-::base\-::\-State $\ast$}]{state, }
+\item[{size\-\_\-t}]{t, }
+\item[{bool}]{is\-Construction\-Mode}
+\end{DoxyParamCaption}
+)}}\label{class_controller_ad7c50856efc6fa7855c7cad4c9bb2352}
+if(!is\-Construction\-Mode) \{ for(int i=0; i$<$z.\-n\-\_\-rows/singleobservationdim; i++) \{ int marker\-I\-D = z\mbox{[}i$\ast$singleobservationdim\mbox{]}; cout$<$$<$\char`\"{}\-Checking if marker I\-D \-:\char`\"{} $<$$<$marker\-I\-D $<$$<$\char`\"{} Is an obstacle marker\char`\"{}$<$$<$endl; if(this-\/$>$\-Get\-M\-P\-Problem()-\/$>$\-Is\-Obstacle\-Marker(marker\-I\-D)) \{ add obstacle to environment if it doesn't already exist flag that you have observed an obstacle marker cout$<$$<$\char`\"{}\-Marker I\-D \-:\char`\"{}$<$$<$marker\-I\-D$<$$<$\char`\"{} is an obstacle\char`\"{}$<$$<$endl; if(this-\/$>$\-Get\-M\-P\-Problem()-\/$>$\-Add\-Obstacle(marker\-I\-D)) m\-\_\-obstacle\-Marker\-Observed = true; \} \} \}\hypertarget{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\index{\-Controller@{\-Controller}!\-Execute@{\-Execute}}
+\index{\-Execute@{\-Execute}!Controller@{\-Controller}}
+\subsubsection[{\-Execute}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Separated\-Controller\-Type , class Filter\-Type $>$ bool {\bf \-Controller}$<$ \-Separated\-Controller\-Type, \-Filter\-Type $>$\-::{\bf \-Execute} (
+\begin{DoxyParamCaption}
+\item[{const ompl\-::base\-::\-State $\ast$}]{start\-State, }
+\item[{ompl\-::base\-::\-State $\ast$}]{end\-State, }
+\item[{ompl\-::base\-::\-Cost \&}]{execution\-Cost, }
+\item[{bool}]{construction\-Mode = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}}\label{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}
+\-H\-O\-W \-T\-O \-S\-E\-T \-I\-N\-I\-T\-A\-L \-V\-A\-L\-U\-E \-O\-F \-C\-O\-S\-T cost = 1 -\/ $>$ for time based only if time per execution is \char`\"{}1\char`\"{} cost = 0.\-01 -\/$>$ for covariance based
+
+\-Increment cost by\-: -\/$>$ 0.\-01 for time based -\/$>$ trace(\-Covariance) for \hyperlink{class_f_i_r_m}{\-F\-I\-R\-M}
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Controllers/\-Controller.\-h\end{DoxyCompactItemize}

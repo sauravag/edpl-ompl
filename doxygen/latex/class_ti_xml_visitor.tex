@@ -1,0 +1,65 @@
+\hypertarget{class_ti_xml_visitor}{\section{\-Ti\-Xml\-Visitor \-Class \-Reference}
+\label{class_ti_xml_visitor}\index{\-Ti\-Xml\-Visitor@{\-Ti\-Xml\-Visitor}}
+}
+
+
+{\ttfamily \#include $<$tinyxml.\-h$>$}
+
+
+
+\-Inheritance diagram for \-Ti\-Xml\-Visitor\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=150pt]{class_ti_xml_visitor__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_ti_xml_visitor_a07baecb52dd7d8716ae2a48ad0956ee0}{virtual bool \hyperlink{class_ti_xml_visitor_a07baecb52dd7d8716ae2a48ad0956ee0}{\-Visit\-Enter} (const \hyperlink{class_ti_xml_document}{\-Ti\-Xml\-Document} \&)}\label{class_ti_xml_visitor_a07baecb52dd7d8716ae2a48ad0956ee0}
+
+\begin{DoxyCompactList}\small\item\em \-Visit a document. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_visitor_aa0ade4f27087447e93974e975c3246ad}{virtual bool \hyperlink{class_ti_xml_visitor_aa0ade4f27087447e93974e975c3246ad}{\-Visit\-Exit} (const \hyperlink{class_ti_xml_document}{\-Ti\-Xml\-Document} \&)}\label{class_ti_xml_visitor_aa0ade4f27087447e93974e975c3246ad}
+
+\begin{DoxyCompactList}\small\item\em \-Visit a document. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_visitor_af6c6178ffa517bbdba95d70490875fff}{virtual bool \hyperlink{class_ti_xml_visitor_af6c6178ffa517bbdba95d70490875fff}{\-Visit\-Enter} (const \hyperlink{class_ti_xml_element}{\-Ti\-Xml\-Element} \&, const \hyperlink{class_ti_xml_attribute}{\-Ti\-Xml\-Attribute} $\ast$)}\label{class_ti_xml_visitor_af6c6178ffa517bbdba95d70490875fff}
+
+\begin{DoxyCompactList}\small\item\em \-Visit an element. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_visitor_aec2b1f8116226d52f3a1b95dafd3a32c}{virtual bool \hyperlink{class_ti_xml_visitor_aec2b1f8116226d52f3a1b95dafd3a32c}{\-Visit\-Exit} (const \hyperlink{class_ti_xml_element}{\-Ti\-Xml\-Element} \&)}\label{class_ti_xml_visitor_aec2b1f8116226d52f3a1b95dafd3a32c}
+
+\begin{DoxyCompactList}\small\item\em \-Visit an element. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_visitor_afad71c71ce6473fb9b4b64cd92de4a19}{virtual bool \hyperlink{class_ti_xml_visitor_afad71c71ce6473fb9b4b64cd92de4a19}{\-Visit} (const \hyperlink{class_ti_xml_declaration}{\-Ti\-Xml\-Declaration} \&)}\label{class_ti_xml_visitor_afad71c71ce6473fb9b4b64cd92de4a19}
+
+\begin{DoxyCompactList}\small\item\em \-Visit a declaration. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_visitor_a399b8ebca5cd14664974a32d2ce029e5}{virtual bool \hyperlink{class_ti_xml_visitor_a399b8ebca5cd14664974a32d2ce029e5}{\-Visit} (const \hyperlink{class_ti_xml_text}{\-Ti\-Xml\-Text} \&)}\label{class_ti_xml_visitor_a399b8ebca5cd14664974a32d2ce029e5}
+
+\begin{DoxyCompactList}\small\item\em \-Visit a text node. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_visitor_a53a60e7a528627b31af3161972cc7fa2}{virtual bool \hyperlink{class_ti_xml_visitor_a53a60e7a528627b31af3161972cc7fa2}{\-Visit} (const \hyperlink{class_ti_xml_comment}{\-Ti\-Xml\-Comment} \&)}\label{class_ti_xml_visitor_a53a60e7a528627b31af3161972cc7fa2}
+
+\begin{DoxyCompactList}\small\item\em \-Visit a comment node. \end{DoxyCompactList}\item 
+\hypertarget{class_ti_xml_visitor_a7e284d607d275c51dac1adb58159ce28}{virtual bool \hyperlink{class_ti_xml_visitor_a7e284d607d275c51dac1adb58159ce28}{\-Visit} (const \hyperlink{class_ti_xml_unknown}{\-Ti\-Xml\-Unknown} \&)}\label{class_ti_xml_visitor_a7e284d607d275c51dac1adb58159ce28}
+
+\begin{DoxyCompactList}\small\item\em \-Visit an unknown node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\-Implements the interface to the \char`\"{}\-Visitor pattern\char`\"{} (see the \-Accept() method.) \-If you call the \-Accept() method, it requires being passed a \hyperlink{class_ti_xml_visitor}{\-Ti\-Xml\-Visitor} class to handle callbacks. \-For nodes that contain other nodes (\-Document, \-Element) you will get called with a \-Visit\-Enter/\-Visit\-Exit pair. \-Nodes that are always leaves are simply called with \hyperlink{class_ti_xml_visitor_afad71c71ce6473fb9b4b64cd92de4a19}{\-Visit()}.
+
+\-If you return 'true' from a \-Visit method, recursive parsing will continue. \-If you return false, {\bfseries no children of this node or its sibilings} will be \-Visited.
+
+\-All flavors of \-Visit methods have a default implementation that returns 'true' (continue visiting). \-You need to only override methods that are interesting to you.
+
+\-Generally \-Accept() is called on the \hyperlink{class_ti_xml_document}{\-Ti\-Xml\-Document}, although all nodes suppert \-Visiting.
+
+\-You should never change the document from a callback.
+
+\begin{DoxySeeAlso}{\-See also}
+\hyperlink{class_ti_xml_node_acc0f88b7462c6cb73809d410a4f5bb86}{\-Ti\-Xml\-Node\-::\-Accept()} 
+\end{DoxySeeAlso}
+
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+tinyxml/tinyxml.\-h\end{DoxyCompactItemize}

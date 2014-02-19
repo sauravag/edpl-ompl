@@ -1,0 +1,93 @@
+\hypertarget{class_observation_model_method}{\section{\-Observation\-Model\-Method \-Class \-Reference}
+\label{class_observation_model_method}\index{\-Observation\-Model\-Method@{\-Observation\-Model\-Method}}
+}
+
+
+\-Inheritance diagram for \-Observation\-Model\-Method\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{class_observation_model_method__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{\-Public \-Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_observation_model_method_af5a5953c0f7b82691d36f353ed08aa03}{typedef arma\-::colvec {\bfseries \-Observation\-Type}}\label{class_observation_model_method_af5a5953c0f7b82691d36f353ed08aa03}
+
+\item 
+\hypertarget{class_observation_model_method_a380b1d02a13fa85f2a4d8610b648d446}{typedef arma\-::colvec {\bfseries \-Noise\-Type}}\label{class_observation_model_method_a380b1d02a13fa85f2a4d8610b648d446}
+
+\item 
+\hypertarget{class_observation_model_method_a1c83d0c9794c0316818c0ee87fba4a24}{typedef arma\-::mat {\bfseries \-Obs\-To\-State\-Jacobian\-Type}}\label{class_observation_model_method_a1c83d0c9794c0316818c0ee87fba4a24}
+
+\item 
+\hypertarget{class_observation_model_method_ac1a379fcac7d5d5d67391362eb91c252}{typedef arma\-::mat {\bfseries \-Obs\-To\-Noise\-Jacobian\-Type}}\label{class_observation_model_method_ac1a379fcac7d5d5d67391362eb91c252}
+
+\item 
+\hypertarget{class_observation_model_method_ad119ee691daccc6a1410de7a18a93b7f}{typedef boost\-::shared\-\_\-ptr\*
+$<$ \hyperlink{class_observation_model_method}{\-Observation\-Model\-Method} $>$ {\bfseries \-Observation\-Model\-Pointer}}\label{class_observation_model_method_ad119ee691daccc6a1410de7a18a93b7f}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_observation_model_method_ace82963106629ded581fd8b43c4a0a6b}{{\bfseries \-Observation\-Model\-Method} (int n\-Dim=0)}\label{class_observation_model_method_ace82963106629ded581fd8b43c4a0a6b}
+
+\item 
+virtual \-Observation\-Type \hyperlink{class_observation_model_method_af1a30aad975576ae8f16042a8ee8276b}{get\-Observation} (const ompl\-::base\-::\-State $\ast$state, bool is\-Simulation)=0
+\item 
+\hypertarget{class_observation_model_method_a9d10ee1be836ef4d406c85b35efd72d8}{virtual \-Observation\-Type {\bfseries get\-Observation\-Prediction} (const ompl\-::base\-::\-State $\ast$state, const \-Observation\-Type \&\-Zg)=0}\label{class_observation_model_method_a9d10ee1be836ef4d406c85b35efd72d8}
+
+\item 
+\hypertarget{class_observation_model_method_acd2e16185fbfd1c25b22b77e52acc936}{virtual \-Obs\-To\-State\-Jacobian\-Type {\bfseries get\-Observation\-Jacobian} (const ompl\-::base\-::\-State $\ast$state, const \-Noise\-Type \&v, const \-Observation\-Type \&z)=0}\label{class_observation_model_method_acd2e16185fbfd1c25b22b77e52acc936}
+
+\item 
+\hypertarget{class_observation_model_method_af53dcf93c40fd8589e84a3cfe48a0c7e}{virtual \-Obs\-To\-Noise\-Jacobian\-Type {\bfseries get\-Noise\-Jacobian} (const ompl\-::base\-::\-State $\ast$state, const \-Noise\-Type \&v, const \-Observation\-Type \&z)=0}\label{class_observation_model_method_af53dcf93c40fd8589e84a3cfe48a0c7e}
+
+\item 
+\hypertarget{class_observation_model_method_a359c3b1473a12dcbaa73f7e63d7cf202}{virtual \-Observation\-Type {\bfseries compute\-Innovation} (const ompl\-::base\-::\-State $\ast$predicted\-State, const \-Observation\-Type \&\-Zg)=0}\label{class_observation_model_method_a359c3b1473a12dcbaa73f7e63d7cf202}
+
+\item 
+\hypertarget{class_observation_model_method_af0ef30992e4ecd8adc81bed96e6d6663}{virtual arma\-::mat {\bfseries get\-Observation\-Noise\-Covariance} (const ompl\-::base\-::\-State $\ast$state, const \-Observation\-Type \&z)=0}\label{class_observation_model_method_af0ef30992e4ecd8adc81bed96e6d6663}
+
+\item 
+\hypertarget{class_observation_model_method_a351bcd27e192c0cc6f07650c3d9beb70}{virtual bool {\bfseries is\-State\-Observable} (const ompl\-::base\-::\-State $\ast$state)=0}\label{class_observation_model_method_a351bcd27e192c0cc6f07650c3d9beb70}
+
+\item 
+\hypertarget{class_observation_model_method_a86809e73a6e01b37f82fe822bd500b7b}{virtual const \-Noise\-Type {\bfseries get\-Zero\-Noise} ()}\label{class_observation_model_method_a86809e73a6e01b37f82fe822bd500b7b}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Public \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_observation_model_method_a183fbeb021b40c30e29239b1c1b895bf}{arma\-::colvec {\bfseries eta\-Phi\-\_\-}}\label{class_observation_model_method_a183fbeb021b40c30e29239b1c1b895bf}
+
+\item 
+\hypertarget{class_observation_model_method_a7cd6d5c8235775f6227d3ee5458927db}{arma\-::colvec {\bfseries eta\-D\-\_\-}}\label{class_observation_model_method_a7cd6d5c8235775f6227d3ee5458927db}
+
+\item 
+\hypertarget{class_observation_model_method_a126bab071775905203dee38c709444c3}{arma\-::colvec {\bfseries sigma\-\_\-}}\label{class_observation_model_method_a126bab071775905203dee38c709444c3}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{\-Member \-Function \-Documentation}
+\hypertarget{class_observation_model_method_af1a30aad975576ae8f16042a8ee8276b}{\index{\-Observation\-Model\-Method@{\-Observation\-Model\-Method}!get\-Observation@{get\-Observation}}
+\index{get\-Observation@{get\-Observation}!ObservationModelMethod@{\-Observation\-Model\-Method}}
+\subsubsection[{get\-Observation}]{\setlength{\rightskip}{0pt plus 5cm}virtual \-Observation\-Type {\bf \-Observation\-Model\-Method\-::get\-Observation} (
+\begin{DoxyParamCaption}
+\item[{const ompl\-::base\-::\-State $\ast$}]{state, }
+\item[{bool}]{is\-Simulation}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}pure virtual\mbox{]}}}}\label{class_observation_model_method_af1a30aad975576ae8f16042a8ee8276b}
+z = h(x,v) get the observation for a given configuration. 1. is\-Simulation= true , corrupted by noise from a given distribution 2. is\-Simulation=false , noise free obs 
+
+\-Implemented in \hyperlink{class_cam_aruco2_d_observation_model_a244fd43dca1734b68bf1379b2be285d2}{\-Cam\-Aruco2\-D\-Observation\-Model}.
+
+
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Observation\-Models/\-Observation\-Model\-Method.\-h\end{DoxyCompactItemize}

@@ -1,0 +1,9 @@
+<map id="G" name="G">
+<area shape="rect" id="node5" href="$class_ti_xml_comment.html" title="TiXmlComment" alt="" coords="5,160,117,189"/>
+<area shape="rect" id="node7" href="$class_ti_xml_declaration.html" title="TiXmlDeclaration" alt="" coords="141,160,264,189"/>
+<area shape="rect" id="node9" href="$class_ti_xml_document.html" title="TiXmlDocument" alt="" coords="288,160,403,189"/>
+<area shape="rect" id="node11" href="$class_ti_xml_element.html" title="TiXmlElement" alt="" coords="427,160,531,189"/>
+<area shape="rect" id="node13" href="$class_ti_xml_text.html" title="TiXmlText" alt="" coords="555,160,637,189"/>
+<area shape="rect" id="node15" href="$class_ti_xml_unknown.html" title="TiXmlUnknown" alt="" coords="661,160,771,189"/>
+<area shape="rect" id="node2" href="$class_ti_xml_base.html" title="TiXmlBase" alt="" coords="369,5,455,35"/>
+</map>
