@@ -107,7 +107,7 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool starStrat
     specs_.optimizingPaths = true;
 
     Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
-    debug_ = false;
+    debug_ = true;
 }
 
 FIRM::~FIRM(void)
@@ -359,7 +359,12 @@ bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Ver
 
             if (same_component && g->isStartGoalPairValid(stateProperty_[goal], stateProperty_[start]))
             {
-                ompl::base::PathPtr p = constructSolution(start, goal);
+                //ompl::base::PathPtr p = constructSolution(start, goal);
+                boost::mutex::scoped_lock _(graphMutex_);
+                solveDynamicProgram(goal);
+
+                return true;
+                /*
                 if (p)
                 {
                     // Check if optimization objective is satisfied
@@ -376,6 +381,7 @@ bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Ver
                         sol_cost_set = true;
                     }
                 }
+                */
             }
         }
     }
@@ -447,6 +453,10 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     slnThread.join();
 
     OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_) - nrStartStates);
+
+    //---- JUST FOR TESTING---
+    executeFeedback();
+    //-------------------
 
     if (sol)
     {
@@ -545,13 +555,13 @@ bool FIRM::sameComponent(Vertex m1, Vertex m2)
     return boost::same_component(m1, m2, disjointSets_);
 }
 
+
 ompl::base::PathPtr FIRM::constructSolution(const Vertex &start, const Vertex &goal)
 {
     boost::mutex::scoped_lock _(graphMutex_);
     boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
-    solveDynamicProgram(goal);
-
-    /*try
+    /*
+    try
     {
         // Consider using a persistent distance_map if it's slow
 
@@ -571,12 +581,11 @@ ompl::base::PathPtr FIRM::constructSolution(const Vertex &start, const Vertex &g
     catch (AStarFoundGoal&)
     {
     }
-
+    */
     if (prev[goal] == goal)
         throw ompl::Exception(name_, "Could not find solution path");
     else
         return constructGeometricPath(prev, start, goal);
-    */
 }
 
 ompl::base::PathPtr FIRM::constructGeometricPath(const boost::vector_property_map<Vertex> &prev, const Vertex &start, const Vertex &goal)
@@ -919,3 +928,40 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(FIRM::Vertex 
 
 }
 
+void FIRM::executeFeedback(void)
+{
+    Vertex start = startM_[0];
+    Vertex goal  = goalM_[0] ;
+
+    Vertex currentVertex =  start;
+
+    EdgeControllerType controller;
+
+    ompl::base::State *endState = si_->allocState();
+
+    if(debug_) OMPL_INFORM("Running policy execution");
+
+    while(currentVertex != goal)
+    {
+        Edge e = feedback_[currentVertex];
+        controller = edgeControllers_[e];
+        ompl::base::Cost cost;
+
+        if(controller.Execute(stateProperty_[currentVertex], endState, cost, false))
+        {
+            currentVertex = boost::target(e, g_);
+            sleep(1);
+
+        }
+
+    }
+
+    if(debug_)
+    {
+        using namespace std;
+
+        cout<<"The final filtered State from controller is :"<<endState->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
+        //cout<<"the final commanded state was :"<<stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
+
+    }
+}

@@ -342,6 +342,9 @@ protected:
     /** \brief Solves the dynamic program to return a feedback policy */
     virtual void solveDynamicProgram(Vertex goalVertex);
 
+    /** \brief Executes the generated policy on the system */
+    void executeFeedback(void);
+
     /** \brief Calculates the new cost to go from a node*/
     std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(Vertex node);
 
