@@ -507,6 +507,15 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
 
 FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
 {
+    /*In addMilestone we must reject duplicate vertices */
+    /*
+    if(boost::num_vertices(g_) > 1 )
+    {
+        foreach(Vertex v, boost::vertices(g_))
+        {
+            if(state == stateProperty_[v]) return v;
+        }
+    }*/
     boost::mutex::scoped_lock _(graphMutex_);
 
     Vertex m = boost::add_vertex(g_);
@@ -686,8 +695,8 @@ FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeSta
         std::cout<<startNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
         std::cout<<"End  : \n"<<std::endl;
         std::cout<<targetNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
-        std::cout<<"Press Enter and wait "<<std::endl;
-        std::cin.get();
+        //std::cout<<"Press Enter and wait "<<std::endl;
+        //std::cin.get();
     }
     double successCount = 0;
 
@@ -756,6 +765,7 @@ FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeSta
 
 void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
 {
+    assert(target && "The target state for generating the edge controller is NULL");
     std::vector<ompl::base::State*> intermediates;
 
     ompl::base::State *intermediate = si_->allocState();
