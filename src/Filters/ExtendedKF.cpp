@@ -45,7 +45,7 @@ KalmanFilterMethod(motionModel, observationModel) {
 
 void ExtendedKF::Predict(const ompl::base::State *belief,
   const ompl::control::Control* control,
-  const LinearSystem& ls, ompl::base::State *predictedState, const bool isConstruction)
+  const LinearSystem& ls, ompl::base::State *predictedState)
 {
 
   using namespace arma;
@@ -54,29 +54,13 @@ void ExtendedKF::Predict(const ompl::base::State *belief,
 
   mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
     ls.getG() * ls.getQ() * trans(ls.getG());
-  /*
-  if(!isConstruction)
-    {
-    std::ofstream myfile;
-    myfile.open("DataOut/PredictStepOutput.txt", std::fstream::app);
-    assert(myfile.is_open());
-    myfile <<"<--ThisStepOutput---->\n";
-    myfile <<"<-----Control-------->\n";
-    myfile <<_control<<endl;
-    myfile <<"<----Predicted Mean------>\n";
-    myfile <<predState->as<StateType>()->getArmaData()<<endl;
-    myfile <<"<----Predicted Covariance---->\n";
-    myfile <<covPred<<endl;
-    //cout<<"Writing"<<endl;
-    myfile.close();
-  }
-  */
+
   predictedState->as<StateType>()->setCovariance(covPred);
 
 }
 
 void ExtendedKF::Update(const ompl::base::State *belief, const typename ObservationModelMethod::ObservationType& obs,
-const LinearSystem& ls, ompl::base::State *updatedState, const bool isConstruction)
+const LinearSystem& ls, ompl::base::State *updatedState)
 {
 
   using namespace arma;
@@ -117,28 +101,6 @@ const LinearSystem& ls, ompl::base::State *updatedState, const bool isConstructi
 
   updatedState->as<StateType>()->setCovariance(covEst);
 
-  /*
-  //------Printing Data to text file-----
-  if(!isConstruction)
-  {
-    ofstream myfile;
-    myfile.open("DataOut/UpdateStepOutput.txt", std::fstream::app);
-    assert(myfile.is_open());
-
-    myfile <<"<--ThisStepOutput---->\n";
-    myfile <<"<---Observation------>\n";
-    myfile <<_obs<<endl;
-    myfile <<"<----Innovation------>\n";
-    myfile <<innov<<endl;
-    myfile <<"<-----Estimated Mean----->\n";
-    myfile << xEst <<endl;
-    myfile <<"<--- Estimated Covariance---->\n";
-    myfile <<covEst<<endl;
-    //cout<<"Writing"<<endl;
-    myfile.close();
-  }
-  */
-
 }
 
 void ExtendedKF::Evolve(const ompl::base::State *belief,
@@ -146,8 +108,7 @@ void ExtendedKF::Evolve(const ompl::base::State *belief,
     const ObservationType& obs,
     const LinearSystem& lsPred,
     const LinearSystem& lsUpdate,
-    ompl::base::State *evolvedState,
-    const bool isConstruction)
+    ompl::base::State *evolvedState)
 {
 
   // In the EKF we do not use the linear systems passed to the filter, instead we generate the linear systems on the fly
@@ -158,7 +119,7 @@ void ExtendedKF::Evolve(const ompl::base::State *belief,
 
   ompl::base::State *bPred = si_->allocState();
 
-  Predict(belief, control, lsPredicted, bPred, isConstruction);
+  Predict(belief, control, lsPredicted, bPred);
 
   if(!obs.n_rows || !obs.n_cols)
   {
@@ -168,6 +129,6 @@ void ExtendedKF::Evolve(const ompl::base::State *belief,
 
   LinearSystem lsUpdated(bPred, control, obs, this->motionModel_, this->observationModel_) ;
 
-  Update(bPred, obs, lsUpdated, evolvedState, isConstruction);
+  Update(bPred, obs, lsUpdated, evolvedState);
 
 }

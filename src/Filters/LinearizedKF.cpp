@@ -37,7 +37,7 @@
 #include "../../include/Filters/LinearizedKF.h"
 
 void LinearizedKF::Predict(const ompl::base::State *belief,
-  const ompl::control::Control* control, const LinearSystem& ls, ompl::base::State *predictedState,const bool isConstruction)
+  const ompl::control::Control* control, const LinearSystem& ls, ompl::base::State *predictedState)
 {
   using namespace arma;
   //SpaceType *space;
@@ -54,7 +54,7 @@ void LinearizedKF::Predict(const ompl::base::State *belief,
 
 
 void LinearizedKF::Update(const ompl::base::State *belief, const typename ObservationModelMethod::ObservationType& obs,
-const LinearSystem& ls, ompl::base::State *updatedState, const bool isConstruction)
+const LinearSystem& ls, ompl::base::State *updatedState)
 {
 
   using namespace arma;
@@ -97,29 +97,7 @@ const LinearSystem& ls, ompl::base::State *updatedState, const bool isConstructi
 
   updatedState->as<StateType>()->setCovariance(covEst);
 
-  /*
-  //------Printing Data to text file-----
-  if(!isConstruction)
-  {
-    ofstream myfile;
-    myfile.open("DataOut/UpdateStepOutput.txt", std::fstream::app);
-    assert(myfile.is_open());
-
-    myfile <<"<--ThisStepOutput---->\n";
-    myfile <<"<---Observation------>\n";
-    myfile <<_obs<<endl;
-    myfile <<"<----Innovation------>\n";
-    myfile <<innov<<endl;
-    myfile <<"<-----Estimated Mean----->\n";
-    myfile << xEst <<endl;
-    myfile <<"<--- Estimated Covariance---->\n";
-    myfile <<covEst<<endl;
-    //cout<<"Writing"<<endl;
-    myfile.close();
-  }
-  */
-
-}
+ }
 
 
 void LinearizedKF::Evolve(const ompl::base::State *belief,
@@ -127,8 +105,7 @@ void LinearizedKF::Evolve(const ompl::base::State *belief,
     const ObservationType& obs,
     const LinearSystem& lsPred,
     const LinearSystem& lsUpdate,
-    ompl::base::State *evolvedState,
-    const bool isConstruction)
+    ompl::base::State *evolvedState)
 {
 
   using namespace arma;

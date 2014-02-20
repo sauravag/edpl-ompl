@@ -115,6 +115,20 @@
 	</CamAruco2DObservationModel>
 </ObservationModels>
 <MotionModels>
+	<!--UnicycleMotionModel
+		sigmaV="0.001"
+		etaV="0.001"
+    sigmaOmega="0.0001"
+    etaOmega="0.001"
+		P_Wg_filename=""
+		orbit_radius=5.0
+		wind_noise_pos="0.000001"
+		wind_noise_ang="0.000001" 
+		min_linear_velocity= 0.2
+		max_linear_velocity= 0.2
+		max_angular_velocity= 0.3
+		dt= 0.1
+	  /> <!--No Noise--> 
 	<UnicycleMotionModel
 		sigmaV="0.012"
 		etaV="0.05"

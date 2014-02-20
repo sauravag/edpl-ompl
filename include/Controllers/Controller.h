@@ -72,7 +72,7 @@ class Controller
 
         bool isTerminated(const ompl::base::State *state, const size_t t);
 
-        ompl::base::State* Evolve(const ompl::base::State *state, size_t t, bool isConstructionMode);
+        void Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState);
 
         ompl::base::State* getGoal() {return goal_; }
 
@@ -119,10 +119,7 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
             const std::vector<ompl::control::Control*>& nominalUs,
             const firm::SpaceInformation::SpaceInformationPtr si): si_(si)
 {
-  //assert(_nominalXs.size() == _nominalUs.size()+1);
-  //create vector of linear systems
-  //ompl::base::StateSpacePtr space(new SpaceType);
-  //ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
+
   goal_ = si_->allocState();
   si_->copyState(goal_, goal);
 
@@ -135,7 +132,6 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
 
     lss_.push_back(ls);
   }
-
 
   //copy construct separated controller
   SeparatedControllerType sepController(goal_, nominalXs, nominalUs, lss_,si_->getMotionModel());
@@ -154,56 +150,107 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
   maxExecTime_ = ceil(nominalXs.size()*3);
   obstacleMarkerObserved_ = false;
   debug_ = false;
-  nominalTrajDeviationThreshold_ = 4.0;
+  nominalTrajDeviationThreshold_ = 4.0; // This value of 4 should not be hard coded
 
 }
 
+
 template <class SeparatedControllerType, class FilterType>
-ompl::base::State*
-Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State *state, size_t t, bool isConstructionMode)
+bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *startState,
+                                                              ompl::base::State* endState,
+                                                              ompl::base::Cost &executionCost,
+                                                              bool constructionMode)
+{
+  using namespace std;
+
+  unsigned int k = 0;
+
+  /**HOW TO SET INITAL VALUE OF COST
+    cost = 1 - > for time based only if time per execution is "1"
+    cost = 0.01 -> for covariance based
+  */
+  double cost = 0.01;
+  //cout<<"!!-----Executing-----!!"<<endl;
+
+  ompl::base::State *internalState = si_->allocState();
+  si_->copyState(internalState, startState);
+
+  while(!this->isTerminated(endState, k))
+  {
+    //std::cout << "time: "<< k << std::endl;
+    this->Evolve(internalState, k, endState) ;
+
+    internalState = si_->cloneState(endState);
+
+    // if the propagated state is not valid, return
+    if( !si_->checkTrueStateValidity())
+    {
+      //cout << k << " of " << m_maxExecTime << " steps used." << endl;
+      //isFailed = true;
+      //failureCode = -1;
+      return false;
+    }
+
+    ompl::base::State  *nominalX_K = si_->allocState();
+
+    if(k<lss_.size())
+      nominalX_K = lss_[k].getX();
+
+    else nominalX_K = lss_[lss_.size()-1].getX();
+
+    arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
+    arma::colvec endStateVec = endState->as<StateType>()->getArmaData();
+    arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
+
+    if(debug_)
+    {
+        std::cout<<"The nominal trajectory point is:" <<nomXVec<<std::endl;
+        std::cout<<"The current state is           :"<<endStateVec<<std::endl;
+        std::cout<<"The deviation from nominal trajectory is: "<<abs(norm(deviation,2))<<std::endl;
+        //std::cout<<"The size of LSS is :"<<lss_.size()<<std::endl;
+        //std::cout<<"The k is : "<<k<<std::endl;
+        std::cin.get();
+    }
+    if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
+    {
+      //isFailed = true;
+      //failureCode = -3;
+      return false;
+    }
+
+    k++;
+
+    /**
+     Increment cost by:
+     -> 0.01 for time based
+     -> trace(Covariance) for FIRM
+    */
+    cost += arma::trace(endState->as<StateType>()->getCovariance());
+
+    if(debug_) cout<<"Trace of covariance: "<<arma::trace(endState->as<StateType>()->getCovariance())<<std::endl;
+  }
+
+  executionCost.v = cost;
+
+  return true ;
+}
+
+template <class SeparatedControllerType, class FilterType>
+void
+Controller<SeparatedControllerType, FilterType>::
+Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
 {
 
-  //cout << "==========================================" << endl;
-  //cout << "Timestep: " << _t << endl;
-  //cout << "HState::: " << endl;
-  //cout << "\t trueState: " << _h.m_trueState << endl;
-  //cout << "\t belief: " << _h.m_belief << endl;
-
   //std::cout << "Do not forget is_reliable for feedback controls." << std::endl;
-  ompl::control::Control* control = separatedController_.generateFeedbackControl(state, t);
-
-  //cout << "Generated control: " << endl << u << endl;
+  ompl::control::Control* control = separatedController_.generateFeedbackControl(state/*, t*/);
 
   si_->applyControl(control);
 
-  //---- WARNING---//
-  //TODO: The singleobservationdim needs to be retrieved from the observation model
   //---------------//
   //cout<<"The observations from actuation system are: "<<endl<<z<<endl;
 
   unsigned int singleobservationdim = 4;
   //cout<<" The construction mode is: "<<_isConstructionMode<<endl;
-
-  //Adding obstacle markers
-  obstacleMarkerObserved_ = false;  // !!---Defaulting to false for development phase---!!
-  /**
-  if(!isConstructionMode)
-  {
-    for(int i=0; i<z.n_rows/singleobservationdim; i++)
-    {
-      int markerID = z[i*singleobservationdim];
-      //cout<<"Checking if marker ID :" <<markerID <<" Is an obstacle marker"<<endl;
-      if(this->GetMPProblem()->IsObstacleMarker(markerID))
-      {
-        //add obstacle to environment if it doesn't already exist
-        //flag that you have observed an obstacle marker
-        //cout<<"Marker ID :"<<markerID<<" is an obstacle"<<endl;
-        if(this->GetMPProblem()->AddObstacle(markerID))
-          m_obstacleMarkerObserved = true;
-      }
-    }
-  }
-  */
 
   ObservationType zCorrected = si_->getObservation();
 
@@ -231,99 +278,18 @@ Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State 
     }
   }
 
-  ompl::base::StateSpacePtr space(new SpaceType());
-  ompl::base::State *nextBelief = space->allocState();
+  ompl::base::State *nextBelief = si_->allocState();
 
-  filter_.Evolve(state, control, zCorrected, current, next, nextBelief , isConstructionMode);
+  filter_.Evolve(state, control, zCorrected, current, next, nextBelief);
 
+  si_->copyState(nextState, nextBelief);
   si_->setBelief(nextBelief);
 
   //cout << "nextBelief: " << nextBelief << endl;
   //cout << "-----------***----***---***---------------" << endl;
-  return nextBelief;
 
 }
 
-template <class SeparatedControllerType, class FilterType>
-bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *startState,
-                                                              ompl::base::State* endState,
-                                                              ompl::base::Cost &executionCost,
-                                                              bool constructionMode)
-{
-    using namespace std;
-  // assign the start state to the end state
-  si_->copyState(endState, startState);
-
-  unsigned int k = 0;
-
-  /**HOW TO SET INITAL VALUE OF COST
-    cost = 1 - > for time based only if time per execution is "1"
-    cost = 0.01 -> for covariance based
-  */
-  double cost = 0.01;
-  //cout<<"!!-----Executing-----!!"<<endl;
-
-  while(!this->isTerminated(endState, k))
-  {
-    //std::cout << "time: "<< k << std::endl;
-    endState = this->Evolve(endState, k, constructionMode) ;
-
-    // if the propagated state is not valid, return
-    if( !si_->checkTrueStateValidity())
-    {
-      //cout << k << " of " << m_maxExecTime << " steps used." << endl;
-      //isFailed = true;
-      //failureCode = -1;
-      return false;
-    }
-
-    ompl::base::State  *nominalX_K = si_->allocState();
-
-    if(k<lss_.size())
-      nominalX_K = lss_[k].getX();
-
-    else nominalX_K = lss_[lss_.size()-1].getX();
-
-    arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
-    arma::colvec endStateVec = endState->as<StateType>()->getArmaData();
-    arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
-
-    // This value of 4 should not be hard coded
-    if(debug_)
-    {
-        //std::cout<<"The nominal trajectory point is:" <<nomXVec<<std::endl;
-        //std::cout<<"The current state is           :"<<endStateVec<<std::endl;
-        //std::cout<<"The deviation from nominal trajectory is: "<<abs(norm(deviation,2))<<std::endl;
-        //std::cout<<"The size of LSS is :"<<lss_.size()<<std::endl;
-        //std::cout<<"The k is : "<<k<<std::endl;
-        //std::cin.get();
-    }
-    if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
-    {
-      //isFailed = true;
-      //failureCode = -3;
-      return false;
-    }
-
-    k++;
-
-    /**
-     Increment cost by:
-     -> 0.01 for time based
-     -> trace(Covariance) for FIRM
-    */
-    cost += arma::trace(endState->as<StateType>()->getCovariance());
-    //std::cout<<"Trace of covariance: "<<arma::trace(endState->as<StateType>()->getCovariance())<<std::endl;
-  }
-  //cout<<"The Filter estimate currently is:  "<< b.GetArmaData()(0)<<" "<< b.GetArmaData()(1)<<" "<<b.GetArmaData()(2)*180/PI<<endl;
-  //cout << "Going on edge" << endl;
-  //cout<<"!!-----End Executing-----!!"<<endl;
-  //obstacleMarkerObserved_ = false;
-  executionCost.v = cost;
-  //std::cout<<"Press enter "<<std::endl;
-  //std::cin.get();
-  return true ;
-}
 
 template <class SeparatedControllerType, class FilterType>
 ompl::base::State* Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base::State *startState)

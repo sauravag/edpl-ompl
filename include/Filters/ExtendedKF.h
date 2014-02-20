@@ -62,23 +62,20 @@ class ExtendedKF : public  KalmanFilterMethod
   	void Predict(const ompl::base::State *belief,
                                 const ompl::control::Control* control,
                                 const LinearSystem& ls,
-                                ompl::base::State *predictedState,
-                                const bool isConstruction=false) ;
+                                ompl::base::State *predictedState) ;
 
   	//gets a belief and observation, returns
   	void Update(const ompl::base::State *belief,
                 const ObservationType& obs,
                 const	LinearSystem& ls,
-                ompl::base::State *updatedState,
-                const bool isConstruction=false) ;
+                ompl::base::State *updatedState) ;
 
   	void Evolve(const ompl::base::State *belief,
                 const ompl::control::Control* control,
                 const ObservationType& obs,
                 const LinearSystem& lsPred,
                 const LinearSystem& lsUpdate,
-                ompl::base::State *evolvedState,
-                const bool isConstruction=false) ;
+                ompl::base::State *evolvedState) ;
 
 
   	arma::mat computeStationaryCovariance (const LinearSystem& ls) {}

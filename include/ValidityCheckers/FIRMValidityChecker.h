@@ -14,7 +14,7 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Rice University nor the names of its
+*   * Neither the name of the Texas A&M University nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
 *
@@ -46,15 +46,15 @@ class FIRMValidityChecker : public ompl::base::StateValidityChecker
     typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
     typedef SE2BeliefSpace::StateType StateType;
 
-    FIRMValidityChecker(const ompl::base::SpaceInformationPtr &si/**, ObservationModelPointer om*/) :
-    ompl::base::StateValidityChecker(si)/**, observationModel_(om)*/
+    FIRMValidityChecker(const firm::SpaceInformation::SpaceInformationPtr &si/**, ObservationModelPointer om*/) :
+    siF_(si), ompl::base::StateValidityChecker(si)/**, observationModel_(om)*/
     {
     }
 
     virtual bool isValid(const ompl::base::State *state) const
     {
       // states within a box are invalid
-      int x_l =  5;
+      int x_l =  3;
       int x_r =  15;
       int y_b =  5;
       int y_t =  15;
@@ -68,9 +68,9 @@ class FIRMValidityChecker : public ompl::base::StateValidityChecker
             return false;
         }
       }
-      return true;
+      return true;//siF_->getObservationModel()->isStateObservable(state);
     }
 
-//  private:
- //   ObservationModelPointer observationModel_;
+    protected:
+        firm::SpaceInformation::SpaceInformationPtr siF_;
 };

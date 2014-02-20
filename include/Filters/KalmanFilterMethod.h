@@ -78,16 +78,14 @@ class KalmanFilterMethod
   	virtual void Predict(const ompl::base::State *belief,
                                 const ompl::control::Control* control,
                                 const LinearSystem& ls,
-                                ompl::base::State *predictedState,
-                                const bool isConstruction=false)  = 0;
+                                ompl::base::State *predictedState)  = 0;
 
   	//gets a belief and observation, returns
   	virtual
   	void Update(const ompl::base::State *belief,
                                 const ObservationType& obs,
                                 const	LinearSystem& ls,
-                                ompl::base::State *updatedState,
-                                const bool isConstruction=false) = 0;
+                                ompl::base::State *updatedState) = 0;
 
     virtual
   	void Evolve(const ompl::base::State *belief,
@@ -95,8 +93,7 @@ class KalmanFilterMethod
                                 const ObservationType& obs,
                                 const LinearSystem& lsPred,
                                 const LinearSystem& lsUpdate,
-                                ompl::base::State *evolvedState,
-                                const bool isConstruction=false) = 0;
+                                ompl::base::State *evolvedState) = 0;
 
   	virtual
   	arma::mat computeStationaryCovariance(const LinearSystem& ls) = 0;

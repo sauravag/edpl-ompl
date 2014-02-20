@@ -540,7 +540,7 @@ void TestController()
     std::vector<ompl::control::Control*> nmu;
     std::vector<LinearSystem> lss;
 
-    RHCICreate *sepController = new RHCICreate(to, nmx, nmu, lss, mm);
+    //RHCICreate *sepController = new RHCICreate(to, nmx, nmu, lss, mm);
     colvec diff = to->as<StateType>()->getArmaData() - from->as<StateType>()->getArmaData();
 
     si->setTrueState(from);
@@ -550,12 +550,16 @@ void TestController()
     bool isFailed = false;
     ompl::base::Cost cost(0);
     int failureCode=0;
-    ompl::base::State* finalEstimate = si->allocState();
-    myController->Execute(kfEstimate, finalEstimate, cost);
 
-    diff = to->as<StateType>()->getArmaData() - kfEstimate->as<StateType>()->getArmaData();
-    cout<<"The failure code of execution was :"<<failureCode<<endl;
-    cout<<"The final filtered State from controller is :"<<kfEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
+    ompl::base::State* finalEstimate = si->allocState();
+
+    bool success = myController->Execute(kfEstimate, finalEstimate, cost);
+
+    if(success) cout<<"Controller executed completely \n";
+    else cout<<"Controller failed !! \n";
+
+    diff = to->as<StateType>()->getArmaData() - finalEstimate->as<StateType>()->getArmaData();
+    cout<<"The final filtered State from controller is :"<<finalEstimate->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
     cout<<"the final commanded state was :"<<to->as<MotionModelMethod::StateType>()->getArmaData()<<endl;
 
     assert(norm(diff.subvec(0,1),2) < 0.10 && "Controller failed to take robot to goal");

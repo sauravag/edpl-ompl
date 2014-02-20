@@ -14,7 +14,7 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Rice University nor the names of its
+*   * Neither the name of the Texas A&M University nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
 *
@@ -243,6 +243,7 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
 
                 // add the edge to the parent vertex
                 //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
+                assert(v!=m && "The 2 states for edge are the same !!");
                 addEdgeToGraph(v,m);
                 addEdgeToGraph(m,v);
                 /**
@@ -267,6 +268,7 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
             {
                 // add the edge to the parent vertex
                 //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
+                assert(v!=last && "The 2 states for edge are the same !!");
                 addEdgeToGraph(v, last);
                 addEdgeToGraph(last,v);
                 /**
@@ -523,17 +525,22 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
     const std::vector<Vertex>& neighbors = connectionStrategy_(m);
 
     foreach (Vertex n, neighbors)
-        if (connectionFilter_(m, n))
+        if (connectionFilter_(m, n) && m!=n)
         {
             totalConnectionAttemptsProperty_[m]++;
             totalConnectionAttemptsProperty_[n]++;
             if (si_->checkMotion(stateProperty_[m], stateProperty_[n]))
             {
+                std::cout<<"The 2 states to create an edge \n";
+                si_->printState(stateProperty_[m]);
+                si_->printState(stateProperty_[n]);
+                assert(stateProperty_[m]!=stateProperty_[n] && "The 2 states for edge are the same !!");
                 successfulConnectionAttemptsProperty_[m]++;
                 successfulConnectionAttemptsProperty_[n]++;
                 addEdgeToGraph(m, n);
-                successfulConnectionAttemptsProperty_[m]++;
-                successfulConnectionAttemptsProperty_[n]++;
+                //TODO: should we increment succesfull attempts twice for a bidirectional edge ?
+                //successfulConnectionAttemptsProperty_[m]++;
+                //successfulConnectionAttemptsProperty_[n]++;
                 addEdgeToGraph(n, m);
                 /**
                 successfulConnectionAttemptsProperty_[m]++;
@@ -661,13 +668,16 @@ void FIRM::addEdgeToGraph(FIRM::Vertex a, FIRM::Vertex b)
 
     edgeControllers_[newEdge.first] = edgeController;
 
-    nodeControllers_[b] = nodeController;
+    //TODO: THIS IS WRONG! NodeController should be created when state is added to graph not here
+    //nodeControllers_[a] = nodeController;
 
     uniteComponents(b, a);
 }
 
 FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeState, ompl::base::State* targetNodeState, EdgeControllerType &edgeController, NodeControllerType &nodeController)
 {
+    assert(targetNodeState && "The target node state in monte carlo sim func is null !!");
+    assert(startNodeState != targetNodeState && "generateControllersWithEdgeCost: The start and goal are same");
 
     if(debug_)
     {
@@ -676,8 +686,8 @@ FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeSta
         std::cout<<startNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
         std::cout<<"End  : \n"<<std::endl;
         std::cout<<targetNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
-        //std::cout<<"Press Enter and wait "<<std::endl;
-        //std::cin.get();
+        std::cout<<"Press Enter and wait "<<std::endl;
+        std::cin.get();
     }
     double successCount = 0;
 
@@ -689,7 +699,7 @@ FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeSta
     generateEdgeController(startNodeState,targetNodeState,edgeController);
 
     // Generate the node controller
-    generateNodeController(targetNodeState, nodeController);
+    generateNodeController(startNodeState, nodeController);
 
     for(int i=0; i< numParticles_;i++)
     {
@@ -781,7 +791,7 @@ void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeCont
 
    if(siF_->getObservationModel()->isStateObservable(node))
    {
-        if(debug_) std::cout<<"The node is observable, constructing node controller \n"<<std::endl;
+        //if(debug_) std::cout<<"The node is observable, constructing node controller \n"<<std::endl;
         // Contruct a linear kalman filter
         LinearizedKF linearizedKF(siF_);
 
@@ -804,7 +814,7 @@ void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeCont
     }
     else
     {
-        if(debug_) std::cout<<"The node is NOT observable, constructing horrendous node controller \n"<<std::endl;
+        //if(debug_) std::cout<<"The node is NOT observable, constructing horrendous node controller \n"<<std::endl;
         // Compute a high stationary cov at node state
         int stateDim = si_->getStateDimension();
         arma::mat stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
@@ -868,7 +878,7 @@ void FIRM::solveDynamicProgram(FIRM::Vertex goalVertex)
 
     //typedef typename map<VID, double>::iterator CostToGoIT;
     int nIter=0;
-    while(!convergenceCondition)
+    while(!convergenceCondition && nIter < 10000)
     {
         nIter++;
 
@@ -967,9 +977,23 @@ void FIRM::executeFeedback(void)
 
     if(debug_)
     {
+        std::cout<<"Printing out the nodes in the graph \n";
+        foreach(Vertex v, boost::vertices(g_))
+        {
+            si_->printState(stateProperty_[v]);
+        }
+
+
+    }
+
+    if(debug_)
+    {
+      std::cout<<"The planner start state is: \n" ;
+      si_->printState(stateProperty_[start]);
       ompl::base::State *goalState = siF_->allocState();
       goalState = stateProperty_[goal];
-      std::cout<<"The goal state is : \n"<<goalState->as<SE2BeliefSpace::StateType>()->getArmaData();
+      std::cout<<"The planner goal state is : (Press Enter)  \n";
+      si_->printState(goalState);
       std::cin.get();
     }
 
@@ -987,30 +1011,38 @@ void FIRM::executeFeedback(void)
         controller = edgeControllers_[e];
         ompl::base::Cost cost;
 
+        assert(controller.getGoal() && "The controller does not have a goal !");
+
         if(debug_)
         {
-            std::cout<<"The controller's goal state is: \n"<<(controller.getGoal())->as<SE2BeliefSpace::StateType>()->getArmaData();
+            std::cout<<"executeFeedback: The start of the controller is : \n" <<stateProperty_[start]->as<SE2BeliefSpace::StateType>()->getArmaData();
+            std::cout<<"executeFeedback: The controller's goal state is: (Press Enter)  \n"<<(controller.getGoal())->as<SE2BeliefSpace::StateType>()->getArmaData();
             //std::cin.get();
         }
 
         if(controller.Execute(stateProperty_[currentVertex], endState, cost, false))
         {
-            if(debug_) std::cout<<"Controller was successful in execution \n";
+            if(debug_) std::cout<<"executeFeedback: Controller was successful in execution (Press Enter) \n";
+            //std::cin.get();
             currentVertex = boost::target(e, g_);
         }
         else
         {
+            if(debug_) std::cout<<"executeFeedback: Controller was NOT successful in execution (Press Enter)  \n";
+            //std::cin.get();
             currentVertex = addMilestone(endState);
             solveDynamicProgram(goal);
         }
-
+        std::cout<<"Press Enter \n";
+        std::cin.get();
     }
 
     if(debug_)
     {
         using namespace std;
 
-        cout<<"The final filtered State from controller is :"<<endState->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
-        cout<<"the final commanded state was :"<<stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
+        cout<<"executeFeedback: The final filtered State from controller is :"<<endState->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
+        cout<<"executeFeedback: the final commanded state was :"<<stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
     }
+    std::cin.get();
 }
