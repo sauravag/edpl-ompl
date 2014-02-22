@@ -60,14 +60,14 @@ namespace ompl
 
         /** \brief The number of steps to take for a random bounce
             motion generated as part of the expansion step of PRM. */
-        static const unsigned int MAX_RANDOM_BOUNCE_STEPS   = 2;
+        static const unsigned int MAX_RANDOM_BOUNCE_STEPS   = 5;
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
 
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
-        static const double ROADMAP_BUILD_TIME = 0.5;
+        static const double ROADMAP_BUILD_TIME = 2;
 
         static const double NUM_MONTE_CARLO_PARTICLES = 2;
 
@@ -84,6 +84,8 @@ namespace ompl
         static const double OBSTACLE_COST_TO_GO = 500;
 
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
+
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 4.0;
     }
 }
 
@@ -126,7 +128,8 @@ void FIRM::setup(void)
     if (!connectionStrategy_)
     {
         if (starStrategy_)
-            connectionStrategy_ = ompl::geometric::KStarStrategy<Vertex>(boost::bind(&FIRM::milestoneCount, this), nn_, si_->getStateDimension());
+            //connectionStrategy_ = ompl::geometric::KStarStrategy<Vertex>(boost::bind(&FIRM::milestoneCount, this), nn_, si_->getStateDimension());
+            connectionStrategy_ = FStrategy<Vertex>(ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
         else
             connectionStrategy_ = ompl::geometric::KStrategy<Vertex>(ompl::magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
     }
@@ -413,8 +416,11 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     }
 
     // Add the valid start states as milestones
-    while (const ompl::base::State *st = pis_.nextStart())
-        startM_.push_back(addMilestone(si_->cloneState(st)));
+    //while (const ompl::base::State *st = pis_.nextStart())
+        //startM_.push_back(addMilestone(si_->cloneState(st)));
+    ompl::base::State *mystartState = si_->allocState();
+    mystartState->as<SE2BeliefSpace::StateType>()->setXYYaw(13,5.1,0);
+    startM_.push_back(addMilestone(mystartState));
 
     if (startM_.size() == 0)
     {
@@ -462,7 +468,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_) - nrStartStates);
 
     //---- JUST FOR TESTING---
-    executeFeedback();
+    if(addedSolution_) executeFeedback();
     //-------------------
 
     if (sol)
@@ -669,6 +675,7 @@ void FIRM::addEdgeToGraph(FIRM::Vertex a, FIRM::Vertex b)
 
     const FIRMWeight weight = generateControllersWithEdgeCost(stateProperty_[a], stateProperty_[b], edgeController, nodeController);
 
+    assert(edgeController.getGoal() && "The generated controller has no goal");
     const unsigned int id = maxEdgeID_++;
 
     const Graph::edge_property_type properties(weight, id);
@@ -863,7 +870,7 @@ void FIRM::solveDynamicProgram(FIRM::Vertex goalVertex)
 
     //--NOTES FROM PMPL--
     //For nodes that are not in the goal CC we should assign a high cost to go to all nodes initially,
-    //twe assign goalcosttogo and initcosttogo for those nodes that are in the CC of the goal
+    //then we assign goalcosttogo and initcosttogo for those nodes that are in the CC of the goal
     //We do this to take care of those nodes that are not in GOAL CC (for replanning purposes)
 
     foreach (Vertex v, boost::vertices(g_))
@@ -982,11 +989,17 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(FIRM::Vertex 
 
 void FIRM::executeFeedback(void)
 {
+    if(boost::num_edges(g_) == 0)
+    {
+        std::cout<<"There are no edges !! Press Enter";
+        std::cin.get();
+    }
     Vertex start = startM_[0];
     Vertex goal  = goalM_[0] ;
 
     if(debug_)
     {
+        std::cout<<"The number of edges in the graph are :"<<boost::num_edges(g_)<<std::endl;
         std::cout<<"Printing out the nodes in the graph \n";
         foreach(Vertex v, boost::vertices(g_))
         {
@@ -995,6 +1008,7 @@ void FIRM::executeFeedback(void)
 
 
     }
+    assert(feedback_.size() > 0  && "There is no feedback generated ");
 
     if(debug_)
     {
@@ -1002,8 +1016,9 @@ void FIRM::executeFeedback(void)
       si_->printState(stateProperty_[start]);
       ompl::base::State *goalState = siF_->allocState();
       goalState = stateProperty_[goal];
-      std::cout<<"The planner goal state is : (Press Enter)  \n";
+      std::cout<<"The planner goal state is:  \n";
       si_->printState(goalState);
+      std::cout<<"Press ENTER \n";
       std::cin.get();
     }
 
@@ -1020,12 +1035,11 @@ void FIRM::executeFeedback(void)
         Edge e = feedback_[currentVertex];
         controller = edgeControllers_[e];
         ompl::base::Cost cost;
-
         assert(controller.getGoal() && "The controller does not have a goal !");
 
         if(debug_)
         {
-            std::cout<<"executeFeedback: The start of the controller is : \n" <<stateProperty_[start]->as<SE2BeliefSpace::StateType>()->getArmaData();
+            std::cout<<"executeFeedback: The start of the controller is : \n" <<stateProperty_[currentVertex]->as<SE2BeliefSpace::StateType>()->getArmaData();
             std::cout<<"executeFeedback: The controller's goal state is: (Press Enter)  \n"<<(controller.getGoal())->as<SE2BeliefSpace::StateType>()->getArmaData();
             //std::cin.get();
         }
@@ -1043,8 +1057,8 @@ void FIRM::executeFeedback(void)
             currentVertex = addMilestone(endState);
             solveDynamicProgram(goal);
         }
-        std::cout<<"Press Enter \n";
-        std::cin.get();
+        //std::cout<<"Press Enter \n";
+        //std::cin.get();
     }
 
     if(debug_)
@@ -1053,6 +1067,9 @@ void FIRM::executeFeedback(void)
 
         cout<<"executeFeedback: The final filtered State from controller is :"<<endState->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
         cout<<"executeFeedback: the final commanded state was :"<<stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
+        cout<<"Press enter "<<endl;
+        std::cin.get();
     }
-    std::cin.get();
+
+
 }

@@ -51,7 +51,7 @@ void plan(void)
     // set the bounds for the R^3 part of SE(3)
     ob::RealVectorBounds bounds(2);
     bounds.setLow(0);
-    bounds.setHigh(20);
+    bounds.setHigh(18);
 
     statespace->as<SE2BeliefSpace>()->setBounds(bounds);
 
@@ -90,7 +90,7 @@ void plan(void)
     // create a random start state
     ob::State *start = statespace->allocState();
 
-    start->as<StateType>()->setXYYaw(13,0.8,0);
+    start->as<StateType>()->setXYYaw(13,2.5,0);
 
     simpleSampler->sample(start);
 
@@ -99,7 +99,7 @@ void plan(void)
 
     // create a random goal state
     ob::State *goal = statespace->allocState();
-    goal->as<StateType>()->setXYYaw(1.5,2.5,1.57);
+    goal->as<StateType>()->setXYYaw(1.5,4.8,1.57);
 
     cout<<"The goal state is:"<<endl;
     statespace->as<SE2BeliefSpace>()->printBeliefState(goal);
@@ -117,6 +117,9 @@ void plan(void)
     // set the problem we are trying to solve for the planner
     planner->setProblemDefinition(pdef);
 
+    //set the maximum number of nearest neighbors
+    //planner->setMaxNearestNeighbors(5);
+
     // perform setup steps for the planner
     planner->setup();
 
@@ -129,7 +132,7 @@ void plan(void)
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = planner->solve(10);
+    ob::PlannerStatus solved = planner->solve(20);
 
     cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 

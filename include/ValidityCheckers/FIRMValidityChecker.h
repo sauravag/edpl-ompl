@@ -54,23 +54,31 @@ class FIRMValidityChecker : public ompl::base::StateValidityChecker
     virtual bool isValid(const ompl::base::State *state) const
     {
       // states within a box are invalid
-      int x_l =  3;
-      int x_r =  15;
-      int y_b =  5;
-      int y_t =  15;
+      double x_l =  3;
+      double x_r =  12;
+      double y_b =  2.3;
+      double y_t =  5;
 
-      arma::colvec pos = state->as<StateType>()->getArmaData();
+      bool valid = true;
 
-      if(pos[0] >= x_l && pos[0] <= x_r )
-      {
-        if(pos[1] >= y_b && pos[1] <= y_t)
-        {
-            return false;
-        }
-      }
-      return true;//siF_->getObservationModel()->isStateObservable(state);
+      return !isInsideBox(state,x_l,x_r, y_b, y_t); // if inside box then not valid
+      //return true;//siF_->getObservationModel()->isStateObservable(state);
     }
 
+    /** \brief Checks if the state is within a bounding box */
+    bool isInsideBox(const ompl::base::State *state, double xl, double xr, double yb, double yt) const
+    {
+        arma::colvec pos = state->as<StateType>()->getArmaData();
+
+        if(pos[0] >= xl && pos[0] <= xr )
+            {
+            if(pos[1] >= yb && pos[1] <= yt)
+            {
+                return true; // inside box
+            }
+        }
+        return false; // outside box
+    }
     protected:
         firm::SpaceInformation::SpaceInformationPtr siF_;
 };

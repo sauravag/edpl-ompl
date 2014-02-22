@@ -294,7 +294,7 @@
 1366325450 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/GreedyKCenters.h
 	"ompl/util/RandomNumbers.h"
 
-1392842408 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
+1393036249 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
 	<ompl/base/spaces/SE3StateSpace.h>
 	<ompl/geometric/SimpleSetup.h>
 	<ompl/config.h>
@@ -355,7 +355,7 @@
 	<boost/foreach.hpp>
 	<boost/thread.hpp>
 
-1392838037 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Planner/FIRM.h
+1393027486 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Planner/FIRM.h
 	"ompl/geometric/planners/PlannerIncludes.h"
 	"ompl/datastructures/NearestNeighbors.h"
 	<boost/graph/graph_traits.hpp>
@@ -374,6 +374,7 @@
 	"../Filters/ExtendedKF.h"
 	"../Filters/LinearizedKF.h"
 	"../Path/FeedbackPath.h"
+	"../ConnectionStrategy/FStrategy.h"
 
 1392759190 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Weight/FIRMWeight.h
 
@@ -576,7 +577,7 @@
 	"../../include/ObservationModels/CamAruco2DObservationModel.h"
 	"../../tinyxml/tinyxml.h"
 
-1392869943 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/FIRM.cpp
+1393036900 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/FIRM.cpp
 	"../../include/Planner/FIRM.h"
 	"ompl/geometric/planners/prm/PRM.h"
 	"ompl/geometric/planners/prm/ConnectionStrategy.h"
@@ -604,7 +605,7 @@
 1377882917 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Spaces/SE2BeliefSpace.cpp
 	"../../include/Spaces/SE2BeliefSpace.h"
 
-1392867704 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ValidityCheckers/FIRMValidityChecker.h
+1393014250 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ValidityCheckers/FIRMValidityChecker.h
 	"../ObservationModels/ObservationModelMethod.h"
 
 1387397612 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/base/Cost.h
@@ -727,4 +728,6 @@
 	"../Controllers/Controller.h"
 	"../SeparatedControllers/RHCICreate.h"
 	"../Filters/ExtendedKF.h"
+
+1393027632 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/ConnectionStrategy/FStrategy.h
 

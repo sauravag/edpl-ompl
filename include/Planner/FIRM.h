@@ -54,6 +54,7 @@
 #include "../Filters/ExtendedKF.h"
 #include "../Filters/LinearizedKF.h"
 #include "../Path/FeedbackPath.h"
+#include "../ConnectionStrategy/FStrategy.h"
 //#include "../SpaceInformation/SpaceInformation.h"
 
 namespace base
@@ -162,11 +163,11 @@ public:
     virtual void setProblemDefinition(const ompl::base::ProblemDefinitionPtr &pdef);
 
     /** \brief Set the connection strategy function that specifies the
-     milestones that connection attempts will be make to for a
+     milestones that connection attempts will be made to for a
      given milestone.
 
      \par The behavior and performance of PRM can be changed drastically
-     by varying the number and properties if the milestones that are
+     by varying the number and properties of the milestones that are
      connected to each other.
 
      \param pdef A function that takes a milestone as an argument and
