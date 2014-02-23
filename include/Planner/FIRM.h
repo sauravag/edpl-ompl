@@ -432,9 +432,6 @@ protected:
     /** \brief A table that stores the node controllers according to the node (vertex) ids */
     std::map <Vertex, NodeControllerType > nodeControllers_;
 
-    // for each edge we store its transition probability
-    std::map <Edge, double> transitionProbabilities_;
-
     std::map <Vertex, double> costToGo_;
 
     // This feedback will eventually be in a feedbackpath class

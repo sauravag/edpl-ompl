@@ -249,24 +249,14 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 assert(v!=m && "The 2 states for edge are the same !!");
                 addEdgeToGraph(v,m);
                 addEdgeToGraph(m,v);
-                /**
-                EdgeControllerType edgeController;
-                NodeControllerType nodeController;
-                const FIRMWeight weight = generateControllersWithEdgeCost(stateProperty_[v], stateProperty_[m], edgeController, nodeController);
-                const unsigned int id = maxEdgeID_++;
-                const Graph::edge_property_type properties(weight, id);
-                std::pair<Edge, bool> newEdge = boost::add_edge(v, m, properties, g_);
-                edgeControllers_[newEdge.first] = edgeController;
-                nodeControllers_[m] = nodeController;
-                uniteComponents(v, m);
-                */
+
                 // add the vertex to the nearest neighbors data structure
                 nn_->add(m);
                 v = m;
             }
 
-            // if there are intermediary states or the milestone has not been connected to the initially sampled vertex,
-            // we add an edge
+            // if there are intermediary states or the milestone has not been connected to the initially
+            //sampled vertex,we add an edge
             if (s > 0 || !sameComponent(v, last))
             {
                 // add the edge to the parent vertex
@@ -274,17 +264,7 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 assert(v!=last && "The 2 states for edge are the same !!");
                 addEdgeToGraph(v, last);
                 addEdgeToGraph(last,v);
-                /**
-                EdgeControllerType edgeController;
-                NodeControllerType nodeController;
-                const FIRMWeight weight = generateControllersWithEdgeCost(stateProperty_[v], stateProperty_[last], edgeController, nodeController);
-                const unsigned int id = maxEdgeID_++;
-                const Graph::edge_property_type properties(weight, id);
-                std::pair<Edge, bool> newEdge = boost::add_edge(v, last, properties, g_);
-                edgeControllers_[newEdge.first] = edgeController;
-                nodeControllers_[last] = nodeController; // should this be last or v ???
-                uniteComponents(v, last);
-                */
+
             }
             graphMutex_.unlock();
         }
@@ -311,7 +291,7 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
 void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                                        ompl::base::State *workState)
 {
-    /* grow roadmap in the regular fashion -- sample valid states, add them to the roadmap, add valid connections */
+    //grow roadmap in the regular fashion -- sample valid states, add them to the roadmap, add valid connections
     while (ptc == false)
     {
         // search for a valid state
@@ -374,24 +354,6 @@ bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Ver
                 solveDynamicProgram(goal);
 
                 return true;
-                /*
-                if (p)
-                {
-                    // Check if optimization objective is satisfied
-                    ompl::base::Cost pathCost = p->cost(opt_);
-                    if (opt_->isSatisfied(pathCost))
-                    {
-                        solution = p;
-                        return true;
-                    }
-                    else if (!sol_cost_set || opt_->isCostBetterThan(pathCost, sol_cost))
-                    {
-                        solution = p;
-                        sol_cost = pathCost;
-                        sol_cost_set = true;
-                    }
-                }
-                */
             }
         }
     }
@@ -416,11 +378,8 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     }
 
     // Add the valid start states as milestones
-    //while (const ompl::base::State *st = pis_.nextStart())
-        //startM_.push_back(addMilestone(si_->cloneState(st)));
-    ompl::base::State *mystartState = si_->allocState();
-    mystartState->as<SE2BeliefSpace::StateType>()->setXYYaw(13,5.1,0);
-    startM_.push_back(addMilestone(mystartState));
+    while (const ompl::base::State *st = pis_.nextStart())
+        startM_.push_back(addMilestone(si_->cloneState(st)));
 
     if (startM_.size() == 0)
     {
@@ -514,14 +473,15 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
 FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
 {
     /*In addMilestone we must reject duplicate vertices */
-    /*
+
     if(boost::num_vertices(g_) > 1 )
     {
         foreach(Vertex v, boost::vertices(g_))
         {
             if(state == stateProperty_[v]) return v;
         }
-    }*/
+    }
+
     boost::mutex::scoped_lock _(graphMutex_);
 
     Vertex m = boost::add_vertex(g_);
@@ -540,7 +500,7 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
     const std::vector<Vertex>& neighbors = connectionStrategy_(m);
 
     foreach (Vertex n, neighbors)
-        if (connectionFilter_(m, n) && m!=n)
+        if (connectionFilter_(m, n) && m!=n && stateProperty_[m]!=stateProperty_[n])
         {
             totalConnectionAttemptsProperty_[m]++;
             totalConnectionAttemptsProperty_[n]++;
@@ -920,7 +880,7 @@ void FIRM::solveDynamicProgram(FIRM::Vertex goalVertex)
 
         if(debug_)
         {
-            cout<<" The new computed costToGo  :"<<endl<<MapToColvec(newCostToGo)<<endl;
+            //cout<<" The new computed costToGo  :"<<endl<<MapToColvec(newCostToGo)<<endl;
             //cout<<"Press Enter"<<endl;
             //std::cin.get();
         }
@@ -981,7 +941,7 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(FIRM::Vertex 
     DoubleValueComp dvc;
     std::pair<Edge,double> bestCandidate =   *min_element(candidateCostToGo.begin(), candidateCostToGo.end(), dvc );
 
-    if(debug_) std::cout<<" The best candidate cost is: "<<bestCandidate.second<<std::endl;
+    //if(debug_) std::cout<<" The best candidate cost is: "<<bestCandidate.second<<std::endl;
     //cin.get();
     return bestCandidate;
 
@@ -996,6 +956,15 @@ void FIRM::executeFeedback(void)
     }
     Vertex start = startM_[0];
     Vertex goal  = goalM_[0] ;
+    /**
+    if(debug_)
+    {
+        std::cout<<"The start states for the planner are \n";
+        for(int i=0;i<startM_.size();i++)
+        {
+            si_->printState(stateProperty_(startM_[i]));
+        }
+    }
 
     if(debug_)
     {
@@ -1008,6 +977,7 @@ void FIRM::executeFeedback(void)
 
 
     }
+    */
     assert(feedback_.size() > 0  && "There is no feedback generated ");
 
     if(debug_)
