@@ -1,89 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="include/MotionModels/UnicycleStatePropagator.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="44" />
-		</Cursor>
-	</File>
-	<File name="Tests.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="18315" topLine="536" />
-		</Cursor>
-	</File>
-	<File name="src/SpaceInformation/SpaceInformation.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2074" topLine="25" />
-		</Cursor>
-	</File>
-	<File name="include/LocalPlanners/MotionModelLP.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1958" topLine="21" />
-		</Cursor>
-	</File>
-	<File name="src/Filters/ExtendedKF.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5868" topLine="119" />
-		</Cursor>
-	</File>
-	<File name="src/Planner/FIRM.cpp" open="1" top="1" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="38959" topLine="1042" />
-		</Cursor>
-	</File>
-	<File name="include/Weight/FIRMWeight.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="109" topLine="23" />
-		</Cursor>
-	</File>
 	<File name="include/Filters/ExtendedKF.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="3584" topLine="66" />
-		</Cursor>
-	</File>
-	<File name="include/Spaces/SE2BeliefSpace.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="266" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="src/ObservationModels/CamAruco2DObservationModel.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4979" topLine="30" />
-		</Cursor>
-	</File>
-	<File name="include/MotionModels/UnicycleMotionModel.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3489" topLine="70" />
-		</Cursor>
-	</File>
-	<File name="include/Filters/KalmanFilterMethod.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3918" topLine="68" />
-		</Cursor>
-	</File>
-	<File name="include/ObservationModels/ObservationModelMethod.h" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2661" topLine="59" />
-		</Cursor>
-	</File>
-	<File name="src/Spaces/SE2BeliefSpace.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1084" topLine="46" />
-		</Cursor>
-	</File>
-	<File name="src/SeparatedControllers/RHCICreate.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4108" topLine="29" />
-		</Cursor>
-	</File>
-	<File name="include/Filters/LinearizedKF.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3478" topLine="48" />
-		</Cursor>
-	</File>
-	<File name="include/ObservationModels/CamAruco2DObservationModel.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1979" topLine="71" />
 		</Cursor>
 	</File>
 	<File name="src/Filters/LinearizedKF.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -91,14 +11,14 @@
 			<Cursor1 position="5094" topLine="121" />
 		</Cursor>
 	</File>
-	<File name="include/SeparatedControllers/SeparatedControllerMethod.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/ObservationModels/CamAruco2DObservationModel.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3328" topLine="38" />
+			<Cursor1 position="4979" topLine="30" />
 		</Cursor>
 	</File>
-	<File name="src/Planner/GoalVisitor.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/Weight/FIRMWeight.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2597" topLine="41" />
+			<Cursor1 position="109" topLine="23" />
 		</Cursor>
 	</File>
 	<File name="src/LocalPlanner/MotionModelLP.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -106,29 +26,44 @@
 			<Cursor1 position="1885" topLine="7" />
 		</Cursor>
 	</File>
-	<File name="include/OptimizationObjectives/FIRMOptimizationObjective.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/LocalPlanners/MotionModelLP.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1993" topLine="28" />
+			<Cursor1 position="1958" topLine="21" />
 		</Cursor>
 	</File>
-	<File name="include/MotionModels/MotionModelMethod.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/Planner/FIRM.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3341" topLine="66" />
+			<Cursor1 position="37045" topLine="1008" />
 		</Cursor>
 	</File>
-	<File name="include/ValidityCheckers/FIRMValidityChecker.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Tests.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2647" topLine="45" />
+			<Cursor1 position="19519" topLine="573" />
 		</Cursor>
 	</File>
-	<File name="FIRMOMPL.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/Planner/FIRM.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2999" topLine="54" />
+			<Cursor1 position="2624" topLine="39" />
 		</Cursor>
 	</File>
-	<File name="main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3870" topLine="88" />
+			<Cursor1 position="6170" topLine="151" />
+		</Cursor>
+	</File>
+	<File name="src/Spaces/SE2BeliefSpace.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1084" topLine="46" />
+		</Cursor>
+	</File>
+	<File name="qcustomplot/qcustomplot.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="32910" topLine="1092" />
+		</Cursor>
+	</File>
+	<File name="include/SpaceInformation/SpaceInformation.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4239" topLine="89" />
 		</Cursor>
 	</File>
 	<File name="src/MotionModels/UnicycleMotionModel.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -136,19 +71,89 @@
 			<Cursor1 position="8225" topLine="192" />
 		</Cursor>
 	</File>
+	<File name="include/MotionModels/UnicycleMotionModel.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3489" topLine="70" />
+		</Cursor>
+	</File>
+	<File name="include/ObservationModels/ObservationModelMethod.h" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2661" topLine="59" />
+		</Cursor>
+	</File>
+	<File name="include/SeparatedControllers/SeparatedControllerMethod.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3328" topLine="38" />
+		</Cursor>
+	</File>
+	<File name="include/Spaces/SE2BeliefSpace.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="266" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="include/Filters/KalmanFilterMethod.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3918" topLine="68" />
+		</Cursor>
+	</File>
+	<File name="src/SpaceInformation/SpaceInformation.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2074" topLine="25" />
+		</Cursor>
+	</File>
+	<File name="include/MotionModels/UnicycleStatePropagator.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="44" />
+		</Cursor>
+	</File>
+	<File name="include/ObservationModels/CamAruco2DObservationModel.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1979" topLine="71" />
+		</Cursor>
+	</File>
+	<File name="include/ValidityCheckers/FIRMValidityChecker.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3329" topLine="24" />
+		</Cursor>
+	</File>
+	<File name="src/Filters/ExtendedKF.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5868" topLine="119" />
+		</Cursor>
+	</File>
+	<File name="src/SeparatedControllers/RHCICreate.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4108" topLine="29" />
+		</Cursor>
+	</File>
+	<File name="include/OptimizationObjectives/FIRMOptimizationObjective.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1993" topLine="28" />
+		</Cursor>
+	</File>
+	<File name="FIRMOMPL.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2999" topLine="54" />
+		</Cursor>
+	</File>
+	<File name="include/Filters/LinearizedKF.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3478" topLine="48" />
+		</Cursor>
+	</File>
+	<File name="include/MotionModels/MotionModelMethod.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3341" topLine="66" />
+		</Cursor>
+	</File>
+	<File name="src/Planner/GoalVisitor.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2597" topLine="41" />
+		</Cursor>
+	</File>
 	<File name="include/SeparatedControllers/RHCICreate.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="2320" topLine="36" />
-		</Cursor>
-	</File>
-	<File name="include/Controllers/Controller.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="13368" topLine="356" />
-		</Cursor>
-	</File>
-	<File name="include/Planner/FIRM.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="14658" topLine="317" />
 		</Cursor>
 	</File>
 	<File name="src/MotionModels/UnicycleStatePropagator.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -156,9 +161,9 @@
 			<Cursor1 position="2279" topLine="35" />
 		</Cursor>
 	</File>
-	<File name="include/SpaceInformation/SpaceInformation.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/Controllers/Controller.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4239" topLine="89" />
+			<Cursor1 position="13368" topLine="356" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

@@ -14,6 +14,11 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
+					<Add directory="/usr/include/qt4/QtCore" />
+					<Add directory="/usr/include/qt4" />
+					<Add directory="/usr/include/qt4/QtGui" />
+					<Add directory="/home/saurav/Research/Development/FIRMApplication/FIRM/utils/mathtool" />
+					<Add directory="/usr/include" />
 				</Compiler>
 				<Linker>
 					<Add library="/usr/lib/libboost_system.so" />
@@ -32,7 +37,16 @@
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/py_boost_function.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_tools.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_util.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libQtCore.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libQtGui.so" />
+					<Add library="/home/saurav/Softwares/qcustomplot/qcustomplot-sharedlib/sharedlib-compilation/libqcustomplot.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libGL.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libGLU.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libglut.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libX11.so" />
 					<Add directory="/home/saurav/Research/Softwares/omplapp/build/Release/lib" />
+					<Add directory="/usr/lib/x86_64-linux-gnu" />
+					<Add directory="/home/saurav/Softwares/qcustomplot/qcustomplot-sharedlib/sharedlib-compilation" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -75,6 +89,7 @@
 		<Unit filename="include/SpaceInformation/SpaceInformation.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
 		<Unit filename="include/ValidityCheckers/FIRMValidityChecker.h" />
+		<Unit filename="include/Visualization/Vizualizer.h" />
 		<Unit filename="include/Weight/FIRMWeight.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Filters/ExtendedKF.cpp" />
@@ -88,6 +103,7 @@
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
 		<Unit filename="src/SpaceInformation/SpaceInformation.cpp" />
 		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />
+		<Unit filename="src/Visualization/Visualizer.cpp" />
 		<Unit filename="tinyxml/tinystr.cpp" />
 		<Unit filename="tinyxml/tinystr.h" />
 		<Unit filename="tinyxml/tinyxml.cpp" />

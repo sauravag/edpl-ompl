@@ -8,6 +8,8 @@
 #include "include/Spaces/SE2BeliefSpace.h"
 #include "FIRMOMPL.h"
 #include "Tests.h"
+#include <QApplication>
+
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
@@ -155,28 +157,30 @@ void plan(void)
 
 }
 
-int main(int, char **)
+int main(int argc, char *argv[])
 {
-  cout << "OMPL version: " << OMPL_VERSION << endl;
+    cout << "OMPL version: " << OMPL_VERSION << endl;
 
     // set static variables
-  RHCICreate::setControlQueueSize(10);
-  RHCICreate::setTurnOnlyDistance(0.05);
-  Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(1); // degrees
-  Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
-  Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
+    RHCICreate::setControlQueueSize(10);
+    RHCICreate::setTurnOnlyDistance(0.05);
+    Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(1); // degrees
+    Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
+    Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
 
-  plan();
+    //plan();
+    //TestSE2BeliefSpace();
+    //TestBeliefStateSampler();
+    //TestObservationModel();
+    //TestMotionModel();
+    //TestKalmanFilter();
+    //TestRHCICreate();
+    //TestController();
+    //TestFIRMWeight();
+    //TestStatePropagator();
+    QApplication a(argc,argv);
 
-  //TestSE2BeliefSpace();
-  //TestBeliefStateSampler();
-  //TestObservationModel();
-  //TestMotionModel();
-  //TestKalmanFilter();
-  //TestRHCICreate();
-  //TestController();
-  //TestFIRMWeight();
-  //TestStatePropagator();
+    //TestPlotting();
+    return 0;//a.exec();
 
-  return 0;
 }
