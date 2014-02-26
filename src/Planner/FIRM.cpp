@@ -52,6 +52,7 @@
 
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
+#include "../../include/Visualization/Visualizer.h"
 
 namespace ompl
 {
@@ -965,7 +966,7 @@ void FIRM::executeFeedback(void)
             si_->printState(stateProperty_(startM_[i]));
         }
     }
-
+    */
     if(debug_)
     {
         std::cout<<"The number of edges in the graph are :"<<boost::num_edges(g_)<<std::endl;
@@ -973,11 +974,12 @@ void FIRM::executeFeedback(void)
         foreach(Vertex v, boost::vertices(g_))
         {
             si_->printState(stateProperty_[v]);
+            Visualizer::addState(stateProperty_[v]);
         }
 
 
     }
-    */
+
     assert(feedback_.size() > 0  && "There is no feedback generated ");
 
     if(debug_)

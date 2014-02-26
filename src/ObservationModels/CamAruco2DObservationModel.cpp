@@ -36,6 +36,7 @@
 #include "../../include/Spaces/SE2BeliefSpace.h"
 #include "../../include/ObservationModels/CamAruco2DObservationModel.h"
 #include "../../tinyxml/tinyxml.h"
+#include "../../include/Visualization/Visualizer.h"
 /*
   For each landmark, produces an observation that is the range and bearing
   of the given State from that landmark. Result is the concatenation of all
@@ -452,8 +453,10 @@ void CamAruco2DObservationModel::loadLandmarks(const char *pathToSetupFile)
 
     //std::cout<<"New landmark loaded [id,x,y,theta]:  "<<std::endl<<landmark<<std::endl;
     this->landmarks_.push_back(landmark);
+
   }
     std::cout<<"Total number of landmarks loaded successfully :"<<landmarks_.size()<<endl;
+    Visualizer::addLandmarks(landmarks_);
 }
 
 void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)

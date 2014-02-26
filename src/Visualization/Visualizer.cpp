@@ -31,7 +31,7 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
-#include "../../include/Visualization/Vizualizer.h"
+#include "../../include/Visualization/Visualizer.h"
 
 
 
@@ -50,7 +50,7 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
 {
   //cout << "++++++++++++++++++++++++++" << endl;
   //cout << "Drawing " << m_landmarks.size() << " landmarks" << endl;
-  glColor3d(0.8,0.8,0.8);
+  glColor3d(1.0,1.0,1.0);
 
   double scale = 0.15;
 
@@ -68,12 +68,96 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
   glPopMatrix();
 }
 
+void Visualizer::drawState(const ompl::base::State *state)
+{
+    using namespace arma;
+    //glColor3d(1.0,1.0,1.0);
+    glPushMatrix();
+
+        arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
+
+        //std::cout<<"The state to br drawn is"<<x<<std::endl;
+        //translate to the coorect position
+        //glTranslated((m_v[0]-dx.first)/(dx.second-dx.first), (m_v[1]-dy.first)/(dy.second-dy.first), 0);
+        glTranslated(x[0], x[1], 0);
+
+        //draw a black disk
+        GLUquadric *disk = gluNewQuadric();
+        gluDisk(disk, 0, 0.17, 15, 1);
+        //glColor3ub(155, 205, 55);
+        gluDeleteQuadric(disk);
+        //glRotated(m_v[2], 0, 0, 1);
+        glBegin(GL_LINES);
+        glVertex3f(0, 0, 0);
+        glVertex3f(1.0*cos(x[2]), 1.0*sin(x[2]), 0);
+        glEnd();
 
 
+        double fovRadius = 2.5; //meters
+        double fovAngle = 22.5*3.14157/180; //radians
+        arma::colvec fovLeft(3), fovRight(3);
+
+        fovLeft	<< fovRadius*cos(x[2] + fovAngle) << endr
+                << fovRadius*sin(x[2] + fovAngle) << endr
+                << 0                              << endr;
+
+        fovRight << fovRadius*cos(x[2] - fovAngle) 	<< endr
+                 << fovRadius*sin(x[2] - fovAngle) 	<< endr
+                 <<	0								<< endr;
+        glColor3d(0.5,0.5,0.5);
+        glBegin(GL_LINE_LOOP);
+            glVertex3f(0,0,0);
+            glVertex3f(fovRight[0], fovRight[1], 0);
+            glVertex3f(fovLeft[0], fovLeft[1], 0);
+        glEnd();
+
+    glPopMatrix();
+}
+
+void Visualizer::refresh()
+{
+    boost::mutex::scoped_lock sl(drawMutex_);
+
+    glPushMatrix();
+    //draw roadmap based on current mode
+    /**
+    switch(m_mode)
+    {
+        case NodeViewMode:
+            DrawNodeViewMode();
+            break;
+        case FeedbackViewMode:
+            DrawFeedbackViewMode();
+            break;
+        case PRMViewMode:
+            DrawPRMViewMode();
+            break;
+        default:
+            assert(!"There is no default drawing mode for OGLDisplay");
+            exit(1);
+    }
+    */
+    //draw landmarks
+    for(size_t i = 0 ; i < landmarks_.size(); ++i)
+    {
+        drawLandmark(landmarks_[i]);
+    }
+
+    drawGraphBeliefNodes();
+
+    glPopMatrix();
+}
 
 
+void Visualizer::drawGraphBeliefNodes()
+{
+    for(typename std::list<ompl::base::State*>::iterator s=states_.begin(), e=states_.end(); s!=e; ++s)
+    {
+          glColor3d(1,1,1);
+          drawState(*s);
+    }
 
-
+}
 
 
 

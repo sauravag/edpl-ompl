@@ -44,6 +44,7 @@
 					<Add library="/usr/lib/x86_64-linux-gnu/libGLU.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libglut.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libX11.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libQtOpenGL.so" />
 					<Add directory="/home/saurav/Research/Softwares/omplapp/build/Release/lib" />
 					<Add directory="/usr/lib/x86_64-linux-gnu" />
 					<Add directory="/home/saurav/Softwares/qcustomplot/qcustomplot-sharedlib/sharedlib-compilation" />
@@ -89,7 +90,9 @@
 		<Unit filename="include/SpaceInformation/SpaceInformation.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
 		<Unit filename="include/ValidityCheckers/FIRMValidityChecker.h" />
-		<Unit filename="include/Visualization/Vizualizer.h" />
+		<Unit filename="include/Visualization/GLWidget.h" />
+		<Unit filename="include/Visualization/Visualizer.h" />
+		<Unit filename="include/Visualization/Window.h" />
 		<Unit filename="include/Weight/FIRMWeight.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Filters/ExtendedKF.cpp" />
@@ -103,7 +106,11 @@
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
 		<Unit filename="src/SpaceInformation/SpaceInformation.cpp" />
 		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />
+		<Unit filename="src/Visualization/GLWidget.cpp" />
 		<Unit filename="src/Visualization/Visualizer.cpp" />
+		<Unit filename="src/Visualization/Window.cpp" />
+		<Unit filename="src/Visualization/moc_GLWidget.cpp" />
+		<Unit filename="src/Visualization/moc_Window.cpp" />
 		<Unit filename="tinyxml/tinystr.cpp" />
 		<Unit filename="tinyxml/tinystr.h" />
 		<Unit filename="tinyxml/tinyxml.cpp" />

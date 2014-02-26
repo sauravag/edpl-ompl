@@ -9,7 +9,10 @@
 #include "FIRMOMPL.h"
 #include "Tests.h"
 #include <QApplication>
-
+#include <QtGui/QDesktopWidget>
+#include "include/Visualization/Window.h"
+#include "include/Visualization/Visualizer.h"
+#include <boost/thread.hpp>
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
@@ -96,7 +99,9 @@ void plan(void)
     // create a random start state
     ob::State *start = statespace->allocState();
 
-    start->as<StateType>()->setXYYaw(13,5.1,0);
+    start->as<StateType>()->setXYYaw(1,1,0);
+
+    Visualizer::addState(start);
 
     //simpleSampler->sample(start);
 
@@ -168,7 +173,7 @@ int main(int argc, char *argv[])
     Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
     Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
 
-    //plan();
+
     //TestSE2BeliefSpace();
     //TestBeliefStateSampler();
     //TestObservationModel();
@@ -178,9 +183,23 @@ int main(int argc, char *argv[])
     //TestController();
     //TestFIRMWeight();
     //TestStatePropagator();
-    QApplication a(argc,argv);
 
-    //TestPlotting();
-    return 0;//a.exec();
+    QApplication app(argc, argv);
+    MyWindow window;
+    window.resize(window.sizeHint());
+    int desktopArea = QApplication::desktop()->width() * \
+        QApplication::desktop()->height();
+    int widgetArea = window.width() * window.height();
+
+    window.showMaximized();
+
+    //plan();
+    boost::thread solveThread(plan);
+
+    app.exec();
+    solveThread.join();
+
+
+    return 0;
 
 }

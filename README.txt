@@ -17,6 +17,15 @@ This application is an implementation of Feedback Information Road Maps (FIRM) w
 "FIRM is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic roadmap 
 methods. The crucial feature of FIRM is that the costs associated with the edges are independent of each other, and in this sense it is the first method that generates a graph in belief space that preserves the optimal substructure property. From a practical point of view, FIRM is a robust and reliable planning framework. It is robust since the solution is a feedback and there is no need for expensive replanning. It is reliable because accurate collision probabilities can be computed along the edges. In addition, FIRM is a scalable framework, where the complexity of planning with FIRM is a constant multiplier of the complexity of planning with PRM."  
 
+
+----------------------------------------
+External Dependencies
+----------------------------------------
+
+1. QT : For Visualization
+2. Armadillo C++ Matrix Algebra Library
+3  OpenGL
+
 -----------------------------------------
 References: 
 -----------------------------------------

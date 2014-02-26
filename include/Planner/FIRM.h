@@ -56,6 +56,7 @@
 #include "../Path/FeedbackPath.h"
 #include "../ConnectionStrategy/FStrategy.h"
 //#include "../SpaceInformation/SpaceInformation.h"
+//#include "../Visualization/Visualizer.h"
 
 namespace base
 {

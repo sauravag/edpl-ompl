@@ -32,76 +32,41 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef FIRM_OMPL_VISUALIZER_H
-#define FIRM_OMPL_VISUALIZER_H
+#ifndef WINDOW_H
+#define WINDOW_H
 
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <GL/gl.h>
-#include <GL/glx.h>
-#include <GL/glu.h>
-#include <pthread.h>
+#include <string>
 
-#include <armadillo>
-#include <list>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread.hpp>
-#include "../Spaces/SE2BeliefSpace.h"
-#include "../SpaceInformation/SpaceInformation.h"
+using namespace std;
 
-class Visualizer
-{
+#include <QtGui/QWidget>
+#include <QtCore/QTimer>
+#include <QtGui/QPushButton>
+#include <QtGui/QComboBox>
 
-    public:
+class GLWidget;
 
-        Visualizer(){}
+class MyWindow : public QWidget {
+  Q_OBJECT
 
-        ~Visualizer(){}
+  public:
+    MyWindow();
 
-        static void addLandmarks(std::vector<arma::colvec>& landmarks)
-        {
-            boost::mutex::scoped_lock sl(drawMutex_);
-            landmarks_.insert(landmarks_.end(), landmarks.begin(), landmarks.end());
-        }
+    //~MyWindow(){};
 
+  protected:
+    void keyPressEvent(QKeyEvent *event);
 
-        static void addState(ompl::base::State *state)
-        {
-            boost::mutex::scoped_lock sl(drawMutex_);
-            states_.push_back(state);
-        }
+  private Q_SLOTS:
+    //call back for simulation
+    void simulate();
 
-        static void updateTrueState(const ompl::base::State *state)
-        {
-            boost::mutex::scoped_lock sl(drawMutex_);
-            si_->copyState(trueState_,state);
-        }
+    //call back for buttons
+    void resetCamera();
 
-        static void updateCurrentBelief(const ompl::base::State *state)
-        {
-            boost::mutex::scoped_lock sl(drawMutex_);
-            si_->copyState(currentBelief_,state);
-        }
-
-        static void drawLandmark(arma::colvec& landmark);
-
-        static void drawState(const ompl::base::State* state);
-
-
-    private:
-
-        static std::list<ompl::base::State*> states_;
-
-        static boost::mutex drawMutex_;
-
-        static ompl::base::State* trueState_;
-
-        static ompl::base::State* currentBelief_;
-
-        static std::vector<arma::colvec> landmarks_;
-
-        static firm::SpaceInformation::SpaceInformationPtr si_;
-
-
+  private:
+    QTimer timer_; //controls framerate
+    GLWidget* glWidget_; //GLScene
 };
-#endif // FIRM_OMPL_VISUALIZER_H
+
+#endif
