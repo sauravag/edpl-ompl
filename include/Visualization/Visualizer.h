@@ -59,7 +59,7 @@ class Visualizer
         ~Visualizer(){}
 
         /** \brief Add the landmarks in the environment */
-        static void addLandmarks(std::vector<arma::colvec>& landmarks)
+        static void addLandmarks(const std::vector<arma::colvec>& landmarks)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
             landmarks_.insert(landmarks_.end(), landmarks.begin(), landmarks.end());
@@ -69,13 +69,25 @@ class Visualizer
         static void addState(ompl::base::State *state)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
-            states_.push_back(state);
+            //ompl::base::State *tempState = si_->allocState();
+            //si_->copyState(tempState, state);
+            states_.push_back(si_->cloneState(state));
+        }
+
+        /** \brief Add a Roadmap Graph edge to the visualization */
+        static void addGraphEdge(const ompl::base::State *source, const ompl::base::State *target)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+            edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
+            graphEdges_.push_back(edge);
         }
 
         /** \brief update the robot's true state for drawing */
         static void updateTrueState(const ompl::base::State *state)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
+            if(!trueState_) trueState_ = si_->allocState();
             si_->copyState(trueState_,state);
         }
 
@@ -83,17 +95,33 @@ class Visualizer
         static void updateCurrentBelief(const ompl::base::State *state)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
+            if(!currentBelief_) currentBelief_ = si_->allocState();
             si_->copyState(currentBelief_,state);
+        }
+
+        /** \brief Copy the space information pointer */
+        static void updateSpaceInformation(const firm::SpaceInformation::SpaceInformationPtr si)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            si_ = si;
+            trueState_ = si_->allocState();
+            currentBelief_ = si->allocState();
         }
 
         /** \brief Draw a single landmark that is passed to this function */
         static void drawLandmark(arma::colvec& landmark);
 
         /** \brief Draw a single state that is passed to this function */
-        static void drawState(const ompl::base::State* state);
+        static void drawState(const ompl::base::State* state, bool isTrueState = false);
+
+        /** \brief Draw an edge that belongs to the Roadmap graph */
+        static void drawEdge(const ompl::base::State* source, const ompl::base::State* target);
 
         /** \brief Draw the stored graph nodes */
         static void drawGraphBeliefNodes();
+
+        /** \brief Draw the edges in the roadmap graph */
+        static void drawGraphEdges();
 
         /** \brief Refresh the drawing and show latest scenario*/
         static void refresh();
@@ -117,6 +145,9 @@ class Visualizer
 
         /** \brief A pointer to the space information, because the visualizer must know what space its drawing */
         static firm::SpaceInformation::SpaceInformationPtr si_;
+
+        /** \brief Store the Roadmap graph edges */
+        static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > graphEdges_;
 
 
 };

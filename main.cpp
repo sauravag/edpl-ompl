@@ -99,9 +99,13 @@ void plan(void)
     // create a random start state
     ob::State *start = statespace->allocState();
 
-    start->as<StateType>()->setXYYaw(1,1,0);
+    start->as<StateType>()->setXYYaw(5,1,0);
 
+    Visualizer::updateSpaceInformation(si);
     Visualizer::addState(start);
+
+    //Visualizer::updateCurrentBelief(start);
+    //Visualizer::updateTrueState(start);
 
     //simpleSampler->sample(start);
 
@@ -111,6 +115,7 @@ void plan(void)
     // create a random goal state
     ob::State *goal = statespace->allocState();
     goal->as<StateType>()->setXYYaw(1.5,4.8,1.57);
+    Visualizer::addState(goal);
 
     cout<<"The goal state is:"<<endl;
     statespace->as<SE2BeliefSpace>()->printBeliefState(goal);

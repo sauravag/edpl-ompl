@@ -45,6 +45,9 @@ ompl::base::State* Visualizer::currentBelief_;
 
 std::vector<arma::colvec> Visualizer::landmarks_;
 
+firm::SpaceInformation::SpaceInformationPtr Visualizer::si_;
+
+std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::graphEdges_;
 
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
@@ -68,10 +71,10 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
   glPopMatrix();
 }
 
-void Visualizer::drawState(const ompl::base::State *state)
+void Visualizer::drawState(const ompl::base::State *state, bool isTrueState)
 {
     using namespace arma;
-    //glColor3d(1.0,1.0,1.0);
+    if(isTrueState) glColor3d(0,1.0,0.0);
     glPushMatrix();
 
         arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
@@ -145,9 +148,27 @@ void Visualizer::refresh()
 
     drawGraphBeliefNodes();
 
+    if(trueState_) drawState(trueState_, true);
+
+    if(currentBelief_) drawState(currentBelief_);
+
+    if(graphEdges_.size()>0) drawGraphEdges();
+
     glPopMatrix();
 }
 
+void Visualizer::drawEdge(const ompl::base::State* source, const ompl::base::State* target)
+{
+    using namespace arma;
+
+    colvec::fixed<2> sourceData = source->as<SE2BeliefSpace::StateType>()->getArmaData().subvec(0,1);
+    colvec::fixed<2> targetData = target->as<SE2BeliefSpace::StateType>()->getArmaData().subvec(0,1);
+
+    glBegin(GL_LINES);
+        glVertex2d(sourceData[0],sourceData[1]);
+        glVertex2d(targetData[0],targetData[1]);
+    glEnd();
+}
 
 void Visualizer::drawGraphBeliefNodes()
 {
@@ -157,6 +178,14 @@ void Visualizer::drawGraphBeliefNodes()
           drawState(*s);
     }
 
+}
+
+void Visualizer::drawGraphEdges()
+{
+    for(int i=0; i<graphEdges_.size();i++)
+    {
+        drawEdge(graphEdges_[i].first,graphEdges_[i].second);
+    }
 }
 
 

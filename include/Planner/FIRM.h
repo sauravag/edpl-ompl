@@ -330,7 +330,7 @@ protected:
     virtual ompl::base::PathPtr constructGeometricPath(const boost::vector_property_map<Vertex> &prev, const Vertex &start, const Vertex &goal);
 
     /** \brief Add an edge from vertex a to b in graph */
-    virtual void addEdgeToGraph(Vertex a, Vertex b);
+    virtual void addEdgeToGraph(const Vertex a, const Vertex b);
 
     /** \brief Generates the cost of the edge */
     virtual FIRMWeight generateControllersWithEdgeCost(ompl::base::State* startNodeState,
@@ -345,10 +345,12 @@ protected:
     virtual void generateNodeController(const ompl::base::State *state, NodeControllerType &nodeController);
 
     /** \brief Solves the dynamic program to return a feedback policy */
-    virtual void solveDynamicProgram(Vertex goalVertex);
+    virtual void solveDynamicProgram(const Vertex goalVertex);
 
     /** \brief Executes the generated policy on the system */
     void executeFeedback(void);
+
+    void addStateToVisualization(ompl::base::State *state) ;
 
     /** \brief Calculates the new cost to go from a node*/
     std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(Vertex node);

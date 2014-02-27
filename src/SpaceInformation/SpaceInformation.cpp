@@ -35,6 +35,19 @@
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #include "../../include/SpaceInformation/SpaceInformation.h"
+#include "../../include/Visualization/Visualizer.h"
+
+void firm::SpaceInformation::setBelief(const ompl::base::State *state)
+{
+    this->copyState(belief_, state);
+    Visualizer::updateCurrentBelief(belief_);
+}
+
+void firm::SpaceInformation::setTrueState(const ompl::base::State *state)
+{
+    this->copyState(trueState_, state);
+    Visualizer::updateTrueState(trueState_);
+}
 
 void firm::SpaceInformation::applyControl(const ompl::control::Control *control)
 {
@@ -42,6 +55,8 @@ void firm::SpaceInformation::applyControl(const ompl::control::Control *control)
     typename MotionModelMethod::NoiseType noise = motionModel_->generateNoise(trueState_, control);
 
     motionModel_->Evolve(trueState_, control, noise, trueState_);
+
+    Visualizer::updateTrueState(trueState_);
 
   //OGLDisplay<MPTraits>::UpdateTrueState(m_trueState);
   //cout<<" The True State is :"<<endl<<m_trueState.GetArmaData()<<endl;

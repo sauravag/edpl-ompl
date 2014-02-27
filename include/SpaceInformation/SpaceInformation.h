@@ -37,9 +37,11 @@
 #ifndef FIRM_SPACE_INFORMATION_
 #define FIRM_SPACE_INFORMATION_
 
+
 #include "ompl/control/SpaceInformation.h"
 #include "../MotionModels/MotionModelMethod.h"
 #include "../ObservationModels/ObservationModelMethod.h"
+
 
 /**
 The FIRMSpace information class is a derivative of the control::spaceinformation
@@ -82,15 +84,9 @@ namespace firm
                 motionModel_ = mm;
             }
 
-            void setBelief(const ompl::base::State *state)
-            {
-                this->copyState(belief_, state);
-            }
+            void setBelief(const ompl::base::State *state);
 
-            void setTrueState(const ompl::base::State *state)
-            {
-                this->copyState(trueState_, state);
-            }
+            void setTrueState(const ompl::base::State *state);
 
             ObservationModelPointer getObservationModel(void)
             {

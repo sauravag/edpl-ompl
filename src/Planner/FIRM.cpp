@@ -254,6 +254,7 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 // add the vertex to the nearest neighbors data structure
                 nn_->add(m);
                 v = m;
+                addStateToVisualization(workStates[i]);
             }
 
             // if there are intermediary states or the milestone has not been connected to the initially
@@ -486,8 +487,8 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
     boost::mutex::scoped_lock _(graphMutex_);
 
     Vertex m = boost::add_vertex(g_);
-    //std::cout<<"Putting out the vertex property :"<<m<<std::endl;
-    //std::cin.get();
+    addStateToVisualization(state);
+
     stateProperty_[m] = state;
     totalConnectionAttemptsProperty_[m] = 1;
     successfulConnectionAttemptsProperty_[m] = 0;
@@ -518,21 +519,6 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
                 //successfulConnectionAttemptsProperty_[m]++;
                 //successfulConnectionAttemptsProperty_[n]++;
                 addEdgeToGraph(n, m);
-                /**
-                successfulConnectionAttemptsProperty_[m]++;
-                successfulConnectionAttemptsProperty_[n]++;
-                // This where we perform MC simulation to get edge cost
-                //const ompl::base::Cost weight = opt_->motionCost(stateProperty_[m], stateProperty_[n]);
-                EdgeControllerType edgeController;
-                NodeControllerType nodeController;
-                const FIRMWeight weight = generateControllersWithEdgeCost(stateProperty_[m], stateProperty_[n], edgeController, nodeController);
-                const unsigned int id = maxEdgeID_++;
-                const Graph::edge_property_type properties(weight, id);
-                std::pair<Edge, bool> newEdge = boost::add_edge(m, n, properties, g_);
-                edgeControllers_[newEdge.first] = edgeController;
-                nodeControllers_[n] = nodeController;
-                uniteComponents(n, m);
-                */
 
             }
         }
@@ -628,7 +614,7 @@ ompl::base::Cost FIRM::costHeuristic(Vertex u, Vertex v) const
     return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
 }
 
-void FIRM::addEdgeToGraph(FIRM::Vertex a, FIRM::Vertex b)
+void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
 {
     EdgeControllerType edgeController;
 
@@ -649,6 +635,8 @@ void FIRM::addEdgeToGraph(FIRM::Vertex a, FIRM::Vertex b)
     //nodeControllers_[a] = nodeController;
 
     uniteComponents(b, a);
+
+    Visualizer::addGraphEdge(stateProperty_[a], stateProperty_[b]);
 }
 
 FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeState, ompl::base::State* targetNodeState, EdgeControllerType &edgeController, NodeControllerType &nodeController)
@@ -816,7 +804,7 @@ arma::colvec MapToColvec(const Map& _m) {
   return mapData;
 }
 
-void FIRM::solveDynamicProgram(FIRM::Vertex goalVertex)
+void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 {
     using namespace arma;
 
@@ -957,6 +945,8 @@ void FIRM::executeFeedback(void)
     }
     Vertex start = startM_[0];
     Vertex goal  = goalM_[0] ;
+
+    siF_->setTrueState(stateProperty_[start]);
     /**
     if(debug_)
     {
@@ -974,7 +964,6 @@ void FIRM::executeFeedback(void)
         foreach(Vertex v, boost::vertices(g_))
         {
             si_->printState(stateProperty_[v]);
-            Visualizer::addState(stateProperty_[v]);
         }
 
 
@@ -1044,4 +1033,9 @@ void FIRM::executeFeedback(void)
     }
 
 
+}
+
+void FIRM::addStateToVisualization(ompl::base::State *state)
+{
+    Visualizer::addState(state);
 }

@@ -130,8 +130,8 @@
 		dt= 0.1
 	  /> <!--No Noise--> 
 	<UnicycleMotionModel
-		sigmaV="0.012"
-		etaV="0.05"
+		sigmaV="0.0012"
+		etaV="0.003"
     sigmaOmega="0.001"
     etaOmega="0.03"
 		P_Wg_filename=""
