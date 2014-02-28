@@ -47,6 +47,8 @@ void firm::SpaceInformation::setTrueState(const ompl::base::State *state)
 {
     this->copyState(trueState_, state);
     Visualizer::updateTrueState(trueState_);
+    //std::cout<<"True state was updated \n";
+    //std::cin.get();
 }
 
 void firm::SpaceInformation::applyControl(const ompl::control::Control *control)

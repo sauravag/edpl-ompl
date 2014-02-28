@@ -58,6 +58,13 @@ class Visualizer
 
         ~Visualizer(){}
 
+        struct VZRFeedbackEdge
+        {
+            ompl::base::State *source;
+            ompl::base::State *target;
+            double cost;
+        };
+
         /** \brief Add the landmarks in the environment */
         static void addLandmarks(const std::vector<arma::colvec>& landmarks)
         {
@@ -82,6 +89,29 @@ class Visualizer
             edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
             graphEdges_.push_back(edge);
         }
+
+        static void addFeedbackEdge(const ompl::base::State *source, const ompl::base::State *target, double cost)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            VZRFeedbackEdge edge;
+
+            edge.source = si_->allocState();
+            si_->copyState(edge.source, source);
+
+            edge.target = si_->allocState();
+            si_->copyState(edge.target, target);
+
+            edge.cost = cost;
+
+            feedbackEdges_.push_back(edge);
+        }
+
+        static void ClearFeedbackEdges()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            feedbackEdges_.clear();
+        }
+
 
         /** \brief update the robot's true state for drawing */
         static void updateTrueState(const ompl::base::State *state)
@@ -123,6 +153,13 @@ class Visualizer
         /** \brief Draw the edges in the roadmap graph */
         static void drawGraphEdges();
 
+        static void drawFeedbackEdges();
+
+        /** \brief Draw the X&Y bounds*/
+        static void drawEnvironmentBoundary();
+
+        static void drawObstacle();
+
         /** \brief Refresh the drawing and show latest scenario*/
         static void refresh();
 
@@ -148,6 +185,9 @@ class Visualizer
 
         /** \brief Store the Roadmap graph edges */
         static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > graphEdges_;
+
+        /** \brief Store the feedback edges */
+        static std::vector<VZRFeedbackEdge> feedbackEdges_;
 
 
 };

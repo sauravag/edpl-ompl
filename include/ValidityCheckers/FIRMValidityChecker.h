@@ -54,9 +54,9 @@ class FIRMValidityChecker : public ompl::base::StateValidityChecker
     virtual bool isValid(const ompl::base::State *state) const
     {
       // states within a box are invalid
-      double x_l =  3;
-      double x_r =  12;
-      double y_b =  2.3;
+      double x_l =  2.0;
+      double x_r =  14.5;
+      double y_b =  2.0;
       double y_t =  5;
 
       bool valid = true;
@@ -69,10 +69,10 @@ class FIRMValidityChecker : public ompl::base::StateValidityChecker
     bool isInsideBox(const ompl::base::State *state, double xl, double xr, double yb, double yt) const
     {
         arma::colvec pos = state->as<StateType>()->getArmaData();
-
-        if(pos[0] >= xl && pos[0] <= xr )
+        double eps = 0.20;
+        if(pos[0] >= xl-eps && pos[0] <= xr+eps )
             {
-            if(pos[1] >= yb && pos[1] <= yt)
+            if(pos[1] >= yb-eps && pos[1] <= yt+eps)
             {
                 return true; // inside box
             }

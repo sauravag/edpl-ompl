@@ -57,10 +57,10 @@ void plan(void)
     ob::RealVectorBounds bounds(2);
     // set X bound
     bounds.setLow(0,0);
-    bounds.setHigh(0,14);
+    bounds.setHigh(0,17);
     //set Y bound
     bounds.setLow(1,0);
-    bounds.setHigh(1,6);
+    bounds.setHigh(1,7);
 
     statespace->as<SE2BeliefSpace>()->setBounds(bounds);
 
@@ -99,7 +99,9 @@ void plan(void)
     // create a random start state
     ob::State *start = statespace->allocState();
 
-    start->as<StateType>()->setXYYaw(5,1,0);
+    //start->as<StateType>()->setXYYaw(15,4.5,0);
+    start->as<StateType>()->setXYYaw(4,1,0);
+    //start->as<StateType>()->setXYYaw(6,6,0);
 
     Visualizer::updateSpaceInformation(si);
     Visualizer::addState(start);
@@ -115,6 +117,7 @@ void plan(void)
     // create a random goal state
     ob::State *goal = statespace->allocState();
     goal->as<StateType>()->setXYYaw(1.5,4.8,1.57);
+    //goal->as<StateType>()->setXYYaw(1.5,5.1,1.57);
     Visualizer::addState(goal);
 
     cout<<"The goal state is:"<<endl;
@@ -148,7 +151,7 @@ void plan(void)
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = planner->solve(200);
+    ob::PlannerStatus solved = planner->solve(40);
 
     cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 
@@ -174,9 +177,9 @@ int main(int argc, char *argv[])
     // set static variables
     RHCICreate::setControlQueueSize(10);
     RHCICreate::setTurnOnlyDistance(0.05);
-    Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(1); // degrees
+    Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(5); // degrees
     Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
-    Controller<RHCICreate, ExtendedKF>::setMaxTries(40);
+    Controller<RHCICreate, ExtendedKF>::setMaxTries(50);
 
 
     //TestSE2BeliefSpace();

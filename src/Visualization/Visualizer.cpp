@@ -49,6 +49,8 @@ firm::SpaceInformation::SpaceInformationPtr Visualizer::si_;
 
 std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::graphEdges_;
 
+std::vector<Visualizer::VZRFeedbackEdge> Visualizer::feedbackEdges_;
+
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
   //cout << "++++++++++++++++++++++++++" << endl;
@@ -122,6 +124,10 @@ void Visualizer::refresh()
     boost::mutex::scoped_lock sl(drawMutex_);
 
     glPushMatrix();
+
+    drawEnvironmentBoundary();
+
+    drawObstacle();
     //draw roadmap based on current mode
     /**
     switch(m_mode)
@@ -152,7 +158,9 @@ void Visualizer::refresh()
 
     if(currentBelief_) drawState(currentBelief_);
 
-    if(graphEdges_.size()>0) drawGraphEdges();
+    //if(graphEdges_.size()>0) drawGraphEdges();
+
+    if(feedbackEdges_.size()>0) drawFeedbackEdges();
 
     glPopMatrix();
 }
@@ -170,6 +178,40 @@ void Visualizer::drawEdge(const ompl::base::State* source, const ompl::base::Sta
     glEnd();
 }
 
+void Visualizer::drawEnvironmentBoundary()
+{
+
+    double xmax = 17;
+    double ymax = 7;
+    //glTranslated(0, 0, 0);
+
+    glBegin(GL_LINE_LOOP);
+            glVertex3f(0,0,0);
+            glVertex3f(0, ymax, 0);
+            glVertex3f(xmax, ymax, 0);
+            glVertex3f(xmax,0,0);
+    glEnd();
+
+}
+
+void Visualizer::drawObstacle()
+{
+
+    double x_l =  2.0;
+    double x_r =  14.5;
+    double y_b =  2.0;
+    double y_t =  5;
+
+    //glTranslated(x_l, y_b, 0);
+
+    glBegin(GL_LINE_LOOP);
+            glVertex3f(x_l,y_b,0);
+            glVertex3f(x_l, y_t, 0);
+            glVertex3f(x_r, y_t, 0);
+            glVertex3f(x_r,y_b,0);
+    glEnd();
+
+}
 void Visualizer::drawGraphBeliefNodes()
 {
     for(typename std::list<ompl::base::State*>::iterator s=states_.begin(), e=states_.end(); s!=e; ++s)
@@ -188,6 +230,13 @@ void Visualizer::drawGraphEdges()
     }
 }
 
+void Visualizer::drawFeedbackEdges()
+{
+    for(int i=0; i<feedbackEdges_.size();i++)
+    {
+        drawEdge(feedbackEdges_[i].source,feedbackEdges_[i].target);
+    }
+}
 
 
 

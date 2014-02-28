@@ -61,14 +61,14 @@ namespace ompl
 
         /** \brief The number of steps to take for a random bounce
             motion generated as part of the expansion step of PRM. */
-        static const unsigned int MAX_RANDOM_BOUNCE_STEPS   = 5;
+        static const unsigned int MAX_RANDOM_BOUNCE_STEPS   = 4;
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 6;
 
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
-        static const double ROADMAP_BUILD_TIME = 2;
+        static const double ROADMAP_BUILD_TIME = 10;
 
         static const double NUM_MONTE_CARLO_PARTICLES = 2;
 
@@ -80,7 +80,7 @@ namespace ompl
 
         static const double GOAL_COST_TO_GO = 0.0;
 
-        static const double INIT_COST_TO_GO = 0.0;
+        static const double INIT_COST_TO_GO = 2.0;
 
         static const double OBSTACLE_COST_TO_GO = 500;
 
@@ -674,7 +674,7 @@ FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeSta
         double tempWeight=0;
 
         siF_->setTrueState(startNodeState);
-        siF_->setBelief(targetNodeState);
+        siF_->setBelief(startNodeState);
 
         if(debug_)
         {
@@ -938,6 +938,8 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(FIRM::Vertex 
 
 void FIRM::executeFeedback(void)
 {
+    sendFeedbackEdgesToViz();
+
     if(boost::num_edges(g_) == 0)
     {
         std::cout<<"There are no edges !! Press Enter";
@@ -947,16 +949,8 @@ void FIRM::executeFeedback(void)
     Vertex goal  = goalM_[0] ;
 
     siF_->setTrueState(stateProperty_[start]);
-    /**
-    if(debug_)
-    {
-        std::cout<<"The start states for the planner are \n";
-        for(int i=0;i<startM_.size();i++)
-        {
-            si_->printState(stateProperty_(startM_[i]));
-        }
-    }
-    */
+    siF_->setBelief(stateProperty_[start]);
+
     if(debug_)
     {
         std::cout<<"The number of edges in the graph are :"<<boost::num_edges(g_)<<std::endl;
@@ -987,7 +981,10 @@ void FIRM::executeFeedback(void)
 
     EdgeControllerType controller;
 
-    ompl::base::State *endState = si_->allocState();
+    ompl::base::State *cstartState = si_->allocState();
+    si_->copyState(cstartState, stateProperty_[start]);
+
+    ompl::base::State *cendState = si_->allocState();
 
     if(debug_) OMPL_INFORM("Running policy execution");
 
@@ -1005,7 +1002,7 @@ void FIRM::executeFeedback(void)
             //std::cin.get();
         }
 
-        if(controller.Execute(stateProperty_[currentVertex], endState, cost, false))
+        if(controller.Execute(cstartState, cendState, cost, false))
         {
             if(debug_) std::cout<<"executeFeedback: Controller was successful in execution (Press Enter) \n";
             //std::cin.get();
@@ -1015,9 +1012,10 @@ void FIRM::executeFeedback(void)
         {
             if(debug_) std::cout<<"executeFeedback: Controller was NOT successful in execution (Press Enter)  \n";
             //std::cin.get();
-            currentVertex = addMilestone(endState);
+            currentVertex = addMilestone(cendState);
             solveDynamicProgram(goal);
         }
+        si_->copyState(cstartState, cendState);
         //std::cout<<"Press Enter \n";
         //std::cin.get();
     }
@@ -1026,7 +1024,7 @@ void FIRM::executeFeedback(void)
     {
         using namespace std;
 
-        cout<<"executeFeedback: The final filtered State from controller is :"<<endState->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
+        cout<<"executeFeedback: The final filtered State from controller is :"<<cendState->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
         cout<<"executeFeedback: the final commanded state was :"<<stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
         cout<<"Press enter "<<endl;
         std::cin.get();
@@ -1038,4 +1036,19 @@ void FIRM::executeFeedback(void)
 void FIRM::addStateToVisualization(ompl::base::State *state)
 {
     Visualizer::addState(state);
+}
+
+void FIRM::sendFeedbackEdgesToViz()
+{
+    Visualizer::ClearFeedbackEdges();
+
+    for(typename std::map<Vertex, Edge>::const_iterator i=feedback_.begin(), e=feedback_.end(); i!=e; ++i)
+    {
+        Vertex sourceVertex, targetVertex;
+        Edge edge;
+        sourceVertex = i->first;
+        edge = i->second;
+        targetVertex = boost::target(edge, g_);
+        Visualizer::addFeedbackEdge(stateProperty_[sourceVertex], stateProperty_[targetVertex], 0);
+  }
 }

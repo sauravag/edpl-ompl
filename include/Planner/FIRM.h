@@ -352,6 +352,8 @@ protected:
 
     void addStateToVisualization(ompl::base::State *state) ;
 
+    void sendFeedbackEdgesToViz();
+
     /** \brief Calculates the new cost to go from a node*/
     std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(Vertex node);
 
