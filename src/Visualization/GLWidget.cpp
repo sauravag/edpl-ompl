@@ -20,9 +20,21 @@ using namespace std;
 GLWidget::GLWidget(QWidget *parent)
   : QGLWidget(QGLFormat(QGL::SampleBuffers), parent),
     m_drawAxes(false),
-    m_camPos(13.5, 3.5, 32.0), m_camAt(0.0, 0.0, -1.0), m_camZoom(27), m_view(false),
+    m_camZoom(27), m_view(false),
     m_snapshotPath(tr("")), m_framePath(tr(""))
 {
+   using namespace arma;
+   arma::colvec campos(3);
+   campos<<13.5<<endr
+         <<3.5<<endr
+         <<32.0<<endr;
+   m_camPos =campos;
+
+   arma::colvec camat(3);
+   camat<<0.0<<endr
+        <<0.0<<endr
+        <<-1.0<<endr;
+   m_camAt = camat;
 
   //GetEnvironmentPolygons();
   m_long = -PI/2.0; m_lat = 0.0;
@@ -59,8 +71,13 @@ void GLWidget::moveCam(double _delta)
 
 void GLWidget::strafeCam(double _delta)
 {
-  Vector3d up(0.0, 0.0, 1.0);
-  Vector3d right = m_camAt^up;
+  using namespace arma;
+  arma::colvec up(3);
+  up<<0.0<<endr
+    <<0.0<<endr
+    <<1.0<<endr;
+
+  arma::colvec right = m_camAt%up;
   m_camPos = m_camPos + right * _delta;
   updateGL();
 }

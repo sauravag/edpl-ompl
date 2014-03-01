@@ -101,6 +101,7 @@
 		<Unit filename="src/MotionModels/UnicycleMotionModel.cpp" />
 		<Unit filename="src/MotionModels/UnicycleStatePropagator.cpp" />
 		<Unit filename="src/ObservationModels/CamAruco2DObservationModel.cpp" />
+		<Unit filename="src/Path/FeedbackPath.cpp" />
 		<Unit filename="src/Planner/FIRM.cpp" />
 		<Unit filename="src/Planner/GoalVisitor.hpp" />
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />

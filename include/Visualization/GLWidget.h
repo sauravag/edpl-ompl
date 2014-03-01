@@ -73,8 +73,8 @@ class GLWidget : public QGLWidget {
     void saveImage(QString&);
 
   private:
-    Vector3D m_camPos; //camera position
-    Vector3D m_camAt; //camera rotation
+    arma::colvec m_camPos; //camera position
+    arma::colvec m_camAt; //camera rotation
     double m_camZoom; //camera zoom (field of view angle)
 
     //Environment* m_env; //environment pointer

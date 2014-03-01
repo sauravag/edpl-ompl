@@ -78,11 +78,12 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
 void Visualizer::drawState(const ompl::base::State *state, bool isTrueState)
 {
     using namespace arma;
-    if(isTrueState) glColor3d(0,1.0,0.0);
+    if(isTrueState) glColor3d(1.0,0.0,0.0);
+
+    arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
+    mat covariance = state->as<SE2BeliefSpace::StateType>()->getCovariance();
+
     glPushMatrix();
-
-        arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
-
         //std::cout<<"The state to br drawn is"<<x<<std::endl;
         //translate to the coorect position
         //glTranslated((m_v[0]-dx.first)/(dx.second-dx.first), (m_v[1]-dy.first)/(dy.second-dy.first), 0);
@@ -119,11 +120,56 @@ void Visualizer::drawState(const ompl::base::State *state, bool isTrueState)
         glEnd();
 
     glPopMatrix();
+
+    if(trace(covariance) != 0)
+    {
+    double chi2 = 9.21034;
+    double magnify = 4.0; // scaled up for viewing
+    mat pos;
+    for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())
+    {
+        //cout << "th: " << th <<  endl;
+        mat tmpRow(1,2);
+        tmpRow << cos(th) << sin(th) << endr;
+        pos = join_cols(pos, tmpRow);
+    }
+
+    pos *= sqrt(chi2);
+    pos *= magnify;
+
+    //cout << "pos size: "<< pos.n_rows << " rows, " << pos.n_cols << " cols" << endl;
+    int nPoints = pos.n_rows;
+
+    mat K = trans(chol(covariance.submat(0,0,1,1)));
+    //cout << "K size: " << K.n_rows << " rows, " << K.n_cols << " cols " <<endl;
+    mat shift;
+    shift = join_cols((ones(1,nPoints)*x[0]),(ones(1,nPoints)*x[1]));
+
+    // cout << "shift size: " << shift.n_rows << ", " << shift.n_cols << endl;
+    mat transformed = K*trans(pos) + shift;
+
+    glPushMatrix();
+    //glColor3d(1,0,0);
+    //glTranslated(m_mean[0], m_mean[1], 0);
+    //glBegin(GL_TRIANGLE_FAN);
+    glBegin(GL_LINES);
+    //glVertex2f((*this)[0], (*this)[1]);
+    for(int i = 0; i < transformed.n_cols; ++i) {
+    glVertex2f(transformed(0,i), transformed(1,i));
+    }
+    glEnd();
+
+    glPopMatrix();
+    }
+
 }
 
 void Visualizer::refresh()
 {
     boost::mutex::scoped_lock sl(drawMutex_);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
     glPushMatrix();
 
@@ -185,8 +231,8 @@ void Visualizer::drawEnvironmentBoundary()
     double xmax = 17;
     double ymax = 7;
     //glTranslated(0, 0, 0);
-
-    glBegin(GL_LINE_LOOP);
+    glColor3f(0.0f,1.0f,0.0f); //blue color
+    glBegin(GL_POLYGON);
             glVertex3f(0,0,0);
             glVertex3f(0, ymax, 0);
             glVertex3f(xmax, ymax, 0);
@@ -204,8 +250,10 @@ void Visualizer::drawObstacle()
     double y_t =  5;
 
     //glTranslated(x_l, y_b, 0);
-
-    glBegin(GL_LINE_LOOP);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glLoadIdentity();//load identity matrix
+    glColor3f(0.0f,0.0f,1.0f); //blue color
+    glBegin(GL_POLYGON);
             glVertex3f(x_l,y_b,0);
             glVertex3f(x_l, y_t, 0);
             glVertex3f(x_r, y_t, 0);
@@ -231,6 +279,7 @@ void Visualizer::drawGraphEdges()
     }
 }
 
+/**
 void Visualizer::drawFeedbackEdges()
 {
     for(int i=0; i<feedbackEdges_.size();i++)
@@ -238,8 +287,28 @@ void Visualizer::drawFeedbackEdges()
         drawEdge(feedbackEdges_[i].source,feedbackEdges_[i].target);
     }
 }
+*/
+void Visualizer::drawFeedbackEdges()
+{
+    using namespace arma;
 
+    double maxCost = 0;
+    for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end(); i!=e; ++i)
+    {
+        maxCost = std::max(maxCost, i->cost);
+    }
 
+    for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
+    {
+        double costFactor = sqrt(i->cost/maxCost);
+        double minColor = 0.2;
+        glColor3d(costFactor,1.0-costFactor,0.0);
+        //glColor3d(1.0,1.0,0.0);
+        glLineWidth(3.0);
+            drawEdge(i->source, i->target);
+        glLineWidth(1.f);
+    }
+}
 
 
 
