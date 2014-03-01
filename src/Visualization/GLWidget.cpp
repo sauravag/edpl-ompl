@@ -125,11 +125,12 @@ void GLWidget::saveFrame()
   ++frameNum;
 }
 
-/**
-void GLWidget::ChangeMode(int _mode) {
-  Display::SetMode((Display::OGLDrawingMode)_mode);
+
+void GLWidget::ChangeMode(int mode)
+{
+  Visualizer::setMode((Visualizer::VZRDrawingMode)mode);
 }
-*/
+
 //initalize GL defaults and construct the simulator
 void GLWidget::initializeGL()
 {

@@ -51,6 +51,8 @@ std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visu
 
 std::vector<Visualizer::VZRFeedbackEdge> Visualizer::feedbackEdges_;
 
+Visualizer::VZRDrawingMode Visualizer::mode_;
+
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
   //cout << "++++++++++++++++++++++++++" << endl;
@@ -129,38 +131,37 @@ void Visualizer::refresh()
 
     drawObstacle();
     //draw roadmap based on current mode
-    /**
-    switch(m_mode)
+
+    switch(mode_)
     {
         case NodeViewMode:
-            DrawNodeViewMode();
+            drawGraphBeliefNodes();
+            //DrawNodeViewMode();
             break;
         case FeedbackViewMode:
-            DrawFeedbackViewMode();
+            drawGraphBeliefNodes();
+            if(feedbackEdges_.size()>0) drawFeedbackEdges();
+            //DrawFeedbackViewMode();
             break;
         case PRMViewMode:
-            DrawPRMViewMode();
+            drawGraphBeliefNodes();
+            if(graphEdges_.size()>0) drawGraphEdges();
+            //DrawPRMViewMode();
             break;
         default:
             assert(!"There is no default drawing mode for OGLDisplay");
             exit(1);
     }
-    */
+
     //draw landmarks
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
     {
         drawLandmark(landmarks_[i]);
     }
 
-    drawGraphBeliefNodes();
-
     if(trueState_) drawState(trueState_, true);
 
     if(currentBelief_) drawState(currentBelief_);
-
-    //if(graphEdges_.size()>0) drawGraphEdges();
-
-    if(feedbackEdges_.size()>0) drawFeedbackEdges();
 
     glPopMatrix();
 }

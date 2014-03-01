@@ -51,7 +51,7 @@ class GLWidget : public QGLWidget {
   public Q_SLOTS:
     void drawAxes(bool);
     void saveSnapshot();
-    void ChangeMode(int){}
+    void ChangeMode(int);
 
   protected:
     void initializeGL();

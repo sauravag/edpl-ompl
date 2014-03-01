@@ -58,6 +58,13 @@ class Visualizer
 
         ~Visualizer(){}
 
+        enum VZRDrawingMode
+        {
+            NodeViewMode,
+            FeedbackViewMode,
+            PRMViewMode
+        };
+
         struct VZRFeedbackEdge
         {
             ompl::base::State *source;
@@ -104,6 +111,11 @@ class Visualizer
             edge.cost = cost;
 
             feedbackEdges_.push_back(edge);
+        }
+
+        static void setMode(VZRDrawingMode mode)
+        {
+            mode_ = mode;
         }
 
         static void ClearFeedbackEdges()
@@ -189,6 +201,8 @@ class Visualizer
         /** \brief Store the feedback edges */
         static std::vector<VZRFeedbackEdge> feedbackEdges_;
 
+        /** \brief Visualizer drawing mode setting */
+        static VZRDrawingMode mode_;
 
 };
 #endif // FIRM_OMPL_VISUALIZER_H
