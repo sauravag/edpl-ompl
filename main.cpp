@@ -116,7 +116,7 @@ void plan(void)
 
     // create a random goal state
     ob::State *goal = statespace->allocState();
-    goal->as<StateType>()->setXYYaw(1.5,4.8,1.57);
+    goal->as<StateType>()->setXYYaw(1.1,4.8,1.57);
     //goal->as<StateType>()->setXYYaw(1.5,5.5,1.57);
     Visualizer::addState(goal);
 

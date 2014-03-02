@@ -354,6 +354,7 @@ bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Ver
                 boost::mutex::scoped_lock _(graphMutex_);
                 solveDynamicProgram(goal);
                 solution = constructFeedbackPath(start, goal);
+                sendFeedbackEdgesToViz();
                 return true;
             }
         }
