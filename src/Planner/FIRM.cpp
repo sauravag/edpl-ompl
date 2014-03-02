@@ -1012,7 +1012,7 @@ void FIRM::executeFeedback(void)
         cout<<"executeFeedback: The final filtered State from controller is :"<<cendState->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
         cout<<"executeFeedback: the final commanded state was :"<<stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
         cout<<"Press enter "<<endl;
-        std::cin.get();
+        //std::cin.get();
     }
 
 

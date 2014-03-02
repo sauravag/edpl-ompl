@@ -289,7 +289,8 @@ public:
         return nn_;
     }
 
-
+     /** \brief Executes the generated policy on the system */
+    void executeFeedback(void);
 protected:
 
     /** \brief Free all the memory allocated by the planner */
@@ -347,9 +348,6 @@ protected:
 
     /** \brief Solves the dynamic program to return a feedback policy */
     virtual void solveDynamicProgram(const Vertex goalVertex);
-
-    /** \brief Executes the generated policy on the system */
-    void executeFeedback(void);
 
     void addStateToVisualization(ompl::base::State *state) ;
 

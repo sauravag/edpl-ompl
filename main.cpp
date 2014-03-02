@@ -164,6 +164,8 @@ void plan(void)
 
         // print the path to screen
         path->print(std::cout);
+
+        planner->as<FIRM>()->executeFeedback();
     }
     else
         std::cout << "No solution found" << std::endl;
