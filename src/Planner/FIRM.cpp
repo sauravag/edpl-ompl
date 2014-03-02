@@ -351,10 +351,9 @@ bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Ver
 
             if (same_component && g->isStartGoalPairValid(stateProperty_[goal], stateProperty_[start]))
             {
-                //ompl::base::PathPtr p = constructSolution(start, goal);
                 boost::mutex::scoped_lock _(graphMutex_);
                 solveDynamicProgram(goal);
-
+                solution = constructFeedbackPath(start, goal);
                 return true;
             }
         }
@@ -429,7 +428,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_) - nrStartStates);
 
     //---- JUST FOR TESTING---
-    if(addedSolution_) executeFeedback();
+    //if(addedSolution_) executeFeedback();
     //-------------------
 
     if (sol)
@@ -536,46 +535,31 @@ bool FIRM::sameComponent(Vertex m1, Vertex m2)
     return boost::same_component(m1, m2, disjointSets_);
 }
 
-
+/**
 ompl::base::PathPtr FIRM::constructSolution(const Vertex &start, const Vertex &goal)
 {
-    boost::mutex::scoped_lock _(graphMutex_);
-    boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
-    /*
-    try
-    {
-        // Consider using a persistent distance_map if it's slow
 
-        boost::astar_search(g_, start,
-                            boost::bind(&FIRM::costHeuristic, this, _1, goal),
-                            boost::predecessor_map(prev).
-                            distance_compare(boost::bind(&ompl::base::OptimizationObjective::
-                                                         isCostBetterThan, opt_.get(), _1, _2)).
-                            distance_combine(boost::bind(&ompl::base::OptimizationObjective::
-                                                         combineCosts, opt_.get(), _1, _2)).
-                            distance_inf(opt_->infiniteCost()).
-                            distance_zero(opt_->identityCost()).
-                            visitor(AStarGoalVisitor<Vertex>(goal)));
-
-
-    }
-    catch (AStarFoundGoal&)
-    {
-    }
-    */
-    if (prev[goal] == goal)
-        throw ompl::Exception(name_, "Could not find solution path");
-    else
-        return constructGeometricPath(prev, start, goal);
 }
+*/
 
-ompl::base::PathPtr FIRM::constructGeometricPath(const boost::vector_property_map<Vertex> &prev, const Vertex &start, const Vertex &goal)
+ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal)
 {
-    ompl::geometric::PathGeometric *p = new ompl::geometric::PathGeometric(si_);
-    for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos])
-        p->append(stateProperty_[pos]);
-    p->append(stateProperty_[start]);
-    p->reverse();
+    FeedbackPath *p = new FeedbackPath(siF_);
+
+    Vertex currentVertex = start;
+
+    while(currentVertex!=goal)
+    {
+        Edge edge = feedback_[currentVertex]; // get the edge
+        Vertex target = boost::target(edge, g_); // get the target of this edge
+        p->append(stateProperty_[currentVertex],edgeControllers_[edge]); // push the state and controller to take
+        if(target == goal)
+        {
+
+            p->append(stateProperty_[target]); // because from the goal node you don't need to take a controller
+        }
+        currentVertex =  target;
+    }
 
     return ompl::base::PathPtr(p);
 }

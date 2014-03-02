@@ -55,6 +55,7 @@
 #include "../Filters/LinearizedKF.h"
 #include "../Path/FeedbackPath.h"
 #include "../ConnectionStrategy/FStrategy.h"
+#include "../Path/FeedbackPath.h"
 //#include "../SpaceInformation/SpaceInformation.h"
 //#include "../Visualization/Visualizer.h"
 
@@ -324,10 +325,10 @@ protected:
     bool addedNewSolution(void) const;
 
     /** \brief Given two milestones from the same connected component, construct a path connecting them and set it as the solution */
-    virtual ompl::base::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
+    //virtual ompl::base::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
 
     /** \brief Given a solution represented as a vector of predecesors in the roadmap, construct a geometric path */
-    virtual ompl::base::PathPtr constructGeometricPath(const boost::vector_property_map<Vertex> &prev, const Vertex &start, const Vertex &goal);
+    virtual ompl::base::PathPtr constructFeedbackPath(const Vertex &start, const Vertex &goal);
 
     /** \brief Add an edge from vertex a to b in graph */
     virtual void addEdgeToGraph(const Vertex a, const Vertex b);

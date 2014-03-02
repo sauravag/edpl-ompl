@@ -294,7 +294,7 @@
 1366325450 /home/saurav/Research/Softwares/omplapp/ompl/src/ompl/datastructures/GreedyKCenters.h
 	"ompl/util/RandomNumbers.h"
 
-1393711602 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
+1393721648 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/main.cpp
 	<ompl/base/spaces/SE3StateSpace.h>
 	<ompl/geometric/SimpleSetup.h>
 	<ompl/config.h>
@@ -360,7 +360,7 @@
 	<boost/foreach.hpp>
 	<boost/thread.hpp>
 
-1393552986 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Planner/FIRM.h
+1393719995 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Planner/FIRM.h
 	"ompl/geometric/planners/PlannerIncludes.h"
 	"ompl/datastructures/NearestNeighbors.h"
 	<boost/graph/graph_traits.hpp>
@@ -380,6 +380,7 @@
 	"../Filters/LinearizedKF.h"
 	"../Path/FeedbackPath.h"
 	"../ConnectionStrategy/FStrategy.h"
+	"../Path/FeedbackPath.h"
 
 1392759190 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Weight/FIRMWeight.h
 
@@ -583,7 +584,7 @@
 	"../../tinyxml/tinyxml.h"
 	"../../include/Visualization/Visualizer.h"
 
-1393711853 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/FIRM.cpp
+1393720856 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Planner/FIRM.cpp
 	"../../include/Planner/FIRM.h"
 	"ompl/geometric/planners/prm/PRM.h"
 	"ompl/geometric/planners/prm/ConnectionStrategy.h"
@@ -730,7 +731,7 @@
 	"../../include/SpaceInformation/SpaceInformation.h"
 	"../../include/Visualization/Visualizer.h"
 
-1393714474 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Path/FeedbackPath.h
+1393721417 /home/saurav/Research/Development/OMPL/FIRM-OMPL/include/Path/FeedbackPath.h
 	"ompl/base/Path.h"
 	"../SpaceInformation/SpaceInformation.h"
 	"../Controllers/Controller.h"
@@ -11405,7 +11406,7 @@
 1331733676 /usr/include/qt4/QtGui/QDesktopWidget
 	"qdesktopwidget.h"
 
-1393709094 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Visualization/GLWidget.cpp
+1393715291 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Visualization/GLWidget.cpp
 	<iostream>
 	<sstream>
 	<cmath>
@@ -13258,5 +13259,6 @@
 1393439980 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Visualization/moc_Window.cpp
 	"../../include/Visualization/Window.h"
 
-1393714484 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Path/FeedbackPath.cpp
+1393720472 source:/home/saurav/Research/Development/OMPL/FIRM-OMPL/src/Path/FeedbackPath.cpp
+	"../../include/Path/FeedbackPath.h"
 
