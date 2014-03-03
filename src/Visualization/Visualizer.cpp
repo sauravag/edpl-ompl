@@ -75,18 +75,33 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
   glPopMatrix();
 }
 
-void Visualizer::drawState(const ompl::base::State *state, bool isTrueState)
+void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateType)
 {
     using namespace arma;
-    if(isTrueState) glColor3d(1.0,0.0,0.0);
+
+    switch(stateType)
+    {
+        case TrueState:
+            glColor3d(1.0,0.0,0.0); // red
+            break;
+
+        case BeliefState:
+            glColor3d(0.5,0.5,0.5); // grey
+            break;
+
+        case GraphNodeState:
+            glColor3d(1.0,1.0,1.0); // white
+            break;
+
+        default:
+            glColor3d(1.0,1.0,1.0); // white
+            break;
+    }
 
     arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
     mat covariance = state->as<SE2BeliefSpace::StateType>()->getCovariance();
 
     glPushMatrix();
-        //std::cout<<"The state to br drawn is"<<x<<std::endl;
-        //translate to the coorect position
-        //glTranslated((m_v[0]-dx.first)/(dx.second-dx.first), (m_v[1]-dy.first)/(dy.second-dy.first), 0);
         glTranslated(x[0], x[1], 0);
 
         //draw a black disk
@@ -99,7 +114,6 @@ void Visualizer::drawState(const ompl::base::State *state, bool isTrueState)
         glVertex3f(0, 0, 0);
         glVertex3f(1.0*cos(x[2]), 1.0*sin(x[2]), 0);
         glEnd();
-
 
         double fovRadius = 2.5; //meters
         double fovAngle = 22.5*3.14157/180; //radians
@@ -154,8 +168,9 @@ void Visualizer::drawState(const ompl::base::State *state, bool isTrueState)
     //glBegin(GL_TRIANGLE_FAN);
     glBegin(GL_LINES);
     //glVertex2f((*this)[0], (*this)[1]);
-    for(int i = 0; i < transformed.n_cols; ++i) {
-    glVertex2f(transformed(0,i), transformed(1,i));
+    for(int i = 0; i < transformed.n_cols; ++i)
+    {
+        glVertex2f(transformed(0,i), transformed(1,i));
     }
     glEnd();
 
@@ -205,9 +220,9 @@ void Visualizer::refresh()
         drawLandmark(landmarks_[i]);
     }
 
-    if(trueState_) drawState(trueState_, true);
+    if(trueState_) drawState(trueState_, (VZRStateType)0);
 
-    if(currentBelief_) drawState(currentBelief_);
+    if(currentBelief_) drawState(currentBelief_, (VZRStateType)1);
 
     glPopMatrix();
 }
@@ -265,8 +280,7 @@ void Visualizer::drawGraphBeliefNodes()
 {
     for(typename std::list<ompl::base::State*>::iterator s=states_.begin(), e=states_.end(); s!=e; ++s)
     {
-          glColor3d(1,1,1);
-          drawState(*s);
+          drawState(*s, (VZRStateType)2);
     }
 
 }

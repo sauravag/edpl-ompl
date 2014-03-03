@@ -58,6 +58,14 @@ class Visualizer
 
         ~Visualizer(){}
 
+        /** \brief Helps distinguish between states while drawing */
+        enum VZRStateType
+        {
+            TrueState,
+            BeliefState,
+            GraphNodeState
+        };
+
         enum VZRDrawingMode
         {
             NodeViewMode,
@@ -154,7 +162,7 @@ class Visualizer
         static void drawLandmark(arma::colvec& landmark);
 
         /** \brief Draw a single state that is passed to this function */
-        static void drawState(const ompl::base::State* state, bool isTrueState = false);
+        static void drawState(const ompl::base::State* state, VZRStateType stateType);
 
         /** \brief Draw an edge that belongs to the Roadmap graph */
         static void drawEdge(const ompl::base::State* source, const ompl::base::State* target);

@@ -68,7 +68,7 @@ namespace ompl
         static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 6;
 
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
-        static const double ROADMAP_BUILD_TIME = 0.2;
+        static const double ROADMAP_BUILD_TIME = 1;
 
         static const double NUM_MONTE_CARLO_PARTICLES = 2;
 
@@ -90,9 +90,10 @@ namespace ompl
     }
 }
 
-FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool starStrategy) :
+FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode, bool starStrategy) :
     ompl::base::Planner(si, "FIRM"),
     siF_(si),
+    debug_(debugMode),
     starStrategy_(starStrategy),
     stateProperty_(boost::get(vertex_state_t(), g_)),
     totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), g_)),
@@ -110,7 +111,7 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool starStrat
     specs_.optimizingPaths = true;
 
     Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
-    debug_ = true;
+    minFIRMNodes_ = 10;
 }
 
 FIRM::~FIRM(void)
@@ -329,9 +330,9 @@ void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
 
         // Check for a solution
         addedSolution_ = haveSolution(startM_, goalM_, solution);
-        // Sleep for 1ms
+        // Sleep for 1s
         if (!addedSolution_)
-            boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1e3));
     }
 }
 
@@ -340,6 +341,9 @@ bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Ver
     ompl::base::Goal *g = pdef_->getGoal().get();
     ompl::base::Cost sol_cost(0.0);
     bool sol_cost_set = false;
+
+    if(boost::num_vertices(g_) < minFIRMNodes_) return false;
+
     foreach (Vertex start, starts)
     {
         foreach (Vertex goal, goals)
@@ -355,7 +359,7 @@ bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Ver
                 solveDynamicProgram(goal);
                 solution = constructFeedbackPath(start, goal);
                 sendFeedbackEdgesToViz();
-                return true;
+                return false;//true;
             }
         }
     }
@@ -463,7 +467,7 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
         // maintain a 2:1 ratio for growing/expansion of roadmap
         // call growRoadmap() twice as long for every call of expandRoadmap()
         if (grow)
-            growRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(2.0 * ompl::magic::ROADMAP_BUILD_TIME)), xstates[0]);
+            growRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(5.0 * ompl::magic::ROADMAP_BUILD_TIME)), xstates[0]);
         else
             expandRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(ompl::magic::ROADMAP_BUILD_TIME)), xstates);
         grow = !grow;
@@ -475,7 +479,7 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
 FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
 {
     /*In addMilestone we must reject duplicate vertices */
-
+    /**
     if(boost::num_vertices(g_) > 1 )
     {
         foreach(Vertex v, boost::vertices(g_))
@@ -483,7 +487,7 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
             if(state == stateProperty_[v]) return v;
         }
     }
-
+    */
     boost::mutex::scoped_lock _(graphMutex_);
 
     Vertex m = boost::add_vertex(g_);
@@ -508,9 +512,12 @@ FIRM::Vertex FIRM::addMilestone(ompl::base::State *state)
             totalConnectionAttemptsProperty_[n]++;
             if (si_->checkMotion(stateProperty_[m], stateProperty_[n]))
             {
-                std::cout<<"The 2 states to create an edge \n";
-                si_->printState(stateProperty_[m]);
-                si_->printState(stateProperty_[n]);
+                if(debug_)
+                {
+                    std::cout<<"The 2 states to create an edge \n";
+                    si_->printState(stateProperty_[m]);
+                    si_->printState(stateProperty_[n]);
+                }
                 assert(stateProperty_[m]!=stateProperty_[n] && "The 2 states for edge are the same !!");
                 successfulConnectionAttemptsProperty_[m]++;
                 successfulConnectionAttemptsProperty_[n]++;
@@ -663,9 +670,9 @@ FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeSta
 
         if(debug_)
         {
-            //cout << "initial belief for the edge: "<<endl<< _c1.GetArmaData()[0]<<endl<<_c1.GetArmaData()[1]<<endl<<_c1.GetArmaData()[2]*180/PI<< endl;
-            //cout << "goal belief for the edge: "<<endl<< _c2.GetArmaData()[0]<<endl<<_c2.GetArmaData()[1]<<endl<<_c2.GetArmaData()[2]*180/PI<< endl;
-            //cout<<"The goal node covariance is: "<<_c2.m_covariance<<endl;
+            cout << "initial belief for the edge: "<<endl<< _c1.GetArmaData()[0]<<endl<<_c1.GetArmaData()[1]<<endl<<_c1.GetArmaData()[2]*180/PI<< endl;
+            cout << "goal belief for the edge: "<<endl<< _c2.GetArmaData()[0]<<endl<<_c2.GetArmaData()[1]<<endl<<_c2.GetArmaData()[2]*180/PI<< endl;
+            cout<<"The goal node covariance is: "<<_c2.m_covariance<<endl;
             //cin.get();
         }
         ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
@@ -679,7 +686,7 @@ FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeSta
 
             if(debug_)
             {
-                //std::cout<<"The cost at particle: "<<i<<"  is : "<<edgeCost.v<<std::endl;
+                std::cout<<"The cost at particle: "<<i<<"  is : "<<edgeCost.v<<std::endl;
                 //std::cin.get();
             }
         }

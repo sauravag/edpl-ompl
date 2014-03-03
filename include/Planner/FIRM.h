@@ -158,7 +158,7 @@ public:
     typedef Controller<RHCICreate, LinearizedKF> NodeControllerType;
 
     /** \brief Constructor */
-    FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool starStrategy = false);
+    FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode=false, bool starStrategy = false);
 
     virtual ~FIRM(void);
 
@@ -444,6 +444,8 @@ protected:
     unsigned int numParticles_;
 
     bool debug_;
+
+    unsigned int minFIRMNodes_;
 
 };
 

@@ -99,12 +99,12 @@ void plan(void)
     // create a random start state
     ob::State *start = statespace->allocState();
 
-    //start->as<StateType>()->setXYYaw(15,5.5,0);
+    start->as<StateType>()->setXYYaw(15,5.5,0);
     //start->as<StateType>()->setXYYaw(4,1,0);
-    start->as<StateType>()->setXYYaw(6,6,0);
+    //start->as<StateType>()->setXYYaw(6,6,0);
 
     Visualizer::updateSpaceInformation(si);
-    Visualizer::addState(start);
+    //Visualizer::addState(start);
 
     //Visualizer::updateCurrentBelief(start);
     //Visualizer::updateTrueState(start);
@@ -118,7 +118,7 @@ void plan(void)
     ob::State *goal = statespace->allocState();
     goal->as<StateType>()->setXYYaw(1.1,4.8,1.57);
     //goal->as<StateType>()->setXYYaw(1.5,5.5,1.57);
-    Visualizer::addState(goal);
+    //Visualizer::addState(goal);
 
     cout<<"The goal state is:"<<endl;
     statespace->as<SE2BeliefSpace>()->printBeliefState(goal);
@@ -151,7 +151,7 @@ void plan(void)
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = planner->solve(1000);
+    ob::PlannerStatus solved = planner->solve(2500);
 
     cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
     Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(5); // degrees
     Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
     Controller<RHCICreate, ExtendedKF>::setMaxTries(50);
-
+    Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(4.0); // meters
 
     //TestSE2BeliefSpace();
     //TestBeliefStateSampler();

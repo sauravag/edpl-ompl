@@ -63,26 +63,33 @@ class Controller
                  const std::vector<ompl::control::Control*>& nominalUs,
                  const firm::SpaceInformation::SpaceInformationPtr si);
 
+        /** \brief Execute the controller i.e. take the system from start to end state of edge */
         bool Execute(const ompl::base::State *startState,
                    ompl::base::State* endState,
                    ompl::base::Cost &executionCost,
                    bool constructionMode=true);
 
+        /** \brief Stabilize the system to an existing FIRM node */
         ompl::base::State*  Stabilize(const ompl::base::State *startState);
 
+        /** \brief Check whether the controller has satisfied its termination condition for e.g. reached target state*/
         bool isTerminated(const ompl::base::State *state, const size_t t);
 
+        /** \brief Evolve the controller over a single time step, i.e. apply control, predict, get observation, update */
         void Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState);
 
+        /** \brief get the controllers goal state */
         ompl::base::State* getGoal() {return goal_; }
 
+        /** \brief Set the space information of the planning problem */
         void setSpaceInformation(SpaceInformationPtr si) { si_ = si; }
 
-        bool isValid();
+        //bool isValid();
 
         static void setNodeReachedAngle(double angle) {nodeReachedAngle_ = angle; }
         static void setNodeReachedDistance(double d) {nodeReachedDistance_ = d; }
         static void setMaxTries(double maxtries) {maxTries_ = maxtries; }
+        static void setMaxTrajectoryDeviation(double dev) {nominalTrajDeviationThreshold_ = dev; }
 
         size_t Length() { return lss_.size(); }
 
@@ -97,10 +104,10 @@ class Controller
 		static double nodeReachedAngle_;
 		static double nodeReachedDistance_;
 		static double maxTries_;
-		double maxExecTime_;
+        static double nominalTrajDeviationThreshold_;
+        double maxExecTime_;
 		bool obstacleMarkerObserved_;
 		bool debug_;
-		double nominalTrajDeviationThreshold_;
 
 };
 
@@ -112,6 +119,9 @@ double Controller<SeparatedControllerType, FilterType>::nodeReachedDistance_ = -
 
 template <class SeparatedControllerType, class FilterType>
 double Controller<SeparatedControllerType, FilterType>::maxTries_ = -1;
+
+template <class SeparatedControllerType, class FilterType>
+double Controller<SeparatedControllerType, FilterType>::nominalTrajDeviationThreshold_ = -1;
 
 template <class SeparatedControllerType, class FilterType>
 Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::State *goal,
@@ -150,7 +160,7 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
   maxExecTime_ = ceil(nominalXs.size()*3);
   obstacleMarkerObserved_ = false;
   debug_ = false;
-  nominalTrajDeviationThreshold_ = 4.0; // This value of 4 should not be hard coded
+  //nominalTrajDeviationThreshold_ = 4.0; // This value of 4 should not be hard coded
 
 }
 
@@ -361,7 +371,7 @@ bool Controller<SeparatedControllerType, FilterType>::isTerminated(const ompl::b
 }
 
 
-/*
+/**
 template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::isValid()
 {
