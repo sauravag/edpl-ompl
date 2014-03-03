@@ -111,7 +111,7 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
     specs_.optimizingPaths = true;
 
     Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
-    minFIRMNodes_ = 10;
+    minFIRMNodes_ = 5;
 }
 
 FIRM::~FIRM(void)
@@ -342,7 +342,7 @@ bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Ver
     ompl::base::Cost sol_cost(0.0);
     bool sol_cost_set = false;
 
-    if(boost::num_vertices(g_) < minFIRMNodes_) return false;
+    //if(boost::num_vertices(g_) < 5) return false;
 
     foreach (Vertex start, starts)
     {
@@ -359,7 +359,7 @@ bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Ver
                 solveDynamicProgram(goal);
                 solution = constructFeedbackPath(start, goal);
                 sendFeedbackEdgesToViz();
-                return false;//true;
+                return true; // return true if solution is found
             }
         }
     }
@@ -432,10 +432,6 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
 
     OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_) - nrStartStates);
 
-    //---- JUST FOR TESTING---
-    //if(addedSolution_) executeFeedback();
-    //-------------------
-
     if (sol)
     {
         ompl::base::PlannerSolution psol(sol);
@@ -466,11 +462,11 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
     {
         // maintain a 2:1 ratio for growing/expansion of roadmap
         // call growRoadmap() twice as long for every call of expandRoadmap()
-        if (grow)
-            growRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(5.0 * ompl::magic::ROADMAP_BUILD_TIME)), xstates[0]);
-        else
-            expandRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(ompl::magic::ROADMAP_BUILD_TIME)), xstates);
-        grow = !grow;
+        //if (grow)
+            growRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(4.0 * ompl::magic::ROADMAP_BUILD_TIME)), xstates[0]);
+        //else
+          //  expandRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(ompl::magic::ROADMAP_BUILD_TIME)), xstates);
+        //grow = !grow;
     }
 
     si_->freeStates(xstates);
@@ -668,13 +664,6 @@ FIRMWeight FIRM::generateControllersWithEdgeCost(ompl::base::State* startNodeSta
         siF_->setTrueState(startNodeState);
         siF_->setBelief(startNodeState);
 
-        if(debug_)
-        {
-            cout << "initial belief for the edge: "<<endl<< _c1.GetArmaData()[0]<<endl<<_c1.GetArmaData()[1]<<endl<<_c1.GetArmaData()[2]*180/PI<< endl;
-            cout << "goal belief for the edge: "<<endl<< _c2.GetArmaData()[0]<<endl<<_c2.GetArmaData()[1]<<endl<<_c2.GetArmaData()[2]*180/PI<< endl;
-            cout<<"The goal node covariance is: "<<_c2.m_covariance<<endl;
-            //cin.get();
-        }
         ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
         ompl::base::Cost pcost(0);
 
@@ -861,9 +850,9 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
         if(debug_)
         {
-            //cout<<" The new computed costToGo  :"<<endl<<MapToColvec(newCostToGo)<<endl;
-            //cout<<"Press Enter"<<endl;
-            //std::cin.get();
+            cout<<" The new computed costToGo  :"<<endl<<MapToColvec(newCostToGo)<<endl;
+            cout<<"Press Enter"<<endl;
+            std::cin.get();
         }
 
         costToGo_.swap(newCostToGo);   // Equivalent to "m_costToGo = newCostToGo"

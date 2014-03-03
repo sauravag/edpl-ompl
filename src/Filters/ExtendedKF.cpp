@@ -90,11 +90,6 @@ const LinearSystem& ls, ompl::base::State *updatedState)
 
   colvec xEstVec = xPredVec + KalmanGain*innov;
 
-  //cout<<"The innovation (in EKF update) :"<<endl<<innov<<endl;
-  //cout<<"The Kalman Gain (in EKF update) :"<<endl<<KalmanGain<<endl;
-
-  //cout<<"New State estimated"<<endl;
-
   updatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
 
   mat covEst = covPred - KalmanGain* ls.getH() * covPred;

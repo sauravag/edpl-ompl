@@ -185,12 +185,14 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
   ompl::base::State *internalState = si_->allocState();
   si_->copyState(internalState, startState);
 
+  ompl::base::State  *nominalX_K = si_->allocState();
+
   while(!this->isTerminated(endState, k))
   {
     //std::cout << "time: "<< k << std::endl;
     this->Evolve(internalState, k, endState) ;
 
-    internalState = si_->cloneState(endState);
+    si_->copyState(internalState, endState);
 
     // if the propagated state is not valid, return
     if( !si_->checkTrueStateValidity())
@@ -201,8 +203,6 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
       return false;
     }
 
-    ompl::base::State  *nominalX_K = si_->allocState();
-
     if(k<lss_.size())
       nominalX_K = lss_[k].getX();
 
@@ -212,6 +212,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     arma::colvec endStateVec = endState->as<StateType>()->getArmaData();
     arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
 
+    /**
     if(debug_)
     {
         std::cout<<"The nominal trajectory point is:" <<nomXVec<<std::endl;
@@ -221,6 +222,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         //std::cout<<"The k is : "<<k<<std::endl;
         std::cin.get();
     }
+    */
     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
       //isFailed = true;
@@ -237,7 +239,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     */
     cost += arma::trace(endState->as<StateType>()->getCovariance());
 
-    if(debug_) cout<<"Trace of covariance: "<<arma::trace(endState->as<StateType>()->getCovariance())<<std::endl;
+    //if(debug_) cout<<"Trace of covariance: "<<arma::trace(endState->as<StateType>()->getCovariance())<<std::endl;
   }
 
   executionCost.v = cost;
@@ -255,12 +257,6 @@ Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
   ompl::control::Control* control = separatedController_.generateFeedbackControl(state/*, t*/);
 
   si_->applyControl(control);
-
-  //---------------//
-  //cout<<"The observations from actuation system are: "<<endl<<z<<endl;
-
-  unsigned int singleobservationdim = 4;
-  //cout<<" The construction mode is: "<<_isConstructionMode<<endl;
 
   ObservationType zCorrected = si_->getObservation();
 
@@ -294,9 +290,6 @@ Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
 
   si_->copyState(nextState, nextBelief);
   si_->setBelief(nextBelief);
-
-  //cout << "nextBelief: " << nextBelief << endl;
-  //cout << "-----------***----***---***---------------" << endl;
 
 }
 

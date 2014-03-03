@@ -116,7 +116,7 @@ void plan(void)
 
     // create a random goal state
     ob::State *goal = statespace->allocState();
-    goal->as<StateType>()->setXYYaw(1.1,4.8,1.57);
+    goal->as<StateType>()->setXYYaw(0.4,4.8,1.57);
     //goal->as<StateType>()->setXYYaw(1.5,5.5,1.57);
     //Visualizer::addState(goal);
 
@@ -131,7 +131,7 @@ void plan(void)
     pdef->setStartAndGoalStates(start, goal);
 
     // create a planner for the defined space
-    ob::PlannerPtr planner(new FIRM(si));
+    ob::PlannerPtr planner(new FIRM(si, true));
 
     // set the problem we are trying to solve for the planner
     planner->setProblemDefinition(pdef);
@@ -151,7 +151,7 @@ void plan(void)
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = planner->solve(2500);
+    ob::PlannerStatus solved = planner->solve(2000);
 
     cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
     app.exec();
     solveThread.join();
 
-
+    cout<<"--------------Press Enter to Exit------------- \n";
     return 0;
 
 }
