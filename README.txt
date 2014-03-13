@@ -17,12 +17,18 @@ This application is an implementation of Feedback Information Road Maps (FIRM) w
 
 
 ----------------------------------------
-External Dependencies
+Compilation
 ----------------------------------------
+The application is shared as a codeblocks project. You can use codeblocks to
+directly compile the application. Be sure to link to the correct libraries 
+and set the include paths for your compiler build settings.
 
-1. QT : For Visualization
-2. Armadillo C++ Matrix Algebra Library
-3  OpenGL
+External Depencies:
+
+1. Open Motion Planning Library 
+2. QT : For Visualization
+3. Armadillo C++ Matrix Algebra Library
+4. OpenGL
 
 -----------------------------------------
 References: 
