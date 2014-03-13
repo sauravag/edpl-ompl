@@ -3,7 +3,6 @@ Feedback Information RoadMaps Using Open Motion Planning Library
 
 Authors:
 Saurav Agarwal (sauravag@tamu.edu)
-Ali-akbar Agha-mohammadi (aliagha@mit.edu)
 
 Texas A&M University
 Copyright 2014
@@ -15,7 +14,6 @@ Brief:
 This application is an implementation of Feedback Information Road Maps (FIRM) with OMPL.
 
 "FIRM is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic roadmap 
-methods. The crucial feature of FIRM is that the costs associated with the edges are independent of each other, and in this sense it is the first method that generates a graph in belief space that preserves the optimal substructure property. From a practical point of view, FIRM is a robust and reliable planning framework. It is robust since the solution is a feedback and there is no need for expensive replanning. It is reliable because accurate collision probabilities can be computed along the edges. In addition, FIRM is a scalable framework, where the complexity of planning with FIRM is a constant multiplier of the complexity of planning with PRM."  
 
 
 ----------------------------------------
@@ -29,13 +27,13 @@ External Dependencies
 -----------------------------------------
 References: 
 -----------------------------------------
-1. A. Agha-mohammadi, Suman Chakravorty, Nancy Amato, "FIRM: Sampling-based Feedback Motion Planning Under Motion Uncertainty and Imperfect Measurements", International Journal of Robotics Research, 33(2):268-304, February 2014.
+1. A. Agha-mohammadi, "FIRM: Sampling-based Feedback Motion Planning Under Motion Uncertainty and Imperfect Measurements", International Journal of Robotics Research, 33(2):268-304, February 2014.
 
-2. A. Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan, Suman Chakravorty, Daniel Tomkins, Jory Denny, Nancy Amato, "Robust Real-time Planning in Belief Space using Multi-query Graphs: Application to Physical Mobile Robots," In Proc. IEEE Int. Conf. Robot. Autom. (ICRA), Hong Kong, China, May 2014. 
+2. A. Agha-mohammadi, "Robust Real-time Planning in Belief Space using Multi-query Graphs: Application to Physical Mobile Robots," In Proc. IEEE Int. Conf. Robot. Autom. (ICRA), Hong Kong, China, May 2014. 
 
-3. A. Agha-mohammadi, Suman Chakravorty, Nancy M. Amato, "Sampling-based Nonholonomic Motion Planning in Belief Space via Dynamic Feedback Linearization-based FIRM", In Proc. IEEE Int. Conf. Intel. Rob. Syst. (IROS), Vilamoura, Portugal, Oct 2012
+3. A. Agha-mohammadi, "Sampling-based Nonholonomic Motion Planning in Belief Space via Dynamic Feedback Linearization-based FIRM", In Proc. IEEE Int. Conf. Intel. Rob. Syst. (IROS), Vilamoura, Portugal, Oct 2012
 
-4. A. Agha-mohammadi, Suman Chakravorty, Nancy M. Amato, "FIRM: Feedback Controller-Based Information-State Roadmap, A Framework for Motion Planning Under Uncertainty," In Proc. IEEE Int. Conf. Intel. Rob. Syst. (IROS), San Francisco, CA, Sep 2011. 
+4. A. Agha-mohammadi, "FIRM: Feedback Controller-Based Information-State Roadmap, A Framework for Motion Planning Under Uncertainty," In Proc. IEEE Int. Conf. Intel. Rob. Syst. (IROS), San Francisco, CA, Sep 2011. 
 
 5. ompl.kavrakilab.org : OMPL documentation and code
 

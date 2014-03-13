@@ -342,7 +342,7 @@ bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Ver
     ompl::base::Cost sol_cost(0.0);
     bool sol_cost_set = false;
 
-    //if(boost::num_vertices(g_) < 5) return false;
+    if(boost::num_vertices(g_) < 8) return false;
 
     foreach (Vertex start, starts)
     {
@@ -852,7 +852,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
         {
             cout<<" The new computed costToGo  :"<<endl<<MapToColvec(newCostToGo)<<endl;
             cout<<"Press Enter"<<endl;
-            std::cin.get();
+            //std::cin.get();
         }
 
         costToGo_.swap(newCostToGo);   // Equivalent to "m_costToGo = newCostToGo"
