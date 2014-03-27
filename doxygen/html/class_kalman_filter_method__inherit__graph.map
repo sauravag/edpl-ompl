@@ -1,4 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$class_extended_k_f.html" title="ExtendedKF" alt="" coords="5,83,99,112"/>
-<area shape="rect" id="node5" href="$class_linearized_k_f.html" title="LinearizedKF" alt="" coords="123,83,221,112"/>
+<area shape="rect" id="node3" href="$class_extended_k_f.html" title="Implementation of the Extended Kalman Filter." alt="" coords="5,83,99,112"/>
+<area shape="rect" id="node5" href="$class_linearized_k_f.html" title="A Linearized Kalman Filter." alt="" coords="123,83,221,112"/>
 </map>

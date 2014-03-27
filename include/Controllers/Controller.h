@@ -111,8 +111,8 @@ class Controller
         /** \brief The pointer to the space information. */ 
         SpaceInformationPtr si_; // Instead of the actuation system, in OMPL we have the spaceinformation
     		
-        /** \brief  The vector of linear systems. The linear systems basically represent the Kalman Gain and Feedback Gain 
-                    at each point in the open loop trajectory.*/ 
+        /** \brief  The vector of linear systems. The linear systems basically represent the system state
+                    at a point in the open loop trajectory.*/ 
         std::vector<LinearSystem> lss_;
 
         /** \brief  The separated controller used to generate the commands that are sent to the robot. */
@@ -202,7 +202,6 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
   maxExecTime_ = ceil(nominalXs.size()*3);
   obstacleMarkerObserved_ = false;
   debug_ = false;
-  //nominalTrajDeviationThreshold_ = 4.0; // This value of 4 should not be hard coded
 
 }
 
@@ -217,13 +216,12 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
   unsigned int k = 0;
 
-  /**
+  /*
     HOW TO SET INITAL VALUE OF COST
     cost = 1 ,for time based only if time per execution is "1"
     cost = 0.01 , for covariance based
   */
   double cost = 0.01;
-  //cout<<"!!-----Executing-----!!"<<endl;
 
   ompl::base::State *internalState = si_->allocState();
   si_->copyState(internalState, startState);
@@ -266,6 +264,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         std::cin.get();
     }
     */
+
     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
       //isFailed = true;

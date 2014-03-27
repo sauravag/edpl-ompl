@@ -121,8 +121,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00039"></a>00039 <span class="preprocessor"></span>
 <a name="l00040"></a>00040 <span class="preprocessor">#include &quot;KalmanFilterMethod.h&quot;</span>
 <a name="l00041"></a>00041 
-<a name="l00042"></a>00042 
-<a name="l00043"></a><a class="code" href="class_extended_k_f.html">00043</a> <span class="keyword">class </span><a class="code" href="class_extended_k_f.html">ExtendedKF</a> : <span class="keyword">public</span>  <a class="code" href="class_kalman_filter_method.html">KalmanFilterMethod</a>
+<a name="l00043"></a><a class="code" href="class_extended_k_f.html">00043</a> <span class="keyword">class </span><a class="code" href="class_extended_k_f.html" title="Implementation of the Extended Kalman Filter.">ExtendedKF</a> : <span class="keyword">public</span>  <a class="code" href="class_kalman_filter_method.html" title="The base class for Kalman filter implementations.">KalmanFilterMethod</a>
 <a name="l00044"></a>00044 {
 <a name="l00045"></a>00045 
 <a name="l00046"></a>00046 
@@ -135,38 +134,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00053"></a>00053         <span class="keyword">typedef</span> <span class="keyword">typename</span> MotionModelMethod::MotionModelPointer MotionModelPointer;
 <a name="l00054"></a>00054         <span class="keyword">typedef</span> <span class="keyword">typename</span> ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
 <a name="l00055"></a>00055 
-<a name="l00056"></a>00056         <a class="code" href="class_extended_k_f.html">ExtendedKF</a>() { }
-<a name="l00057"></a>00057 
-<a name="l00058"></a>00058         <a class="code" href="class_extended_k_f.html">ExtendedKF</a>(firm::SpaceInformation::SpaceInformationPtr si): <a class="code" href="class_kalman_filter_method.html">KalmanFilterMethod</a>(si) {}
-<a name="l00059"></a>00059 
-<a name="l00060"></a>00060         <span class="comment">//gets a belief and control, returns predicted belief if control</span>
-<a name="l00061"></a>00061         <span class="comment">//were to be applied</span>
-<a name="l00062"></a>00062         <span class="keywordtype">void</span> Predict(<span class="keyword">const</span> ompl::base::State *belief,
-<a name="l00063"></a>00063                                 <span class="keyword">const</span> ompl::control::Control* control,
-<a name="l00064"></a>00064                                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; ls,
-<a name="l00065"></a>00065                                 ompl::base::State *predictedState) ;
-<a name="l00066"></a>00066 
-<a name="l00067"></a>00067         <span class="comment">//gets a belief and observation, returns</span>
-<a name="l00068"></a>00068         <span class="keywordtype">void</span> Update(<span class="keyword">const</span> ompl::base::State *belief,
-<a name="l00069"></a>00069                 <span class="keyword">const</span> ObservationType&amp; obs,
-<a name="l00070"></a>00070                 <span class="keyword">const</span>   <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; ls,
-<a name="l00071"></a>00071                 ompl::base::State *updatedState) ;
-<a name="l00072"></a>00072 
-<a name="l00073"></a>00073         <span class="keywordtype">void</span> Evolve(<span class="keyword">const</span> ompl::base::State *belief,
-<a name="l00074"></a>00074                 <span class="keyword">const</span> ompl::control::Control* control,
-<a name="l00075"></a>00075                 <span class="keyword">const</span> ObservationType&amp; obs,
-<a name="l00076"></a>00076                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; lsPred,
-<a name="l00077"></a>00077                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; lsUpdate,
-<a name="l00078"></a>00078                 ompl::base::State *evolvedState) ;
-<a name="l00079"></a>00079 
-<a name="l00080"></a>00080 
-<a name="l00081"></a>00081         arma::mat computeStationaryCovariance (<span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; ls) {}
-<a name="l00082"></a>00082 
-<a name="l00083"></a>00083 };
-<a name="l00084"></a>00084 
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086 <span class="preprocessor">#endif</span>
-<a name="l00087"></a>00087 <span class="preprocessor"></span>
+<a name="l00057"></a><a class="code" href="class_extended_k_f.html#ab97e8270ba3204edacd21a4915d913a4">00057</a>         <a class="code" href="class_extended_k_f.html#ab97e8270ba3204edacd21a4915d913a4" title="Constructor.">ExtendedKF</a>() { }
+<a name="l00058"></a>00058 
+<a name="l00060"></a><a class="code" href="class_extended_k_f.html#a4fd20fe66ee89ad9c4103557afc9836c">00060</a>         <a class="code" href="class_extended_k_f.html#a4fd20fe66ee89ad9c4103557afc9836c" title="Constructor.">ExtendedKF</a>(firm::SpaceInformation::SpaceInformationPtr si): <a class="code" href="class_kalman_filter_method.html" title="The base class for Kalman filter implementations.">KalmanFilterMethod</a>(si) {}
+<a name="l00061"></a>00061 
+<a name="l00064"></a>00064         <span class="keywordtype">void</span> <a class="code" href="class_extended_k_f.html#aa622a74dcda7a4abb78334df8c850a3e" title="Gets as input belief and control, returns predicted belief if control were to be applied to the robot...">Predict</a>(<span class="keyword">const</span> ompl::base::State *belief,
+<a name="l00065"></a>00065                                 <span class="keyword">const</span> ompl::control::Control* control,
+<a name="l00066"></a>00066                                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; ls,
+<a name="l00067"></a>00067                                 ompl::base::State *predictedState) ;
+<a name="l00068"></a>00068 
+<a name="l00070"></a>00070         <span class="keywordtype">void</span> <a class="code" href="class_extended_k_f.html#ae89c058d2f53b4740957d3234110ad50" title="Gets as input belief and observation, returns the updated state of the robot. Also called the Posteri...">Update</a>(<span class="keyword">const</span> ompl::base::State *belief,
+<a name="l00071"></a>00071                 <span class="keyword">const</span> ObservationType&amp; obs,
+<a name="l00072"></a>00072                 <span class="keyword">const</span>   <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; ls,
+<a name="l00073"></a>00073                 ompl::base::State *updatedState) ;
+<a name="l00074"></a>00074 
+<a name="l00077"></a>00077         <span class="keywordtype">void</span> <a class="code" href="class_extended_k_f.html#abac2469798813a08cb9d482509bc6dce" title="Evolves the robot&#39;s belief on the input control, previous state and new observation. It first calls predict and then update.">Evolve</a>(<span class="keyword">const</span> ompl::base::State *belief,
+<a name="l00078"></a>00078                 <span class="keyword">const</span> ompl::control::Control* control,
+<a name="l00079"></a>00079                 <span class="keyword">const</span> ObservationType&amp; obs,
+<a name="l00080"></a>00080                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; lsPred,
+<a name="l00081"></a>00081                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; lsUpdate,
+<a name="l00082"></a>00082                 ompl::base::State *evolvedState) ;
+<a name="l00083"></a>00083 
+<a name="l00086"></a><a class="code" href="class_extended_k_f.html#a2aaf37aae5d4105c384f88b6c948e4cb">00086</a>         arma::mat <a class="code" href="class_extended_k_f.html#a2aaf37aae5d4105c384f88b6c948e4cb" title="Compute the covariance for a given linear system. A linear system describes a robot&#39;s state at a poin...">computeStationaryCovariance</a> (<span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; ls) {}
+<a name="l00087"></a>00087 
+<a name="l00088"></a>00088 };
+<a name="l00089"></a>00089 
+<a name="l00090"></a>00090 
+<a name="l00091"></a>00091 <span class="preprocessor">#endif</span>
+<a name="l00092"></a>00092 <span class="preprocessor"></span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -185,7 +180,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 27 2014 17:36:55 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

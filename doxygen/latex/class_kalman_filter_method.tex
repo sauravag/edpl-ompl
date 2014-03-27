@@ -3,7 +3,17 @@
 }
 
 
-\-Inheritance diagram for \-Kalman\-Filter\-Method\-:\nopagebreak
+\-The base class for \-Kalman filter implementations.  
+
+
+
+
+{\ttfamily \#include $<$\-Kalman\-Filter\-Method.\-h$>$}
+
+
+
+\-Inheritance diagram for \-Kalman\-Filter\-Method\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -13,45 +23,48 @@
 \subsection*{\-Public \-Member \-Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_kalman_filter_method_afbea7fdb6e6faffd74de8ee647b97a02}{{\bfseries \-Kalman\-Filter\-Method} (firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_kalman_filter_method_afbea7fdb6e6faffd74de8ee647b97a02}
+\hypertarget{class_kalman_filter_method_a1a3da9af1c9f982195c064c042feab8e}{\hyperlink{class_kalman_filter_method_a1a3da9af1c9f982195c064c042feab8e}{\-Kalman\-Filter\-Method} ()}\label{class_kalman_filter_method_a1a3da9af1c9f982195c064c042feab8e}
 
-\item 
-\hypertarget{class_kalman_filter_method_aed467f00719c58d7be5458f8f99511d9}{\-Motion\-Model\-Pointer {\bfseries get\-Motion\-Model\-Pointer} ()}\label{class_kalman_filter_method_aed467f00719c58d7be5458f8f99511d9}
+\begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_afbea7fdb6e6faffd74de8ee647b97a02}{\hyperlink{class_kalman_filter_method_afbea7fdb6e6faffd74de8ee647b97a02}{\-Kalman\-Filter\-Method} (firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_kalman_filter_method_afbea7fdb6e6faffd74de8ee647b97a02}
 
-\item 
-\hypertarget{class_kalman_filter_method_a7f2542d72d92f1e44cf4d0cdcaec02b8}{void {\bfseries set\-Motion\-Model\-Pointeer} (const \-Motion\-Model\-Pointer \&mm)}\label{class_kalman_filter_method_a7f2542d72d92f1e44cf4d0cdcaec02b8}
+\begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_aed467f00719c58d7be5458f8f99511d9}{\-Motion\-Model\-Pointer \hyperlink{class_kalman_filter_method_aed467f00719c58d7be5458f8f99511d9}{get\-Motion\-Model\-Pointer} ()}\label{class_kalman_filter_method_aed467f00719c58d7be5458f8f99511d9}
 
-\item 
-\hypertarget{class_kalman_filter_method_aa93f7e7e297eb337cc1fda8ae46763cc}{\-Observation\-Model\-Pointer {\bfseries get\-Observation\-Model\-Pointer} ()}\label{class_kalman_filter_method_aa93f7e7e297eb337cc1fda8ae46763cc}
+\begin{DoxyCompactList}\small\item\em \-Return the pointer to the motion model used by the filter. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_a7f2542d72d92f1e44cf4d0cdcaec02b8}{void \hyperlink{class_kalman_filter_method_a7f2542d72d92f1e44cf4d0cdcaec02b8}{set\-Motion\-Model\-Pointeer} (const \-Motion\-Model\-Pointer \&mm)}\label{class_kalman_filter_method_a7f2542d72d92f1e44cf4d0cdcaec02b8}
 
-\item 
-\hypertarget{class_kalman_filter_method_a4b966a487acbbdda0f145be9a1da03d5}{void {\bfseries set\-Observation\-Model\-Pointer} (const \-Observation\-Model\-Pointer \&om)}\label{class_kalman_filter_method_a4b966a487acbbdda0f145be9a1da03d5}
+\begin{DoxyCompactList}\small\item\em \-Set the \-Motion \-Model pointer. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_aa93f7e7e297eb337cc1fda8ae46763cc}{\-Observation\-Model\-Pointer \hyperlink{class_kalman_filter_method_aa93f7e7e297eb337cc1fda8ae46763cc}{get\-Observation\-Model\-Pointer} ()}\label{class_kalman_filter_method_aa93f7e7e297eb337cc1fda8ae46763cc}
 
-\item 
-\hypertarget{class_kalman_filter_method_a60d4e0a2eb06676f48727e21d33eb31f}{virtual void {\bfseries \-Predict} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$predicted\-State)=0}\label{class_kalman_filter_method_a60d4e0a2eb06676f48727e21d33eb31f}
+\begin{DoxyCompactList}\small\item\em \-Return the observation model poointer. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_a4b966a487acbbdda0f145be9a1da03d5}{void \hyperlink{class_kalman_filter_method_a4b966a487acbbdda0f145be9a1da03d5}{set\-Observation\-Model\-Pointer} (const \-Observation\-Model\-Pointer \&om)}\label{class_kalman_filter_method_a4b966a487acbbdda0f145be9a1da03d5}
 
-\item 
-\hypertarget{class_kalman_filter_method_af79c09c56a2f81c1af8896f235d37afd}{virtual void {\bfseries \-Update} (const ompl\-::base\-::\-State $\ast$belief, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$updated\-State)=0}\label{class_kalman_filter_method_af79c09c56a2f81c1af8896f235d37afd}
+\begin{DoxyCompactList}\small\item\em \-Set the observation model pointer. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_a60d4e0a2eb06676f48727e21d33eb31f}{virtual void \hyperlink{class_kalman_filter_method_a60d4e0a2eb06676f48727e21d33eb31f}{\-Predict} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$predicted\-State)=0}\label{class_kalman_filter_method_a60d4e0a2eb06676f48727e21d33eb31f}
 
-\item 
-\hypertarget{class_kalman_filter_method_a9e56fcd80484eb15d50597b528bc6da9}{virtual void {\bfseries \-Evolve} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Pred, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Update, ompl\-::base\-::\-State $\ast$evolved\-State)=0}\label{class_kalman_filter_method_a9e56fcd80484eb15d50597b528bc6da9}
+\begin{DoxyCompactList}\small\item\em \-Gets as input belief and control, returns predicted belief if control were to be applied to the robot. \-Also called the \-Prior. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_af79c09c56a2f81c1af8896f235d37afd}{virtual void \hyperlink{class_kalman_filter_method_af79c09c56a2f81c1af8896f235d37afd}{\-Update} (const ompl\-::base\-::\-State $\ast$belief, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$updated\-State)=0}\label{class_kalman_filter_method_af79c09c56a2f81c1af8896f235d37afd}
 
-\item 
-\hypertarget{class_kalman_filter_method_a8f9d8ae8cf4e3bd0138d731bd2539441}{virtual arma\-::mat {\bfseries compute\-Stationary\-Covariance} (const \hyperlink{class_linear_system}{\-Linear\-System} \&ls)=0}\label{class_kalman_filter_method_a8f9d8ae8cf4e3bd0138d731bd2539441}
+\begin{DoxyCompactList}\small\item\em \-Gets as input belief and observation, returns the updated state of the robot. \-Also called the \-Posterior. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_a9e56fcd80484eb15d50597b528bc6da9}{virtual void \hyperlink{class_kalman_filter_method_a9e56fcd80484eb15d50597b528bc6da9}{\-Evolve} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Pred, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Update, ompl\-::base\-::\-State $\ast$evolved\-State)=0}\label{class_kalman_filter_method_a9e56fcd80484eb15d50597b528bc6da9}
 
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em \-Evolves the robot's belief on the input control, previous state and new observation. \-It first calls predict and then update. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_a8f9d8ae8cf4e3bd0138d731bd2539441}{virtual arma\-::mat \hyperlink{class_kalman_filter_method_a8f9d8ae8cf4e3bd0138d731bd2539441}{compute\-Stationary\-Covariance} (const \hyperlink{class_linear_system}{\-Linear\-System} \&ls)=0}\label{class_kalman_filter_method_a8f9d8ae8cf4e3bd0138d731bd2539441}
+
+\begin{DoxyCompactList}\small\item\em \-Compute the covariance for a given linear system. \-A linear system describes a robot's state at a point in an open loop trajectory. \-Helps to understand the expected uncertainty at a point in the trajectory. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{\-Protected \-Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_kalman_filter_method_a9a2355339d83656f5db7c86a60d12822}{firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr {\bfseries si\-\_\-}}\label{class_kalman_filter_method_a9a2355339d83656f5db7c86a60d12822}
+\hypertarget{class_kalman_filter_method_a9a2355339d83656f5db7c86a60d12822}{firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \hyperlink{class_kalman_filter_method_a9a2355339d83656f5db7c86a60d12822}{si\-\_\-}}\label{class_kalman_filter_method_a9a2355339d83656f5db7c86a60d12822}
 
-\item 
-\hypertarget{class_kalman_filter_method_a5969ade2e4d4f70a1cccc2f2f2bf4bb3}{\-Motion\-Model\-Pointer {\bfseries motion\-Model\-\_\-}}\label{class_kalman_filter_method_a5969ade2e4d4f70a1cccc2f2f2bf4bb3}
+\begin{DoxyCompactList}\small\item\em \-Pointer to the space information. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_a5969ade2e4d4f70a1cccc2f2f2bf4bb3}{\-Motion\-Model\-Pointer \hyperlink{class_kalman_filter_method_a5969ade2e4d4f70a1cccc2f2f2bf4bb3}{motion\-Model\-\_\-}}\label{class_kalman_filter_method_a5969ade2e4d4f70a1cccc2f2f2bf4bb3}
 
-\item 
-\hypertarget{class_kalman_filter_method_a43191b745846715c66854634ba58e85c}{\-Observation\-Model\-Pointer {\bfseries observation\-Model\-\_\-}}\label{class_kalman_filter_method_a43191b745846715c66854634ba58e85c}
+\begin{DoxyCompactList}\small\item\em \-Pointer to the motion model. \end{DoxyCompactList}\item 
+\hypertarget{class_kalman_filter_method_a43191b745846715c66854634ba58e85c}{\-Observation\-Model\-Pointer \hyperlink{class_kalman_filter_method_a43191b745846715c66854634ba58e85c}{observation\-Model\-\_\-}}\label{class_kalman_filter_method_a43191b745846715c66854634ba58e85c}
 
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em \-Pointer to the observation model. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{\-Private \-Types}
 \begin{DoxyCompactItemize}
 \item 
@@ -81,6 +94,9 @@
 
 \end{DoxyCompactItemize}
 
+
+\subsection{\-Detailed \-Description}
+\-The base class for \-Kalman filter implementations. 
 
 \-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
 \item 

@@ -87,44 +87,64 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">KalmanFilterMethod Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<!-- doxytag: class="KalmanFilterMethod" --><div class="dynheader">
+<!-- doxytag: class="KalmanFilterMethod" -->
+<p>The base class for Kalman filter implementations.  
+ <a href="class_kalman_filter_method.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_kalman_filter_method_8h_source.html">KalmanFilterMethod.h</a>&gt;</code></p>
+<div class="dynheader">
 Inheritance diagram for KalmanFilterMethod:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_kalman_filter_method__inherit__graph.png" border="0" usemap="#_kalman_filter_method_inherit__map" alt="Inheritance graph"/></div>
 <map name="_kalman_filter_method_inherit__map" id="_kalman_filter_method_inherit__map">
-<area shape="rect" id="node3" href="class_extended_k_f.html" title="ExtendedKF" alt="" coords="5,83,99,112"/><area shape="rect" id="node5" href="class_linearized_k_f.html" title="LinearizedKF" alt="" coords="123,83,221,112"/></map>
+<area shape="rect" id="node3" href="class_extended_k_f.html" title="Implementation of the Extended Kalman Filter." alt="" coords="5,83,99,112"/><area shape="rect" id="node5" href="class_linearized_k_f.html" title="A Linearized Kalman Filter." alt="" coords="123,83,221,112"/></map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 
 <p><a href="class_kalman_filter_method-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1a3da9af1c9f982195c064c042feab8e"></a><!-- doxytag: member="KalmanFilterMethod::KalmanFilterMethod" ref="a1a3da9af1c9f982195c064c042feab8e" args="()" -->
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#a1a3da9af1c9f982195c064c042feab8e">KalmanFilterMethod</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afbea7fdb6e6faffd74de8ee647b97a02"></a><!-- doxytag: member="KalmanFilterMethod::KalmanFilterMethod" ref="afbea7fdb6e6faffd74de8ee647b97a02" args="(firm::SpaceInformation::SpaceInformationPtr si)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><b>KalmanFilterMethod</b> (firm::SpaceInformation::SpaceInformationPtr si)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#afbea7fdb6e6faffd74de8ee647b97a02">KalmanFilterMethod</a> (firm::SpaceInformation::SpaceInformationPtr si)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aed467f00719c58d7be5458f8f99511d9"></a><!-- doxytag: member="KalmanFilterMethod::getMotionModelPointer" ref="aed467f00719c58d7be5458f8f99511d9" args="()" -->
-MotionModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>getMotionModelPointer</b> ()</td></tr>
+MotionModelPointer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#aed467f00719c58d7be5458f8f99511d9">getMotionModelPointer</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the pointer to the motion model used by the filter. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7f2542d72d92f1e44cf4d0cdcaec02b8"></a><!-- doxytag: member="KalmanFilterMethod::setMotionModelPointeer" ref="a7f2542d72d92f1e44cf4d0cdcaec02b8" args="(const MotionModelPointer &amp;mm)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setMotionModelPointeer</b> (const MotionModelPointer &amp;mm)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#a7f2542d72d92f1e44cf4d0cdcaec02b8">setMotionModelPointeer</a> (const MotionModelPointer &amp;mm)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Motion Model pointer. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa93f7e7e297eb337cc1fda8ae46763cc"></a><!-- doxytag: member="KalmanFilterMethod::getObservationModelPointer" ref="aa93f7e7e297eb337cc1fda8ae46763cc" args="()" -->
-ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>getObservationModelPointer</b> ()</td></tr>
+ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#aa93f7e7e297eb337cc1fda8ae46763cc">getObservationModelPointer</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the observation model poointer. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4b966a487acbbdda0f145be9a1da03d5"></a><!-- doxytag: member="KalmanFilterMethod::setObservationModelPointer" ref="a4b966a487acbbdda0f145be9a1da03d5" args="(const ObservationModelPointer &amp;om)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setObservationModelPointer</b> (const ObservationModelPointer &amp;om)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#a4b966a487acbbdda0f145be9a1da03d5">setObservationModelPointer</a> (const ObservationModelPointer &amp;om)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the observation model pointer. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60d4e0a2eb06676f48727e21d33eb31f"></a><!-- doxytag: member="KalmanFilterMethod::Predict" ref="a60d4e0a2eb06676f48727e21d33eb31f" args="(const ompl::base::State *belief, const ompl::control::Control *control, const LinearSystem &amp;ls, ompl::base::State *predictedState)=0" -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Predict</b> (const ompl::base::State *belief, const ompl::control::Control *control, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *predictedState)=0</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#a60d4e0a2eb06676f48727e21d33eb31f">Predict</a> (const ompl::base::State *belief, const ompl::control::Control *control, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *predictedState)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets as input belief and control, returns predicted belief if control were to be applied to the robot. Also called the Prior. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af79c09c56a2f81c1af8896f235d37afd"></a><!-- doxytag: member="KalmanFilterMethod::Update" ref="af79c09c56a2f81c1af8896f235d37afd" args="(const ompl::base::State *belief, const ObservationType &amp;obs, const LinearSystem &amp;ls, ompl::base::State *updatedState)=0" -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> (const ompl::base::State *belief, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *updatedState)=0</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#af79c09c56a2f81c1af8896f235d37afd">Update</a> (const ompl::base::State *belief, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *updatedState)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets as input belief and observation, returns the updated state of the robot. Also called the Posterior. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e56fcd80484eb15d50597b528bc6da9"></a><!-- doxytag: member="KalmanFilterMethod::Evolve" ref="a9e56fcd80484eb15d50597b528bc6da9" args="(const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const LinearSystem &amp;lsPred, const LinearSystem &amp;lsUpdate, ompl::base::State *evolvedState)=0" -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Evolve</b> (const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsPred, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsUpdate, ompl::base::State *evolvedState)=0</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#a9e56fcd80484eb15d50597b528bc6da9">Evolve</a> (const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsPred, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsUpdate, ompl::base::State *evolvedState)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Evolves the robot's belief on the input control, previous state and new observation. It first calls predict and then update. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f9d8ae8cf4e3bd0138d731bd2539441"></a><!-- doxytag: member="KalmanFilterMethod::computeStationaryCovariance" ref="a8f9d8ae8cf4e3bd0138d731bd2539441" args="(const LinearSystem &amp;ls)=0" -->
-virtual arma::mat&#160;</td><td class="memItemRight" valign="bottom"><b>computeStationaryCovariance</b> (const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls)=0</td></tr>
+virtual arma::mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#a8f9d8ae8cf4e3bd0138d731bd2539441">computeStationaryCovariance</a> (const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the covariance for a given linear system. A linear system describes a robot's state at a point in an open loop trajectory. Helps to understand the expected uncertainty at a point in the trajectory. <br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9a2355339d83656f5db7c86a60d12822"></a><!-- doxytag: member="KalmanFilterMethod::si_" ref="a9a2355339d83656f5db7c86a60d12822" args="" -->
-firm::SpaceInformation::SpaceInformationPtr&#160;</td><td class="memItemRight" valign="bottom"><b>si_</b></td></tr>
+firm::SpaceInformation::SpaceInformationPtr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#a9a2355339d83656f5db7c86a60d12822">si_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the space information. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5969ade2e4d4f70a1cccc2f2f2bf4bb3"></a><!-- doxytag: member="KalmanFilterMethod::motionModel_" ref="a5969ade2e4d4f70a1cccc2f2f2bf4bb3" args="" -->
-MotionModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>motionModel_</b></td></tr>
+MotionModelPointer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#a5969ade2e4d4f70a1cccc2f2f2bf4bb3">motionModel_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the motion model. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a43191b745846715c66854634ba58e85c"></a><!-- doxytag: member="KalmanFilterMethod::observationModel_" ref="a43191b745846715c66854634ba58e85c" args="" -->
-ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>observationModel_</b></td></tr>
+ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kalman_filter_method.html#a43191b745846715c66854634ba58e85c">observationModel_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the observation model. <br/></td></tr>
 <tr><td colspan="2"><h2><a name="pri-types"></a>
 Private Types</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2718a343b6cf3edf6c8226fe64e9d468"></a><!-- doxytag: member="KalmanFilterMethod::ObservationType" ref="a2718a343b6cf3edf6c8226fe64e9d468" args="" -->
@@ -146,7 +166,9 @@ ObservationModelMethod::ObservationModelPointer&#160;</td><td class="memItemRigh
 typedef <br class="typebreak"/>
 MotionModelMethod::MotionModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>MotionModelPointer</b></td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>The base class for Kalman filter implementations. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/Filters/<a class="el" href="_kalman_filter_method_8h_source.html">KalmanFilterMethod.h</a></li>
 </ul>
 </div><!-- contents -->
@@ -167,7 +189,7 @@ MotionModelMethod::MotionModelPointer&#160;</td><td class="memItemRight" valign=
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 27 2014 17:36:55 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

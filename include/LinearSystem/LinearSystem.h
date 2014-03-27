@@ -41,6 +41,13 @@
 #include <ompl/base/SpaceInformation.h>
 #include "armadillo"
 
+/**
+    @par Description of the Linear System Class
+    A Linear System is a construct which is used to store information about the system at a given state in the 
+    open loop trajectory. It is used to compute and retrieve the Jacobians at the particular state.
+    and  
+ */
+/** \brief The linear system class. */
 class LinearSystem
 {
 
@@ -56,57 +63,39 @@ class LinearSystem
     typedef arma::mat MotionJacobianType;
     typedef arma::mat ObsJacobianType;
 
-    /*
-    LinearSystem (CfgType& _x, shared_ptr<MotionModelMethod> _motionModel,
-                  shared_ptr<ObservationModelMethod> _observationModel,
-                  ControlType& _u,
-                  MotionNoiseType& _w, ObsNoiseType& _v) :
-                  motionModel_(_motionModel),
-                  observationModel_(_observationModel),
-                  x_(_x), u_(_u), w_(_w), v_(_v) { }
-    */
-
+    /** \brief  Constructor.*/
   	LinearSystem() {}
 
+    /** \brief  Constructor.*/
     LinearSystem (const ompl::base::State *state, const ompl::control::Control* control,
                   MotionModelPointer motionModel, ObservationModelPointer observationModel):
                   u_(control), motionModel_(motionModel), observationModel_(observationModel)
-      {
+    {
 
       using namespace arma;
 
       assert(observationModel_);
+
       ompl::base::StateSpacePtr space(new SpaceType());
 
-      //ompl::base::State *tempState
       ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
       x_ = si->cloneState(state);
 
-       //= tempState;
-
-      //TODO: zero noise??
       w_ = motionModel_->getZeroNoise();
-      //v_ = observationModel_->GetZeroNoise();
-      colvec junknoise = arma::zeros<colvec>(1); // this is just useless junk that we are creating just so that we don't need to change interface to observationmodel functions
-      v_ = junknoise;
-      //cout << "GetA: " << endl << GetA() << endl;
-      //cout << "GetB: " << endl << GetB() << endl;
-      //cout << "GetG: " << endl << GetG() << endl;
-      //cout << "GetQ: " << endl << GetQ() << endl;
 
-  		//cout << "GetR: " << endl << GetR() << endl;
-      //
-  		//cout << "GetH: " << GetH() << endl;
-      //cout << "GetM: " << GetM() << endl;
-      //cout << "GetR: " << GetR() << endl;
+      colvec junknoise = arma::zeros<colvec>(1); // this is just useless junk that we are creating just so that we don't need to change interface to observationmodel functions
+
+      v_ = junknoise;
+ 
     }
 
+    /** \brief  Constructor.*/
     LinearSystem (const ompl::base::State *state, const ompl::control::Control* control, const ObservationType& obs,
       MotionModelPointer motionModel,
       ObservationModelPointer observationModel):
       u_(control), motionModel_(motionModel),
       observationModel_(observationModel)
-      {
+    {
 
       using namespace arma;
       assert(observationModel_);
@@ -119,45 +108,59 @@ class LinearSystem
 
       z_ = observation; // using the ids from outside
 
-      //TODO: zero noise??
       w_ = motionModel_->getZeroNoise();
-      //v_ = observationModel_->GetZeroNoise();
-      colvec junknoise = arma::zeros<colvec>(1); // this is just useless junk that we are creating just so that we don't need to change interface to observationmodel functions
-      v_ = junknoise;
-      //cout << "GetA: " << endl << GetA() << endl;
-      //cout << "GetB: " << endl << GetB() << endl;
-      //cout << "GetG: " << endl << GetG() << endl;
-      //cout << "GetQ: " << endl << GetQ() << endl;
 
-  		//cout << "GetR: " << endl << GetR() << endl;
-      //
-  		//cout << "GetH: " << GetH() << endl;
-      //cout << "GetM: " << GetM() << endl;
-      //cout << "GetR: " << GetR() << endl;
+      colvec junknoise = arma::zeros<colvec>(1); // this is just junk that we are creating just so that we don't need to change interface to observationmodel functions
+      
+      v_ = junknoise;
+
     }
 
+    /** \brief  Return the state at which this system was constructed. */
     ompl::base::State* getX() {return x_; }
 
+    /** \brief  Get the state transition jacobian. */
     arma::mat getA() const { return motionModel_->getStateJacobian(x_, u_, w_); }
+    
+    /** \brief  Get the control jacobian for the state transition. */
     arma::mat getB() const { return motionModel_->getControlJacobian(x_, u_, w_); }
+    
+    /** \brief  Get the noise jacobian in the state transition. */
     arma::mat getG() const { return motionModel_->getNoiseJacobian(x_, u_, w_); }
+    
+    /** \brief  Get the process noise covariance for the state transition. */
     arma::mat getQ() const { return motionModel_->processNoiseCovariance(x_, u_); }
 
+    /** \brief  Get the jacobian for the observation. */
     arma::mat getH() const { return observationModel_->getObservationJacobian(x_, v_, z_);}
 
+    /** \brief  Get the observation noise jacobian. */
     arma::mat getM() const { return observationModel_->getNoiseJacobian(x_, v_, z_); }
 
+    /** \brief  Get the observation noise covariance. */
     arma::mat getR() const { return observationModel_->getObservationNoiseCovariance(x_, z_); }
 
   private:
 
+    /** \brief  The state at which the linear system is constructed.*/
     ompl::base::State *x_;
+    
+    /** \brief  The control applied at the internal state. */
     const ompl::control::Control* u_;
+    
+    /** \brief  The motion noise. */
     MotionNoiseType w_;
+    
+    /** \brief  The observation noise. */
     ObsNoiseType v_;
+
+    /** \brief  Observation at the state. */
     ObservationType z_;
 
+    /** \brief  Pointer to the motion model that models the state transition. */
     MotionModelPointer motionModel_;
+
+    /** \brief  Pointer to the observation model that models the sensor measurement. */
     ObservationModelPointer observationModel_;
 };
 

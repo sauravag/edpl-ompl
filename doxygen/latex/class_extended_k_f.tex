@@ -3,7 +3,17 @@
 }
 
 
-\-Inheritance diagram for \-Extended\-K\-F\-:\nopagebreak
+\-Implementation of the \-Extended \-Kalman \-Filter.  
+
+
+
+
+{\ttfamily \#include $<$\-Extended\-K\-F.\-h$>$}
+
+
+
+\-Inheritance diagram for \-Extended\-K\-F\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -12,7 +22,8 @@
 \end{figure}
 
 
-\-Collaboration diagram for \-Extended\-K\-F\-:\nopagebreak
+\-Collaboration diagram for \-Extended\-K\-F\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -49,22 +60,28 @@
 \subsection*{\-Public \-Member \-Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_extended_k_f_a4fd20fe66ee89ad9c4103557afc9836c}{{\bfseries \-Extended\-K\-F} (firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_extended_k_f_a4fd20fe66ee89ad9c4103557afc9836c}
+\hypertarget{class_extended_k_f_ab97e8270ba3204edacd21a4915d913a4}{\hyperlink{class_extended_k_f_ab97e8270ba3204edacd21a4915d913a4}{\-Extended\-K\-F} ()}\label{class_extended_k_f_ab97e8270ba3204edacd21a4915d913a4}
 
-\item 
-\hypertarget{class_extended_k_f_aa622a74dcda7a4abb78334df8c850a3e}{void {\bfseries \-Predict} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$predicted\-State)}\label{class_extended_k_f_aa622a74dcda7a4abb78334df8c850a3e}
+\begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_extended_k_f_a4fd20fe66ee89ad9c4103557afc9836c}{\hyperlink{class_extended_k_f_a4fd20fe66ee89ad9c4103557afc9836c}{\-Extended\-K\-F} (firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_extended_k_f_a4fd20fe66ee89ad9c4103557afc9836c}
 
-\item 
-\hypertarget{class_extended_k_f_ae89c058d2f53b4740957d3234110ad50}{void {\bfseries \-Update} (const ompl\-::base\-::\-State $\ast$belief, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$updated\-State)}\label{class_extended_k_f_ae89c058d2f53b4740957d3234110ad50}
+\begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_extended_k_f_aa622a74dcda7a4abb78334df8c850a3e}{void \hyperlink{class_extended_k_f_aa622a74dcda7a4abb78334df8c850a3e}{\-Predict} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$predicted\-State)}\label{class_extended_k_f_aa622a74dcda7a4abb78334df8c850a3e}
 
-\item 
-\hypertarget{class_extended_k_f_abac2469798813a08cb9d482509bc6dce}{void {\bfseries \-Evolve} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Pred, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Update, ompl\-::base\-::\-State $\ast$evolved\-State)}\label{class_extended_k_f_abac2469798813a08cb9d482509bc6dce}
+\begin{DoxyCompactList}\small\item\em \-Gets as input belief and control, returns predicted belief if control were to be applied to the robot. \-Also called the \-Prior. \end{DoxyCompactList}\item 
+\hypertarget{class_extended_k_f_ae89c058d2f53b4740957d3234110ad50}{void \hyperlink{class_extended_k_f_ae89c058d2f53b4740957d3234110ad50}{\-Update} (const ompl\-::base\-::\-State $\ast$belief, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$updated\-State)}\label{class_extended_k_f_ae89c058d2f53b4740957d3234110ad50}
 
-\item 
-\hypertarget{class_extended_k_f_a2aaf37aae5d4105c384f88b6c948e4cb}{arma\-::mat {\bfseries compute\-Stationary\-Covariance} (const \hyperlink{class_linear_system}{\-Linear\-System} \&ls)}\label{class_extended_k_f_a2aaf37aae5d4105c384f88b6c948e4cb}
+\begin{DoxyCompactList}\small\item\em \-Gets as input belief and observation, returns the updated state of the robot. \-Also called the \-Posterior. \end{DoxyCompactList}\item 
+\hypertarget{class_extended_k_f_abac2469798813a08cb9d482509bc6dce}{void \hyperlink{class_extended_k_f_abac2469798813a08cb9d482509bc6dce}{\-Evolve} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Pred, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Update, ompl\-::base\-::\-State $\ast$evolved\-State)}\label{class_extended_k_f_abac2469798813a08cb9d482509bc6dce}
 
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em \-Evolves the robot's belief on the input control, previous state and new observation. \-It first calls predict and then update. \end{DoxyCompactList}\item 
+\hypertarget{class_extended_k_f_a2aaf37aae5d4105c384f88b6c948e4cb}{arma\-::mat \hyperlink{class_extended_k_f_a2aaf37aae5d4105c384f88b6c948e4cb}{compute\-Stationary\-Covariance} (const \hyperlink{class_linear_system}{\-Linear\-System} \&ls)}\label{class_extended_k_f_a2aaf37aae5d4105c384f88b6c948e4cb}
 
+\begin{DoxyCompactList}\small\item\em \-Compute the covariance for a given linear system. \-A linear system describes a robot's state at a point in an open loop trajectory. \-Helps to understand the expected uncertainty at a point in the trajectory. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\-Implementation of the \-Extended \-Kalman \-Filter. 
 
 \-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
 \item 

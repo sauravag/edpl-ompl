@@ -86,19 +86,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">ExtendedKF Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<!-- doxytag: class="ExtendedKF" --><!-- doxytag: inherits="KalmanFilterMethod" --><div class="dynheader">
+<!-- doxytag: class="ExtendedKF" --><!-- doxytag: inherits="KalmanFilterMethod" -->
+<p>Implementation of the Extended Kalman Filter.  
+ <a href="class_extended_k_f.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_extended_k_f_8h_source.html">ExtendedKF.h</a>&gt;</code></p>
+<div class="dynheader">
 Inheritance diagram for ExtendedKF:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_extended_k_f__inherit__graph.png" border="0" usemap="#_extended_k_f_inherit__map" alt="Inheritance graph"/></div>
 <map name="_extended_k_f_inherit__map" id="_extended_k_f_inherit__map">
-<area shape="rect" id="node2" href="class_kalman_filter_method.html" title="KalmanFilterMethod" alt="" coords="5,5,144,35"/></map>
+<area shape="rect" id="node2" href="class_kalman_filter_method.html" title="The base class for Kalman filter implementations." alt="" coords="5,5,144,35"/></map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for ExtendedKF:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_extended_k_f__coll__graph.png" border="0" usemap="#_extended_k_f_coll__map" alt="Collaboration graph"/></div>
 <map name="_extended_k_f_coll__map" id="_extended_k_f_coll__map">
-<area shape="rect" id="node2" href="class_kalman_filter_method.html" title="KalmanFilterMethod" alt="" coords="5,5,144,35"/></map>
+<area shape="rect" id="node2" href="class_kalman_filter_method.html" title="The base class for Kalman filter implementations." alt="" coords="5,5,144,35"/></map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 
 <p><a href="class_extended_k_f-members.html">List of all members.</a></p>
@@ -125,18 +130,28 @@ typedef <br class="typebreak"/>
 ObservationModelMethod::ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>ObservationModelPointer</b></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab97e8270ba3204edacd21a4915d913a4"></a><!-- doxytag: member="ExtendedKF::ExtendedKF" ref="ab97e8270ba3204edacd21a4915d913a4" args="()" -->
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_extended_k_f.html#ab97e8270ba3204edacd21a4915d913a4">ExtendedKF</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4fd20fe66ee89ad9c4103557afc9836c"></a><!-- doxytag: member="ExtendedKF::ExtendedKF" ref="a4fd20fe66ee89ad9c4103557afc9836c" args="(firm::SpaceInformation::SpaceInformationPtr si)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><b>ExtendedKF</b> (firm::SpaceInformation::SpaceInformationPtr si)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_extended_k_f.html#a4fd20fe66ee89ad9c4103557afc9836c">ExtendedKF</a> (firm::SpaceInformation::SpaceInformationPtr si)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa622a74dcda7a4abb78334df8c850a3e"></a><!-- doxytag: member="ExtendedKF::Predict" ref="aa622a74dcda7a4abb78334df8c850a3e" args="(const ompl::base::State *belief, const ompl::control::Control *control, const LinearSystem &amp;ls, ompl::base::State *predictedState)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Predict</b> (const ompl::base::State *belief, const ompl::control::Control *control, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *predictedState)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_extended_k_f.html#aa622a74dcda7a4abb78334df8c850a3e">Predict</a> (const ompl::base::State *belief, const ompl::control::Control *control, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *predictedState)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets as input belief and control, returns predicted belief if control were to be applied to the robot. Also called the Prior. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae89c058d2f53b4740957d3234110ad50"></a><!-- doxytag: member="ExtendedKF::Update" ref="ae89c058d2f53b4740957d3234110ad50" args="(const ompl::base::State *belief, const ObservationType &amp;obs, const LinearSystem &amp;ls, ompl::base::State *updatedState)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> (const ompl::base::State *belief, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *updatedState)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_extended_k_f.html#ae89c058d2f53b4740957d3234110ad50">Update</a> (const ompl::base::State *belief, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *updatedState)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets as input belief and observation, returns the updated state of the robot. Also called the Posterior. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abac2469798813a08cb9d482509bc6dce"></a><!-- doxytag: member="ExtendedKF::Evolve" ref="abac2469798813a08cb9d482509bc6dce" args="(const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const LinearSystem &amp;lsPred, const LinearSystem &amp;lsUpdate, ompl::base::State *evolvedState)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Evolve</b> (const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsPred, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsUpdate, ompl::base::State *evolvedState)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_extended_k_f.html#abac2469798813a08cb9d482509bc6dce">Evolve</a> (const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsPred, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsUpdate, ompl::base::State *evolvedState)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Evolves the robot's belief on the input control, previous state and new observation. It first calls predict and then update. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2aaf37aae5d4105c384f88b6c948e4cb"></a><!-- doxytag: member="ExtendedKF::computeStationaryCovariance" ref="a2aaf37aae5d4105c384f88b6c948e4cb" args="(const LinearSystem &amp;ls)" -->
-arma::mat&#160;</td><td class="memItemRight" valign="bottom"><b>computeStationaryCovariance</b> (const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls)</td></tr>
+arma::mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_extended_k_f.html#a2aaf37aae5d4105c384f88b6c948e4cb">computeStationaryCovariance</a> (const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the covariance for a given linear system. A linear system describes a robot's state at a point in an open loop trajectory. Helps to understand the expected uncertainty at a point in the trajectory. <br/></td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following files:<ul>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>Implementation of the Extended Kalman Filter. </p>
+</div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>include/Filters/<a class="el" href="_extended_k_f_8h_source.html">ExtendedKF.h</a></li>
 <li>src/Filters/ExtendedKF.cpp</li>
 </ul>
@@ -158,7 +173,7 @@ arma::mat&#160;</td><td class="memItemRight" valign="bottom"><b>computeStationar
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 27 2014 17:36:55 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
