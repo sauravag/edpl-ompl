@@ -84,6 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 This is the complete list of members for <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>, including all inherited members.<table>
+  <tr bgcolor="#f0f0f0"><td><b>controlQueueSize_</b> (defined in <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>)</td><td><a class="el" href="class_r_h_c_i_create.html">RHCICreate</a></td><td><code> [private, static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>ControlType</b> typedef (defined in <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>)</td><td><a class="el" href="class_r_h_c_i_create.html">RHCICreate</a></td><td></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>CostType</b> typedef (defined in <a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a>)</td><td><a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a></td><td></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>GainType</b> typedef (defined in <a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a>)</td><td><a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a></td><td></td></tr>
@@ -95,6 +96,7 @@ This is the complete list of members for <a class="el" href="class_r_h_c_i_creat
   <tr bgcolor="#f0f0f0"><td><b>nominalUs_</b> (defined in <a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a>)</td><td><a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a></td><td><code> [protected]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>nominalXs_</b> (defined in <a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a>)</td><td><a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a></td><td><code> [protected]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>ObservationType</b> typedef (defined in <a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a>)</td><td><a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a></td><td></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>openLoopControls_</b> (defined in <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>)</td><td><a class="el" href="class_r_h_c_i_create.html">RHCICreate</a></td><td><code> [private]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>RHCICreate</b>() (defined in <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>)</td><td><a class="el" href="class_r_h_c_i_create.html">RHCICreate</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>RHCICreate</b>(ompl::base::State *goal, const std::vector&lt; ompl::base::State * &gt; &amp;nominalXs, const std::vector&lt; ompl::control::Control * &gt; &amp;nominalUs, const std::vector&lt; LinearSystem &gt; &amp;linearSystems, const MotionModelPointer mm) (defined in <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>)</td><td><a class="el" href="class_r_h_c_i_create.html">RHCICreate</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>SeparatedControllerMethod</b>() (defined in <a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a>)</td><td><a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a></td><td><code> [inline]</code></td></tr>
@@ -103,6 +105,7 @@ This is the complete list of members for <a class="el" href="class_r_h_c_i_creat
   <tr bgcolor="#f0f0f0"><td><b>setTurnOnlyDistance</b>(const double turnDist) (defined in <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>)</td><td><a class="el" href="class_r_h_c_i_create.html">RHCICreate</a></td><td><code> [inline, static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>SpaceType</b> typedef (defined in <a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a>)</td><td><a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a></td><td></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>StateType</b> typedef (defined in <a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a>)</td><td><a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a></td><td></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>turnOnlyDistance_</b> (defined in <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>)</td><td><a class="el" href="class_r_h_c_i_create.html">RHCICreate</a></td><td><code> [private, static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>~RHCICreate</b>() (defined in <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>)</td><td><a class="el" href="class_r_h_c_i_create.html">RHCICreate</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>~SeparatedControllerMethod</b>() (defined in <a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a>)</td><td><a class="el" href="class_separated_controller_method.html">SeparatedControllerMethod</a></td><td><code> [inline]</code></td></tr>
 </table></div><!-- contents -->
@@ -123,7 +126,7 @@ This is the complete list of members for <a class="el" href="class_r_h_c_i_creat
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

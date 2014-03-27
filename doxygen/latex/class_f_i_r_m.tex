@@ -81,14 +81,14 @@ typedef \hyperlink{class_controller}{\-Controller}$<$ \hyperlink{class_r_h_c_i_c
 \subsection*{\-Public \-Member \-Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_f_i_r_m_acc62503ed6d1d9674e3b18102fb0dd98}{\hyperlink{class_f_i_r_m_acc62503ed6d1d9674e3b18102fb0dd98}{\-F\-I\-R\-M} (const firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \&si, bool star\-Strategy=false)}\label{class_f_i_r_m_acc62503ed6d1d9674e3b18102fb0dd98}
+\hypertarget{class_f_i_r_m_a45dfdcb347763c633bf46ee653c35ce9}{\hyperlink{class_f_i_r_m_a45dfdcb347763c633bf46ee653c35ce9}{\-F\-I\-R\-M} (const firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \&si, bool debug\-Mode=false, bool star\-Strategy=false)}\label{class_f_i_r_m_a45dfdcb347763c633bf46ee653c35ce9}
 
 \begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_a09a7ff97d8202a82ca7f6dddfd7ba185}{virtual void {\bfseries set\-Problem\-Definition} (const ompl\-::base\-::\-Problem\-Definition\-Ptr \&pdef)}\label{class_f_i_r_m_a09a7ff97d8202a82ca7f6dddfd7ba185}
 
 \item 
 void \hyperlink{class_f_i_r_m_a8017d1847e682f39c2cbce33e904af57}{set\-Connection\-Strategy} (const \hyperlink{class_f_i_r_m_a15cfbcaf52c0bdd5e6c1a969bbf7ea1e}{\-Connection\-Strategy} \&connection\-Strategy)
-\begin{DoxyCompactList}\small\item\em \-Set the connection strategy function that specifies the milestones that connection attempts will be make to for a given milestone. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em \-Set the connection strategy function that specifies the milestones that connection attempts will be made to for a given milestone. \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_a2a87b6c094c21b956a469a2b69cd387c}{void \hyperlink{class_f_i_r_m_a2a87b6c094c21b956a469a2b69cd387c}{set\-Max\-Nearest\-Neighbors} (unsigned int k)}\label{class_f_i_r_m_a2a87b6c094c21b956a469a2b69cd387c}
 
 \begin{DoxyCompactList}\small\item\em \-Convenience function that sets the connection strategy to the default one with k nearest neighbors. \end{DoxyCompactList}\item 
@@ -138,7 +138,10 @@ void \hyperlink{class_f_i_r_m_a3f85ba51a7c3b62b75df7f7c16064cec}{set\-Connection
 \begin{DoxyCompactList}\small\item\em \-Compute distance between two milestones (this is simply distance between the states of the milestones) \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_ad6df82888d88ab8479f92f9f3e453c2e}{const \-Roadmap\-Neighbors \& {\bfseries get\-Nearest\-Neighbors} (void)}\label{class_f_i_r_m_ad6df82888d88ab8479f92f9f3e453c2e}
 
-\end{DoxyCompactItemize}
+\item 
+\hypertarget{class_f_i_r_m_ae448791d4c9af9016bc9d5e9de166f0e}{void \hyperlink{class_f_i_r_m_ae448791d4c9af9016bc9d5e9de166f0e}{execute\-Feedback} (void)}\label{class_f_i_r_m_ae448791d4c9af9016bc9d5e9de166f0e}
+
+\begin{DoxyCompactList}\small\item\em \-Executes the generated policy on the system. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{\-Protected \-Member \-Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -156,7 +159,8 @@ virtual \-Vertex \hyperlink{class_f_i_r_m_a6b72ace6d1708b25bf8c7f69331ae82b}{add
 \hypertarget{class_f_i_r_m_ae33b03b6c78466e4a47f7b6d9f59d7f8}{virtual void \hyperlink{class_f_i_r_m_ae33b03b6c78466e4a47f7b6d9f59d7f8}{grow\-Roadmap} (const ompl\-::base\-::\-Planner\-Termination\-Condition \&ptc, ompl\-::base\-::\-State $\ast$work\-State)}\label{class_f_i_r_m_ae33b03b6c78466e4a47f7b6d9f59d7f8}
 
 \begin{DoxyCompactList}\small\item\em \-Randomly sample the state space, add and connect milestones in the roadmap. \-Stop this process when the termination condition {\itshape ptc\/} returns true. \-Use {\itshape work\-State\/} as temporary memory. \end{DoxyCompactList}\item 
-virtual void \hyperlink{class_f_i_r_m_ab0c4511064a0cd59f5b5ad756879c4ef}{expand\-Roadmap} (const ompl\-::base\-::\-Planner\-Termination\-Condition \&ptc, std\-::vector$<$ ompl\-::base\-::\-State $\ast$ $>$ \&work\-States)
+\hypertarget{class_f_i_r_m_ab0c4511064a0cd59f5b5ad756879c4ef}{virtual void \hyperlink{class_f_i_r_m_ab0c4511064a0cd59f5b5ad756879c4ef}{expand\-Roadmap} (const ompl\-::base\-::\-Planner\-Termination\-Condition \&ptc, std\-::vector$<$ ompl\-::base\-::\-State $\ast$ $>$ \&work\-States)}\label{class_f_i_r_m_ab0c4511064a0cd59f5b5ad756879c4ef}
+
 \begin{DoxyCompactList}\small\item\em \-Attempt to connect disjoint components in the roadmap using random bounding motions (the \-P\-R\-M expansion step) \end{DoxyCompactList}\item 
 void \hyperlink{class_f_i_r_m_a4c909fc53ceeeecb6992ccebf0ab60d6}{check\-For\-Solution} (const ompl\-::base\-::\-Planner\-Termination\-Condition \&ptc, ompl\-::base\-::\-Path\-Ptr \&solution)
 \item 
@@ -166,13 +170,9 @@ void \hyperlink{class_f_i_r_m_a4c909fc53ceeeecb6992ccebf0ab60d6}{check\-For\-Sol
 \hypertarget{class_f_i_r_m_a341a81deb4e550fbacf6c239a801d2a8}{bool \hyperlink{class_f_i_r_m_a341a81deb4e550fbacf6c239a801d2a8}{added\-New\-Solution} (void) const }\label{class_f_i_r_m_a341a81deb4e550fbacf6c239a801d2a8}
 
 \begin{DoxyCompactList}\small\item\em \-Returns the value of the added\-Solution\-\_\- member. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_a780c6849089ac155758c7d74a1114d1b}{virtual ompl\-::base\-::\-Path\-Ptr \hyperlink{class_f_i_r_m_a780c6849089ac155758c7d74a1114d1b}{construct\-Solution} (const \-Vertex \&start, const \-Vertex \&goal)}\label{class_f_i_r_m_a780c6849089ac155758c7d74a1114d1b}
-
+virtual ompl\-::base\-::\-Path\-Ptr \hyperlink{class_f_i_r_m_a28ff922dfb8df66dbb82a6b6078959a0}{construct\-Feedback\-Path} (const \-Vertex \&start, const \-Vertex \&goal)
 \begin{DoxyCompactList}\small\item\em \-Given two milestones from the same connected component, construct a path connecting them and set it as the solution. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_a1da2ab71468c89f8d640df882eb97d36}{virtual ompl\-::base\-::\-Path\-Ptr \hyperlink{class_f_i_r_m_a1da2ab71468c89f8d640df882eb97d36}{construct\-Geometric\-Path} (const boost\-::vector\-\_\-property\-\_\-map$<$ \-Vertex $>$ \&prev, const \-Vertex \&start, const \-Vertex \&goal)}\label{class_f_i_r_m_a1da2ab71468c89f8d640df882eb97d36}
-
-\begin{DoxyCompactList}\small\item\em \-Given a solution represented as a vector of predecesors in the roadmap, construct a geometric path. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_aff9745cc3d4c9419f7e263634b01d97c}{virtual void \hyperlink{class_f_i_r_m_aff9745cc3d4c9419f7e263634b01d97c}{add\-Edge\-To\-Graph} (\-Vertex a, \-Vertex b)}\label{class_f_i_r_m_aff9745cc3d4c9419f7e263634b01d97c}
+\hypertarget{class_f_i_r_m_a9774dc171985f4521c02b5db8552397f}{virtual void \hyperlink{class_f_i_r_m_a9774dc171985f4521c02b5db8552397f}{add\-Edge\-To\-Graph} (const \-Vertex a, const \-Vertex b)}\label{class_f_i_r_m_a9774dc171985f4521c02b5db8552397f}
 
 \begin{DoxyCompactList}\small\item\em \-Add an edge from vertex a to b in graph. \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_acb96d1cd6665cf4da65a41f580932103}{virtual \hyperlink{class_f_i_r_m_weight}{\-F\-I\-R\-M\-Weight} \hyperlink{class_f_i_r_m_acb96d1cd6665cf4da65a41f580932103}{generate\-Controllers\-With\-Edge\-Cost} (ompl\-::base\-::\-State $\ast$start\-Node\-State, ompl\-::base\-::\-State $\ast$target\-Node\-State, \hyperlink{class_f_i_r_m_a70abcb24fbc9f836b94119f65c8f8a37}{\-Edge\-Controller\-Type} \&edge\-Controller, \hyperlink{class_controller}{\-Node\-Controller\-Type} \&node\-Controller)}\label{class_f_i_r_m_acb96d1cd6665cf4da65a41f580932103}
@@ -184,12 +184,15 @@ void \hyperlink{class_f_i_r_m_a4c909fc53ceeeecb6992ccebf0ab60d6}{check\-For\-Sol
 \hypertarget{class_f_i_r_m_a1856164aa0dba82e6cfad26a4ef5a7fe}{virtual void \hyperlink{class_f_i_r_m_a1856164aa0dba82e6cfad26a4ef5a7fe}{generate\-Node\-Controller} (const ompl\-::base\-::\-State $\ast$state, \hyperlink{class_controller}{\-Node\-Controller\-Type} \&node\-Controller)}\label{class_f_i_r_m_a1856164aa0dba82e6cfad26a4ef5a7fe}
 
 \begin{DoxyCompactList}\small\item\em \-Generates the node controller that stabilizes the robot to the node. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_a932c11dc22cdf26b3f24d74adffcf424}{virtual void \hyperlink{class_f_i_r_m_a932c11dc22cdf26b3f24d74adffcf424}{solve\-Dynamic\-Program} (\-Vertex goal\-Vertex)}\label{class_f_i_r_m_a932c11dc22cdf26b3f24d74adffcf424}
+\hypertarget{class_f_i_r_m_a7ffdc57247b8f40899646195750b6a20}{virtual void \hyperlink{class_f_i_r_m_a7ffdc57247b8f40899646195750b6a20}{solve\-Dynamic\-Program} (const \-Vertex goal\-Vertex)}\label{class_f_i_r_m_a7ffdc57247b8f40899646195750b6a20}
 
 \begin{DoxyCompactList}\small\item\em \-Solves the dynamic program to return a feedback policy. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_ae448791d4c9af9016bc9d5e9de166f0e}{void \hyperlink{class_f_i_r_m_ae448791d4c9af9016bc9d5e9de166f0e}{execute\-Feedback} (void)}\label{class_f_i_r_m_ae448791d4c9af9016bc9d5e9de166f0e}
+\hypertarget{class_f_i_r_m_a4003d4144f6c32e9eaba79f292ec9ce4}{void {\bfseries add\-State\-To\-Visualization} (ompl\-::base\-::\-State $\ast$state)}\label{class_f_i_r_m_a4003d4144f6c32e9eaba79f292ec9ce4}
 
-\begin{DoxyCompactList}\small\item\em \-Executes the generated policy on the system. \end{DoxyCompactList}\item 
+\item 
+\hypertarget{class_f_i_r_m_a8d9e316c11b1e2ff52b5ff65996d3a01}{void {\bfseries send\-Feedback\-Edges\-To\-Viz} ()}\label{class_f_i_r_m_a8d9e316c11b1e2ff52b5ff65996d3a01}
+
+\item 
 \hypertarget{class_f_i_r_m_a44321fba1c038c1f43ccfeccf9a1c44c}{std\-::pair$<$ typename \-F\-I\-R\-M\-::\-Edge, \*
 double $>$ \hyperlink{class_f_i_r_m_a44321fba1c038c1f43ccfeccf9a1c44c}{get\-Updated\-Node\-Cost\-To\-Go} (\-Vertex node)}\label{class_f_i_r_m_a44321fba1c038c1f43ccfeccf9a1c44c}
 
@@ -287,9 +290,6 @@ firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \hyperlink{class_f_i_r
 \hyperlink{class_controller}{\-Node\-Controller\-Type} $>$ \hyperlink{class_f_i_r_m_ac80211b920fb34ee04779c9af2c0d1c4}{node\-Controllers\-\_\-}}\label{class_f_i_r_m_ac80211b920fb34ee04779c9af2c0d1c4}
 
 \begin{DoxyCompactList}\small\item\em \-A table that stores the node controllers according to the node (vertex) ids. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_ae206a19c2bc7d2a8a31b9ae6a1f40fda}{std\-::map$<$ \-Edge, double $>$ {\bfseries transition\-Probabilities\-\_\-}}\label{class_f_i_r_m_ae206a19c2bc7d2a8a31b9ae6a1f40fda}
-
-\item 
 \hypertarget{class_f_i_r_m_a2da49edf6ea58f4116cd3c31022bd693}{std\-::map$<$ \-Vertex, double $>$ {\bfseries cost\-To\-Go\-\_\-}}\label{class_f_i_r_m_a2da49edf6ea58f4116cd3c31022bd693}
 
 \item 
@@ -300,6 +300,9 @@ firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \hyperlink{class_f_i_r
 
 \begin{DoxyCompactList}\small\item\em \-The number of particles to use for monte carlo simulations. \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_a7fc88496b950b90b92876dea03b3102f}{bool {\bfseries debug\-\_\-}}\label{class_f_i_r_m_a7fc88496b950b90b92876dea03b3102f}
+
+\item 
+\hypertarget{class_f_i_r_m_add9de6c5accdea0f9b6d1ff458350036}{unsigned int {\bfseries min\-F\-I\-R\-M\-Nodes\-\_\-}}\label{class_f_i_r_m_add9de6c5accdea0f9b6d1ff458350036}
 
 \end{DoxyCompactItemize}
 
@@ -369,7 +372,7 @@ expect the roadmap to be sparse (m$<$n$^\wedge$2), an adjacency\-\_\-list is mor
 
 \-Construct a milestone for a given state ({\itshape state\/}), store it in the nearest neighbors data structure and then connect it to the roadmap in accordance to the connection strategy. 
 
-successful\-Connection\-Attempts\-Property\-\_\-\mbox{[}m\mbox{]}++; successful\-Connection\-Attempts\-Property\-\_\-\mbox{[}n\mbox{]}++; \-This where we perform \-M\-C simulation to get edge cost const ompl\-::base\-::\-Cost weight = opt\-\_\--\/$>$motion\-Cost(state\-Property\-\_\-\mbox{[}m\mbox{]}, state\-Property\-\_\-\mbox{[}n\mbox{]}); \-Edge\-Controller\-Type edge\-Controller; \-Node\-Controller\-Type node\-Controller; const \hyperlink{class_f_i_r_m_weight}{\-F\-I\-R\-M\-Weight} weight = generate\-Controllers\-With\-Edge\-Cost(state\-Property\-\_\-\mbox{[}m\mbox{]}, state\-Property\-\_\-\mbox{[}n\mbox{]}, edge\-Controller, node\-Controller); const unsigned int id = max\-Edge\-I\-D\-\_\-++; const \-Graph\-::edge\-\_\-property\-\_\-type properties(weight, id); std\-::pair$<$\-Edge, bool$>$ new\-Edge = boost\-::add\-\_\-edge(m, n, properties, g\-\_\-); edge\-Controllers\-\_\-\mbox{[}new\-Edge.\-first\mbox{]} = edge\-Controller; node\-Controllers\-\_\-\mbox{[}n\mbox{]} = node\-Controller; unite\-Components(n, m);\hypertarget{class_f_i_r_m_a4c909fc53ceeeecb6992ccebf0ab60d6}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!check\-For\-Solution@{check\-For\-Solution}}
+if(boost\-::num\-\_\-vertices(g\-\_\-) $>$ 1 ) \{ foreach(\-Vertex v, boost\-::vertices(g\-\_\-)) \{ if(state == state\-Property\-\_\-\mbox{[}v\mbox{]}) return v; \} \}\hypertarget{class_f_i_r_m_a4c909fc53ceeeecb6992ccebf0ab60d6}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!check\-For\-Solution@{check\-For\-Solution}}
 \index{check\-For\-Solution@{check\-For\-Solution}!FIRM@{\-F\-I\-R\-M}}
 \subsubsection[{check\-For\-Solution}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-F\-I\-R\-M\-::check\-For\-Solution} (
 \begin{DoxyParamCaption}
@@ -377,21 +380,23 @@ successful\-Connection\-Attempts\-Property\-\_\-\mbox{[}m\mbox{]}++; successful\
 \item[{ompl\-::base\-::\-Path\-Ptr \&}]{solution}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}\label{class_f_i_r_m_a4c909fc53ceeeecb6992ccebf0ab60d6}
-\-Thread that checks for solution \hypertarget{class_f_i_r_m_ab0c4511064a0cd59f5b5ad756879c4ef}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!expand\-Roadmap@{expand\-Roadmap}}
-\index{expand\-Roadmap@{expand\-Roadmap}!FIRM@{\-F\-I\-R\-M}}
-\subsubsection[{expand\-Roadmap}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-F\-I\-R\-M\-::expand\-Roadmap} (
+\-Thread that checks for solution \hypertarget{class_f_i_r_m_a28ff922dfb8df66dbb82a6b6078959a0}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!construct\-Feedback\-Path@{construct\-Feedback\-Path}}
+\index{construct\-Feedback\-Path@{construct\-Feedback\-Path}!FIRM@{\-F\-I\-R\-M}}
+\subsubsection[{construct\-Feedback\-Path}]{\setlength{\rightskip}{0pt plus 5cm}ompl\-::base\-::\-Path\-Ptr {\bf \-F\-I\-R\-M\-::construct\-Feedback\-Path} (
 \begin{DoxyParamCaption}
-\item[{const ompl\-::base\-::\-Planner\-Termination\-Condition \&}]{ptc, }
-\item[{std\-::vector$<$ ompl\-::base\-::\-State $\ast$ $>$ \&}]{work\-States}
+\item[{const \-Vertex \&}]{start, }
+\item[{const \-Vertex \&}]{goal}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily  \mbox{[}protected, virtual\mbox{]}}}}\label{class_f_i_r_m_ab0c4511064a0cd59f5b5ad756879c4ef}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}protected, virtual\mbox{]}}}}\label{class_f_i_r_m_a28ff922dfb8df66dbb82a6b6078959a0}
 
 
-\-Attempt to connect disjoint components in the roadmap using random bounding motions (the \-P\-R\-M expansion step) 
+\-Given two milestones from the same connected component, construct a path connecting them and set it as the solution. 
 
-\-Edge\-Controller\-Type edge\-Controller; \-Node\-Controller\-Type node\-Controller; const \hyperlink{class_f_i_r_m_weight}{\-F\-I\-R\-M\-Weight} weight = generate\-Controllers\-With\-Edge\-Cost(state\-Property\-\_\-\mbox{[}v\mbox{]}, state\-Property\-\_\-\mbox{[}m\mbox{]}, edge\-Controller, node\-Controller); const unsigned int id = max\-Edge\-I\-D\-\_\-++; const \-Graph\-::edge\-\_\-property\-\_\-type properties(weight, id); std\-::pair$<$\-Edge, bool$>$ new\-Edge = boost\-::add\-\_\-edge(v, m, properties, g\-\_\-); edge\-Controllers\-\_\-\mbox{[}new\-Edge.\-first\mbox{]} = edge\-Controller; node\-Controllers\-\_\-\mbox{[}m\mbox{]} = node\-Controller; unite\-Components(v, m);
+\-Given a solution represented as a vector of predecesors in the roadmap, construct a geometric path
 
-\-Edge\-Controller\-Type edge\-Controller; \-Node\-Controller\-Type node\-Controller; const \hyperlink{class_f_i_r_m_weight}{\-F\-I\-R\-M\-Weight} weight = generate\-Controllers\-With\-Edge\-Cost(state\-Property\-\_\-\mbox{[}v\mbox{]}, state\-Property\-\_\-\mbox{[}last\mbox{]}, edge\-Controller, node\-Controller); const unsigned int id = max\-Edge\-I\-D\-\_\-++; const \-Graph\-::edge\-\_\-property\-\_\-type properties(weight, id); std\-::pair$<$\-Edge, bool$>$ new\-Edge = boost\-::add\-\_\-edge(v, last, properties, g\-\_\-); edge\-Controllers\-\_\-\mbox{[}new\-Edge.\-first\mbox{]} = edge\-Controller; node\-Controllers\-\_\-\mbox{[}last\mbox{]} = node\-Controller; // should this be last or v ??? unite\-Components(v, last);\hypertarget{class_f_i_r_m_a3f85ba51a7c3b62b75df7f7c16064cec}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!set\-Connection\-Filter@{set\-Connection\-Filter}}
+ompl\-::base\-::\-Path\-Ptr \-F\-I\-R\-M\-::construct\-Solution(const Vertex \&start, const Vertex \&goal) \{
+
+\} \hypertarget{class_f_i_r_m_a3f85ba51a7c3b62b75df7f7c16064cec}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!set\-Connection\-Filter@{set\-Connection\-Filter}}
 \index{set\-Connection\-Filter@{set\-Connection\-Filter}!FIRM@{\-F\-I\-R\-M}}
 \subsubsection[{set\-Connection\-Filter}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-F\-I\-R\-M\-::set\-Connection\-Filter} (
 \begin{DoxyParamCaption}
@@ -419,10 +424,10 @@ is checked for collision and added to the roadmap. \-Other neighbors may have al
 )\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}\label{class_f_i_r_m_a8017d1847e682f39c2cbce33e904af57}
 
 
-\-Set the connection strategy function that specifies the milestones that connection attempts will be make to for a given milestone. 
+\-Set the connection strategy function that specifies the milestones that connection attempts will be made to for a given milestone. 
 
 \begin{DoxyParagraph}{\-The behavior and performance of \-P\-R\-M can be changed drastically}
-by varying the number and properties if the milestones that are connected to each other.
+by varying the number and properties of the milestones that are connected to each other.
 \end{DoxyParagraph}
 
 \begin{DoxyParams}{\-Parameters}

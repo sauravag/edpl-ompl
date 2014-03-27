@@ -81,7 +81,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">FIRMValidityChecker Class Reference</div>  </div>
 </div><!--header-->
@@ -98,19 +99,26 @@ ObservationModelMethod::ObservationModelPointer&#160;</td><td class="memItemRigh
 typedef <a class="el" href="class_s_e2_belief_space_1_1_state_type.html">SE2BeliefSpace::StateType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>StateType</b></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m_validity_checker.html#a6721f3a590c4ee967f57361aaba79b9d">FIRMValidityChecker</a> (const ompl::base::SpaceInformationPtr &amp;si)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m_validity_checker.html#afeac2dfdf78f58c204e09cf57f9abe95">FIRMValidityChecker</a> (const firm::SpaceInformation::SpaceInformationPtr &amp;si)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29fbd40e9a25430b7f5e296abe654f0b"></a><!-- doxytag: member="FIRMValidityChecker::isValid" ref="a29fbd40e9a25430b7f5e296abe654f0b" args="(const ompl::base::State *state) const " -->
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>isValid</b> (const ompl::base::State *state) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3952564ebdabf2a1bf14f5a8e5d8ba11"></a><!-- doxytag: member="FIRMValidityChecker::isInsideBox" ref="a3952564ebdabf2a1bf14f5a8e5d8ba11" args="(const ompl::base::State *state, double xl, double xr, double yb, double yt) const " -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m_validity_checker.html#a3952564ebdabf2a1bf14f5a8e5d8ba11">isInsideBox</a> (const ompl::base::State *state, double xl, double xr, double yb, double yt) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the state is within a bounding box. <br/></td></tr>
+<tr><td colspan="2"><h2><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5eeef7d4d889cbcd81d9bde11b8a1de1"></a><!-- doxytag: member="FIRMValidityChecker::siF_" ref="a5eeef7d4d889cbcd81d9bde11b8a1de1" args="" -->
+firm::SpaceInformation::SpaceInformationPtr&#160;</td><td class="memItemRight" valign="bottom"><b>siF_</b></td></tr>
 </table>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a6721f3a590c4ee967f57361aaba79b9d"></a><!-- doxytag: member="FIRMValidityChecker::FIRMValidityChecker" ref="a6721f3a590c4ee967f57361aaba79b9d" args="(const ompl::base::SpaceInformationPtr &amp;si)" -->
+<a class="anchor" id="afeac2dfdf78f58c204e09cf57f9abe95"></a><!-- doxytag: member="FIRMValidityChecker::FIRMValidityChecker" ref="afeac2dfdf78f58c204e09cf57f9abe95" args="(const firm::SpaceInformation::SpaceInformationPtr &amp;si)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_i_r_m_validity_checker.html#a6721f3a590c4ee967f57361aaba79b9d">FIRMValidityChecker::FIRMValidityChecker</a> </td>
+          <td class="memname"><a class="el" href="class_f_i_r_m_validity_checker.html#afeac2dfdf78f58c204e09cf57f9abe95">FIRMValidityChecker::FIRMValidityChecker</a> </td>
           <td>(</td>
-          <td class="paramtype">const ompl::base::SpaceInformationPtr &amp;&#160;</td>
+          <td class="paramtype">const firm::SpaceInformation::SpaceInformationPtr &amp;&#160;</td>
           <td class="paramname"><em>si</em></td><td>)</td>
           <td><code> [inline]</code></td>
         </tr>
@@ -148,7 +156,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>isValid</b> (
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

@@ -39,6 +39,7 @@
 
 #include "KalmanFilterMethod.h"
 
+/** \brief A Linearized Kalman Filter. */
 class LinearizedKF : public KalmanFilterMethod
 {
   public:
@@ -50,23 +51,27 @@ class LinearizedKF : public KalmanFilterMethod
     typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
     typedef typename ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
 
+    /** \brief  Constructor.*/
     LinearizedKF() { }
 
+    /** \brief  Constructor.*/
     LinearizedKF(firm::SpaceInformation::SpaceInformationPtr si) : KalmanFilterMethod(si) {}
 
-    //gets a belief and control, returns predicted belief if control
-  	//were to be applied
+    /** \brief  Gets as input belief and control, returns predicted belief if control
+            were to be applied to the robot. Also called the Prior. */
   	void Predict(const ompl::base::State *belief,
                                 const ompl::control::Control* control,
                                 const LinearSystem& ls,
                                 ompl::base::State *predictedState) ;
 
-  	//gets a belief and observation, returns
+    /** \brief  Gets as input belief and observation, returns the updated state of the robot. Also called the Posterior.*/
   	void Update(const ompl::base::State *belief,
                 const ObservationType& obs,
                 const	LinearSystem& ls,
                 ompl::base::State *updatedState) ;
 
+    /** \brief  Evolves the robot's belief on the input control, previous state and new observation. It first calls predict
+            and then update.*/
   	void Evolve(const ompl::base::State *belief,
                 const ompl::control::Control* control,
                 const ObservationType& obs,
@@ -74,6 +79,8 @@ class LinearizedKF : public KalmanFilterMethod
                 const LinearSystem& lsUpdate,
                 ompl::base::State *evolvedState) ;
 
+    /** \brief  Compute the covariance for a given linear system. A linear system describes a robot's state at a point in
+            an open loop trajectory. Helps to understand the expected uncertainty at a point in the trajectory.*/
     arma::mat computeStationaryCovariance (const LinearSystem& ls);
 
 };

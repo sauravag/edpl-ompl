@@ -4,5 +4,6 @@ var searchData=
   ['firm',['FIRM',['../class_f_i_r_m.html',1,'']]],
   ['firmoptimizationobjective',['FIRMOptimizationObjective',['../class_f_i_r_m_optimization_objective.html',1,'']]],
   ['firmvaliditychecker',['FIRMValidityChecker',['../class_f_i_r_m_validity_checker.html',1,'']]],
-  ['firmweight',['FIRMWeight',['../class_f_i_r_m_weight.html',1,'']]]
+  ['firmweight',['FIRMWeight',['../class_f_i_r_m_weight.html',1,'']]],
+  ['fstrategy',['FStrategy',['../class_f_strategy.html',1,'']]]
 ];

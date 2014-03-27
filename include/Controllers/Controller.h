@@ -43,6 +43,9 @@
 #include "../ObservationModels/ObservationModelMethod.h"
 #include "../SpaceInformation/SpaceInformation.h"
 
+/** \brief Base class for Controller. A controller's task is to use the filter to estimate the belief robot's state and
+          generate control commands using the separated controller. For example by fusing an LQR and Kalman Filter
+          we generate an LQG controller. */
 template <class SeparatedControllerType, class FilterType>
 class Controller
 {
@@ -56,27 +59,29 @@ class Controller
         typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
         typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
 
+        /** \brief Constructor */ 
         Controller() {};
 
+        /** \brief Constructor */
         Controller(const ompl::base::State *goal,
                  const std::vector<ompl::base::State*>& nominalXs,
                  const std::vector<ompl::control::Control*>& nominalUs,
                  const firm::SpaceInformation::SpaceInformationPtr si);
 
         /** \brief Execute the controller i.e. take the system from start to end state of edge */
-        bool Execute(const ompl::base::State *startState,
+        virtual bool Execute(const ompl::base::State *startState,
                    ompl::base::State* endState,
                    ompl::base::Cost &executionCost,
                    bool constructionMode=true);
 
         /** \brief Stabilize the system to an existing FIRM node */
-        ompl::base::State*  Stabilize(const ompl::base::State *startState);
+        virtual ompl::base::State*  Stabilize(const ompl::base::State *startState);
 
         /** \brief Check whether the controller has satisfied its termination condition for e.g. reached target state*/
-        bool isTerminated(const ompl::base::State *state, const size_t t);
+        virtual bool isTerminated(const ompl::base::State *state, const size_t t);
 
         /** \brief Evolve the controller over a single time step, i.e. apply control, predict, get observation, update */
-        void Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState);
+        virtual void Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState);
 
         /** \brief get the controllers goal state */
         ompl::base::State* getGoal() {return goal_; }
@@ -86,28 +91,65 @@ class Controller
 
         //bool isValid();
 
+        /** \brief Set the nodeReached angle.*/
         static void setNodeReachedAngle(double angle) {nodeReachedAngle_ = angle; }
+
+        /** \brief Set the distance at which we assume the robot has reached a target node.*/
         static void setNodeReachedDistance(double d) {nodeReachedDistance_ = d; }
+
+        /** \brief The max number of attempts to align with node. */
         static void setMaxTries(double maxtries) {maxTries_ = maxtries; }
+
+        /** \brief Set the maximum trajectory deviation before which to replan. */
         static void setMaxTrajectoryDeviation(double dev) {nominalTrajDeviationThreshold_ = dev; }
 
+        /** \brief Return the number of linear systems. */
         size_t Length() { return lss_.size(); }
 
     private:
 
+        /** \brief The pointer to the space information. */ 
         SpaceInformationPtr si_; // Instead of the actuation system, in OMPL we have the spaceinformation
-		std::vector<LinearSystem> lss_;
-		SeparatedControllerType separatedController_;
-		FilterType filter_;
-		ompl::base::State *goal_;   // last nominal point
-		int tries_;
-		static double nodeReachedAngle_;
-		static double nodeReachedDistance_;
-		static double maxTries_;
+    		
+        /** \brief  The vector of linear systems. The linear systems basically represent the Kalman Gain and Feedback Gain 
+                    at each point in the open loop trajectory.*/ 
+        std::vector<LinearSystem> lss_;
+
+        /** \brief  The separated controller used to generate the commands that are sent to the robot. */
+    		SeparatedControllerType separatedController_;
+
+        /** \brief  The filter used to estimate the robot belief. */
+    		FilterType filter_;
+
+        /** \brief  The target node to which the controller drives the robot.*/
+    		ompl::base::State *goal_;
+
+        /** \brief Tracks the current number of time steps the robot has executed to align with goal node. */
+    		int tries_;
+
+        /** \brief If the robot's heading is deviated from the target heading by less 
+            than the nodeReachedAngle_ then the robot is assumed to have alligned with the target heading. Used
+            for node reachability checking. */
+    		static double nodeReachedAngle_;
+
+        /** \brief The distance at which we assume the robot has reached a target node. Reaching the exact node 
+            location is almost impractical for real systems. We assume the robot has reached if it is within 
+            a certain radius of the target. */
+    		static double nodeReachedDistance_;
+
+        /** \brief  The max number of tries to align with target node. */
+    		static double maxTries_;
+
+        /** \brief  The maximum deviation from the nominal trajectory beyond which the robot must replan.*/
         static double nominalTrajDeviationThreshold_;
+
+        /** \brief  The maximum time for which a controller can be executed. We need this bound as we cannot let a controller
+                    execute indefinitely. This avoids situations when the robot has deviated or collided and the current 
+                    controller is no longer capable of driving the robot to the goal.*/
         double maxExecTime_;
-		bool obstacleMarkerObserved_;
-		bool debug_;
+
+        /** \brief  The debug mode, if true, controller is verbose.*/
+    		bool debug_;
 
 };
 
@@ -175,9 +217,10 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
   unsigned int k = 0;
 
-  /**HOW TO SET INITAL VALUE OF COST
-    cost = 1 - > for time based only if time per execution is "1"
-    cost = 0.01 -> for covariance based
+  /**
+    HOW TO SET INITAL VALUE OF COST
+    cost = 1 ,for time based only if time per execution is "1"
+    cost = 0.01 , for covariance based
   */
   double cost = 0.01;
   //cout<<"!!-----Executing-----!!"<<endl;
@@ -212,7 +255,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     arma::colvec endStateVec = endState->as<StateType>()->getArmaData();
     arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
 
-    /**
+    /*
     if(debug_)
     {
         std::cout<<"The nominal trajectory point is:" <<nomXVec<<std::endl;
@@ -364,7 +407,7 @@ bool Controller<SeparatedControllerType, FilterType>::isTerminated(const ompl::b
 }
 
 
-/**
+/*
 template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::isValid()
 {

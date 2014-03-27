@@ -1,3 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$class_controller.html" title="Controller\&lt; RHCICreate, ExtendedKF \&gt;" alt="" coords="5,5,259,35"/>
+<area shape="rect" id="node2" href="$class_controller.html" title="Controller\&lt; RHCICreate, ExtendedKF \&gt;" alt="" coords="49,181,303,211"/>
+<area shape="rect" id="node4" href="$class_extended_k_f.html" title="ExtendedKF" alt="" coords="45,85,139,115"/>
+<area shape="rect" id="node6" href="$class_kalman_filter_method.html" title="KalmanFilterMethod" alt="" coords="5,5,144,35"/>
+<area shape="rect" id="node8" href="$class_r_h_c_i_create.html" title="RHCICreate" alt="" coords="195,85,288,115"/>
+<area shape="rect" id="node10" href="$class_separated_controller_method.html" title="SeparatedControllerMethod" alt="" coords="168,5,347,35"/>
 </map>

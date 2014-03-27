@@ -81,7 +81,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
+<a href="#pri-static-attribs">Static Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">CamAruco2DObservationModel Class Reference</div>  </div>
 </div><!--header-->
@@ -132,6 +135,28 @@ arma::mat&#160;</td><td class="memItemRight" valign="bottom"><b>getObservationNo
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isLandmarkVisible</b> (const arma::colvec xVec, const arma::colvec &amp;landmark, double &amp;range, double &amp;bearing, double &amp;viewingAngle)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="addfed85e3589e4525bb8f2fa03657a01"></a><!-- doxytag: member="CamAruco2DObservationModel::isStateObservable" ref="addfed85e3589e4525bb8f2fa03657a01" args="(const ompl::base::State *state)" -->
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isStateObservable</b> (const ompl::base::State *state)</td></tr>
+<tr><td colspan="2"><h2><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a616ee9ed0c516b0c9fc0eeb6d492ac3f"></a><!-- doxytag: member="CamAruco2DObservationModel::removeSpuriousObservations" ref="a616ee9ed0c516b0c9fc0eeb6d492ac3f" args="(const ObservationType &amp;Zg)" -->
+ObservationType&#160;</td><td class="memItemRight" valign="bottom"><b>removeSpuriousObservations</b> (const ObservationType &amp;Zg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a105506bb8493e23b2a70f4c811577ea3"></a><!-- doxytag: member="CamAruco2DObservationModel::loadLandmarks" ref="a105506bb8493e23b2a70f4c811577ea3" args="(const char *pathToSetupFile)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>loadLandmarks</b> (const char *pathToSetupFile)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af2586c7b2c3ab276f1c13ba1e3ba71f3"></a><!-- doxytag: member="CamAruco2DObservationModel::loadParameters" ref="af2586c7b2c3ab276f1c13ba1e3ba71f3" args="(const char *pathToSetupFile)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>loadParameters</b> (const char *pathToSetupFile)</td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06626a8304e171f284bd550d02b6f63c"></a><!-- doxytag: member="CamAruco2DObservationModel::landmarks_" ref="a06626a8304e171f284bd550d02b6f63c" args="" -->
+std::vector&lt; arma::colvec &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>landmarks_</b></td></tr>
+<tr><td colspan="2"><h2><a name="pri-static-attribs"></a>
+Static Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a88056dea15d6aeaafa5a11e2226eab21"></a><!-- doxytag: member="CamAruco2DObservationModel::stateDim" ref="a88056dea15d6aeaafa5a11e2226eab21" args="" -->
+static const int&#160;</td><td class="memItemRight" valign="bottom"><b>stateDim</b> = 3</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8cfcef2cce47d94816e6d2692102df6f"></a><!-- doxytag: member="CamAruco2DObservationModel::singleObservationDim" ref="a8cfcef2cce47d94816e6d2692102df6f" args="" -->
+static const int&#160;</td><td class="memItemRight" valign="bottom"><b>singleObservationDim</b> = 4</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0b4eff8ec91d2cae6a2d37495e9541d3"></a><!-- doxytag: member="CamAruco2DObservationModel::landmarkInfoDim" ref="a0b4eff8ec91d2cae6a2d37495e9541d3" args="" -->
+static const int&#160;</td><td class="memItemRight" valign="bottom"><b>landmarkInfoDim</b> = 2</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1750ab1c5ac476d09da804e7a92576f5"></a><!-- doxytag: member="CamAruco2DObservationModel::numLandmarksForObservability" ref="a1750ab1c5ac476d09da804e7a92576f5" args="" -->
+static const int&#160;</td><td class="memItemRight" valign="bottom"><b>numLandmarksForObservability</b> = 2</td></tr>
 </table>
 <hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a244fd43dca1734b68bf1379b2be285d2"></a><!-- doxytag: member="CamAruco2DObservationModel::getObservation" ref="a244fd43dca1734b68bf1379b2be285d2" args="(const ompl::base::State *state, bool isSimulation)" -->
@@ -186,7 +211,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>isStateObservable</b>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

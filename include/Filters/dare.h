@@ -42,6 +42,7 @@
 
 //arma::mat generate_gain_with_dare(const arma::mat _A, const arma::mat _B, const arma::mat _Q, const arma::mat _R);
 
+/** \brief Solver for the Differential Algebraic Riccatti Equation. */
 inline arma::mat dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R) {
 using namespace arma;
 

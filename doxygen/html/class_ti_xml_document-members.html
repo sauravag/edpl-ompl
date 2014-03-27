@@ -90,12 +90,17 @@ This is the complete list of members for <a class="el" href="class_ti_xml_docume
   <tr class="memlist"><td><a class="el" href="class_ti_xml_document.html#ac9e8f09b23454d953b32d1b65cd1409e">Clone</a>() const </td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [protected, virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_base.html#ab54bfb9b70fe6dd276e7b279cab7f003">Column</a>() const </td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>ConvertUTF32ToUTF8</b>(unsigned long input, char *output, int *length) (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [protected, static]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>CopyTo</b>(TiXmlDocument *target) const  (defined in <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a>)</td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [private]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>CopyTo</b>(TiXmlNode *target) const  (defined in <a class="el" href="class_ti_xml_node.html">TiXmlNode</a>)</td><td><a class="el" href="class_ti_xml_node.html">TiXmlNode</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_base.html#a32ed202562b58de64c7d799ca3c9db98">EncodeString</a>(const TIXML_STRING &amp;str, TIXML_STRING *out)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [static]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>error</b> (defined in <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a>)</td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [private]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_document.html#a6dfc01a6e5d58e56acd537dfd3bdeb29">Error</a>() const </td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [inline]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_document.html#aa90bc630ee5203c6109ca5fad3323649">ErrorCol</a>() const </td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>errorDesc</b> (defined in <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a>)</td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [private]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_document.html#a9d0f689f6e09ea494ea547be8d79c25e">ErrorDesc</a>() const </td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>errorId</b> (defined in <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a>)</td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [private]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_document.html#af96fc2f3f9ec6422782bfe916c9e778f">ErrorId</a>() const </td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>errorLocation</b> (defined in <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a>)</td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [private]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_document.html#af30efc75e804aa2e92fb8be3a8cb676e">ErrorRow</a>() const </td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>errorString</b> (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [protected, static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>firstChild</b> (defined in <a class="el" href="class_ti_xml_node.html">TiXmlNode</a>)</td><td><a class="el" href="class_ti_xml_node.html">TiXmlNode</a></td><td><code> [protected]</code></td></tr>
@@ -176,6 +181,7 @@ This is the complete list of members for <a class="el" href="class_ti_xml_docume
   <tr class="memlist"><td><a class="el" href="class_ti_xml_node.html#a2a38329ca5d3f28f98ce932b8299ae90">SetValue</a>(const char *_value)</td><td><a class="el" href="class_ti_xml_node.html">TiXmlNode</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>SkipWhiteSpace</b>(const char *, TiXmlEncoding encoding) (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [protected, static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>StringEqual</b>(const char *p, const char *endTag, bool ignoreCase, TiXmlEncoding encoding) (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [protected, static]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>tabsize</b> (defined in <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a>)</td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [private]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>TabSize</b>() const  (defined in <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a>)</td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>TINYXML_COMMENT</b> enum value (defined in <a class="el" href="class_ti_xml_node.html">TiXmlNode</a>)</td><td><a class="el" href="class_ti_xml_node.html">TiXmlNode</a></td><td></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>TINYXML_DECLARATION</b> enum value (defined in <a class="el" href="class_ti_xml_node.html">TiXmlNode</a>)</td><td><a class="el" href="class_ti_xml_node.html">TiXmlNode</a></td><td></td></tr>
@@ -221,6 +227,7 @@ This is the complete list of members for <a class="el" href="class_ti_xml_docume
   <tr class="memlist"><td><a class="el" href="class_ti_xml_node.html#a06de5af852668c7e4af0d09c205f0b0d">ToUnknown</a>()</td><td><a class="el" href="class_ti_xml_node.html">TiXmlNode</a></td><td><code> [inline, virtual]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>type</b> (defined in <a class="el" href="class_ti_xml_node.html">TiXmlNode</a>)</td><td><a class="el" href="class_ti_xml_node.html">TiXmlNode</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_node.html#a57b99d5c97d67a42b9752f5210a1ba5e">Type</a>() const </td><td><a class="el" href="class_ti_xml_node.html">TiXmlNode</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>useMicrosoftBOM</b> (defined in <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a>)</td><td><a class="el" href="class_ti_xml_document.html">TiXmlDocument</a></td><td><code> [private]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_base.html#ab242c01590191f644569fa89a080d97c">userData</a></td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [protected]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>utf8ByteTable</b> (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>value</b> (defined in <a class="el" href="class_ti_xml_node.html">TiXmlNode</a>)</td><td><a class="el" href="class_ti_xml_node.html">TiXmlNode</a></td><td><code> [protected]</code></td></tr>
@@ -247,7 +254,7 @@ This is the complete list of members for <a class="el" href="class_ti_xml_docume
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

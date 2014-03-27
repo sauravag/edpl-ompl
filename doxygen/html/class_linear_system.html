@@ -81,7 +81,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">LinearSystem Class Reference</div>  </div>
 </div><!--header-->
@@ -137,6 +138,22 @@ arma::mat&#160;</td><td class="memItemRight" valign="bottom"><b>getH</b> () cons
 arma::mat&#160;</td><td class="memItemRight" valign="bottom"><b>getM</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaad4f742dcb61f776d5de952977a745e"></a><!-- doxytag: member="LinearSystem::getR" ref="aaad4f742dcb61f776d5de952977a745e" args="() const " -->
 arma::mat&#160;</td><td class="memItemRight" valign="bottom"><b>getR</b> () const </td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c0d8d1a986bd267171d8c821e173d1e"></a><!-- doxytag: member="LinearSystem::x_" ref="a0c0d8d1a986bd267171d8c821e173d1e" args="" -->
+ompl::base::State *&#160;</td><td class="memItemRight" valign="bottom"><b>x_</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5b5cb60bca40f61e6b4a6ac3afe56115"></a><!-- doxytag: member="LinearSystem::u_" ref="a5b5cb60bca40f61e6b4a6ac3afe56115" args="" -->
+const ompl::control::Control *&#160;</td><td class="memItemRight" valign="bottom"><b>u_</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab3909105492e1b8f55919584d9f99a03"></a><!-- doxytag: member="LinearSystem::w_" ref="ab3909105492e1b8f55919584d9f99a03" args="" -->
+MotionNoiseType&#160;</td><td class="memItemRight" valign="bottom"><b>w_</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a41f05f9ef0c2e5e69a0b0c2d50d983bb"></a><!-- doxytag: member="LinearSystem::v_" ref="a41f05f9ef0c2e5e69a0b0c2d50d983bb" args="" -->
+ObsNoiseType&#160;</td><td class="memItemRight" valign="bottom"><b>v_</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8d402083ec5c55357a11ec8e780bcf20"></a><!-- doxytag: member="LinearSystem::z_" ref="a8d402083ec5c55357a11ec8e780bcf20" args="" -->
+ObservationType&#160;</td><td class="memItemRight" valign="bottom"><b>z_</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6ae00f368bfa21a8dfe0d6855bfc1322"></a><!-- doxytag: member="LinearSystem::motionModel_" ref="a6ae00f368bfa21a8dfe0d6855bfc1322" args="" -->
+MotionModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>motionModel_</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6aacc355010106de6f65f66c8dfa301b"></a><!-- doxytag: member="LinearSystem::observationModel_" ref="a6aacc355010106de6f65f66c8dfa301b" args="" -->
+ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>observationModel_</b></td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/LinearSystem/<a class="el" href="_linear_system_8h_source.html">LinearSystem.h</a></li>
@@ -159,7 +176,7 @@ arma::mat&#160;</td><td class="memItemRight" valign="bottom"><b>getR</b> () cons
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

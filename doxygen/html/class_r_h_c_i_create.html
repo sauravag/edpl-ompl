@@ -82,7 +82,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-methods">Static Public Member Functions</a>  </div>
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
+<a href="#pri-static-attribs">Static Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">RHCICreate Class Reference</div>  </div>
 </div><!--header-->
@@ -124,6 +126,17 @@ Static Public Member Functions</h2></td></tr>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>setControlQueueSize</b> (const int queueSize)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08e9bd17083a978c6b5cd142bca84460"></a><!-- doxytag: member="RHCICreate::setTurnOnlyDistance" ref="a08e9bd17083a978c6b5cd142bca84460" args="(const double turnDist)" -->
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>setTurnOnlyDistance</b> (const double turnDist)</td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aed57f59895dd7562eeefdd70638c8c83"></a><!-- doxytag: member="RHCICreate::openLoopControls_" ref="aed57f59895dd7562eeefdd70638c8c83" args="" -->
+std::deque<br class="typebreak"/>
+&lt; ompl::control::Control * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>openLoopControls_</b></td></tr>
+<tr><td colspan="2"><h2><a name="pri-static-attribs"></a>
+Static Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad97b8d5019fbef4599a7bde102c57ff1"></a><!-- doxytag: member="RHCICreate::controlQueueSize_" ref="ad97b8d5019fbef4599a7bde102c57ff1" args="" -->
+static int&#160;</td><td class="memItemRight" valign="bottom"><b>controlQueueSize_</b> = -1</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9a891d5fa2fb784d3345c3c8d65be810"></a><!-- doxytag: member="RHCICreate::turnOnlyDistance_" ref="a9a891d5fa2fb784d3345c3c8d65be810" args="" -->
+static double&#160;</td><td class="memItemRight" valign="bottom"><b>turnOnlyDistance_</b> = -1</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>include/SeparatedControllers/<a class="el" href="_r_h_c_i_create_8h_source.html">RHCICreate.h</a></li>
@@ -147,7 +160,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>setTurnOnlyDis
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

@@ -81,6 +81,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="#friends">Friends</a>  </div>
   <div class="headertitle">
 <div class="title">TiXmlAttribute Class Reference</div>  </div>
@@ -100,7 +102,7 @@ Collaboration diagram for TiXmlAttribute:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_ti_xml_attribute__coll__graph.png" border="0" usemap="#_ti_xml_attribute_coll__map" alt="Collaboration graph"/></div>
 <map name="_ti_xml_attribute_coll__map" id="_ti_xml_attribute_coll__map">
-<area shape="rect" id="node2" href="class_ti_xml_base.html" title="TiXmlBase" alt="" coords="15,101,100,131"/><area shape="rect" id="node4" href="struct_ti_xml_cursor.html" title="TiXmlCursor" alt="" coords="11,5,104,35"/></map>
+<area shape="rect" id="node2" href="class_ti_xml_base.html" title="TiXmlBase" alt="" coords="135,101,220,131"/><area shape="rect" id="node10" href="class_ti_xml_node.html" title="TiXmlNode" alt="" coords="89,225,175,255"/><area shape="rect" id="node4" href="struct_ti_xml_cursor.html" title="TiXmlCursor" alt="" coords="5,5,99,35"/><area shape="rect" id="node8" href="class_ti_xml_document.html" title="TiXmlDocument" alt="" coords="75,333,189,363"/><area shape="rect" id="node6" href="struct_ti_xml_base_1_1_entity.html" title="TiXmlBase::Entity" alt="" coords="123,5,251,35"/></map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 
 <p><a href="class_ti_xml_attribute-members.html">List of all members.</a></p>
@@ -166,6 +168,24 @@ virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><b>Parse
 void&#160;</td><td class="memItemRight" valign="bottom"><b>Print</b> (FILE *cfile, int depth, TIXML_STRING *str) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac12a94d4548302afb12f488ba101f7d1"></a><!-- doxytag: member="TiXmlAttribute::SetDocument" ref="ac12a94d4548302afb12f488ba101f7d1" args="(TiXmlDocument *doc)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDocument</b> (<a class="el" href="class_ti_xml_document.html">TiXmlDocument</a> *doc)</td></tr>
+<tr><td colspan="2"><h2><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aee53e434ace7271afc5ce51aeea0b400"></a><!-- doxytag: member="TiXmlAttribute::TiXmlAttribute" ref="aee53e434ace7271afc5ce51aeea0b400" args="(const TiXmlAttribute &amp;)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><b>TiXmlAttribute</b> (const <a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> &amp;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a83b9c2a47dbfadf5029f2c0f13c18466"></a><!-- doxytag: member="TiXmlAttribute::operator=" ref="a83b9c2a47dbfadf5029f2c0f13c18466" args="(const TiXmlAttribute &amp;base)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> &amp;base)</td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada41d3cff50cd33a78072806f88d4433"></a><!-- doxytag: member="TiXmlAttribute::document" ref="ada41d3cff50cd33a78072806f88d4433" args="" -->
+<a class="el" href="class_ti_xml_document.html">TiXmlDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>document</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afcbe165f33f08cf9b24daa33f0ee951a"></a><!-- doxytag: member="TiXmlAttribute::name" ref="afcbe165f33f08cf9b24daa33f0ee951a" args="" -->
+TIXML_STRING&#160;</td><td class="memItemRight" valign="bottom"><b>name</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9e4e5f442347434b1da43954cc1b411"></a><!-- doxytag: member="TiXmlAttribute::value" ref="ae9e4e5f442347434b1da43954cc1b411" args="" -->
+TIXML_STRING&#160;</td><td class="memItemRight" valign="bottom"><b>value</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaf6c6272c625fbf38e571cbf570ea94a"></a><!-- doxytag: member="TiXmlAttribute::prev" ref="aaf6c6272c625fbf38e571cbf570ea94a" args="" -->
+<a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>prev</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae851adf61b80cf45b797fee77dea135f"></a><!-- doxytag: member="TiXmlAttribute::next" ref="ae851adf61b80cf45b797fee77dea135f" args="" -->
+<a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>next</b></td></tr>
 <tr><td colspan="2"><h2><a name="friends"></a>
 Friends</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a35a7b7f89f708527677d5078d41ce0bf"></a><!-- doxytag: member="TiXmlAttribute::TiXmlAttributeSet" ref="a35a7b7f89f708527677d5078d41ce0bf" args="" -->
@@ -249,7 +269,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>TiXmlAttributeSet</b
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

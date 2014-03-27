@@ -3,8 +3,7 @@
 }
 
 
-\-Inheritance diagram for \-Kalman\-Filter\-Method\-:
-\nopagebreak
+\-Inheritance diagram for \-Kalman\-Filter\-Method\-:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -29,13 +28,13 @@
 \hypertarget{class_kalman_filter_method_a4b966a487acbbdda0f145be9a1da03d5}{void {\bfseries set\-Observation\-Model\-Pointer} (const \-Observation\-Model\-Pointer \&om)}\label{class_kalman_filter_method_a4b966a487acbbdda0f145be9a1da03d5}
 
 \item 
-\hypertarget{class_kalman_filter_method_ae8d8c8f2eeaca1a556cfc655d1897ce5}{virtual void {\bfseries \-Predict} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$predicted\-State, const bool is\-Construction=false)=0}\label{class_kalman_filter_method_ae8d8c8f2eeaca1a556cfc655d1897ce5}
+\hypertarget{class_kalman_filter_method_a60d4e0a2eb06676f48727e21d33eb31f}{virtual void {\bfseries \-Predict} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$predicted\-State)=0}\label{class_kalman_filter_method_a60d4e0a2eb06676f48727e21d33eb31f}
 
 \item 
-\hypertarget{class_kalman_filter_method_aac4f9c1f1a79821898891f2c13aa5cfc}{virtual void {\bfseries \-Update} (const ompl\-::base\-::\-State $\ast$belief, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$updated\-State, const bool is\-Construction=false)=0}\label{class_kalman_filter_method_aac4f9c1f1a79821898891f2c13aa5cfc}
+\hypertarget{class_kalman_filter_method_af79c09c56a2f81c1af8896f235d37afd}{virtual void {\bfseries \-Update} (const ompl\-::base\-::\-State $\ast$belief, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls, ompl\-::base\-::\-State $\ast$updated\-State)=0}\label{class_kalman_filter_method_af79c09c56a2f81c1af8896f235d37afd}
 
 \item 
-\hypertarget{class_kalman_filter_method_a8a13cf9a962588fbd3441726b7b95e77}{virtual void {\bfseries \-Evolve} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Pred, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Update, ompl\-::base\-::\-State $\ast$evolved\-State, const bool is\-Construction=false)=0}\label{class_kalman_filter_method_a8a13cf9a962588fbd3441726b7b95e77}
+\hypertarget{class_kalman_filter_method_a9e56fcd80484eb15d50597b528bc6da9}{virtual void {\bfseries \-Evolve} (const ompl\-::base\-::\-State $\ast$belief, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Pred, const \hyperlink{class_linear_system}{\-Linear\-System} \&ls\-Update, ompl\-::base\-::\-State $\ast$evolved\-State)=0}\label{class_kalman_filter_method_a9e56fcd80484eb15d50597b528bc6da9}
 
 \item 
 \hypertarget{class_kalman_filter_method_a8f9d8ae8cf4e3bd0138d731bd2539441}{virtual arma\-::mat {\bfseries compute\-Stationary\-Covariance} (const \hyperlink{class_linear_system}{\-Linear\-System} \&ls)=0}\label{class_kalman_filter_method_a8f9d8ae8cf4e3bd0138d731bd2539441}
@@ -51,6 +50,34 @@
 
 \item 
 \hypertarget{class_kalman_filter_method_a43191b745846715c66854634ba58e85c}{\-Observation\-Model\-Pointer {\bfseries observation\-Model\-\_\-}}\label{class_kalman_filter_method_a43191b745846715c66854634ba58e85c}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Private \-Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_kalman_filter_method_a2718a343b6cf3edf6c8226fe64e9d468}{typedef arma\-::colvec {\bfseries \-Observation\-Type}}\label{class_kalman_filter_method_a2718a343b6cf3edf6c8226fe64e9d468}
+
+\item 
+\hypertarget{class_kalman_filter_method_adbc3ad1e37351d9131606dd0b7be1bc5}{typedef arma\-::colvec {\bfseries \-Control\-Type}}\label{class_kalman_filter_method_adbc3ad1e37351d9131606dd0b7be1bc5}
+
+\item 
+\hypertarget{class_kalman_filter_method_aeeec5cac3998634d89ff52570dd087a5}{typedef arma\-::colvec {\bfseries \-Noise\-Type}}\label{class_kalman_filter_method_aeeec5cac3998634d89ff52570dd087a5}
+
+\item 
+\hypertarget{class_kalman_filter_method_a9fad30fff8a91e24a894d284ffab38e8}{typedef \*
+\hyperlink{class_s_e2_belief_space}{\-Motion\-Model\-Method\-::\-Space\-Type} {\bfseries \-Space\-Type}}\label{class_kalman_filter_method_a9fad30fff8a91e24a894d284ffab38e8}
+
+\item 
+\hypertarget{class_kalman_filter_method_a26f4e426a422c85e1ad9096180a0e240}{typedef \*
+\hyperlink{class_s_e2_belief_space_1_1_state_type}{\-Motion\-Model\-Method\-::\-State\-Type} {\bfseries \-State\-Type}}\label{class_kalman_filter_method_a26f4e426a422c85e1ad9096180a0e240}
+
+\item 
+\hypertarget{class_kalman_filter_method_a353dd8a63c75605e197382224cca2f7e}{typedef \*
+\-Observation\-Model\-Method\-::\-Observation\-Model\-Pointer {\bfseries \-Observation\-Model\-Pointer}}\label{class_kalman_filter_method_a353dd8a63c75605e197382224cca2f7e}
+
+\item 
+\hypertarget{class_kalman_filter_method_a9f792b6e5b6e7fc97fab550ce5e7440e}{typedef \*
+\-Motion\-Model\-Method\-::\-Motion\-Model\-Pointer {\bfseries \-Motion\-Model\-Pointer}}\label{class_kalman_filter_method_a9f792b6e5b6e7fc97fab550ce5e7440e}
 
 \end{DoxyCompactItemize}
 

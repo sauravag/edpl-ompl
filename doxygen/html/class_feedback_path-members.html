@@ -84,13 +84,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 This is the complete list of members for <a class="el" href="class_feedback_path.html">FeedbackPath</a>, including all inherited members.<table>
-  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#a5ccf91587a1e62d1237db427e1fe9419">append</a>(const ompl::base::State *state)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#a80ea993f1c341ab15985e820b00997bc">append</a>(const ompl::base::State *state, Controller&lt; RHCICreate, ExtendedKF &gt; controller)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#a4117bfb07f93580234f5d5bc722a2da1">feedbackControllers_</a></td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [protected]</code></td></tr>
-  <tr bgcolor="#f0f0f0"><td><b>FeedbackPath</b>(const firm::SpaceInformation::SpaceInformationPtr &amp;si) (defined in <a class="el" href="class_feedback_path.html">FeedbackPath</a>)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#a036ec9e8dffad9b2c99401b4e54adc64">getControllers</a>(void)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [virtual]</code></td></tr>
-  <tr bgcolor="#f0f0f0"><td><b>nodesToVisit_</b> (defined in <a class="el" href="class_feedback_path.html">FeedbackPath</a>)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [protected]</code></td></tr>
-  <tr bgcolor="#f0f0f0"><td><b>siF_</b> (defined in <a class="el" href="class_feedback_path.html">FeedbackPath</a>)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#af5cfe1f344e0e05fc189180930c95356">append</a>(const ompl::base::State *state)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#a3bc6573cb989802923f92ed311a2dcad">append</a>(const ompl::base::State *state, Controller&lt; RHCICreate, ExtendedKF &gt; controller)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>check</b>(void) const  (defined in <a class="el" href="class_feedback_path.html">FeedbackPath</a>)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#a6d146f9ba97660395fc94bd93646f759">clearFeedback</a>()</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>cost</b>(const OptimizationObjectivePtr &amp;obj) const  (defined in <a class="el" href="class_feedback_path.html">FeedbackPath</a>)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#acc635307df317b85241b4ea93642bf57">feedbackControllers_</a></td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#aac87c9c760ee3583c7a79bc964b3a156">FeedbackPath</a>(const firm::SpaceInformation::SpaceInformationPtr &amp;si)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#a3bd4f1f2f1a6eb8ff92bbbb2cc25f1fb">getControllers</a>(void)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>getStateCount</b>(void) (defined in <a class="el" href="class_feedback_path.html">FeedbackPath</a>)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>getStates</b>(void) (defined in <a class="el" href="class_feedback_path.html">FeedbackPath</a>)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>length</b>(void) const  (defined in <a class="el" href="class_feedback_path.html">FeedbackPath</a>)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#a6efa9a9ed1e8bf5b784308308feceec7">nodesToVisit_</a></td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>print</b>(std::ostream &amp;out) const  (defined in <a class="el" href="class_feedback_path.html">FeedbackPath</a>)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_feedback_path.html#a46025a3de9b291abfad72ddc37a621f2">siF_</a></td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [protected]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>~FeedbackPath</b>(void) (defined in <a class="el" href="class_feedback_path.html">FeedbackPath</a>)</td><td><a class="el" href="class_feedback_path.html">FeedbackPath</a></td><td><code> [inline]</code></td></tr>
 </table></div><!-- contents -->
 <!-- window showing the filter options -->
@@ -110,7 +117,7 @@ This is the complete list of members for <a class="el" href="class_feedback_path
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

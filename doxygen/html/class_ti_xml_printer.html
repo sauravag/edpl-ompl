@@ -80,7 +80,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">TiXmlPrinter Class Reference</div>  </div>
 </div><!--header-->
@@ -145,6 +147,24 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad01375ae9199bd2f48252eaddce3039d"></a><!-- doxytag: member="TiXmlPrinter::Size" ref="ad01375ae9199bd2f48252eaddce3039d" args="()" -->
 size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_printer.html#ad01375ae9199bd2f48252eaddce3039d">Size</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the length of the result string. <br/></td></tr>
+<tr><td colspan="2"><h2><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a348ad6527b1d43ddeb51454cddeb6a1d"></a><!-- doxytag: member="TiXmlPrinter::DoIndent" ref="a348ad6527b1d43ddeb51454cddeb6a1d" args="()" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DoIndent</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a252a0e13e06def9a06b2eb30a04677a0"></a><!-- doxytag: member="TiXmlPrinter::DoLineBreak" ref="a252a0e13e06def9a06b2eb30a04677a0" args="()" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DoLineBreak</b> ()</td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7e11330449daea912320c22f84387df7"></a><!-- doxytag: member="TiXmlPrinter::depth" ref="a7e11330449daea912320c22f84387df7" args="" -->
+int&#160;</td><td class="memItemRight" valign="bottom"><b>depth</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2dceede5ae9bb8948f1ecaabb24ab2fb"></a><!-- doxytag: member="TiXmlPrinter::simpleTextPrint" ref="a2dceede5ae9bb8948f1ecaabb24ab2fb" args="" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>simpleTextPrint</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae6cc56c79e52ef352ecc612809fdbedf"></a><!-- doxytag: member="TiXmlPrinter::buffer" ref="ae6cc56c79e52ef352ecc612809fdbedf" args="" -->
+TIXML_STRING&#160;</td><td class="memItemRight" valign="bottom"><b>buffer</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a672fda389bb3f5a2ae8ead867f9a2536"></a><!-- doxytag: member="TiXmlPrinter::indent" ref="a672fda389bb3f5a2ae8ead867f9a2536" args="" -->
+TIXML_STRING&#160;</td><td class="memItemRight" valign="bottom"><b>indent</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a25e8120bcfda10cc06a11b2dedcef7fe"></a><!-- doxytag: member="TiXmlPrinter::lineBreak" ref="a25e8120bcfda10cc06a11b2dedcef7fe" args="" -->
+TIXML_STRING&#160;</td><td class="memItemRight" valign="bottom"><b>lineBreak</b></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Print to memory functionality. The <a class="el" href="class_ti_xml_printer.html">TiXmlPrinter</a> is useful when you need to:</p>
@@ -237,7 +257,7 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:11 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

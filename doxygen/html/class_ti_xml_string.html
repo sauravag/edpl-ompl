@@ -83,7 +83,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-attribs">Static Public Attributes</a>  </div>
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
+<a href="#pri-static-attribs">Static Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">TiXmlString Class Reference</div>  </div>
 </div><!--header-->
@@ -95,12 +98,19 @@ Inheritance diagram for TiXmlString:</div>
 <map name="_ti_xml_string_inherit__map" id="_ti_xml_string_inherit__map">
 <area shape="rect" id="node3" href="class_ti_xml_out_stream.html" title="TiXmlOutStream" alt="" coords="5,83,123,112"/></map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for TiXmlString:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_ti_xml_string__coll__graph.png" border="0" usemap="#_ti_xml_string_coll__map" alt="Collaboration graph"/></div>
+<map name="_ti_xml_string_coll__map" id="_ti_xml_string_coll__map">
+<area shape="rect" id="node2" href="struct_ti_xml_string_1_1_rep.html" title="TiXmlString::Rep" alt="" coords="5,5,128,35"/></map>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 
 <p><a href="class_ti_xml_string-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><b>Rep</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_ti_xml_string_1_1_rep.html">Rep</a></td></tr>
 <tr><td colspan="2"><h2><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abeb2c1893a04c17904f7c06546d0b971"></a><!-- doxytag: member="TiXmlString::size_type" ref="abeb2c1893a04c17904f7c06546d0b971" args="" -->
@@ -157,6 +167,28 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>swap</b> (<a class="e
 Static Public Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f4422d227088dc7bec96f479b275d0a"></a><!-- doxytag: member="TiXmlString::npos" ref="a8f4422d227088dc7bec96f479b275d0a" args="" -->
 static const size_type&#160;</td><td class="memItemRight" valign="bottom"><b>npos</b> = static_cast&lt; TiXmlString::size_type &gt;(-1)</td></tr>
+<tr><td colspan="2"><h2><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a694eacb51c43d8eba8aa7d4552b598ff"></a><!-- doxytag: member="TiXmlString::init" ref="a694eacb51c43d8eba8aa7d4552b598ff" args="(size_type sz)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (size_type sz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5d70615367bf2920c25feddf6ac4ad30"></a><!-- doxytag: member="TiXmlString::set_size" ref="a5d70615367bf2920c25feddf6ac4ad30" args="(size_type sz)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_size</b> (size_type sz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a36417caceebe25352f53a87e8cd966b4"></a><!-- doxytag: member="TiXmlString::start" ref="a36417caceebe25352f53a87e8cd966b4" args="() const " -->
+char *&#160;</td><td class="memItemRight" valign="bottom"><b>start</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58faf1c6b9828c8d5d5092bebf146167"></a><!-- doxytag: member="TiXmlString::finish" ref="a58faf1c6b9828c8d5d5092bebf146167" args="() const " -->
+char *&#160;</td><td class="memItemRight" valign="bottom"><b>finish</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae11cd23e090fd2e7bb62eda05b45a2d6"></a><!-- doxytag: member="TiXmlString::init" ref="ae11cd23e090fd2e7bb62eda05b45a2d6" args="(size_type sz, size_type cap)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (size_type sz, size_type cap)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa6008ae51286a342cd366fbf1e3eeafc"></a><!-- doxytag: member="TiXmlString::quit" ref="aa6008ae51286a342cd366fbf1e3eeafc" args="()" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>quit</b> ()</td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac7be48f31ca451bcb16de428b5c40e0c"></a><!-- doxytag: member="TiXmlString::rep_" ref="ac7be48f31ca451bcb16de428b5c40e0c" args="" -->
+<a class="el" href="struct_ti_xml_string_1_1_rep.html">Rep</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>rep_</b></td></tr>
+<tr><td colspan="2"><h2><a name="pri-static-attribs"></a>
+Static Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae1f9e0de28328eed27d5623ff67a3191"></a><!-- doxytag: member="TiXmlString::nullrep_" ref="ae1f9e0de28328eed27d5623ff67a3191" args="" -->
+static <a class="el" href="struct_ti_xml_string_1_1_rep.html">Rep</a>&#160;</td><td class="memItemRight" valign="bottom"><b>nullrep_</b> = { 0, 0, { '\0' } }</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>tinyxml/<a class="el" href="tinystr_8h_source.html">tinystr.h</a></li>
@@ -180,7 +212,7 @@ static const size_type&#160;</td><td class="memItemRight" valign="bottom"><b>npo
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:11 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

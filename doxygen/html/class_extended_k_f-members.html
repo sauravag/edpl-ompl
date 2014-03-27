@@ -86,7 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 This is the complete list of members for <a class="el" href="class_extended_k_f.html">ExtendedKF</a>, including all inherited members.<table>
   <tr bgcolor="#f0f0f0"><td><b>computeStationaryCovariance</b>(const LinearSystem &amp;ls) (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td><code> [inline, virtual]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>ControlType</b> typedef (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td></td></tr>
-  <tr bgcolor="#f0f0f0"><td><b>Evolve</b>(const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const LinearSystem &amp;lsPred, const LinearSystem &amp;lsUpdate, ompl::base::State *evolvedState, const bool isConstruction=false) (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>Evolve</b>(const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const LinearSystem &amp;lsPred, const LinearSystem &amp;lsUpdate, ompl::base::State *evolvedState) (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td><code> [virtual]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>ExtendedKF</b>() (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>ExtendedKF</b>(firm::SpaceInformation::SpaceInformationPtr si) (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>getMotionModelPointer</b>() (defined in <a class="el" href="class_kalman_filter_method.html">KalmanFilterMethod</a>)</td><td><a class="el" href="class_kalman_filter_method.html">KalmanFilterMethod</a></td><td><code> [inline]</code></td></tr>
@@ -98,13 +98,13 @@ This is the complete list of members for <a class="el" href="class_extended_k_f.
   <tr bgcolor="#f0f0f0"><td><b>observationModel_</b> (defined in <a class="el" href="class_kalman_filter_method.html">KalmanFilterMethod</a>)</td><td><a class="el" href="class_kalman_filter_method.html">KalmanFilterMethod</a></td><td><code> [protected]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>ObservationModelPointer</b> typedef (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>ObservationType</b> typedef (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td></td></tr>
-  <tr bgcolor="#f0f0f0"><td><b>Predict</b>(const ompl::base::State *belief, const ompl::control::Control *control, const LinearSystem &amp;ls, ompl::base::State *predictedState, const bool isConstruction=false) (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>Predict</b>(const ompl::base::State *belief, const ompl::control::Control *control, const LinearSystem &amp;ls, ompl::base::State *predictedState) (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td><code> [virtual]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>setMotionModelPointeer</b>(const MotionModelPointer &amp;mm) (defined in <a class="el" href="class_kalman_filter_method.html">KalmanFilterMethod</a>)</td><td><a class="el" href="class_kalman_filter_method.html">KalmanFilterMethod</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>setObservationModelPointer</b>(const ObservationModelPointer &amp;om) (defined in <a class="el" href="class_kalman_filter_method.html">KalmanFilterMethod</a>)</td><td><a class="el" href="class_kalman_filter_method.html">KalmanFilterMethod</a></td><td><code> [inline]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>si_</b> (defined in <a class="el" href="class_kalman_filter_method.html">KalmanFilterMethod</a>)</td><td><a class="el" href="class_kalman_filter_method.html">KalmanFilterMethod</a></td><td><code> [protected]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>SpaceType</b> typedef (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>StateType</b> typedef (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td></td></tr>
-  <tr bgcolor="#f0f0f0"><td><b>Update</b>(const ompl::base::State *belief, const ObservationType &amp;obs, const LinearSystem &amp;ls, ompl::base::State *updatedState, const bool isConstruction=false) (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>Update</b>(const ompl::base::State *belief, const ObservationType &amp;obs, const LinearSystem &amp;ls, ompl::base::State *updatedState) (defined in <a class="el" href="class_extended_k_f.html">ExtendedKF</a>)</td><td><a class="el" href="class_extended_k_f.html">ExtendedKF</a></td><td><code> [virtual]</code></td></tr>
 </table></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -123,7 +123,7 @@ This is the complete list of members for <a class="el" href="class_extended_k_f.
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

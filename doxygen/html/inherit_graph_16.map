@@ -1,5 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$class_kalman_filter_method.html" title="KalmanFilterMethod" alt="" coords="5,32,144,61"/>
-<area shape="rect" id="node3" href="$class_extended_k_f.html" title="ExtendedKF" alt="" coords="195,5,288,35"/>
-<area shape="rect" id="node5" href="$class_linearized_k_f.html" title="LinearizedKF" alt="" coords="192,59,291,88"/>
+<area shape="rect" id="node1" href="$class_gaussian_valid_belief_sampler.html" title="Generate valid samples using the Gaussian sampling strategy." alt="" coords="5,5,192,35"/>
 </map>

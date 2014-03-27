@@ -1,5 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$class_ti_xml_node.html" title="TiXmlNode" alt="" coords="17,209,103,239"/>
-<area shape="rect" id="node4" href="$class_ti_xml_base.html" title="TiXmlBase" alt="" coords="17,101,103,131"/>
-<area shape="rect" id="node6" href="$struct_ti_xml_cursor.html" title="TiXmlCursor" alt="" coords="13,5,107,35"/>
+<area shape="rect" id="node2" href="$class_ti_xml_node.html" title="TiXmlNode" alt="" coords="76,209,161,239"/>
+<area shape="rect" id="node4" href="$class_ti_xml_base.html" title="TiXmlBase" alt="" coords="76,101,161,131"/>
+<area shape="rect" id="node6" href="$struct_ti_xml_cursor.html" title="TiXmlCursor" alt="" coords="5,5,99,35"/>
+<area shape="rect" id="node8" href="$struct_ti_xml_base_1_1_entity.html" title="TiXmlBase::Entity" alt="" coords="123,5,251,35"/>
 </map>

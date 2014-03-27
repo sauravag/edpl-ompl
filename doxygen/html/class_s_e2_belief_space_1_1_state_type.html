@@ -101,7 +101,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-attribs">Static Public Attributes</a>  </div>
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="#pri-attribs">Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">SE2BeliefSpace::StateType Class Reference</div>  </div>
 </div><!--header-->
@@ -151,6 +152,14 @@ Static Public Attributes</h2></td></tr>
 static double&#160;</td><td class="memItemRight" valign="bottom"><b>meanNormWeight_</b></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="accb04f4d8d86cd9ba3626f2a96611fff"></a><!-- doxytag: member="SE2BeliefSpace::StateType::covNormWeight_" ref="accb04f4d8d86cd9ba3626f2a96611fff" args="" -->
 static double&#160;</td><td class="memItemRight" valign="bottom"><b>covNormWeight_</b></td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17d0cf7beb04a436d85a4a98344e8d49"></a><!-- doxytag: member="SE2BeliefSpace::StateType::covariance_" ref="a17d0cf7beb04a436d85a4a98344e8d49" args="" -->
+arma::mat&#160;</td><td class="memItemRight" valign="bottom"><b>covariance_</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03b49bbd3c6dfe72df5fbb51482d9f54"></a><!-- doxytag: member="SE2BeliefSpace::StateType::reachDist_" ref="a03b49bbd3c6dfe72df5fbb51482d9f54" args="" -->
+double&#160;</td><td class="memItemRight" valign="bottom"><b>reachDist_</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a66c59e8db1686813bae0ea854afd9296"></a><!-- doxytag: member="SE2BeliefSpace::StateType::controllerID_" ref="a66c59e8db1686813bae0ea854afd9296" args="" -->
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>controllerID_</b></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>A belief in SE(2): (x, y, yaw, covariance) </p>
@@ -175,7 +184,7 @@ static double&#160;</td><td class="memItemRight" valign="bottom"><b>covNormWeigh
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

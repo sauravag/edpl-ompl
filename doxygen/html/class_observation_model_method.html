@@ -82,7 +82,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a>  </div>
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pri-attribs">Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">ObservationModelMethod Class Reference</div>  </div>
 </div><!--header-->
@@ -137,6 +138,12 @@ arma::colvec&#160;</td><td class="memItemRight" valign="bottom"><b>etaPhi_</b></
 arma::colvec&#160;</td><td class="memItemRight" valign="bottom"><b>etaD_</b></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a126bab071775905203dee38c709444c3"></a><!-- doxytag: member="ObservationModelMethod::sigma_" ref="a126bab071775905203dee38c709444c3" args="" -->
 arma::colvec&#160;</td><td class="memItemRight" valign="bottom"><b>sigma_</b></td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adf0334680c9f2f49320c1d584ae9d1b3"></a><!-- doxytag: member="ObservationModelMethod::noiseDim_" ref="adf0334680c9f2f49320c1d584ae9d1b3" args="" -->
+const int&#160;</td><td class="memItemRight" valign="bottom"><b>noiseDim_</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a30517a6bfae555908e82880f9d23492c"></a><!-- doxytag: member="ObservationModelMethod::zeroNoise_" ref="a30517a6bfae555908e82880f9d23492c" args="" -->
+const NoiseType&#160;</td><td class="memItemRight" valign="bottom"><b>zeroNoise_</b></td></tr>
 </table>
 <hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="af1a30aad975576ae8f16042a8ee8276b"></a><!-- doxytag: member="ObservationModelMethod::getObservation" ref="af1a30aad975576ae8f16042a8ee8276b" args="(const ompl::base::State *state, bool isSimulation)=0" -->
@@ -190,7 +197,7 @@ arma::colvec&#160;</td><td class="memItemRight" valign="bottom"><b>sigma_</b></t
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

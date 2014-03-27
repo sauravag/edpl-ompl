@@ -85,8 +85,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="contents">
 This is the complete list of members for <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>, including all inherited members.<table>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_base.html#ab54bfb9b70fe6dd276e7b279cab7f003">Column</a>() const </td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>condenseWhiteSpace</b> (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [private, static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>ConvertUTF32ToUTF8</b>(unsigned long input, char *output, int *length) (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [protected, static]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_base.html#a32ed202562b58de64c7d799ca3c9db98">EncodeString</a>(const TIXML_STRING &amp;str, TIXML_STRING *out)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [static]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>entity</b> (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [private, static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>errorString</b> (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [protected, static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>GetChar</b>(const char *p, char *_value, int *length, TiXmlEncoding encoding) (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [inline, protected, static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>GetEntity</b>(const char *in, char *value, int *length, TiXmlEncoding encoding) (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [protected, static]</code></td></tr>
@@ -98,6 +100,9 @@ This is the complete list of members for <a class="el" href="class_ti_xml_base.h
   <tr bgcolor="#f0f0f0"><td><b>IsWhiteSpace</b>(int c) (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [inline, protected, static]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_base.html#ad4b1472531c647a25b1840a87ae42438">IsWhiteSpaceCondensed</a>()</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [inline, static]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>location</b> (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>MAX_ENTITY_LENGTH</b> enum value (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [private]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>NUM_ENTITY</b> enum value (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [private]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>operator=</b>(const TiXmlBase &amp;base) (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [private]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>Parse</b>(const char *p, TiXmlParsingData *data, TiXmlEncoding encoding)=0 (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [pure virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="class_ti_xml_base.html#a0de56b3f2ef14c65091a3b916437b512">Print</a>(FILE *cfile, int depth) const =0</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [pure virtual]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>ReadName</b>(const char *p, TIXML_STRING *name, TiXmlEncoding encoding) (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [protected, static]</code></td></tr>
@@ -125,6 +130,7 @@ This is the complete list of members for <a class="el" href="class_ti_xml_base.h
   <tr bgcolor="#f0f0f0"><td><b>TIXML_ERROR_STRING_COUNT</b> enum value (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>TIXML_NO_ERROR</b> enum value (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>TiXmlBase</b>() (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>TiXmlBase</b>(const TiXmlBase &amp;) (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [private]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>TiXmlDocument</b> (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [friend]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>TiXmlElement</b> (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [friend]</code></td></tr>
   <tr bgcolor="#f0f0f0"><td><b>TiXmlNode</b> (defined in <a class="el" href="class_ti_xml_base.html">TiXmlBase</a>)</td><td><a class="el" href="class_ti_xml_base.html">TiXmlBase</a></td><td><code> [friend]</code></td></tr>
@@ -150,7 +156,7 @@ This is the complete list of members for <a class="el" href="class_ti_xml_base.h
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

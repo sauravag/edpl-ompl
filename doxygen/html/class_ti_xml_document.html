@@ -81,7 +81,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a>  </div>
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">TiXmlDocument Class Reference</div>  </div>
 </div><!--header-->
@@ -100,7 +102,7 @@ Collaboration diagram for TiXmlDocument:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_ti_xml_document__coll__graph.png" border="0" usemap="#_ti_xml_document_coll__map" alt="Collaboration graph"/></div>
 <map name="_ti_xml_document_coll__map" id="_ti_xml_document_coll__map">
-<area shape="rect" id="node2" href="class_ti_xml_node.html" title="TiXmlNode" alt="" coords="20,209,105,239"/><area shape="rect" id="node4" href="class_ti_xml_base.html" title="TiXmlBase" alt="" coords="20,101,105,131"/><area shape="rect" id="node6" href="struct_ti_xml_cursor.html" title="TiXmlCursor" alt="" coords="16,5,109,35"/></map>
+<area shape="rect" id="node2" href="class_ti_xml_node.html" title="TiXmlNode" alt="" coords="99,225,184,255"/><area shape="rect" id="node4" href="class_ti_xml_base.html" title="TiXmlBase" alt="" coords="109,101,195,131"/><area shape="rect" id="node6" href="struct_ti_xml_cursor.html" title="TiXmlCursor" alt="" coords="5,5,99,35"/><area shape="rect" id="node8" href="struct_ti_xml_base_1_1_entity.html" title="TiXmlBase::Entity" alt="" coords="123,5,251,35"/></map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 
 <p><a href="class_ti_xml_document-members.html">List of all members.</a></p>
@@ -164,6 +166,24 @@ virtual <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a> *&#160
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_ti_xml_node.html">TiXmlNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#ac9e8f09b23454d953b32d1b65cd1409e">Clone</a> () const </td></tr>
+<tr><td colspan="2"><h2><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af69deeb984e060bd00f668460dec8ef2"></a><!-- doxytag: member="TiXmlDocument::CopyTo" ref="af69deeb984e060bd00f668460dec8ef2" args="(TiXmlDocument *target) const " -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>CopyTo</b> (<a class="el" href="class_ti_xml_document.html">TiXmlDocument</a> *target) const </td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ff6a063602f31acae6f37fc049d8bbd"></a><!-- doxytag: member="TiXmlDocument::error" ref="a1ff6a063602f31acae6f37fc049d8bbd" args="" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>error</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acdef97a4bb80729ac6863dd54cee7eeb"></a><!-- doxytag: member="TiXmlDocument::errorId" ref="acdef97a4bb80729ac6863dd54cee7eeb" args="" -->
+int&#160;</td><td class="memItemRight" valign="bottom"><b>errorId</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2da9a95ba3f9c895a8d7f4de7122a642"></a><!-- doxytag: member="TiXmlDocument::errorDesc" ref="a2da9a95ba3f9c895a8d7f4de7122a642" args="" -->
+TIXML_STRING&#160;</td><td class="memItemRight" valign="bottom"><b>errorDesc</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af2fa6a010b903d893d52cc6fee5575a1"></a><!-- doxytag: member="TiXmlDocument::tabsize" ref="af2fa6a010b903d893d52cc6fee5575a1" args="" -->
+int&#160;</td><td class="memItemRight" valign="bottom"><b>tabsize</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa4030f989f1549f6b897147fc2851d1a"></a><!-- doxytag: member="TiXmlDocument::errorLocation" ref="aa4030f989f1549f6b897147fc2851d1a" args="" -->
+<a class="el" href="struct_ti_xml_cursor.html">TiXmlCursor</a>&#160;</td><td class="memItemRight" valign="bottom"><b>errorLocation</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4d5400dec9bfb55c640428de33297886"></a><!-- doxytag: member="TiXmlDocument::useMicrosoftBOM" ref="a4d5400dec9bfb55c640428de33297886" args="" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>useMicrosoftBOM</b></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Always the top level node. A document binds together all the XML pieces. It can be saved, loaded, and printed to the screen. The 'value' of a document node is the xml file name. </p>
@@ -447,7 +467,7 @@ Protected Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

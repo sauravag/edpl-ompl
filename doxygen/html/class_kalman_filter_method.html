@@ -81,7 +81,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a>  </div>
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pri-types">Private Types</a>  </div>
   <div class="headertitle">
 <div class="title">KalmanFilterMethod Class Reference</div>  </div>
 </div><!--header-->
@@ -108,12 +109,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setMotionModelPointee
 ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>getObservationModelPointer</b> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4b966a487acbbdda0f145be9a1da03d5"></a><!-- doxytag: member="KalmanFilterMethod::setObservationModelPointer" ref="a4b966a487acbbdda0f145be9a1da03d5" args="(const ObservationModelPointer &amp;om)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setObservationModelPointer</b> (const ObservationModelPointer &amp;om)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8d8c8f2eeaca1a556cfc655d1897ce5"></a><!-- doxytag: member="KalmanFilterMethod::Predict" ref="ae8d8c8f2eeaca1a556cfc655d1897ce5" args="(const ompl::base::State *belief, const ompl::control::Control *control, const LinearSystem &amp;ls, ompl::base::State *predictedState, const bool isConstruction=false)=0" -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Predict</b> (const ompl::base::State *belief, const ompl::control::Control *control, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *predictedState, const bool isConstruction=false)=0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac4f9c1f1a79821898891f2c13aa5cfc"></a><!-- doxytag: member="KalmanFilterMethod::Update" ref="aac4f9c1f1a79821898891f2c13aa5cfc" args="(const ompl::base::State *belief, const ObservationType &amp;obs, const LinearSystem &amp;ls, ompl::base::State *updatedState, const bool isConstruction=false)=0" -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> (const ompl::base::State *belief, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *updatedState, const bool isConstruction=false)=0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8a13cf9a962588fbd3441726b7b95e77"></a><!-- doxytag: member="KalmanFilterMethod::Evolve" ref="a8a13cf9a962588fbd3441726b7b95e77" args="(const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const LinearSystem &amp;lsPred, const LinearSystem &amp;lsUpdate, ompl::base::State *evolvedState, const bool isConstruction=false)=0" -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Evolve</b> (const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsPred, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsUpdate, ompl::base::State *evolvedState, const bool isConstruction=false)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60d4e0a2eb06676f48727e21d33eb31f"></a><!-- doxytag: member="KalmanFilterMethod::Predict" ref="a60d4e0a2eb06676f48727e21d33eb31f" args="(const ompl::base::State *belief, const ompl::control::Control *control, const LinearSystem &amp;ls, ompl::base::State *predictedState)=0" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Predict</b> (const ompl::base::State *belief, const ompl::control::Control *control, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *predictedState)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af79c09c56a2f81c1af8896f235d37afd"></a><!-- doxytag: member="KalmanFilterMethod::Update" ref="af79c09c56a2f81c1af8896f235d37afd" args="(const ompl::base::State *belief, const ObservationType &amp;obs, const LinearSystem &amp;ls, ompl::base::State *updatedState)=0" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> (const ompl::base::State *belief, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls, ompl::base::State *updatedState)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e56fcd80484eb15d50597b528bc6da9"></a><!-- doxytag: member="KalmanFilterMethod::Evolve" ref="a9e56fcd80484eb15d50597b528bc6da9" args="(const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const LinearSystem &amp;lsPred, const LinearSystem &amp;lsUpdate, ompl::base::State *evolvedState)=0" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Evolve</b> (const ompl::base::State *belief, const ompl::control::Control *control, const ObservationType &amp;obs, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsPred, const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;lsUpdate, ompl::base::State *evolvedState)=0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f9d8ae8cf4e3bd0138d731bd2539441"></a><!-- doxytag: member="KalmanFilterMethod::computeStationaryCovariance" ref="a8f9d8ae8cf4e3bd0138d731bd2539441" args="(const LinearSystem &amp;ls)=0" -->
 virtual arma::mat&#160;</td><td class="memItemRight" valign="bottom"><b>computeStationaryCovariance</b> (const <a class="el" href="class_linear_system.html">LinearSystem</a> &amp;ls)=0</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
@@ -124,6 +125,26 @@ firm::SpaceInformation::SpaceInformationPtr&#160;</td><td class="memItemRight" v
 MotionModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>motionModel_</b></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a43191b745846715c66854634ba58e85c"></a><!-- doxytag: member="KalmanFilterMethod::observationModel_" ref="a43191b745846715c66854634ba58e85c" args="" -->
 ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>observationModel_</b></td></tr>
+<tr><td colspan="2"><h2><a name="pri-types"></a>
+Private Types</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2718a343b6cf3edf6c8226fe64e9d468"></a><!-- doxytag: member="KalmanFilterMethod::ObservationType" ref="a2718a343b6cf3edf6c8226fe64e9d468" args="" -->
+typedef arma::colvec&#160;</td><td class="memItemRight" valign="bottom"><b>ObservationType</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adbc3ad1e37351d9131606dd0b7be1bc5"></a><!-- doxytag: member="KalmanFilterMethod::ControlType" ref="adbc3ad1e37351d9131606dd0b7be1bc5" args="" -->
+typedef arma::colvec&#160;</td><td class="memItemRight" valign="bottom"><b>ControlType</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeeec5cac3998634d89ff52570dd087a5"></a><!-- doxytag: member="KalmanFilterMethod::NoiseType" ref="aeeec5cac3998634d89ff52570dd087a5" args="" -->
+typedef arma::colvec&#160;</td><td class="memItemRight" valign="bottom"><b>NoiseType</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9fad30fff8a91e24a894d284ffab38e8"></a><!-- doxytag: member="KalmanFilterMethod::SpaceType" ref="a9fad30fff8a91e24a894d284ffab38e8" args="" -->
+typedef <br class="typebreak"/>
+<a class="el" href="class_s_e2_belief_space.html">MotionModelMethod::SpaceType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>SpaceType</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a26f4e426a422c85e1ad9096180a0e240"></a><!-- doxytag: member="KalmanFilterMethod::StateType" ref="a26f4e426a422c85e1ad9096180a0e240" args="" -->
+typedef <br class="typebreak"/>
+<a class="el" href="class_s_e2_belief_space_1_1_state_type.html">MotionModelMethod::StateType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>StateType</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a353dd8a63c75605e197382224cca2f7e"></a><!-- doxytag: member="KalmanFilterMethod::ObservationModelPointer" ref="a353dd8a63c75605e197382224cca2f7e" args="" -->
+typedef <br class="typebreak"/>
+ObservationModelMethod::ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>ObservationModelPointer</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9f792b6e5b6e7fc97fab550ce5e7440e"></a><!-- doxytag: member="KalmanFilterMethod::MotionModelPointer" ref="a9f792b6e5b6e7fc97fab550ce5e7440e" args="" -->
+typedef <br class="typebreak"/>
+MotionModelMethod::MotionModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>MotionModelPointer</b></td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/Filters/<a class="el" href="_kalman_filter_method_8h_source.html">KalmanFilterMethod.h</a></li>
@@ -146,7 +167,7 @@ ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>ob
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

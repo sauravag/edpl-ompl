@@ -7,8 +7,7 @@
 
 
 
-\-Inheritance diagram for \-Ti\-Xml\-Base\-:
-\nopagebreak
+\-Inheritance diagram for \-Ti\-Xml\-Base\-:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -22,13 +21,13 @@
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=152pt]{class_ti_xml_base__coll__graph}
+\includegraphics[width=264pt]{class_ti_xml_base__coll__graph}
 \end{center}
 \end{figure}
 \subsection*{\-Classes}
 \begin{DoxyCompactItemize}
 \item 
-struct {\bfseries \-Entity}
+struct \hyperlink{struct_ti_xml_base_1_1_entity}{\-Entity}
 \end{DoxyCompactItemize}
 \subsection*{\-Public \-Types}
 \begin{DoxyCompactItemize}
@@ -147,6 +146,30 @@ static const int {\bfseries utf8\-Byte\-Table} \mbox{[}256\mbox{]}
 \item 
 static const char $\ast$ {\bfseries error\-String} \mbox{[}\-T\-I\-X\-M\-L\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-I\-N\-G\-\_\-\-C\-O\-U\-N\-T\mbox{]}
 \end{DoxyCompactItemize}
+\subsection*{\-Private \-Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ {\bfseries \-N\-U\-M\-\_\-\-E\-N\-T\-I\-T\-Y} =  5, 
+{\bfseries \-M\-A\-X\-\_\-\-E\-N\-T\-I\-T\-Y\-\_\-\-L\-E\-N\-G\-T\-H} =  6
+ \}
+\end{DoxyCompactItemize}
+\subsection*{\-Private \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_ti_xml_base_a626975d7fb27b0a471142ca582b561b4}{{\bfseries \-Ti\-Xml\-Base} (const \hyperlink{class_ti_xml_base}{\-Ti\-Xml\-Base} \&)}\label{class_ti_xml_base_a626975d7fb27b0a471142ca582b561b4}
+
+\item 
+\hypertarget{class_ti_xml_base_a183315aa6f1bb36d509b179e912cb93f}{void {\bfseries operator=} (const \hyperlink{class_ti_xml_base}{\-Ti\-Xml\-Base} \&base)}\label{class_ti_xml_base_a183315aa6f1bb36d509b179e912cb93f}
+
+\end{DoxyCompactItemize}
+\subsection*{\-Static \-Private \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static \hyperlink{struct_ti_xml_base_1_1_entity}{\-Entity} {\bfseries entity} \mbox{[}\-N\-U\-M\-\_\-\-E\-N\-T\-I\-T\-Y\mbox{]}
+\item 
+\hypertarget{class_ti_xml_base_a447a05f6a3edbb7892f66f9df8244a3d}{static bool {\bfseries condense\-White\-Space} = true}\label{class_ti_xml_base_a447a05f6a3edbb7892f66f9df8244a3d}
+
+\end{DoxyCompactItemize}
 \subsection*{\-Friends}
 \begin{DoxyCompactItemize}
 \item 
@@ -235,6 +258,20 @@ static const char $\ast$ {\bfseries error\-String} \mbox{[}\-T\-I\-X\-M\-L\-\_\-
 \-The world does not agree on whether white space should be kept or not. \-In order to make everyone happy, these global, static functions are provided to set whether or not \-Tiny\-Xml will condense all white space into a single space or not. \-The default is to condense. \-Note changing this value is not thread safe. 
 
 \subsection{\-Member \-Data \-Documentation}
+\hypertarget{class_ti_xml_base_aae956c75fedff20d337f7cc109c6b71a}{\index{\-Ti\-Xml\-Base@{\-Ti\-Xml\-Base}!entity@{entity}}
+\index{entity@{entity}!TiXmlBase@{\-Ti\-Xml\-Base}}
+\subsubsection[{entity}]{\setlength{\rightskip}{0pt plus 5cm}{\bf \-Ti\-Xml\-Base\-::\-Entity} \-Ti\-Xml\-Base\-::entity\hspace{0.3cm}{\ttfamily  \mbox{[}static, private\mbox{]}}}}\label{class_ti_xml_base_aae956c75fedff20d337f7cc109c6b71a}
+{\bfseries \-Initial value\-:}
+\begin{DoxyCode}
+ 
+{
+        { "&amp;",  5, '&' },
+        { "&lt;",   4, '<' },
+        { "&gt;",   4, '>' },
+        { "&quot;", 6, '\"' },
+        { "&apos;", 6, '\'' }
+}
+\end{DoxyCode}
 \hypertarget{class_ti_xml_base_a7ac8feec4100e446b3d78e1ac0659700}{\index{\-Ti\-Xml\-Base@{\-Ti\-Xml\-Base}!error\-String@{error\-String}}
 \index{error\-String@{error\-String}!TiXmlBase@{\-Ti\-Xml\-Base}}
 \subsubsection[{error\-String}]{\setlength{\rightskip}{0pt plus 5cm}const char $\ast$ \-Ti\-Xml\-Base\-::error\-String\hspace{0.3cm}{\ttfamily  \mbox{[}static, protected\mbox{]}}}}\label{class_ti_xml_base_a7ac8feec4100e446b3d78e1ac0659700}

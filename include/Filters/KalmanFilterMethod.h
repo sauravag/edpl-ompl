@@ -42,9 +42,9 @@
 #include "../LinearSystem/LinearSystem.h"
 #include "dare.h"
 #include "../SpaceInformation/SpaceInformation.h"
-//#include "HState.h"
 
 
+/** \brief  The base class for Kalman filter implementations.*/
 class KalmanFilterMethod
 {
   typedef arma::colvec ObservationType;
@@ -57,51 +57,63 @@ class KalmanFilterMethod
 
 	public:
 
+    /** \brief  Constructor.*/
   	KalmanFilterMethod() {}
 
+    /** \brief  Constructor. */
   	KalmanFilterMethod (firm::SpaceInformation::SpaceInformationPtr si):
   	si_(si), observationModel_(si->getObservationModel()), motionModel_(si->getMotionModel()){}
 
   	//virtual ~KalmanFilterMethod() {}
 
-  	//gets a belief and control, returns predicted belief if control
-  	//were to be applied
-
+    /** \brief  Return the pointer to the motion model used by the filter.*/
   	MotionModelPointer getMotionModelPointer(){return motionModel_;}
 
+    /** \brief  Set the Motion Model pointer.*/
   	void setMotionModelPointeer(const MotionModelPointer& mm) { motionModel_ = mm;}
 
+    /** \brief  Return the observation model poointer. */
   	ObservationModelPointer getObservationModelPointer(){return observationModel_;}
 
+    /** \brief  Set the observation model pointer. */
   	void setObservationModelPointer(const ObservationModelPointer& om) { observationModel_ = om;}
 
+    /** \brief  Gets as input belief and control, returns predicted belief if control
+            were to be applied to the robot. Also called the Prior. */
   	virtual void Predict(const ompl::base::State *belief,
                                 const ompl::control::Control* control,
                                 const LinearSystem& ls,
                                 ompl::base::State *predictedState)  = 0;
 
-  	//gets a belief and observation, returns
-  	virtual
-  	void Update(const ompl::base::State *belief,
+    /** \brief  Gets as input belief and observation, returns the updated state of the robot. Also called the Posterior.*/
+  	virtual void Update(const ompl::base::State *belief,
                                 const ObservationType& obs,
                                 const	LinearSystem& ls,
                                 ompl::base::State *updatedState) = 0;
 
-    virtual
-  	void Evolve(const ompl::base::State *belief,
+    /** \brief  Evolves the robot's belief on the input control, previous state and new observation. It first calls predict
+            and then update.*/
+    virtual void Evolve(const ompl::base::State *belief,
                                 const ompl::control::Control* control,
                                 const ObservationType& obs,
                                 const LinearSystem& lsPred,
                                 const LinearSystem& lsUpdate,
                                 ompl::base::State *evolvedState) = 0;
 
-  	virtual
-  	arma::mat computeStationaryCovariance(const LinearSystem& ls) = 0;
+    /** \brief  Compute the covariance for a given linear system. A linear system describes a robot's state at a point in
+            an open loop trajectory. Helps to understand the expected uncertainty at a point in the trajectory.*/
+  	virtual arma::mat computeStationaryCovariance(const LinearSystem& ls) = 0;
 
 
 	protected:
+
+        /** \brief Pointer to the space information.*/
         firm::SpaceInformation::SpaceInformationPtr si_;
+
+        /** \brief Pointer to the motion model. */
         MotionModelPointer motionModel_;
+
+        /** \brief Pointer to the observation model.*/
         ObservationModelPointer observationModel_;
 
 };

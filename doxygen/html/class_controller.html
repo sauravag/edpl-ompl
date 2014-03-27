@@ -82,12 +82,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-methods">Static Public Member Functions</a>  </div>
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
+<a href="#pri-static-attribs">Static Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">Controller&lt; SeparatedControllerType, FilterType &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <!-- doxytag: class="Controller" -->
+<p>Base class for <a class="el" href="class_controller.html" title="Base class for Controller. A controller&#39;s task is to use the filter to estimate the belief robot&#39;s st...">Controller</a>. A controller's task is to use the filter to estimate the belief robot's state and generate control commands using the separated controller. For example by fusing an LQR and Kalman Filter we generate an LQG controller.  
+ <a href="class_controller.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_controller_8h_source.html">Controller.h</a>&gt;</code></p>
+<div class="dynheader">
+Collaboration diagram for Controller&lt; SeparatedControllerType, FilterType &gt;:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_controller__coll__graph.png" border="0" usemap="#_controller_3_01_separated_controller_type_00_01_filter_type_01_4_coll__map" alt="Collaboration graph"/></div>
+<map name="_controller_3_01_separated_controller_type_00_01_filter_type_01_4_coll__map" id="_controller_3_01_separated_controller_type_00_01_filter_type_01_4_coll__map">
+</map>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+
 <p><a href="class_controller-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-types"></a>
@@ -115,71 +129,93 @@ typedef <br class="typebreak"/>
 ObservationModelMethod::ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><b>ObservationModelPointer</b></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab3f614e32fa25535809e056ce2492ab3"></a><!-- doxytag: member="Controller::Controller" ref="ab3f614e32fa25535809e056ce2492ab3" args="()" -->
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#ab3f614e32fa25535809e056ce2492ab3">Controller</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a50a65edd2cf9fcce0cca465cbc3d527d"></a><!-- doxytag: member="Controller::Controller" ref="a50a65edd2cf9fcce0cca465cbc3d527d" args="(const ompl::base::State *goal, const std::vector&lt; ompl::base::State * &gt; &amp;nominalXs, const std::vector&lt; ompl::control::Control * &gt; &amp;nominalUs, const firm::SpaceInformation::SpaceInformationPtr si)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><b>Controller</b> (const ompl::base::State *goal, const std::vector&lt; ompl::base::State * &gt; &amp;nominalXs, const std::vector&lt; ompl::control::Control * &gt; &amp;nominalUs, const firm::SpaceInformation::SpaceInformationPtr si)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a01cbbc1435d0a4ed8733332bef6d7342">Execute</a> (const ompl::base::State *startState, ompl::base::State *endState, ompl::base::Cost &amp;executionCost, bool constructionMode=true)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a50a65edd2cf9fcce0cca465cbc3d527d">Controller</a> (const ompl::base::State *goal, const std::vector&lt; ompl::base::State * &gt; &amp;nominalXs, const std::vector&lt; ompl::control::Control * &gt; &amp;nominalUs, const firm::SpaceInformation::SpaceInformationPtr si)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a01cbbc1435d0a4ed8733332bef6d7342">Execute</a> (const ompl::base::State *startState, ompl::base::State *endState, ompl::base::Cost &amp;executionCost, bool constructionMode=true)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute the controller i.e. take the system from start to end state of edge.  <a href="#a01cbbc1435d0a4ed8733332bef6d7342"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba227cad46f73fab5fcf37b41cae71a9"></a><!-- doxytag: member="Controller::Stabilize" ref="aba227cad46f73fab5fcf37b41cae71a9" args="(const ompl::base::State *startState)" -->
-ompl::base::State *&#160;</td><td class="memItemRight" valign="bottom"><b>Stabilize</b> (const ompl::base::State *startState)</td></tr>
+virtual ompl::base::State *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#aba227cad46f73fab5fcf37b41cae71a9">Stabilize</a> (const ompl::base::State *startState)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Stabilize the system to an existing <a class="el" href="class_f_i_r_m.html" title="Feedback Information RoadMap planner.">FIRM</a> node. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab80efffa3b03aa4d1d10c0bf82675201"></a><!-- doxytag: member="Controller::isTerminated" ref="ab80efffa3b03aa4d1d10c0bf82675201" args="(const ompl::base::State *state, const size_t t)" -->
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>isTerminated</b> (const ompl::base::State *state, const size_t t)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">ompl::base::State *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#ad7c50856efc6fa7855c7cad4c9bb2352">Evolve</a> (const ompl::base::State *state, size_t t, bool isConstructionMode)</td></tr>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#ab80efffa3b03aa4d1d10c0bf82675201">isTerminated</a> (const ompl::base::State *state, const size_t t)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether the controller has satisfied its termination condition for e.g. reached target state. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a64c3c47732f138326490303858133ae7"></a><!-- doxytag: member="Controller::Evolve" ref="a64c3c47732f138326490303858133ae7" args="(const ompl::base::State *state, size_t t, ompl::base::State *nextState)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a64c3c47732f138326490303858133ae7">Evolve</a> (const ompl::base::State *state, size_t t, ompl::base::State *nextState)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Evolve the controller over a single time step, i.e. apply control, predict, get observation, update. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a848b1e5a3dc6d36c3ede121b7461d896"></a><!-- doxytag: member="Controller::getGoal" ref="a848b1e5a3dc6d36c3ede121b7461d896" args="()" -->
-ompl::base::State *&#160;</td><td class="memItemRight" valign="bottom"><b>getGoal</b> ()</td></tr>
+ompl::base::State *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a848b1e5a3dc6d36c3ede121b7461d896">getGoal</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">get the controllers goal state <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac0b9c339df7157c73d61b7064f88483c"></a><!-- doxytag: member="Controller::setSpaceInformation" ref="ac0b9c339df7157c73d61b7064f88483c" args="(SpaceInformationPtr si)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setSpaceInformation</b> (SpaceInformationPtr si)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acd39b9995176be2ac40b286c0cdaeabd"></a><!-- doxytag: member="Controller::isValid" ref="acd39b9995176be2ac40b286c0cdaeabd" args="()" -->
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>isValid</b> ()</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#ac0b9c339df7157c73d61b7064f88483c">setSpaceInformation</a> (SpaceInformationPtr si)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the space information of the planning problem. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2aa89a4cd76ba7fb6ad717d608b8c355"></a><!-- doxytag: member="Controller::Length" ref="a2aa89a4cd76ba7fb6ad717d608b8c355" args="()" -->
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>Length</b> ()</td></tr>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a2aa89a4cd76ba7fb6ad717d608b8c355">Length</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of linear systems. <br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a665b0a9cab38c11e575681944e2c8d8a"></a><!-- doxytag: member="Controller::setNodeReachedAngle" ref="a665b0a9cab38c11e575681944e2c8d8a" args="(double angle)" -->
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>setNodeReachedAngle</b> (double angle)</td></tr>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a665b0a9cab38c11e575681944e2c8d8a">setNodeReachedAngle</a> (double angle)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the nodeReached angle. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5d394a75a6d1cf325fda099b23c91a2f"></a><!-- doxytag: member="Controller::setNodeReachedDistance" ref="a5d394a75a6d1cf325fda099b23c91a2f" args="(double d)" -->
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>setNodeReachedDistance</b> (double d)</td></tr>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a5d394a75a6d1cf325fda099b23c91a2f">setNodeReachedDistance</a> (double d)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the distance at which we assume the robot has reached a target node. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e27a2fbd5d1c83d918e05da91302863"></a><!-- doxytag: member="Controller::setMaxTries" ref="a2e27a2fbd5d1c83d918e05da91302863" args="(double maxtries)" -->
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>setMaxTries</b> (double maxtries)</td></tr>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a2e27a2fbd5d1c83d918e05da91302863">setMaxTries</a> (double maxtries)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The max number of attempts to align with node. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aacd25b8b49bcec685b0ec284bb9694d6"></a><!-- doxytag: member="Controller::setMaxTrajectoryDeviation" ref="aacd25b8b49bcec685b0ec284bb9694d6" args="(double dev)" -->
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#aacd25b8b49bcec685b0ec284bb9694d6">setMaxTrajectoryDeviation</a> (double dev)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum trajectory deviation before which to replan. <br/></td></tr>
+<tr><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34912a3b87662649231e2d096882c454"></a><!-- doxytag: member="Controller::si_" ref="a34912a3b87662649231e2d096882c454" args="" -->
+SpaceInformationPtr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a34912a3b87662649231e2d096882c454">si_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The pointer to the space information. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb68b603afc759b4e62b8c6db8125671"></a><!-- doxytag: member="Controller::lss_" ref="acb68b603afc759b4e62b8c6db8125671" args="" -->
+std::vector&lt; <a class="el" href="class_linear_system.html">LinearSystem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#acb68b603afc759b4e62b8c6db8125671">lss_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of linear systems. The linear systems basically represent the Kalman Gain and Feedback Gain at each point in the open loop trajectory. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a040da727bdc40ab69f0c3e4033bc9df9"></a><!-- doxytag: member="Controller::separatedController_" ref="a040da727bdc40ab69f0c3e4033bc9df9" args="" -->
+SeparatedControllerType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a040da727bdc40ab69f0c3e4033bc9df9">separatedController_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The separated controller used to generate the commands that are sent to the robot. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9ff37d34a8a9a20f606c501d2ab5cb2e"></a><!-- doxytag: member="Controller::filter_" ref="a9ff37d34a8a9a20f606c501d2ab5cb2e" args="" -->
+FilterType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a9ff37d34a8a9a20f606c501d2ab5cb2e">filter_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The filter used to estimate the robot belief. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e5e3c0828c9e0d216e7d53f3625d9b4"></a><!-- doxytag: member="Controller::goal_" ref="a4e5e3c0828c9e0d216e7d53f3625d9b4" args="" -->
+ompl::base::State *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a4e5e3c0828c9e0d216e7d53f3625d9b4">goal_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The target node to which the controller drives the robot. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adb2235b65db786dbd287e0b57a42b959"></a><!-- doxytag: member="Controller::tries_" ref="adb2235b65db786dbd287e0b57a42b959" args="" -->
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#adb2235b65db786dbd287e0b57a42b959">tries_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Tracks the current number of time steps the robot has executed to align with goal node. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeddadf542e253ff266e596eb0574c3de"></a><!-- doxytag: member="Controller::maxExecTime_" ref="aeddadf542e253ff266e596eb0574c3de" args="" -->
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#aeddadf542e253ff266e596eb0574c3de">maxExecTime_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum time for which a controller can be executed. We need this bound as we cannot let a controller execute indefinitely. This avoids situations when the robot has deviated or collided and the current controller is no longer capable of driving the robot to the goal. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1288c6ee79e962bba7421ffb59bae047"></a><!-- doxytag: member="Controller::debug_" ref="a1288c6ee79e962bba7421ffb59bae047" args="" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a1288c6ee79e962bba7421ffb59bae047">debug_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The debug mode, if true, controller is verbose. <br/></td></tr>
+<tr><td colspan="2"><h2><a name="pri-static-attribs"></a>
+Static Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a93ec5b0a3ae4e7229cb63f659e1b6e1d"></a><!-- doxytag: member="Controller::nodeReachedAngle_" ref="a93ec5b0a3ae4e7229cb63f659e1b6e1d" args="" -->
+static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a93ec5b0a3ae4e7229cb63f659e1b6e1d">nodeReachedAngle_</a> = -1</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the robot's heading is deviated from the target heading by less than the nodeReachedAngle_ then the robot is assumed to have alligned with the target heading. Used for node reachability checking. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2688f277c2087c527c67eec19b2a3c70"></a><!-- doxytag: member="Controller::nodeReachedDistance_" ref="a2688f277c2087c527c67eec19b2a3c70" args="" -->
+static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a2688f277c2087c527c67eec19b2a3c70">nodeReachedDistance_</a> = -1</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The distance at which we assume the robot has reached a target node. Reaching the exact node location is almost impractical for real systems. We assume the robot has reached if it is within a certain radius of the target. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a430b93daf349b2172311924d69b44c08"></a><!-- doxytag: member="Controller::maxTries_" ref="a430b93daf349b2172311924d69b44c08" args="" -->
+static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a430b93daf349b2172311924d69b44c08">maxTries_</a> = -1</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The max number of tries to align with target node. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1999422f369674236a5ae9b83ef6a6b1"></a><!-- doxytag: member="Controller::nominalTrajDeviationThreshold_" ref="a1999422f369674236a5ae9b83ef6a6b1" args="" -->
+static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a1999422f369674236a5ae9b83ef6a6b1">nominalTrajDeviationThreshold_</a> = -1</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum deviation from the nominal trajectory beyond which the robot must replan. <br/></td></tr>
 </table>
-<h3>template&lt;class SeparatedControllerType, class FilterType&gt;<br/>
- class Controller&lt; SeparatedControllerType, FilterType &gt;</h3>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><h3>template&lt;class SeparatedControllerType, class FilterType&gt;<br/>
+class Controller&lt; SeparatedControllerType, FilterType &gt;</h3>
 
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="ad7c50856efc6fa7855c7cad4c9bb2352"></a><!-- doxytag: member="Controller::Evolve" ref="ad7c50856efc6fa7855c7cad4c9bb2352" args="(const ompl::base::State *state, size_t t, bool isConstructionMode)" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class SeparatedControllerType , class FilterType &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">ompl::base::State * <a class="el" href="class_controller.html">Controller</a>&lt; SeparatedControllerType, FilterType &gt;::<a class="el" href="class_controller.html#ad7c50856efc6fa7855c7cad4c9bb2352">Evolve</a> </td>
-          <td>(</td>
-          <td class="paramtype">const ompl::base::State *&#160;</td>
-          <td class="paramname"><em>state</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>t</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>isConstructionMode</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>if(!isConstructionMode) { for(int i=0; i&lt;z.n_rows/singleobservationdim; i++) { int markerID = z[i*singleobservationdim]; cout&lt;&lt;"Checking if marker ID :" &lt;&lt;markerID &lt;&lt;" Is an obstacle marker"&lt;&lt;endl; if(this-&gt;GetMPProblem()-&gt;IsObstacleMarker(markerID)) { add obstacle to environment if it doesn't already exist flag that you have observed an obstacle marker cout&lt;&lt;"Marker ID :"&lt;&lt;markerID&lt;&lt;" is an obstacle"&lt;&lt;endl; if(this-&gt;GetMPProblem()-&gt;AddObstacle(markerID)) m_obstacleMarkerObserved = true; } } }</p>
-
-</div>
-</div>
+<p>Base class for <a class="el" href="class_controller.html" title="Base class for Controller. A controller&#39;s task is to use the filter to estimate the belief robot&#39;s st...">Controller</a>. A controller's task is to use the filter to estimate the belief robot's state and generate control commands using the separated controller. For example by fusing an LQR and Kalman Filter we generate an LQG controller. </p>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a01cbbc1435d0a4ed8733332bef6d7342"></a><!-- doxytag: member="Controller::Execute" ref="a01cbbc1435d0a4ed8733332bef6d7342" args="(const ompl::base::State *startState, ompl::base::State *endState, ompl::base::Cost &amp;executionCost, bool constructionMode=true)" -->
 <div class="memitem">
 <div class="memproto">
@@ -213,12 +249,14 @@ template&lt;class SeparatedControllerType , class FilterType &gt; </div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td><code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>HOW TO SET INITAL VALUE OF COST cost = 1 - &gt; for time based only if time per execution is "1" cost = 0.01 -&gt; for covariance based</p>
+
+<p>Execute the controller i.e. take the system from start to end state of edge. </p>
+<p>HOW TO SET INITAL VALUE OF COST cost = 1 ,for time based only if time per execution is "1" cost = 0.01 , for covariance based</p>
 <p>Increment cost by: -&gt; 0.01 for time based -&gt; trace(Covariance) for <a class="el" href="class_f_i_r_m.html" title="Feedback Information RoadMap planner.">FIRM</a></p>
 
 </div>
@@ -244,7 +282,7 @@ template&lt;class SeparatedControllerType , class FilterType &gt; </div>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 19 2014 12:38:10 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 26 2014 20:46:56 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

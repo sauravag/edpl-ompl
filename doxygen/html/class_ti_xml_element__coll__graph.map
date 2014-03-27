@@ -1,5 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$class_ti_xml_node.html" title="TiXmlNode" alt="" coords="15,209,100,239"/>
-<area shape="rect" id="node4" href="$class_ti_xml_base.html" title="TiXmlBase" alt="" coords="15,101,100,131"/>
-<area shape="rect" id="node6" href="$struct_ti_xml_cursor.html" title="TiXmlCursor" alt="" coords="11,5,104,35"/>
+<area shape="rect" id="node2" href="$class_ti_xml_node.html" title="TiXmlNode" alt="" coords="11,225,96,255"/>
+<area shape="rect" id="node16" href="$class_ti_xml_document.html" title="TiXmlDocument" alt="" coords="59,333,173,363"/>
+<area shape="rect" id="node4" href="$class_ti_xml_base.html" title="TiXmlBase" alt="" coords="109,101,195,131"/>
+<area shape="rect" id="node13" href="$class_ti_xml_attribute.html" title="TiXmlAttribute" alt="" coords="69,432,173,461"/>
+<area shape="rect" id="node6" href="$struct_ti_xml_cursor.html" title="TiXmlCursor" alt="" coords="213,5,307,35"/>
+<area shape="rect" id="node8" href="$struct_ti_xml_base_1_1_entity.html" title="TiXmlBase::Entity" alt="" coords="60,5,188,35"/>
+<area shape="rect" id="node11" href="$class_ti_xml_attribute_set.html" title="TiXmlAttributeSet" alt="" coords="59,531,184,560"/>
 </map>

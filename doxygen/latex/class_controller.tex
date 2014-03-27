@@ -1,6 +1,25 @@
 \hypertarget{class_controller}{\section{\-Controller$<$ \-Separated\-Controller\-Type, \-Filter\-Type $>$ \-Class \-Template \-Reference}
 \label{class_controller}\index{\-Controller$<$ Separated\-Controller\-Type, Filter\-Type $>$@{\-Controller$<$ Separated\-Controller\-Type, Filter\-Type $>$}}
 }
+
+
+\-Base class for \hyperlink{class_controller}{\-Controller}. \-A controller's task is to use the filter to estimate the belief robot's state and generate control commands using the separated controller. \-For example by fusing an \-L\-Q\-R and \-Kalman \-Filter we generate an \-L\-Q\-G controller.  
+
+
+
+
+{\ttfamily \#include $<$\-Controller.\-h$>$}
+
+
+
+\-Collaboration diagram for \-Controller$<$ \-Separated\-Controller\-Type, \-Filter\-Type $>$\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{class_controller__coll__graph}
+\end{center}
+\end{figure}
 \subsection*{\-Public \-Types}
 \begin{DoxyCompactItemize}
 \item 
@@ -35,58 +54,98 @@ firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr {\bfseries \-Space\-In
 \subsection*{\-Public \-Member \-Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_controller_a50a65edd2cf9fcce0cca465cbc3d527d}{{\bfseries \-Controller} (const ompl\-::base\-::\-State $\ast$goal, const std\-::vector$<$ ompl\-::base\-::\-State $\ast$ $>$ \&nominal\-Xs, const std\-::vector$<$ ompl\-::control\-::\-Control $\ast$ $>$ \&nominal\-Us, const firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_controller_a50a65edd2cf9fcce0cca465cbc3d527d}
+\hypertarget{class_controller_ab3f614e32fa25535809e056ce2492ab3}{\hyperlink{class_controller_ab3f614e32fa25535809e056ce2492ab3}{\-Controller} ()}\label{class_controller_ab3f614e32fa25535809e056ce2492ab3}
 
-\item 
-bool \hyperlink{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\-Execute} (const ompl\-::base\-::\-State $\ast$start\-State, ompl\-::base\-::\-State $\ast$end\-State, ompl\-::base\-::\-Cost \&execution\-Cost, bool construction\-Mode=true)
-\item 
-\hypertarget{class_controller_aba227cad46f73fab5fcf37b41cae71a9}{ompl\-::base\-::\-State $\ast$ {\bfseries \-Stabilize} (const ompl\-::base\-::\-State $\ast$start\-State)}\label{class_controller_aba227cad46f73fab5fcf37b41cae71a9}
+\begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a50a65edd2cf9fcce0cca465cbc3d527d}{\hyperlink{class_controller_a50a65edd2cf9fcce0cca465cbc3d527d}{\-Controller} (const ompl\-::base\-::\-State $\ast$goal, const std\-::vector$<$ ompl\-::base\-::\-State $\ast$ $>$ \&nominal\-Xs, const std\-::vector$<$ ompl\-::control\-::\-Control $\ast$ $>$ \&nominal\-Us, const firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_controller_a50a65edd2cf9fcce0cca465cbc3d527d}
 
-\item 
-\hypertarget{class_controller_ab80efffa3b03aa4d1d10c0bf82675201}{bool {\bfseries is\-Terminated} (const ompl\-::base\-::\-State $\ast$state, const size\-\_\-t t)}\label{class_controller_ab80efffa3b03aa4d1d10c0bf82675201}
+\begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\-Execute} (const ompl\-::base\-::\-State $\ast$start\-State, ompl\-::base\-::\-State $\ast$end\-State, ompl\-::base\-::\-Cost \&execution\-Cost, bool construction\-Mode=true)
+\begin{DoxyCompactList}\small\item\em \-Execute the controller i.\-e. take the system from start to end state of edge. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_aba227cad46f73fab5fcf37b41cae71a9}{virtual ompl\-::base\-::\-State $\ast$ \hyperlink{class_controller_aba227cad46f73fab5fcf37b41cae71a9}{\-Stabilize} (const ompl\-::base\-::\-State $\ast$start\-State)}\label{class_controller_aba227cad46f73fab5fcf37b41cae71a9}
 
-\item 
-ompl\-::base\-::\-State $\ast$ \hyperlink{class_controller_ad7c50856efc6fa7855c7cad4c9bb2352}{\-Evolve} (const ompl\-::base\-::\-State $\ast$state, size\-\_\-t t, bool is\-Construction\-Mode)
-\item 
-\hypertarget{class_controller_a848b1e5a3dc6d36c3ede121b7461d896}{ompl\-::base\-::\-State $\ast$ {\bfseries get\-Goal} ()}\label{class_controller_a848b1e5a3dc6d36c3ede121b7461d896}
+\begin{DoxyCompactList}\small\item\em \-Stabilize the system to an existing \hyperlink{class_f_i_r_m}{\-F\-I\-R\-M} node. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_ab80efffa3b03aa4d1d10c0bf82675201}{virtual bool \hyperlink{class_controller_ab80efffa3b03aa4d1d10c0bf82675201}{is\-Terminated} (const ompl\-::base\-::\-State $\ast$state, const size\-\_\-t t)}\label{class_controller_ab80efffa3b03aa4d1d10c0bf82675201}
 
-\item 
-\hypertarget{class_controller_ac0b9c339df7157c73d61b7064f88483c}{void {\bfseries set\-Space\-Information} (\-Space\-Information\-Ptr si)}\label{class_controller_ac0b9c339df7157c73d61b7064f88483c}
+\begin{DoxyCompactList}\small\item\em \-Check whether the controller has satisfied its termination condition for e.\-g. reached target state. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a64c3c47732f138326490303858133ae7}{virtual void \hyperlink{class_controller_a64c3c47732f138326490303858133ae7}{\-Evolve} (const ompl\-::base\-::\-State $\ast$state, size\-\_\-t t, ompl\-::base\-::\-State $\ast$next\-State)}\label{class_controller_a64c3c47732f138326490303858133ae7}
 
-\item 
-\hypertarget{class_controller_acd39b9995176be2ac40b286c0cdaeabd}{bool {\bfseries is\-Valid} ()}\label{class_controller_acd39b9995176be2ac40b286c0cdaeabd}
+\begin{DoxyCompactList}\small\item\em \-Evolve the controller over a single time step, i.\-e. apply control, predict, get observation, update. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a848b1e5a3dc6d36c3ede121b7461d896}{ompl\-::base\-::\-State $\ast$ \hyperlink{class_controller_a848b1e5a3dc6d36c3ede121b7461d896}{get\-Goal} ()}\label{class_controller_a848b1e5a3dc6d36c3ede121b7461d896}
 
-\item 
-\hypertarget{class_controller_a2aa89a4cd76ba7fb6ad717d608b8c355}{size\-\_\-t {\bfseries \-Length} ()}\label{class_controller_a2aa89a4cd76ba7fb6ad717d608b8c355}
+\begin{DoxyCompactList}\small\item\em get the controllers goal state \end{DoxyCompactList}\item 
+\hypertarget{class_controller_ac0b9c339df7157c73d61b7064f88483c}{void \hyperlink{class_controller_ac0b9c339df7157c73d61b7064f88483c}{set\-Space\-Information} (\-Space\-Information\-Ptr si)}\label{class_controller_ac0b9c339df7157c73d61b7064f88483c}
 
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em \-Set the space information of the planning problem. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a2aa89a4cd76ba7fb6ad717d608b8c355}{size\-\_\-t \hyperlink{class_controller_a2aa89a4cd76ba7fb6ad717d608b8c355}{\-Length} ()}\label{class_controller_a2aa89a4cd76ba7fb6ad717d608b8c355}
+
+\begin{DoxyCompactList}\small\item\em \-Return the number of linear systems. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{\-Static \-Public \-Member \-Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_controller_a665b0a9cab38c11e575681944e2c8d8a}{static void {\bfseries set\-Node\-Reached\-Angle} (double angle)}\label{class_controller_a665b0a9cab38c11e575681944e2c8d8a}
+\hypertarget{class_controller_a665b0a9cab38c11e575681944e2c8d8a}{static void \hyperlink{class_controller_a665b0a9cab38c11e575681944e2c8d8a}{set\-Node\-Reached\-Angle} (double angle)}\label{class_controller_a665b0a9cab38c11e575681944e2c8d8a}
 
+\begin{DoxyCompactList}\small\item\em \-Set the node\-Reached angle. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a5d394a75a6d1cf325fda099b23c91a2f}{static void \hyperlink{class_controller_a5d394a75a6d1cf325fda099b23c91a2f}{set\-Node\-Reached\-Distance} (double d)}\label{class_controller_a5d394a75a6d1cf325fda099b23c91a2f}
+
+\begin{DoxyCompactList}\small\item\em \-Set the distance at which we assume the robot has reached a target node. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a2e27a2fbd5d1c83d918e05da91302863}{static void \hyperlink{class_controller_a2e27a2fbd5d1c83d918e05da91302863}{set\-Max\-Tries} (double maxtries)}\label{class_controller_a2e27a2fbd5d1c83d918e05da91302863}
+
+\begin{DoxyCompactList}\small\item\em \-The max number of attempts to align with node. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_aacd25b8b49bcec685b0ec284bb9694d6}{static void \hyperlink{class_controller_aacd25b8b49bcec685b0ec284bb9694d6}{set\-Max\-Trajectory\-Deviation} (double dev)}\label{class_controller_aacd25b8b49bcec685b0ec284bb9694d6}
+
+\begin{DoxyCompactList}\small\item\em \-Set the maximum trajectory deviation before which to replan. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Private \-Attributes}
+\begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_controller_a5d394a75a6d1cf325fda099b23c91a2f}{static void {\bfseries set\-Node\-Reached\-Distance} (double d)}\label{class_controller_a5d394a75a6d1cf325fda099b23c91a2f}
+\hypertarget{class_controller_a34912a3b87662649231e2d096882c454}{\-Space\-Information\-Ptr \hyperlink{class_controller_a34912a3b87662649231e2d096882c454}{si\-\_\-}}\label{class_controller_a34912a3b87662649231e2d096882c454}
 
+\begin{DoxyCompactList}\small\item\em \-The pointer to the space information. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_acb68b603afc759b4e62b8c6db8125671}{std\-::vector$<$ \hyperlink{class_linear_system}{\-Linear\-System} $>$ \hyperlink{class_controller_acb68b603afc759b4e62b8c6db8125671}{lss\-\_\-}}\label{class_controller_acb68b603afc759b4e62b8c6db8125671}
+
+\begin{DoxyCompactList}\small\item\em \-The vector of linear systems. \-The linear systems basically represent the \-Kalman \-Gain and \-Feedback \-Gain at each point in the open loop trajectory. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a040da727bdc40ab69f0c3e4033bc9df9}{\-Separated\-Controller\-Type \hyperlink{class_controller_a040da727bdc40ab69f0c3e4033bc9df9}{separated\-Controller\-\_\-}}\label{class_controller_a040da727bdc40ab69f0c3e4033bc9df9}
+
+\begin{DoxyCompactList}\small\item\em \-The separated controller used to generate the commands that are sent to the robot. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a9ff37d34a8a9a20f606c501d2ab5cb2e}{\-Filter\-Type \hyperlink{class_controller_a9ff37d34a8a9a20f606c501d2ab5cb2e}{filter\-\_\-}}\label{class_controller_a9ff37d34a8a9a20f606c501d2ab5cb2e}
+
+\begin{DoxyCompactList}\small\item\em \-The filter used to estimate the robot belief. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a4e5e3c0828c9e0d216e7d53f3625d9b4}{ompl\-::base\-::\-State $\ast$ \hyperlink{class_controller_a4e5e3c0828c9e0d216e7d53f3625d9b4}{goal\-\_\-}}\label{class_controller_a4e5e3c0828c9e0d216e7d53f3625d9b4}
+
+\begin{DoxyCompactList}\small\item\em \-The target node to which the controller drives the robot. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_adb2235b65db786dbd287e0b57a42b959}{int \hyperlink{class_controller_adb2235b65db786dbd287e0b57a42b959}{tries\-\_\-}}\label{class_controller_adb2235b65db786dbd287e0b57a42b959}
+
+\begin{DoxyCompactList}\small\item\em \-Tracks the current number of time steps the robot has executed to align with goal node. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_aeddadf542e253ff266e596eb0574c3de}{double \hyperlink{class_controller_aeddadf542e253ff266e596eb0574c3de}{max\-Exec\-Time\-\_\-}}\label{class_controller_aeddadf542e253ff266e596eb0574c3de}
+
+\begin{DoxyCompactList}\small\item\em \-The maximum time for which a controller can be executed. \-We need this bound as we cannot let a controller execute indefinitely. \-This avoids situations when the robot has deviated or collided and the current controller is no longer capable of driving the robot to the goal. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a1288c6ee79e962bba7421ffb59bae047}{bool \hyperlink{class_controller_a1288c6ee79e962bba7421ffb59bae047}{debug\-\_\-}}\label{class_controller_a1288c6ee79e962bba7421ffb59bae047}
+
+\begin{DoxyCompactList}\small\item\em \-The debug mode, if true, controller is verbose. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Static \-Private \-Attributes}
+\begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_controller_a2e27a2fbd5d1c83d918e05da91302863}{static void {\bfseries set\-Max\-Tries} (double maxtries)}\label{class_controller_a2e27a2fbd5d1c83d918e05da91302863}
+\hypertarget{class_controller_a93ec5b0a3ae4e7229cb63f659e1b6e1d}{static double \hyperlink{class_controller_a93ec5b0a3ae4e7229cb63f659e1b6e1d}{node\-Reached\-Angle\-\_\-} = -\/1}\label{class_controller_a93ec5b0a3ae4e7229cb63f659e1b6e1d}
 
-\end{DoxyCompactItemize}
-\subsubsection*{template$<$class \-Separated\-Controller\-Type, class \-Filter\-Type$>$ class Controller$<$ Separated\-Controller\-Type, Filter\-Type $>$}
+\begin{DoxyCompactList}\small\item\em \-If the robot's heading is deviated from the target heading by less than the node\-Reached\-Angle\-\_\- then the robot is assumed to have alligned with the target heading. \-Used for node reachability checking. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a2688f277c2087c527c67eec19b2a3c70}{static double \hyperlink{class_controller_a2688f277c2087c527c67eec19b2a3c70}{node\-Reached\-Distance\-\_\-} = -\/1}\label{class_controller_a2688f277c2087c527c67eec19b2a3c70}
+
+\begin{DoxyCompactList}\small\item\em \-The distance at which we assume the robot has reached a target node. \-Reaching the exact node location is almost impractical for real systems. \-We assume the robot has reached if it is within a certain radius of the target. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a430b93daf349b2172311924d69b44c08}{static double \hyperlink{class_controller_a430b93daf349b2172311924d69b44c08}{max\-Tries\-\_\-} = -\/1}\label{class_controller_a430b93daf349b2172311924d69b44c08}
+
+\begin{DoxyCompactList}\small\item\em \-The max number of tries to align with target node. \end{DoxyCompactList}\item 
+\hypertarget{class_controller_a1999422f369674236a5ae9b83ef6a6b1}{static double \hyperlink{class_controller_a1999422f369674236a5ae9b83ef6a6b1}{nominal\-Traj\-Deviation\-Threshold\-\_\-} = -\/1}\label{class_controller_a1999422f369674236a5ae9b83ef6a6b1}
+
+\begin{DoxyCompactList}\small\item\em \-The maximum deviation from the nominal trajectory beyond which the robot must replan. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
+\subsection{\-Detailed \-Description}
+\subsubsection*{template$<$class \-Separated\-Controller\-Type, class \-Filter\-Type$>$class Controller$<$ Separated\-Controller\-Type, Filter\-Type $>$}
+
+\-Base class for \hyperlink{class_controller}{\-Controller}. \-A controller's task is to use the filter to estimate the belief robot's state and generate control commands using the separated controller. \-For example by fusing an \-L\-Q\-R and \-Kalman \-Filter we generate an \-L\-Q\-G controller. 
 
 \subsection{\-Member \-Function \-Documentation}
-\hypertarget{class_controller_ad7c50856efc6fa7855c7cad4c9bb2352}{\index{\-Controller@{\-Controller}!\-Evolve@{\-Evolve}}
-\index{\-Evolve@{\-Evolve}!Controller@{\-Controller}}
-\subsubsection[{\-Evolve}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Separated\-Controller\-Type , class Filter\-Type $>$ ompl\-::base\-::\-State $\ast$ {\bf \-Controller}$<$ \-Separated\-Controller\-Type, \-Filter\-Type $>$\-::{\bf \-Evolve} (
-\begin{DoxyParamCaption}
-\item[{const ompl\-::base\-::\-State $\ast$}]{state, }
-\item[{size\-\_\-t}]{t, }
-\item[{bool}]{is\-Construction\-Mode}
-\end{DoxyParamCaption}
-)}}\label{class_controller_ad7c50856efc6fa7855c7cad4c9bb2352}
-if(!is\-Construction\-Mode) \{ for(int i=0; i$<$z.\-n\-\_\-rows/singleobservationdim; i++) \{ int marker\-I\-D = z\mbox{[}i$\ast$singleobservationdim\mbox{]}; cout$<$$<$\char`\"{}\-Checking if marker I\-D \-:\char`\"{} $<$$<$marker\-I\-D $<$$<$\char`\"{} Is an obstacle marker\char`\"{}$<$$<$endl; if(this-\/$>$\-Get\-M\-P\-Problem()-\/$>$\-Is\-Obstacle\-Marker(marker\-I\-D)) \{ add obstacle to environment if it doesn't already exist flag that you have observed an obstacle marker cout$<$$<$\char`\"{}\-Marker I\-D \-:\char`\"{}$<$$<$marker\-I\-D$<$$<$\char`\"{} is an obstacle\char`\"{}$<$$<$endl; if(this-\/$>$\-Get\-M\-P\-Problem()-\/$>$\-Add\-Obstacle(marker\-I\-D)) m\-\_\-obstacle\-Marker\-Observed = true; \} \} \}\hypertarget{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\index{\-Controller@{\-Controller}!\-Execute@{\-Execute}}
+\hypertarget{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\index{\-Controller@{\-Controller}!\-Execute@{\-Execute}}
 \index{\-Execute@{\-Execute}!Controller@{\-Controller}}
 \subsubsection[{\-Execute}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Separated\-Controller\-Type , class Filter\-Type $>$ bool {\bf \-Controller}$<$ \-Separated\-Controller\-Type, \-Filter\-Type $>$\-::{\bf \-Execute} (
 \begin{DoxyParamCaption}
@@ -95,8 +154,12 @@ if(!is\-Construction\-Mode) \{ for(int i=0; i$<$z.\-n\-\_\-rows/singleobservatio
 \item[{ompl\-::base\-::\-Cost \&}]{execution\-Cost, }
 \item[{bool}]{construction\-Mode = {\ttfamily true}}
 \end{DoxyParamCaption}
-)}}\label{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}
-\-H\-O\-W \-T\-O \-S\-E\-T \-I\-N\-I\-T\-A\-L \-V\-A\-L\-U\-E \-O\-F \-C\-O\-S\-T cost = 1 -\/ $>$ for time based only if time per execution is \char`\"{}1\char`\"{} cost = 0.\-01 -\/$>$ for covariance based
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}
+
+
+\-Execute the controller i.\-e. take the system from start to end state of edge. 
+
+\-H\-O\-W \-T\-O \-S\-E\-T \-I\-N\-I\-T\-A\-L \-V\-A\-L\-U\-E \-O\-F \-C\-O\-S\-T cost = 1 ,for time based only if time per execution is \char`\"{}1\char`\"{} cost = 0.\-01 , for covariance based
 
 \-Increment cost by\-: -\/$>$ 0.\-01 for time based -\/$>$ trace(\-Covariance) for \hyperlink{class_f_i_r_m}{\-F\-I\-R\-M}
 
