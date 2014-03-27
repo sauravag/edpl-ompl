@@ -38,13 +38,10 @@
 #include <cassert>
 
 
-//arma::mat dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R);
-
-//arma::mat generate_gain_with_dare(const arma::mat _A, const arma::mat _B, const arma::mat _Q, const arma::mat _R);
-
 /** \brief Solver for the Differential Algebraic Riccatti Equation. */
-inline arma::mat dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R) {
-using namespace arma;
+inline arma::mat dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R) 
+{
+  using namespace arma;
 
   int n = _A.n_rows, m = _B.n_cols;
   mat Z11(n,n);
@@ -113,8 +110,10 @@ using namespace arma;
   return U21 * inv(U11);
 }
 
-inline arma::mat generate_gain_with_dare(const arma::mat _A, const arma::mat _B, const arma::mat _Q, const arma::mat _R) {
-using namespace arma;
+/** \brief Generate a gain using the DARE solver */
+inline arma::mat generate_gain_with_dare(const arma::mat _A, const arma::mat _B, const arma::mat _Q, const arma::mat _R) 
+{
+  using namespace arma;
 
   int n = _A.n_rows, m = _B.n_cols;
   mat S(n,n);
@@ -124,11 +123,9 @@ using namespace arma;
   S = dare(_A, _B, _Q, _R);
   temp1 = trans(_B) * S;
   temp2 = _R + temp1 * _B;
-  //should it be inv instead of trans? are they the same?
-  //temp1 = trans(temp2) * temp1;
   temp1 = inv(temp2) * temp1;
+  
   return (temp1 * _A);
-
 }
 
 #endif
