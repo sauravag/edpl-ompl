@@ -102,7 +102,7 @@ virtual bool \hyperlink{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\-Ex
 \begin{DoxyCompactList}\small\item\em \-The pointer to the space information. \end{DoxyCompactList}\item 
 \hypertarget{class_controller_acb68b603afc759b4e62b8c6db8125671}{std\-::vector$<$ \hyperlink{class_linear_system}{\-Linear\-System} $>$ \hyperlink{class_controller_acb68b603afc759b4e62b8c6db8125671}{lss\-\_\-}}\label{class_controller_acb68b603afc759b4e62b8c6db8125671}
 
-\begin{DoxyCompactList}\small\item\em \-The vector of linear systems. \-The linear systems basically represent the \-Kalman \-Gain and \-Feedback \-Gain at each point in the open loop trajectory. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em \-The vector of linear systems. \-The linear systems basically represent the system state at a point in the open loop trajectory. \end{DoxyCompactList}\item 
 \hypertarget{class_controller_a040da727bdc40ab69f0c3e4033bc9df9}{\-Separated\-Controller\-Type \hyperlink{class_controller_a040da727bdc40ab69f0c3e4033bc9df9}{separated\-Controller\-\_\-}}\label{class_controller_a040da727bdc40ab69f0c3e4033bc9df9}
 
 \begin{DoxyCompactList}\small\item\em \-The separated controller used to generate the commands that are sent to the robot. \end{DoxyCompactList}\item 
@@ -157,8 +157,6 @@ virtual bool \hyperlink{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\-Ex
 
 
 \-Execute the controller i.\-e. take the system from start to end state of edge. 
-
-\-H\-O\-W \-T\-O \-S\-E\-T \-I\-N\-I\-T\-A\-L \-V\-A\-L\-U\-E \-O\-F \-C\-O\-S\-T cost = 1 ,for time based only if time per execution is \char`\"{}1\char`\"{} cost = 0.\-01 , for covariance based
 
 \-Increment cost by\-: -\/$>$ 0.\-01 for time based -\/$>$ trace(\-Covariance) for \hyperlink{class_f_i_r_m}{\-F\-I\-R\-M}
 

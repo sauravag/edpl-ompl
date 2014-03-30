@@ -1,6 +1,15 @@
 \hypertarget{class_linear_system}{\section{\-Linear\-System \-Class \-Reference}
 \label{class_linear_system}\index{\-Linear\-System@{\-Linear\-System}}
 }
+
+
+\-The linear system class.  
+
+
+
+
+{\ttfamily \#include $<$\-Linear\-System.\-h$>$}
+
 \subsection*{\-Public \-Types}
 \begin{DoxyCompactItemize}
 \item 
@@ -41,60 +50,71 @@
 \subsection*{\-Public \-Member \-Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_linear_system_a6f05277076a4302dbcfa9646232871dc}{{\bfseries \-Linear\-System} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, \-Motion\-Model\-Pointer motion\-Model, \-Observation\-Model\-Pointer observation\-Model)}\label{class_linear_system_a6f05277076a4302dbcfa9646232871dc}
+\hypertarget{class_linear_system_a3f75bddc5fb799e7daab008f415bd1fa}{\hyperlink{class_linear_system_a3f75bddc5fb799e7daab008f415bd1fa}{\-Linear\-System} ()}\label{class_linear_system_a3f75bddc5fb799e7daab008f415bd1fa}
 
-\item 
-\hypertarget{class_linear_system_a428c800b858ed6c6d63230c64e470208}{{\bfseries \-Linear\-System} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, \-Motion\-Model\-Pointer motion\-Model, \-Observation\-Model\-Pointer observation\-Model)}\label{class_linear_system_a428c800b858ed6c6d63230c64e470208}
+\begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_a6f05277076a4302dbcfa9646232871dc}{\hyperlink{class_linear_system_a6f05277076a4302dbcfa9646232871dc}{\-Linear\-System} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, \-Motion\-Model\-Pointer motion\-Model, \-Observation\-Model\-Pointer observation\-Model)}\label{class_linear_system_a6f05277076a4302dbcfa9646232871dc}
 
-\item 
-\hypertarget{class_linear_system_a7d556441c0f68f6ccfdde32b72f888b6}{ompl\-::base\-::\-State $\ast$ {\bfseries get\-X} ()}\label{class_linear_system_a7d556441c0f68f6ccfdde32b72f888b6}
+\begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_a428c800b858ed6c6d63230c64e470208}{\hyperlink{class_linear_system_a428c800b858ed6c6d63230c64e470208}{\-Linear\-System} (const ompl\-::base\-::\-State $\ast$state, const ompl\-::control\-::\-Control $\ast$control, const \-Observation\-Type \&obs, \-Motion\-Model\-Pointer motion\-Model, \-Observation\-Model\-Pointer observation\-Model)}\label{class_linear_system_a428c800b858ed6c6d63230c64e470208}
 
-\item 
-\hypertarget{class_linear_system_aa9b7cdb3f9e09902fbe9b1d65d932edb}{arma\-::mat {\bfseries get\-A} () const }\label{class_linear_system_aa9b7cdb3f9e09902fbe9b1d65d932edb}
+\begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_a7d556441c0f68f6ccfdde32b72f888b6}{ompl\-::base\-::\-State $\ast$ \hyperlink{class_linear_system_a7d556441c0f68f6ccfdde32b72f888b6}{get\-X} ()}\label{class_linear_system_a7d556441c0f68f6ccfdde32b72f888b6}
 
-\item 
-\hypertarget{class_linear_system_af1a0b99cb2b4e30eb61b1bee328fb0bd}{arma\-::mat {\bfseries get\-B} () const }\label{class_linear_system_af1a0b99cb2b4e30eb61b1bee328fb0bd}
+\begin{DoxyCompactList}\small\item\em \-Return the state at which this system was constructed. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_aa9b7cdb3f9e09902fbe9b1d65d932edb}{arma\-::mat \hyperlink{class_linear_system_aa9b7cdb3f9e09902fbe9b1d65d932edb}{get\-A} () const }\label{class_linear_system_aa9b7cdb3f9e09902fbe9b1d65d932edb}
 
-\item 
-\hypertarget{class_linear_system_aaadd9d063ecdb4afb67ae4522cf921a7}{arma\-::mat {\bfseries get\-G} () const }\label{class_linear_system_aaadd9d063ecdb4afb67ae4522cf921a7}
+\begin{DoxyCompactList}\small\item\em \-Get the state transition jacobian. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_af1a0b99cb2b4e30eb61b1bee328fb0bd}{arma\-::mat \hyperlink{class_linear_system_af1a0b99cb2b4e30eb61b1bee328fb0bd}{get\-B} () const }\label{class_linear_system_af1a0b99cb2b4e30eb61b1bee328fb0bd}
 
-\item 
-\hypertarget{class_linear_system_ab95733398800308c2e69522d37f2a005}{arma\-::mat {\bfseries get\-Q} () const }\label{class_linear_system_ab95733398800308c2e69522d37f2a005}
+\begin{DoxyCompactList}\small\item\em \-Get the control jacobian for the state transition. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_aaadd9d063ecdb4afb67ae4522cf921a7}{arma\-::mat \hyperlink{class_linear_system_aaadd9d063ecdb4afb67ae4522cf921a7}{get\-G} () const }\label{class_linear_system_aaadd9d063ecdb4afb67ae4522cf921a7}
 
-\item 
-\hypertarget{class_linear_system_a678fe164168013e7a4a4fc97e6716fa6}{arma\-::mat {\bfseries get\-H} () const }\label{class_linear_system_a678fe164168013e7a4a4fc97e6716fa6}
+\begin{DoxyCompactList}\small\item\em \-Get the noise jacobian in the state transition. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_ab95733398800308c2e69522d37f2a005}{arma\-::mat \hyperlink{class_linear_system_ab95733398800308c2e69522d37f2a005}{get\-Q} () const }\label{class_linear_system_ab95733398800308c2e69522d37f2a005}
 
-\item 
-\hypertarget{class_linear_system_a4b69f2e4c7b6144c6abb8abf725ce063}{arma\-::mat {\bfseries get\-M} () const }\label{class_linear_system_a4b69f2e4c7b6144c6abb8abf725ce063}
+\begin{DoxyCompactList}\small\item\em \-Get the process noise covariance for the state transition. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_a678fe164168013e7a4a4fc97e6716fa6}{arma\-::mat \hyperlink{class_linear_system_a678fe164168013e7a4a4fc97e6716fa6}{get\-H} () const }\label{class_linear_system_a678fe164168013e7a4a4fc97e6716fa6}
 
-\item 
-\hypertarget{class_linear_system_aaad4f742dcb61f776d5de952977a745e}{arma\-::mat {\bfseries get\-R} () const }\label{class_linear_system_aaad4f742dcb61f776d5de952977a745e}
+\begin{DoxyCompactList}\small\item\em \-Get the jacobian for the observation. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_a4b69f2e4c7b6144c6abb8abf725ce063}{arma\-::mat \hyperlink{class_linear_system_a4b69f2e4c7b6144c6abb8abf725ce063}{get\-M} () const }\label{class_linear_system_a4b69f2e4c7b6144c6abb8abf725ce063}
 
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em \-Get the observation noise jacobian. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_aaad4f742dcb61f776d5de952977a745e}{arma\-::mat \hyperlink{class_linear_system_aaad4f742dcb61f776d5de952977a745e}{get\-R} () const }\label{class_linear_system_aaad4f742dcb61f776d5de952977a745e}
+
+\begin{DoxyCompactList}\small\item\em \-Get the observation noise covariance. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{\-Private \-Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_linear_system_a0c0d8d1a986bd267171d8c821e173d1e}{ompl\-::base\-::\-State $\ast$ {\bfseries x\-\_\-}}\label{class_linear_system_a0c0d8d1a986bd267171d8c821e173d1e}
+\hypertarget{class_linear_system_a0c0d8d1a986bd267171d8c821e173d1e}{ompl\-::base\-::\-State $\ast$ \hyperlink{class_linear_system_a0c0d8d1a986bd267171d8c821e173d1e}{x\-\_\-}}\label{class_linear_system_a0c0d8d1a986bd267171d8c821e173d1e}
 
-\item 
-\hypertarget{class_linear_system_a5b5cb60bca40f61e6b4a6ac3afe56115}{const ompl\-::control\-::\-Control $\ast$ {\bfseries u\-\_\-}}\label{class_linear_system_a5b5cb60bca40f61e6b4a6ac3afe56115}
+\begin{DoxyCompactList}\small\item\em \-The state at which the linear system is constructed. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_a5b5cb60bca40f61e6b4a6ac3afe56115}{const ompl\-::control\-::\-Control $\ast$ \hyperlink{class_linear_system_a5b5cb60bca40f61e6b4a6ac3afe56115}{u\-\_\-}}\label{class_linear_system_a5b5cb60bca40f61e6b4a6ac3afe56115}
 
-\item 
-\hypertarget{class_linear_system_ab3909105492e1b8f55919584d9f99a03}{\-Motion\-Noise\-Type {\bfseries w\-\_\-}}\label{class_linear_system_ab3909105492e1b8f55919584d9f99a03}
+\begin{DoxyCompactList}\small\item\em \-The control applied at the internal state. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_ab3909105492e1b8f55919584d9f99a03}{\-Motion\-Noise\-Type \hyperlink{class_linear_system_ab3909105492e1b8f55919584d9f99a03}{w\-\_\-}}\label{class_linear_system_ab3909105492e1b8f55919584d9f99a03}
 
-\item 
-\hypertarget{class_linear_system_a41f05f9ef0c2e5e69a0b0c2d50d983bb}{\-Obs\-Noise\-Type {\bfseries v\-\_\-}}\label{class_linear_system_a41f05f9ef0c2e5e69a0b0c2d50d983bb}
+\begin{DoxyCompactList}\small\item\em \-The motion noise. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_a41f05f9ef0c2e5e69a0b0c2d50d983bb}{\-Obs\-Noise\-Type \hyperlink{class_linear_system_a41f05f9ef0c2e5e69a0b0c2d50d983bb}{v\-\_\-}}\label{class_linear_system_a41f05f9ef0c2e5e69a0b0c2d50d983bb}
 
-\item 
-\hypertarget{class_linear_system_a8d402083ec5c55357a11ec8e780bcf20}{\-Observation\-Type {\bfseries z\-\_\-}}\label{class_linear_system_a8d402083ec5c55357a11ec8e780bcf20}
+\begin{DoxyCompactList}\small\item\em \-The observation noise. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_a8d402083ec5c55357a11ec8e780bcf20}{\-Observation\-Type \hyperlink{class_linear_system_a8d402083ec5c55357a11ec8e780bcf20}{z\-\_\-}}\label{class_linear_system_a8d402083ec5c55357a11ec8e780bcf20}
 
-\item 
-\hypertarget{class_linear_system_a6ae00f368bfa21a8dfe0d6855bfc1322}{\-Motion\-Model\-Pointer {\bfseries motion\-Model\-\_\-}}\label{class_linear_system_a6ae00f368bfa21a8dfe0d6855bfc1322}
+\begin{DoxyCompactList}\small\item\em \-Observation at the state. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_a6ae00f368bfa21a8dfe0d6855bfc1322}{\-Motion\-Model\-Pointer \hyperlink{class_linear_system_a6ae00f368bfa21a8dfe0d6855bfc1322}{motion\-Model\-\_\-}}\label{class_linear_system_a6ae00f368bfa21a8dfe0d6855bfc1322}
 
-\item 
-\hypertarget{class_linear_system_a6aacc355010106de6f65f66c8dfa301b}{\-Observation\-Model\-Pointer {\bfseries observation\-Model\-\_\-}}\label{class_linear_system_a6aacc355010106de6f65f66c8dfa301b}
+\begin{DoxyCompactList}\small\item\em \-Pointer to the motion model that models the state transition. \end{DoxyCompactList}\item 
+\hypertarget{class_linear_system_a6aacc355010106de6f65f66c8dfa301b}{\-Observation\-Model\-Pointer \hyperlink{class_linear_system_a6aacc355010106de6f65f66c8dfa301b}{observation\-Model\-\_\-}}\label{class_linear_system_a6aacc355010106de6f65f66c8dfa301b}
 
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em \-Pointer to the observation model that models the sensor measurement. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\-The linear system class. 
+
+\begin{DoxyParagraph}{\-Description of the \-Linear \-System \-Class}
+\-A \-Linear \-System is a construct which is used to store information about the system at a given state in the open loop trajectory. \-It is used to compute and retrieve the \-Jacobians at the particular state. and 
+\end{DoxyParagraph}
 
 
 \-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}

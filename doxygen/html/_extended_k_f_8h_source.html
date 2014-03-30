@@ -140,22 +140,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00061"></a>00061 
 <a name="l00064"></a>00064         <span class="keywordtype">void</span> <a class="code" href="class_extended_k_f.html#aa622a74dcda7a4abb78334df8c850a3e" title="Gets as input belief and control, returns predicted belief if control were to be applied to the robot...">Predict</a>(<span class="keyword">const</span> ompl::base::State *belief,
 <a name="l00065"></a>00065                                 <span class="keyword">const</span> ompl::control::Control* control,
-<a name="l00066"></a>00066                                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; ls,
+<a name="l00066"></a>00066                                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html" title="The linear system class.">LinearSystem</a>&amp; ls,
 <a name="l00067"></a>00067                                 ompl::base::State *predictedState) ;
 <a name="l00068"></a>00068 
 <a name="l00070"></a>00070         <span class="keywordtype">void</span> <a class="code" href="class_extended_k_f.html#ae89c058d2f53b4740957d3234110ad50" title="Gets as input belief and observation, returns the updated state of the robot. Also called the Posteri...">Update</a>(<span class="keyword">const</span> ompl::base::State *belief,
 <a name="l00071"></a>00071                 <span class="keyword">const</span> ObservationType&amp; obs,
-<a name="l00072"></a>00072                 <span class="keyword">const</span>   <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; ls,
+<a name="l00072"></a>00072                 <span class="keyword">const</span>   <a class="code" href="class_linear_system.html" title="The linear system class.">LinearSystem</a>&amp; ls,
 <a name="l00073"></a>00073                 ompl::base::State *updatedState) ;
 <a name="l00074"></a>00074 
 <a name="l00077"></a>00077         <span class="keywordtype">void</span> <a class="code" href="class_extended_k_f.html#abac2469798813a08cb9d482509bc6dce" title="Evolves the robot&#39;s belief on the input control, previous state and new observation. It first calls predict and then update.">Evolve</a>(<span class="keyword">const</span> ompl::base::State *belief,
 <a name="l00078"></a>00078                 <span class="keyword">const</span> ompl::control::Control* control,
 <a name="l00079"></a>00079                 <span class="keyword">const</span> ObservationType&amp; obs,
-<a name="l00080"></a>00080                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; lsPred,
-<a name="l00081"></a>00081                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; lsUpdate,
+<a name="l00080"></a>00080                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html" title="The linear system class.">LinearSystem</a>&amp; lsPred,
+<a name="l00081"></a>00081                 <span class="keyword">const</span> <a class="code" href="class_linear_system.html" title="The linear system class.">LinearSystem</a>&amp; lsUpdate,
 <a name="l00082"></a>00082                 ompl::base::State *evolvedState) ;
 <a name="l00083"></a>00083 
-<a name="l00086"></a><a class="code" href="class_extended_k_f.html#a2aaf37aae5d4105c384f88b6c948e4cb">00086</a>         arma::mat <a class="code" href="class_extended_k_f.html#a2aaf37aae5d4105c384f88b6c948e4cb" title="Compute the covariance for a given linear system. A linear system describes a robot&#39;s state at a poin...">computeStationaryCovariance</a> (<span class="keyword">const</span> <a class="code" href="class_linear_system.html">LinearSystem</a>&amp; ls) {}
+<a name="l00086"></a><a class="code" href="class_extended_k_f.html#a2aaf37aae5d4105c384f88b6c948e4cb">00086</a>         arma::mat <a class="code" href="class_extended_k_f.html#a2aaf37aae5d4105c384f88b6c948e4cb" title="Compute the covariance for a given linear system. A linear system describes a robot&#39;s state at a poin...">computeStationaryCovariance</a> (<span class="keyword">const</span> <a class="code" href="class_linear_system.html" title="The linear system class.">LinearSystem</a>&amp; ls) {}
 <a name="l00087"></a>00087 
 <a name="l00088"></a>00088 };
 <a name="l00089"></a>00089 
@@ -180,7 +180,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 27 2014 17:36:55 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Mar 29 2014 20:53:17 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

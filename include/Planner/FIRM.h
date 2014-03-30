@@ -68,14 +68,13 @@ namespace base
 /**
    @anchor FIRM
    @par Short description
+   Feedback Information RoadMap is a method that generates a graph in belief space 
+   and returns a policy that guides that robot from the start to goal.
 
    @par External documentation
-   L.E. Kavraki, P.Švestka, J.-C. Latombe, and M.H. Overmars,
-   Probabilistic roadmaps for path planning in high-dimensional configuration spaces,
-   <em>IEEE Trans. on Robotics and Automation</em>, vol. 12, pp. 566–580, Aug. 1996.
-   DOI: <a href="http://dx.doi.org/10.1109/70.508439">10.1109/70.508439</a><br>
-   <a href="http://ieeexplore.ieee.org/ielx4/70/11078/00508439.pdf?tp=&arnumber=508439&isnumber=11078">[PDF]</a>
-   <a href="http://www.kavrakilab.org/robotics/prm.html">[more]</a>
+   Please refer to the publications at Ali's research page.
+  
+   <a href="http://www.mit.edu/~aliagha/Web/publications.htm">[Link to Ali Agha's publications]</a>
 */
 
 /** \brief Feedback Information RoadMap planner */
@@ -107,17 +106,9 @@ public:
     /**
      @brief The underlying roadmap graph.
 
-     @par Any BGL graph representation could be used here. Because we
-     expect the roadmap to be sparse (m<n^2), an adjacency_list is more
-     appropriate than an adjacency_matrix.
-
-     @par Obviously, a ompl::base::State* vertex property is required.
-     The incremental connected components algorithm requires
-     vertex_predecessor_t and vertex_rank_t properties.
-     If boost::vecS is not used for vertex storage, then there must also
-     be a boost:vertex_index_t property manually added.
-
-     @par Edges are directed and have a weight property.
+     @par Edges are directed and have a weight property called FIRMWeight. This weight property 
+          stores information about the edge controller identification, transition probability and 
+          execution cost.
      */
     typedef boost::adjacency_list <
         boost::vecS, boost::vecS, boost::bidirectionalS,
@@ -138,16 +129,11 @@ public:
     typedef boost::shared_ptr< ompl::NearestNeighbors<Vertex> > RoadmapNeighbors;
 
     /** @brief A function returning the milestones that should be
-     * attempted to connect to
-     *
-     * @note Can't use the prefered boost::function syntax here because
-     * the Python bindings don't like it.
+     *         attempted to connect to
      */
-    typedef boost::function<std::vector<Vertex>&(const Vertex)>
-        ConnectionStrategy;
+    typedef boost::function<std::vector<Vertex>&(const Vertex)> ConnectionStrategy;
 
     /** @brief A function that can reject connections.
-
      This is called after previous connections from the neighbor list
      have been added to the roadmap.
      */
@@ -231,25 +217,10 @@ public:
         given condition evaluates true. */
     virtual void expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
 
-    /** \brief Function that can solve the motion planning
-        problem. Grows a roadmap using
-        constructRoadmap(). This function can be called
-        multiple times on the same problem, without calling
-        clear() in between. This allows the planner to
-        continue work for more time on an unsolved problem,
-        for example. Start and goal states from the currently
-        specified ProblemDefinition are cached. This means
-        that between calls to solve(), input states are only
-        added, not removed. When using PRM as a multi-query
-        planner, the input states should be however cleared,
-        without clearing the roadmap itself. This can be done
-        using the clearQuery() function. */
+    /** \brief  */
     virtual ompl::base::PlannerStatus solve(const ompl::base::PlannerTerminationCondition &ptc);
 
-    /** \brief Clear the query previously loaded from the ProblemDefinition.
-        Subsequent calls to solve() will reuse the previously computed roadmap,
-        but will clear the set of input states constructed by the previous call to solve().
-        This enables multi-query functionality for PRM. */
+    /** \brief  */
     void clearQuery(void);
 
     virtual void clear(void);
