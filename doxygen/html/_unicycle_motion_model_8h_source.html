@@ -124,83 +124,74 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00042"></a>00042 <span class="preprocessor">#include &lt;limits&gt;</span>
 <a name="l00043"></a>00043 <span class="preprocessor">#include &lt;cassert&gt;</span>
 <a name="l00044"></a>00044 
-<a name="l00045"></a><a class="code" href="class_unicycle_motion_model.html">00045</a> <span class="keyword">class </span><a class="code" href="class_unicycle_motion_model.html">UnicycleMotionModel</a> : <span class="keyword">public</span> <a class="code" href="class_motion_model_method.html">MotionModelMethod</a>
+<a name="l00045"></a><a class="code" href="class_unicycle_motion_model.html">00045</a> <span class="keyword">class </span><a class="code" href="class_unicycle_motion_model.html">UnicycleMotionModel</a> : <span class="keyword">public</span> <a class="code" href="class_motion_model_method.html" title="Abstract class interface for defining a motion model.">MotionModelMethod</a>
 <a name="l00046"></a>00046 {
 <a name="l00047"></a>00047 
 <a name="l00048"></a>00048     <span class="comment">//Dimensions of stat vector, control vector, motion noise vector</span>
 <a name="l00049"></a>00049     <span class="comment">//These are constant and specific to the motion model. This also implies</span>
 <a name="l00050"></a>00050     <span class="comment">//the motion model will only work with configurations of a particular dimension</span>
 <a name="l00051"></a>00051     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> stateDim = 3;
-<a name="l00052"></a>00052     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> controlDim = 2;
+<a name="l00052"></a>00052     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code" href="class_motion_model_method.html#ad0012e93feba030fa8e9a47a18c6ff0e" title="Get the control dimension.">controlDim</a> = 2;
 <a name="l00053"></a>00053     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> motionNoiseDim = 5;
 <a name="l00054"></a>00054 
 <a name="l00055"></a>00055   <span class="keyword">public</span>:
 <a name="l00056"></a>00056     <span class="keyword">typedef</span> <span class="keyword">typename</span> MotionModelMethod::ControlType ControlType;
 <a name="l00057"></a>00057     <span class="keyword">typedef</span> <span class="keyword">typename</span> MotionModelMethod::NoiseType NoiseType;
 <a name="l00058"></a>00058     <span class="keyword">typedef</span> <span class="keyword">typename</span> MotionModelMethod::JacobianType JacobianType;
-<a name="l00059"></a>00059     <span class="comment">//typedef boost::shared_ptr&lt;UnicycleMotionModel&gt; MotionModelPointer;</span>
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061     <span class="comment">//Default constructor</span>
-<a name="l00062"></a>00062     <span class="comment">//UnicycleMotionModel() {}</span>
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064     <span class="comment">// XML-based constructor</span>
-<a name="l00065"></a>00065     <a class="code" href="class_unicycle_motion_model.html">UnicycleMotionModel</a>(ompl::control::SpaceInformationPtr si, <span class="keyword">const</span> <span class="keywordtype">char</span> *pathToSetupFile) :
-<a name="l00066"></a>00066     <a class="code" href="class_motion_model_method.html">MotionModelMethod</a>(si, motionNoiseDim)
-<a name="l00067"></a>00067     {
+<a name="l00059"></a>00059 
+<a name="l00060"></a>00060     <span class="comment">// XML-based constructor</span>
+<a name="l00061"></a>00061     <a class="code" href="class_unicycle_motion_model.html">UnicycleMotionModel</a>(<span class="keyword">const</span> ompl::control::SpaceInformationPtr si, <span class="keyword">const</span> <span class="keywordtype">char</span> *pathToSetupFile) :
+<a name="l00062"></a>00062     <a class="code" href="class_motion_model_method.html#ae6076a87b40c19bd8e65ba6c0a82fb8c" title="Constructor.">MotionModelMethod</a>(si, motionNoiseDim)
+<a name="l00063"></a>00063     {
+<a name="l00064"></a>00064 
+<a name="l00065"></a>00065        <span class="comment">//In here, should check if the cfg type is compatible with this</span>
+<a name="l00066"></a>00066        <span class="comment">//motion model, and exit with error otherwise</span>
+<a name="l00067"></a>00067         this-&gt;<a class="code" href="class_unicycle_motion_model.html#ae932dca27f26105c4d91e809b304b58d" title="Load parameters from XML.">loadParameters</a>(pathToSetupFile);
 <a name="l00068"></a>00068 
-<a name="l00069"></a>00069       <span class="comment">//In here, should check if the cfg type is compatible with this</span>
-<a name="l00070"></a>00070       <span class="comment">//motion model, and exit with error otherwise</span>
-<a name="l00071"></a>00071         this-&gt;loadParameters(pathToSetupFile);
-<a name="l00072"></a>00072 
-<a name="l00073"></a>00073     }
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075     ~<a class="code" href="class_unicycle_motion_model.html">UnicycleMotionModel</a>() {}
+<a name="l00069"></a>00069     }
+<a name="l00070"></a>00070 
+<a name="l00072"></a><a class="code" href="class_unicycle_motion_model.html#ab5a56555b6b489cc3040fb61c71b5f15">00072</a>     <a class="code" href="class_unicycle_motion_model.html#ab5a56555b6b489cc3040fb61c71b5f15" title="Destructor.">~UnicycleMotionModel</a>() {}
+<a name="l00073"></a>00073 
+<a name="l00075"></a>00075     <span class="keywordtype">void</span> <a class="code" href="class_unicycle_motion_model.html#a7d78a6e7de4ad59dbd8aa0e6fd338ca7" title="Propagate the system to the next state, given the current state, a control and a noise.">Evolve</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control *control, <span class="keyword">const</span> NoiseType&amp; w, ompl::base::State *result);
 <a name="l00076"></a>00076 
-<a name="l00077"></a>00077     <span class="keywordtype">void</span> Evolve(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control *control, <span class="keyword">const</span> NoiseType&amp; w, ompl::base::State *result);
-<a name="l00078"></a>00078 
-<a name="l00079"></a>00079     <span class="keywordtype">void</span> generateOpenLoopControls(<span class="keyword">const</span> ompl::base::State *startState,
+<a name="l00077"></a>00077 
+<a name="l00079"></a>00079     <span class="keywordtype">void</span> <a class="code" href="class_unicycle_motion_model.html#adf6f10302c29b5a196628af789e80739" title="Generate open loop control that drives robot from start to end state.">generateOpenLoopControls</a>(<span class="keyword">const</span> ompl::base::State *startState,
 <a name="l00080"></a>00080                                                   <span class="keyword">const</span> ompl::base::State *endState,
 <a name="l00081"></a>00081                                                   std::vector&lt;ompl::control::Control*&gt; &amp;openLoopControls);
 <a name="l00082"></a>00082 
-<a name="l00083"></a>00083     NoiseType generateNoise(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control);
-<a name="l00084"></a>00084 
-<a name="l00085"></a>00085     <span class="comment">// df/dx</span>
-<a name="l00086"></a>00086     JacobianType
-<a name="l00087"></a>00087     getStateJacobian(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w);
-<a name="l00088"></a>00088     <span class="comment">// df/du</span>
-<a name="l00089"></a>00089     JacobianType
-<a name="l00090"></a>00090     getControlJacobian(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w);
-<a name="l00091"></a>00091     <span class="comment">// df/dw</span>
-<a name="l00092"></a>00092     JacobianType
-<a name="l00093"></a>00093     getNoiseJacobian(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w);
+<a name="l00084"></a>00084     NoiseType <a class="code" href="class_unicycle_motion_model.html#aff0d7239670e191b7d6ac518952b0428" title="Generate noise according to specified state and control input.">generateNoise</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control);
+<a name="l00085"></a>00085 
+<a name="l00087"></a>00087     JacobianType <a class="code" href="class_unicycle_motion_model.html#adb849fef38055401851adf4e87e8ec23" title="Calculate the state transition Jacobian i.e. df/dx where f is the transition function and x is the st...">getStateJacobian</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w);
+<a name="l00088"></a>00088     
+<a name="l00090"></a>00090     JacobianType <a class="code" href="class_unicycle_motion_model.html#a422cbf49ce1b509e7f031008483bd6ff" title="Calculate the control transition Jacobian i.e. df/du where f is the transition function and u is the ...">getControlJacobian</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w);
+<a name="l00091"></a>00091     
+<a name="l00093"></a>00093     JacobianType <a class="code" href="class_unicycle_motion_model.html#a62aa73b58447613c0745dab9453760b7" title="Calculate the noise transition Jacobian i.e. df/dw where f is the transition function and w is the no...">getNoiseJacobian</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w);
 <a name="l00094"></a>00094 
-<a name="l00095"></a>00095     arma::mat processNoiseCovariance(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control);
-<a name="l00096"></a>00096 
-<a name="l00097"></a>00097     <span class="comment">/*</span>
-<a name="l00098"></a>00098 <span class="comment">    bool GenerateOrbit(const CfgType&amp; _start,</span>
-<a name="l00099"></a>00099 <span class="comment">      vector&lt;CfgType&gt;&amp; _intermediates,</span>
-<a name="l00100"></a>00100 <span class="comment">      vector&lt;ControlType&gt;&amp; _controls);</span>
-<a name="l00101"></a>00101 <span class="comment">    */</span>
+<a name="l00096"></a>00096     arma::mat <a class="code" href="class_unicycle_motion_model.html#a1ae47461abed522cc1d611a1f60b6f7c" title="Calculate the process noise covariance.">processNoiseCovariance</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control);
+<a name="l00097"></a>00097 
+<a name="l00098"></a>00098   <span class="keyword">private</span>:
+<a name="l00099"></a>00099 
+<a name="l00101"></a>00101     arma::mat <a class="code" href="class_unicycle_motion_model.html#acb8c6afd05d931f53d8bb7b30184b83e" title="Generate the control noise covariance.">controlNoiseCovariance</a>(<span class="keyword">const</span> ompl::control::Control* control);
 <a name="l00102"></a>00102 
-<a name="l00103"></a>00103   <span class="keyword">private</span>:
-<a name="l00104"></a>00104 
-<a name="l00105"></a>00105     arma::mat controlNoiseCovariance(<span class="keyword">const</span> ompl::control::Control* control);
-<a name="l00106"></a>00106     <span class="keywordtype">void</span> loadParameters(<span class="keyword">const</span> <span class="keywordtype">char</span> *pathToSetupFile);
-<a name="l00107"></a>00107 
-<a name="l00108"></a>00108     <span class="comment">//mat EvolveContinuous(const ompl::base::State *state, const ControlType&amp; _u, const NoiseType&amp; _w);</span>
-<a name="l00109"></a>00109 
-<a name="l00110"></a>00110     <span class="comment">//double m_robotBaseLength; // rear wheel axle length</span>
-<a name="l00111"></a>00111     arma::colvec sigma_; <span class="comment">// Bias standard deviation of the motion noise</span>
-<a name="l00112"></a>00112     arma::colvec eta_; <span class="comment">// Proportional standard deviation of the motion noise</span>
-<a name="l00113"></a>00113     arma::mat    P_Wg_; <span class="comment">// Covariance of state additive noise</span>
+<a name="l00104"></a>00104     <span class="keywordtype">void</span> <a class="code" href="class_unicycle_motion_model.html#ae932dca27f26105c4d91e809b304b58d" title="Load parameters from XML.">loadParameters</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *pathToSetupFile);
+<a name="l00105"></a>00105 
+<a name="l00107"></a><a class="code" href="class_unicycle_motion_model.html#a8d47c96b281d68b16bfed5c6019b7502">00107</a>     arma::colvec <a class="code" href="class_unicycle_motion_model.html#a8d47c96b281d68b16bfed5c6019b7502" title="Bias standard deviation of the motion noise.">sigma_</a>; <span class="comment">// </span>
+<a name="l00108"></a>00108     
+<a name="l00110"></a><a class="code" href="class_unicycle_motion_model.html#a4025caf061ba4e6426af86ae7074b7a9">00110</a>     arma::colvec <a class="code" href="class_unicycle_motion_model.html#a4025caf061ba4e6426af86ae7074b7a9" title="Proportional standard deviation of the motion noise.">eta_</a>; <span class="comment">// </span>
+<a name="l00111"></a>00111     
+<a name="l00113"></a><a class="code" href="class_unicycle_motion_model.html#aa23aec795c0d97c5c54db925cfa27426">00113</a>     arma::mat    <a class="code" href="class_unicycle_motion_model.html#aa23aec795c0d97c5c54db925cfa27426" title="Covariance of state additive noise.">P_Wg_</a>; <span class="comment">//</span>
 <a name="l00114"></a>00114 
-<a name="l00115"></a>00115     <span class="keywordtype">double</span> maxAngularVelocity_; <span class="comment">//max rotational velocity</span>
-<a name="l00116"></a>00116     <span class="keywordtype">double</span> maxLinearVelocity_; <span class="comment">//max translational velocity</span>
-<a name="l00117"></a>00117     <span class="keywordtype">double</span> orbitRadius_;
-<a name="l00118"></a>00118     <span class="keywordtype">double</span> minLinearVelocity_;
-<a name="l00119"></a>00119     std::string vcMethod_;
-<a name="l00120"></a>00120 };
-<a name="l00121"></a>00121 <span class="preprocessor">#endif</span>
+<a name="l00116"></a><a class="code" href="class_unicycle_motion_model.html#a64f132a45af955098864992fd06e6bf0">00116</a>     <span class="keywordtype">double</span> <a class="code" href="class_unicycle_motion_model.html#a64f132a45af955098864992fd06e6bf0" title="max rotational velocity">maxAngularVelocity_</a>; <span class="comment">//</span>
+<a name="l00117"></a>00117     
+<a name="l00119"></a><a class="code" href="class_unicycle_motion_model.html#aaa92675e5a2f14a45ba08b6e008fd0b0">00119</a>     <span class="keywordtype">double</span> <a class="code" href="class_unicycle_motion_model.html#aaa92675e5a2f14a45ba08b6e008fd0b0" title="max translational velocity">maxLinearVelocity_</a>; <span class="comment">//</span>
+<a name="l00120"></a>00120     
+<a name="l00122"></a><a class="code" href="class_unicycle_motion_model.html#a35645b20aa08d05a106d9698ccc71919">00122</a>     <span class="keywordtype">double</span> <a class="code" href="class_unicycle_motion_model.html#a35645b20aa08d05a106d9698ccc71919" title="max translational velocity">orbitRadius_</a>;
+<a name="l00123"></a>00123     
+<a name="l00125"></a><a class="code" href="class_unicycle_motion_model.html#a0e1c9df0b9f1736a92bf10bcf5ad597f">00125</a>     <span class="keywordtype">double</span> <a class="code" href="class_unicycle_motion_model.html#a0e1c9df0b9f1736a92bf10bcf5ad597f" title="min translational velocity">minLinearVelocity_</a>;
+<a name="l00126"></a>00126 
+<a name="l00127"></a>00127 };
+<a name="l00128"></a>00128 
+<a name="l00129"></a>00129 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -219,7 +210,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 31 2014 13:00:49 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 1 2014 17:06:44 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

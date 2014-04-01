@@ -116,150 +116,125 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00034"></a>00034 
 <a name="l00035"></a>00035 <span class="comment">/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */</span>
 <a name="l00036"></a>00036 
-<a name="l00038"></a>00038 <span class="comment">// Abstract class interface for motion models</span>
-<a name="l00039"></a>00039 <span class="comment">// This class defines the operations that can be performed on motion models,</span>
-<a name="l00040"></a>00040 <span class="comment">// as well as the data they are expected to have</span>
-<a name="l00042"></a>00042 <span class="comment"></span>
-<a name="l00043"></a>00043 <span class="preprocessor">#ifndef MOTIONMODELMETHOD_</span>
-<a name="l00044"></a>00044 <span class="preprocessor"></span><span class="preprocessor">#define MOTIONMODELMETHOD_</span>
-<a name="l00045"></a>00045 <span class="preprocessor"></span>
-<a name="l00046"></a>00046 <span class="preprocessor">#include &quot;armadillo&quot;</span>
-<a name="l00047"></a>00047 <span class="preprocessor">#include &quot;../Spaces/SE2BeliefSpace.h&quot;</span>
-<a name="l00048"></a>00048 <span class="preprocessor">#include &quot;ompl/control/Control.h&quot;</span>
-<a name="l00049"></a>00049 <span class="preprocessor">#include &quot;ompl/control/spaces/RealVectorControlSpace.h&quot;</span>
-<a name="l00050"></a>00050 <span class="preprocessor">#include &quot;ompl/control/SpaceInformation.h&quot;</span>
-<a name="l00051"></a>00051 
-<a name="l00052"></a><a class="code" href="class_motion_model_method.html">00052</a> <span class="keyword">class </span><a class="code" href="class_motion_model_method.html">MotionModelMethod</a>
-<a name="l00053"></a>00053 {
-<a name="l00054"></a>00054 
+<a name="l00037"></a>00037 <span class="preprocessor">#ifndef MOTIONMODELMETHOD_</span>
+<a name="l00038"></a>00038 <span class="preprocessor"></span><span class="preprocessor">#define MOTIONMODELMETHOD_</span>
+<a name="l00039"></a>00039 <span class="preprocessor"></span>
+<a name="l00040"></a>00040 <span class="preprocessor">#include &quot;armadillo&quot;</span>
+<a name="l00041"></a>00041 <span class="preprocessor">#include &quot;../Spaces/SE2BeliefSpace.h&quot;</span>
+<a name="l00042"></a>00042 <span class="preprocessor">#include &quot;ompl/control/Control.h&quot;</span>
+<a name="l00043"></a>00043 <span class="preprocessor">#include &quot;ompl/control/spaces/RealVectorControlSpace.h&quot;</span>
+<a name="l00044"></a>00044 <span class="preprocessor">#include &quot;ompl/control/SpaceInformation.h&quot;</span>
+<a name="l00045"></a>00045 
+<a name="l00050"></a><a class="code" href="class_motion_model_method.html">00050</a> <span class="keyword">class </span><a class="code" href="class_motion_model_method.html" title="Abstract class interface for defining a motion model.">MotionModelMethod</a>
+<a name="l00051"></a>00051 {
+<a name="l00052"></a>00052 
+<a name="l00053"></a>00053 
+<a name="l00054"></a>00054   <span class="keyword">public</span>:
 <a name="l00055"></a>00055 
-<a name="l00056"></a>00056   <span class="keyword">public</span>:
-<a name="l00057"></a>00057 
-<a name="l00058"></a>00058                 <span class="keyword">typedef</span> arma::colvec  ControlType;
-<a name="l00059"></a>00059                 <span class="keyword">typedef</span> arma::colvec  NoiseType;
-<a name="l00060"></a>00060         <span class="keyword">typedef</span> <a class="code" href="class_s_e2_belief_space.html">SE2BeliefSpace</a> <a class="code" href="class_s_e2_belief_space.html">SpaceType</a>;
-<a name="l00061"></a>00061                 <span class="keyword">typedef</span> <a class="code" href="class_s_e2_belief_space_1_1_state_type.html" title="A belief in SE(2): (x, y, yaw, covariance)">SpaceType::StateType</a> <a class="code" href="class_s_e2_belief_space_1_1_state_type.html" title="A belief in SE(2): (x, y, yaw, covariance)">StateType</a>;
-<a name="l00062"></a>00062                 <span class="keyword">typedef</span> arma::mat     JacobianType;
-<a name="l00063"></a>00063         <span class="keyword">typedef</span> boost::shared_ptr&lt;MotionModelMethod&gt; MotionModelPointer;
-<a name="l00064"></a>00064 
-<a name="l00066"></a>00066         <span class="comment">//              Constructors and destructors                     //</span>
-<a name="l00068"></a>00068 <span class="comment"></span>        <span class="comment">//Default constructor</span>
-<a name="l00069"></a>00069         <span class="comment">//MotionModelMethod() : stateDim_(0), controlDim_(0), noiseDim_(0) {}</span>
-<a name="l00070"></a>00070 
-<a name="l00071"></a>00071 
-<a name="l00072"></a>00072                 <a class="code" href="class_motion_model_method.html">MotionModelMethod</a>(ompl::control::SpaceInformationPtr si, <span class="keywordtype">int</span> nDim=0):
-<a name="l00073"></a>00073         <span class="comment">//TODO: can the noise dimension actually be different from the control dimension?</span>
-<a name="l00074"></a>00074             si_(si),
-<a name="l00075"></a>00075                         stateDim_(si-&gt;getStateDimension()),
-<a name="l00076"></a>00076                         controlDim_((si-&gt;getControlSpace())-&gt;getDimension()),
-<a name="l00077"></a>00077                         noiseDim_(nDim),
-<a name="l00078"></a>00078             zeroNoise_(arma::zeros&lt;NoiseType&gt;(noiseDim_)),
-<a name="l00079"></a>00079                         dt_(0.0)
-<a name="l00080"></a>00080         {
-<a name="l00081"></a>00081             zeroControl_ = si_-&gt;allocControl();
-<a name="l00082"></a>00082             <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; controlDim_ ; i++)
-<a name="l00083"></a>00083             {
-<a name="l00084"></a>00084                 zeroControl_-&gt;as&lt;ompl::control::RealVectorControlSpace::ControlType&gt;()-&gt;values[i] = 0;
-<a name="l00085"></a>00085             }
+<a name="l00056"></a>00056                 <span class="keyword">typedef</span> arma::colvec  ControlType;
+<a name="l00057"></a>00057                 <span class="keyword">typedef</span> arma::colvec  NoiseType;
+<a name="l00058"></a>00058         <span class="keyword">typedef</span> <a class="code" href="class_s_e2_belief_space.html">SE2BeliefSpace</a> <a class="code" href="class_s_e2_belief_space.html">SpaceType</a>;
+<a name="l00059"></a>00059                 <span class="keyword">typedef</span> <a class="code" href="class_s_e2_belief_space_1_1_state_type.html" title="A belief in SE(2): (x, y, yaw, covariance)">SpaceType::StateType</a> <a class="code" href="class_s_e2_belief_space_1_1_state_type.html" title="A belief in SE(2): (x, y, yaw, covariance)">StateType</a>;
+<a name="l00060"></a>00060                 <span class="keyword">typedef</span> arma::mat     JacobianType;
+<a name="l00061"></a>00061         <span class="keyword">typedef</span> boost::shared_ptr&lt;MotionModelMethod&gt; MotionModelPointer;
+<a name="l00062"></a>00062 
+<a name="l00064"></a><a class="code" href="class_motion_model_method.html#ae6076a87b40c19bd8e65ba6c0a82fb8c">00064</a>                 <a class="code" href="class_motion_model_method.html#ae6076a87b40c19bd8e65ba6c0a82fb8c" title="Constructor.">MotionModelMethod</a>(<span class="keyword">const</span> ompl::control::SpaceInformationPtr si, <span class="keywordtype">int</span> nDim=0):
+<a name="l00065"></a>00065             <a class="code" href="class_motion_model_method.html#a7410df94d1231268c431dd73f2e5338d" title="A pointer to the space information.">si_</a>(si),
+<a name="l00066"></a>00066                         <a class="code" href="class_motion_model_method.html#a6d76506c342c3bf089eb548c531e2105" title="Dimension of the system state.">stateDim_</a>(si-&gt;getStateDimension()),
+<a name="l00067"></a>00067                         <a class="code" href="class_motion_model_method.html#ab9b45acbafce1f4c873ee7095bc49964" title="control vector dimension is specific to each motion model subclass.">controlDim_</a>((si-&gt;getControlSpace())-&gt;getDimension()),
+<a name="l00068"></a>00068                         <a class="code" href="class_motion_model_method.html#a47725ad490fdc510cdc38838165b27c6" title="noise vector dimension is specific to each motion model subclass.">noiseDim_</a>(nDim),
+<a name="l00069"></a>00069             <a class="code" href="class_motion_model_method.html#ac5b0a8829ec75b20d78deff84f71cbb5" title="Zero noise.">zeroNoise_</a>(arma::zeros&lt;NoiseType&gt;(<a class="code" href="class_motion_model_method.html#a47725ad490fdc510cdc38838165b27c6" title="noise vector dimension is specific to each motion model subclass.">noiseDim_</a>)),
+<a name="l00070"></a>00070                         <a class="code" href="class_motion_model_method.html#a482972cd2ec0bec4b42137811e1d0446" title="timestep size, used to generate the next state by applying a control for this period of time...">dt_</a>(0.0)
+<a name="l00071"></a>00071         {
+<a name="l00072"></a>00072             <a class="code" href="class_motion_model_method.html#ae5e55aa39c0d819c3e9afffefa3d5b08" title="Zero control.">zeroControl_</a> = <a class="code" href="class_motion_model_method.html#a7410df94d1231268c431dd73f2e5338d" title="A pointer to the space information.">si_</a>-&gt;allocControl();
+<a name="l00073"></a>00073             <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="class_motion_model_method.html#ab9b45acbafce1f4c873ee7095bc49964" title="control vector dimension is specific to each motion model subclass.">controlDim_</a> ; i++)
+<a name="l00074"></a>00074             {
+<a name="l00075"></a>00075                 <a class="code" href="class_motion_model_method.html#ae5e55aa39c0d819c3e9afffefa3d5b08" title="Zero control.">zeroControl_</a>-&gt;as&lt;ompl::control::RealVectorControlSpace::ControlType&gt;()-&gt;values[i] = 0;
+<a name="l00076"></a>00076             }
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078         }
+<a name="l00079"></a>00079 
+<a name="l00081"></a><a class="code" href="class_motion_model_method.html#aa15c21f81b71cfe8c65224bbdfba61d8">00081</a>         <span class="keywordtype">void</span> <a class="code" href="class_motion_model_method.html#aa15c21f81b71cfe8c65224bbdfba61d8" title="Set the timestep for motion.">setTimeStep</a>(<span class="keywordtype">double</span> timeStep){ <a class="code" href="class_motion_model_method.html#a482972cd2ec0bec4b42137811e1d0446" title="timestep size, used to generate the next state by applying a control for this period of time...">dt_</a> = timeStep;}
+<a name="l00082"></a>00082 
+<a name="l00084"></a><a class="code" href="class_motion_model_method.html#a1d703f6d9b1f68e19b67a177d8034112">00084</a>                 <span class="keyword">virtual</span> <a class="code" href="class_motion_model_method.html#a1d703f6d9b1f68e19b67a177d8034112" title="Destructor.">~MotionModelMethod</a>() {};
+<a name="l00085"></a>00085 
 <a name="l00086"></a>00086 
-<a name="l00087"></a>00087         }
-<a name="l00088"></a>00088 
-<a name="l00089"></a>00089         <span class="keywordtype">void</span> setTimeStep(<span class="keywordtype">double</span> timeStep){ dt_ = timeStep;}
-<a name="l00090"></a>00090 
-<a name="l00091"></a>00091                 <span class="comment">//Destructor</span>
-<a name="l00092"></a>00092                 <span class="keyword">virtual</span> ~<a class="code" href="class_motion_model_method.html">MotionModelMethod</a>() {};
-<a name="l00093"></a>00093 
+<a name="l00088"></a>00088                 <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_motion_model_method.html#a9fafbf79b4ea570819e01050dadf4826" title="Propagate the system to the next state, given the current state, a control and a noise.">Evolve</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control *control, <span class="keyword">const</span> NoiseType&amp; w, ompl::base::State *result) = 0;
+<a name="l00089"></a>00089 
+<a name="l00091"></a>00091                 <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_motion_model_method.html#a6ec853871652bfa2c4fdad2c46e81e44" title="Generate open loop control that drives robot from start to end state.">generateOpenLoopControls</a>(<span class="keyword">const</span> ompl::base::State *startState,
+<a name="l00092"></a>00092                                               <span class="keyword">const</span> ompl::base::State *endState,
+<a name="l00093"></a>00093                                               std::vector&lt;ompl::control::Control*&gt; &amp;openLoopControls) = 0;
 <a name="l00094"></a>00094 
-<a name="l00095"></a>00095                 <span class="comment">//Produce the next state, given the current state, a control and a noise</span>
-<a name="l00096"></a>00096                 <span class="comment">//Implementation is specific to particular motion model</span>
-<a name="l00097"></a>00097                 <span class="keyword">virtual</span> <span class="keywordtype">void</span> Evolve(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control *control, <span class="keyword">const</span> NoiseType&amp; w, ompl::base::State *result) = 0;
-<a name="l00098"></a>00098 
-<a name="l00099"></a>00099                 <span class="comment">//Generate open loop control between two specified Cfgs/states</span>
-<a name="l00100"></a>00100                 <span class="comment">//Implementation is specific to particular motion model</span>
-<a name="l00101"></a>00101                 <span class="keyword">virtual</span> <span class="keywordtype">void</span> generateOpenLoopControls(<span class="keyword">const</span> ompl::base::State *startState,
-<a name="l00102"></a>00102                                               <span class="keyword">const</span> ompl::base::State *endState,
-<a name="l00103"></a>00103                                               std::vector&lt;ompl::control::Control*&gt; &amp;openLoopControls) = 0;
-<a name="l00104"></a>00104 
-<a name="l00105"></a>00105 
-<a name="l00106"></a>00106 
-<a name="l00107"></a>00107                 <span class="comment">//Generate noise according to specified state and control input</span>
-<a name="l00108"></a>00108                 <span class="comment">//Appears to be common to all motion models</span>
-<a name="l00109"></a>00109                 <span class="keyword">virtual</span> NoiseType generateNoise(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control) = 0;
-<a name="l00110"></a>00110 
-<a name="l00111"></a>00111                 <span class="comment">// df/dx</span>
-<a name="l00112"></a>00112                 <span class="keyword">virtual</span> JacobianType
-<a name="l00113"></a>00113                 getStateJacobian(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w) = 0;
-<a name="l00114"></a>00114                 <span class="comment">// df/du</span>
-<a name="l00115"></a>00115                 <span class="keyword">virtual</span> JacobianType
-<a name="l00116"></a>00116                 getControlJacobian(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w) = 0;
-<a name="l00117"></a>00117                 <span class="comment">// df/dw</span>
-<a name="l00118"></a>00118                 <span class="keyword">virtual</span> JacobianType
-<a name="l00119"></a>00119                 getNoiseJacobian(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w) = 0;
-<a name="l00120"></a>00120 
-<a name="l00121"></a>00121                 <span class="keyword">virtual</span> arma::mat
-<a name="l00122"></a>00122                 processNoiseCovariance(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control) = 0;
-<a name="l00123"></a>00123 
-<a name="l00124"></a>00124         <span class="comment">// Get zero control which affects no change on the robot</span>
-<a name="l00125"></a>00125                 <span class="keyword">virtual</span> ompl::control::Control* getZeroControl() { <span class="keywordflow">return</span> zeroControl_; }
-<a name="l00126"></a>00126 
-<a name="l00127"></a>00127                 <span class="comment">// Zero noise</span>
-<a name="l00128"></a>00128                 <span class="keyword">virtual</span> <span class="keyword">const</span> NoiseType&amp; getZeroNoise()     { <span class="keywordflow">return</span> zeroNoise_; }
-<a name="l00129"></a>00129 
-<a name="l00130"></a>00130         <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> controlDim()           { <span class="keywordflow">return</span> controlDim_; }
+<a name="l00095"></a>00095 
+<a name="l00096"></a>00096 
+<a name="l00098"></a>00098                 <span class="keyword">virtual</span> NoiseType <a class="code" href="class_motion_model_method.html#a036e2254bcae3730fe157419f9cf9c19" title="Generate noise according to specified state and control input.">generateNoise</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control) = 0;
+<a name="l00099"></a>00099 
+<a name="l00101"></a>00101                 <span class="keyword">virtual</span> JacobianType
+<a name="l00102"></a>00102                 <a class="code" href="class_motion_model_method.html#af1429b7c54c0b6bdde9e6b8272bbb50e" title="Calculate the state transition Jacobian i.e. df/dx where f is the transition function and x is the st...">getStateJacobian</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w) = 0;
+<a name="l00103"></a>00103                 
+<a name="l00105"></a>00105                 <span class="keyword">virtual</span> JacobianType
+<a name="l00106"></a>00106                 <a class="code" href="class_motion_model_method.html#aac2be89931926f5883fd4e0ec0b7a073" title="Calculate the control transition Jacobian i.e. df/du where f is the transition function and u is the ...">getControlJacobian</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w) = 0;
+<a name="l00107"></a>00107                 
+<a name="l00109"></a>00109                 <span class="keyword">virtual</span> JacobianType
+<a name="l00110"></a>00110                 <a class="code" href="class_motion_model_method.html#adefbf482a8d6d409b262cb1af014026a" title="Calculate the noise transition Jacobian i.e. df/dw where f is the transition function and w is the no...">getNoiseJacobian</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> NoiseType&amp; w) = 0;
+<a name="l00111"></a>00111 
+<a name="l00113"></a>00113                 <span class="keyword">virtual</span> arma::mat
+<a name="l00114"></a>00114                 <a class="code" href="class_motion_model_method.html#a559dc48932d5aca3215e3f24e29680ce" title="Calculate the process noise covariance.">processNoiseCovariance</a>(<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control) = 0;
+<a name="l00115"></a>00115 
+<a name="l00117"></a><a class="code" href="class_motion_model_method.html#a4002e8e3bb3af13d56bc162b655a1543">00117</a>                 <span class="keyword">virtual</span> ompl::control::Control* <a class="code" href="class_motion_model_method.html#a4002e8e3bb3af13d56bc162b655a1543" title="Get zero control which produces no change in the robot state.">getZeroControl</a>() { <span class="keywordflow">return</span> <a class="code" href="class_motion_model_method.html#ae5e55aa39c0d819c3e9afffefa3d5b08" title="Zero control.">zeroControl_</a>; }
+<a name="l00118"></a>00118 
+<a name="l00120"></a><a class="code" href="class_motion_model_method.html#a56d9a853b4ec8158c4c9016614c86a9f">00120</a>                 <span class="keyword">virtual</span> <span class="keyword">const</span> NoiseType&amp; <a class="code" href="class_motion_model_method.html#a56d9a853b4ec8158c4c9016614c86a9f" title="Get the zero noise.">getZeroNoise</a>()  { <span class="keywordflow">return</span> <a class="code" href="class_motion_model_method.html#ac5b0a8829ec75b20d78deff84f71cbb5" title="Zero noise.">zeroNoise_</a>; }
+<a name="l00121"></a>00121 
+<a name="l00123"></a><a class="code" href="class_motion_model_method.html#ad0012e93feba030fa8e9a47a18c6ff0e">00123</a>         <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="class_motion_model_method.html#ad0012e93feba030fa8e9a47a18c6ff0e" title="Get the control dimension.">controlDim</a>()           { <span class="keywordflow">return</span> <a class="code" href="class_motion_model_method.html#ab9b45acbafce1f4c873ee7095bc49964" title="control vector dimension is specific to each motion model subclass.">controlDim_</a>; }
+<a name="l00124"></a>00124 
+<a name="l00126"></a><a class="code" href="class_motion_model_method.html#a86ef6178a4d438fde83f1c3f110ad2b4">00126</a>         <span class="keyword">virtual</span> <span class="keywordtype">double</span> <a class="code" href="class_motion_model_method.html#a86ef6178a4d438fde83f1c3f110ad2b4" title="Get the time step value.">getTimestepSize</a>() { <span class="keywordflow">return</span> <a class="code" href="class_motion_model_method.html#a482972cd2ec0bec4b42137811e1d0446" title="timestep size, used to generate the next state by applying a control for this period of time...">dt_</a>; }
+<a name="l00127"></a>00127 
+<a name="l00129"></a><a class="code" href="class_motion_model_method.html#a924d7bb8eb665d12181c3755e831bc50">00129</a>         arma::colvec <a class="code" href="class_motion_model_method.html#a924d7bb8eb665d12181c3755e831bc50" title="Convert a control from OMPL format to armadillo vector.">OMPL2ARMA</a>(<span class="keyword">const</span> ompl::control::Control *control)
+<a name="l00130"></a>00130         {
 <a name="l00131"></a>00131 
-<a name="l00132"></a>00132 
-<a name="l00133"></a>00133         <span class="keyword">virtual</span> <span class="keywordtype">double</span> getTimestepSize() { <span class="keywordflow">return</span> dt_; }
-<a name="l00134"></a>00134 
-<a name="l00135"></a>00135         <span class="comment">// Convert a control from OMPL format to armadillo vector</span>
-<a name="l00136"></a>00136         arma::colvec OMPL2ARMA(<span class="keyword">const</span> ompl::control::Control *control)
-<a name="l00137"></a>00137         {
-<a name="l00138"></a>00138             <span class="comment">//std::cout&lt;&lt;&quot;OMPL2ARMA Printing the control :&quot;&lt;&lt;std::endl;</span>
-<a name="l00139"></a>00139             <span class="comment">//si_-&gt;printControl(control, std::cout);</span>
-<a name="l00140"></a>00140 
-<a name="l00141"></a>00141             arma::colvec u(2);
-<a name="l00142"></a>00142             <span class="keywordflow">if</span>(!control) control = si_-&gt;allocControl();
-<a name="l00143"></a>00143             <span class="keyword">const</span> <span class="keywordtype">double</span> *conVals = control-&gt;as&lt;ompl::control::RealVectorControlSpace::ControlType&gt;()-&gt;values;
-<a name="l00144"></a>00144 
-<a name="l00145"></a>00145             <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; controlDim_; i++)
-<a name="l00146"></a>00146             {
-<a name="l00147"></a>00147                 u[i] = conVals[i];
-<a name="l00148"></a>00148             }
-<a name="l00149"></a>00149 
-<a name="l00150"></a>00150             <span class="keywordflow">return</span> u;
-<a name="l00151"></a>00151         }
-<a name="l00152"></a>00152         <span class="keywordtype">void</span> ARMA2OMPL(arma::colvec u, ompl::control::Control *control)
-<a name="l00153"></a>00153         {
-<a name="l00154"></a>00154             <span class="comment">//const double *conVals = control-&gt;as&lt;ompl::control::RealVectorControlSpace::ControlType&gt;()-&gt;values;</span>
-<a name="l00155"></a>00155             <span class="keywordflow">if</span>(!control) control = si_-&gt;allocControl();
-<a name="l00156"></a>00156             <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; controlDim_; i++)
-<a name="l00157"></a>00157             {
-<a name="l00158"></a>00158                 control-&gt;as&lt;ompl::control::RealVectorControlSpace::ControlType&gt;()-&gt;values[i] = u[i];
-<a name="l00159"></a>00159             }
-<a name="l00160"></a>00160             <span class="comment">//std::cout&lt;&lt;&quot;ARMA2OMPL Printing the control :&quot;&lt;&lt;std::endl;</span>
-<a name="l00161"></a>00161             <span class="comment">//si_-&gt;printControl(control, std::cout);</span>
-<a name="l00162"></a>00162         }
-<a name="l00163"></a>00163 
-<a name="l00164"></a>00164         <span class="keyword">protected</span>:
-<a name="l00165"></a>00165 
-<a name="l00166"></a>00166             ompl::control::SpaceInformationPtr si_;
+<a name="l00132"></a>00132             arma::colvec u(2);
+<a name="l00133"></a>00133 
+<a name="l00134"></a>00134             <span class="keywordflow">if</span>(!control) control = <a class="code" href="class_motion_model_method.html#a7410df94d1231268c431dd73f2e5338d" title="A pointer to the space information.">si_</a>-&gt;allocControl();
+<a name="l00135"></a>00135 
+<a name="l00136"></a>00136             <span class="keyword">const</span> <span class="keywordtype">double</span> *conVals = control-&gt;as&lt;ompl::control::RealVectorControlSpace::ControlType&gt;()-&gt;values;
+<a name="l00137"></a>00137 
+<a name="l00138"></a>00138             <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="class_motion_model_method.html#ab9b45acbafce1f4c873ee7095bc49964" title="control vector dimension is specific to each motion model subclass.">controlDim_</a>; i++)
+<a name="l00139"></a>00139             {
+<a name="l00140"></a>00140                 u[i] = conVals[i];
+<a name="l00141"></a>00141             }
+<a name="l00142"></a>00142 
+<a name="l00143"></a>00143             <span class="keywordflow">return</span> u;
+<a name="l00144"></a>00144         }
+<a name="l00145"></a>00145 
+<a name="l00147"></a><a class="code" href="class_motion_model_method.html#af473fd665c4fa562143beef5733db523">00147</a>         <span class="keywordtype">void</span> <a class="code" href="class_motion_model_method.html#af473fd665c4fa562143beef5733db523" title="Convert a control from aradillo vector to ompl::control::Control* .">ARMA2OMPL</a>(arma::colvec u, ompl::control::Control *control)
+<a name="l00148"></a>00148         {
+<a name="l00149"></a>00149             <span class="keywordflow">if</span>(!control) control = <a class="code" href="class_motion_model_method.html#a7410df94d1231268c431dd73f2e5338d" title="A pointer to the space information.">si_</a>-&gt;allocControl();
+<a name="l00150"></a>00150             
+<a name="l00151"></a>00151             <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="class_motion_model_method.html#ab9b45acbafce1f4c873ee7095bc49964" title="control vector dimension is specific to each motion model subclass.">controlDim_</a>; i++)
+<a name="l00152"></a>00152             {
+<a name="l00153"></a>00153                 control-&gt;as&lt;ompl::control::RealVectorControlSpace::ControlType&gt;()-&gt;values[i] = u[i];
+<a name="l00154"></a>00154             }
+<a name="l00155"></a>00155         }
+<a name="l00156"></a>00156 
+<a name="l00157"></a>00157         <span class="keyword">protected</span>:
+<a name="l00158"></a>00158 
+<a name="l00160"></a><a class="code" href="class_motion_model_method.html#a7410df94d1231268c431dd73f2e5338d">00160</a>             ompl::control::SpaceInformationPtr <a class="code" href="class_motion_model_method.html#a7410df94d1231268c431dd73f2e5338d" title="A pointer to the space information.">si_</a>;
+<a name="l00161"></a>00161 
+<a name="l00163"></a><a class="code" href="class_motion_model_method.html#a6d76506c342c3bf089eb548c531e2105">00163</a>                 <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="class_motion_model_method.html#a6d76506c342c3bf089eb548c531e2105" title="Dimension of the system state.">stateDim_</a>;
+<a name="l00164"></a>00164 
+<a name="l00166"></a><a class="code" href="class_motion_model_method.html#ab9b45acbafce1f4c873ee7095bc49964">00166</a>                 <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="class_motion_model_method.html#ab9b45acbafce1f4c873ee7095bc49964" title="control vector dimension is specific to each motion model subclass.">controlDim_</a>;
 <a name="l00167"></a>00167 
-<a name="l00168"></a>00168                 <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> stateDim_;
-<a name="l00169"></a>00169 
-<a name="l00170"></a>00170                 <span class="comment">//control vector dimension is specific to each motion model subclass</span>
-<a name="l00171"></a>00171                 <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> controlDim_;
-<a name="l00172"></a>00172                 ompl::control::Control* zeroControl_;
+<a name="l00169"></a><a class="code" href="class_motion_model_method.html#ae5e55aa39c0d819c3e9afffefa3d5b08">00169</a>                 ompl::control::Control* <a class="code" href="class_motion_model_method.html#ae5e55aa39c0d819c3e9afffefa3d5b08" title="Zero control.">zeroControl_</a>;
+<a name="l00170"></a>00170 
+<a name="l00172"></a><a class="code" href="class_motion_model_method.html#a47725ad490fdc510cdc38838165b27c6">00172</a>                 <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code" href="class_motion_model_method.html#a47725ad490fdc510cdc38838165b27c6" title="noise vector dimension is specific to each motion model subclass.">noiseDim_</a>;
 <a name="l00173"></a>00173 
-<a name="l00174"></a>00174                 <span class="comment">//noise vector dimension is specific to each motion model subclass</span>
-<a name="l00175"></a>00175                 <span class="keyword">const</span> <span class="keywordtype">int</span> noiseDim_;
-<a name="l00176"></a>00176                 NoiseType zeroNoise_;
-<a name="l00177"></a>00177 
-<a name="l00178"></a>00178                 <span class="comment">//timestep size, which is used to generate the next state by applying</span>
-<a name="l00179"></a>00179                 <span class="comment">//a control for that period of time</span>
-<a name="l00180"></a>00180                 <span class="keywordtype">double</span> dt_;
+<a name="l00175"></a><a class="code" href="class_motion_model_method.html#ac5b0a8829ec75b20d78deff84f71cbb5">00175</a>                 NoiseType <a class="code" href="class_motion_model_method.html#ac5b0a8829ec75b20d78deff84f71cbb5" title="Zero noise.">zeroNoise_</a>;
+<a name="l00176"></a>00176 
+<a name="l00178"></a><a class="code" href="class_motion_model_method.html#a482972cd2ec0bec4b42137811e1d0446">00178</a>                 <span class="keywordtype">double</span> <a class="code" href="class_motion_model_method.html#a482972cd2ec0bec4b42137811e1d0446" title="timestep size, used to generate the next state by applying a control for this period of time...">dt_</a>;
+<a name="l00179"></a>00179 
+<a name="l00180"></a>00180 };
 <a name="l00181"></a>00181 
-<a name="l00182"></a>00182 };
-<a name="l00183"></a>00183 
-<a name="l00184"></a>00184 <span class="preprocessor">#endif</span>
+<a name="l00182"></a>00182 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -278,7 +253,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 31 2014 13:00:49 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 1 2014 17:06:44 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

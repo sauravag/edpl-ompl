@@ -58,27 +58,18 @@ void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::con
 {
 
   using namespace arma;
+
   typedef typename MotionModelMethod::StateType StateType;
   typedef std::vector<double> stdvec;
 
    arma::colvec u = OMPL2ARMA(control);
 
-  //Assume the cfg type is compatible with this motion model (this should have been checked in the constructor)
-
-  //generate a column vector (arma::colvec) corresponding to the next state
-  //and return a Cfg initialized with it
-  //cout << "noise vector: " << endl << w << endl;
-  //cout << "getting control noise " << endl;
-  //cout << "controlDim_ = " << this->controlDim_ << endl;
-  //std::cout<<"The input control is :"<<u<<std::endl;
-
   const colvec& Un = w.subvec(0, this->controlDim_-1);
-  //cout << "getting process noise " << endl;
-  //cout << "noiseDim_ = " << this->noiseDim_ << endl;
+
   const colvec& Wg = w.subvec(this->controlDim_, this->noiseDim_-1);
 
   colvec x = state->as<StateType>()->getArmaData();
-  //std::cout<<"The input state is   :"<<x<<std::endl;
+
   const double c = cos(x[2]);
   const double s = sin(x[2]);
 
@@ -89,14 +80,10 @@ void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::con
 
   x += (u2*this->dt_) + (Un2*sqrt(this->dt_)) + (Wg*sqrt(this->dt_));
 
-  //std::cout<<"The evolved state is   :"<<x<<std::endl;
-
   result->as<StateType>()->setXYYaw(x[0],x[1],x[2]);
 }
 
 
-
-//Generate open loop control between two specified Cfgs/states
 void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *startState,
                                                   const ompl::base::State *endState,
                                                   std::vector<ompl::control::Control*> &openLoopControls)
@@ -104,7 +91,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
 
   using namespace arma;
   typedef typename MotionModelMethod::StateType StateType;
-  //cout << "starting generate open-loop control" << endl;
+
   colvec start = startState->as<StateType>()->getArmaData(); // turn into colvec (in radian)
   colvec end = endState->as<StateType>()->getArmaData(); // turn into colvec (in radian)
 
@@ -114,7 +101,6 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
   y_c << start[1] << endr
       << end[1] << endr;
 
-  //TODO: init all these to zero
   double th_p = 0;
   double delta_th_p_start = 0;
   double delta_th_p_end = 0;
@@ -132,14 +118,13 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
 
     // turining anlge at start
     delta_th_p_start = th_p - theta_start;
-    pirange(delta_th_p_start); // bringing the delta_th_p_start to the -PI to PI range
-   // turining anlge at end
+
+    // bringing the delta_th_p_start to the -PI to PI range
+    pirange(delta_th_p_start); 
+
+    // turining anlge at end
     delta_th_p_end = th_end - th_p;
     pirange(delta_th_p_end); // bringing the delta_th_p_end to the -PI to PI range
-
-    //cout << "theta_start: " << theta_start*180/PI << endl;
-    //cout << "th_line: " << th_p*180/PI << endl;
-    //cout << "delta_th_p_start: " << delta_th_p_start*180/PI << endl;
 
     //count rotational steps
     rotation_steps_start = fabs(delta_th_p_start/(maxAngularVelocity_*this->dt_));
@@ -152,16 +137,14 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
     // total number of steps
     kf += ceil(rotation_steps_start) + ceil(translation_steps) + ceil(rotation_steps_end);
 
-   //cout << "kf: " << kf << endl;
-
-    //std::vector<ControlType> controlSeq(kf);
-
-    /////////////////////////Generating control signal for start rotation
+    //Generating control signal for start rotation
     const double& rsi = rotation_steps_start;
     const double frsi = floor(rsi);
+
     colvec u_const_rot;
     u_const_rot << 0 << endr
                 << maxAngularVelocity_*signum(delta_th_p_start) << endr;
+    
     int ix = 0;
     for(int j=0; j<frsi; ++j, ++ix)
     {
@@ -169,20 +152,26 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
       ARMA2OMPL(u_const_rot, tempControl);
       openLoopControls.push_back(tempControl);
     }
+    
     if(frsi < rsi)
     {
       ompl::control::Control *tempControl = si_->allocControl();
       ARMA2OMPL(u_const_rot*(rsi-frsi), tempControl);
       openLoopControls.push_back(tempControl);
     }
-    /////////////////////////Generating control signal for translation
+    
+    //Generating control signal for translation
+    
     const double& tsi = translation_steps;
     const double ftsi = floor(tsi);
+    
     static colvec u_const_trans;
+    
     if(u_const_trans.n_rows == 0) {
       u_const_trans << maxLinearVelocity_ << endr
                     << 0        << endr;
     }
+    
     for(int j=0; j<ftsi; ++j, ++ix)
     {
       ompl::control::Control *tempControl = si_->allocControl();
@@ -196,11 +185,12 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
       openLoopControls.push_back(tempControl);
     }
 
-    /////////////////////////Generating control signal for end rotation
+    // Generating control signal for end rotation
 
     const double& rsi_end = rotation_steps_end;
     const double frsi_end = floor(rsi_end);
     colvec u_const_rot_end;
+    
     u_const_rot_end << 0 << endr
                 << maxAngularVelocity_*signum(delta_th_p_end) << endr;
 
@@ -210,25 +200,21 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
       ARMA2OMPL(u_const_rot_end, tempControl);
       openLoopControls.push_back(tempControl);
     }
+    
     if(frsi_end < rsi_end)
     {
       ompl::control::Control *tempControl = si_->allocControl();
       ARMA2OMPL(u_const_rot_end*(rsi_end-frsi_end), tempControl);
       openLoopControls.push_back(tempControl);
     }
-
-    //std::cout<<"size of openloopcontrol in ump :"<<openLoopControls.size()<<std::endl;
-  //assert(ix == kf);
 }
 
-//Generate noise according to specified state and control input
 typename UnicycleMotionModel::NoiseType
 UnicycleMotionModel::generateNoise(const ompl::base::State *state, const ompl::control::Control* control)
 {
 
   using namespace arma;
 
-  //TODO: confirm that this is the correct noise generation method
   NoiseType noise(this->noiseDim_);
   colvec indepUn = randn(this->controlDim_,1);
   mat P_Un = controlNoiseCovariance(control);
@@ -236,11 +222,10 @@ UnicycleMotionModel::generateNoise(const ompl::base::State *state, const ompl::c
 
   colvec Wg = sqrt(P_Wg_) * randn(this->stateDim_,1);
   noise = join_cols(Un, Wg);
-  //cout << "noise" << noise << endl;
+
   return noise;
 }
 
-// df/dx
 typename UnicycleMotionModel::JacobianType
 UnicycleMotionModel::getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w)
 {
@@ -250,8 +235,6 @@ UnicycleMotionModel::getStateJacobian(const ompl::base::State *state, const ompl
   typedef typename MotionModelMethod::StateType StateType;
 
   arma::colvec u = OMPL2ARMA(control);
-
-  //assert(!"UnicycleMotionModel<MPTraits>::GetStateJacobian not yet implemented!");
 
   colvec xData = state->as<StateType>()->getArmaData();
 
@@ -274,7 +257,6 @@ UnicycleMotionModel::getStateJacobian(const ompl::base::State *state, const ompl
   return A;
 }
 
-// df/du
 typename UnicycleMotionModel::JacobianType
 UnicycleMotionModel::getControlJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w)
 {
@@ -298,23 +280,22 @@ UnicycleMotionModel::getControlJacobian(const ompl::base::State *state, const om
 
 }
 
-// df/dw
 typename UnicycleMotionModel::JacobianType
 UnicycleMotionModel::getNoiseJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w)
 {
 
   using namespace arma;
   typedef typename MotionModelMethod::StateType StateType;
-  //assert(!"UnicycleMotionModel<MPTraits>::GetNoiseJacobian not yet implemented!");
+
   colvec xData = state->as<StateType>()->getArmaData();
+
   assert (xData.n_rows == (size_t)this->stateDim_);
 
   const double& theta = xData[2];
 
-  /*
-  th=x(3);
-  G = [cos(th) , 0 , 1 , 0 , 0 ;  sin(th) , 0 , 0 ,1,0 ;  0 , 1 , 0 ,0,1] * sqrt(Unicycle_robot.dt);
-  */
+  
+  //th=x(3);
+  //G = [cos(th) , 0 , 1 , 0 , 0 ;  sin(th) , 0 , 0 ,1,0 ;  0 , 1 , 0 ,0,1] * sqrt(Unicycle_robot.dt);
 
   mat G(3,5);
 
@@ -327,19 +308,10 @@ UnicycleMotionModel::getNoiseJacobian(const ompl::base::State *state, const ompl
 
 }
 
-// Q matrix
 arma::mat UnicycleMotionModel::processNoiseCovariance(const ompl::base::State *state, const ompl::control::Control* control)
 {
 
   using namespace arma;
-
-  //assert(!"UnicycleMotionModel<MPTraits>::ProcessNoiseCovariance not yet implemented!");
-
-  /*
-  P_Un = control_noise_covariance(u);
-  Q_process_noise = blkdiag(P_Un,Unicycle_robot.P_Wg);
-  ?? What is P_Wg?
-  */
 
   mat P_Un = controlNoiseCovariance(control);
   mat Q_processNoise = zeros<mat>(P_Un.n_rows + P_Wg_.n_rows, P_Un.n_cols +
@@ -360,13 +332,12 @@ arma::mat UnicycleMotionModel::controlNoiseCovariance(const ompl::control::Contr
 
   using namespace arma;
 
-  /*
-    u_std=(Unicycle_robot.eta_u).*U+(Unicycle_robot.sigma_b_u);
-    P_Un=diag(u_std.^2);
-  */
   arma::colvec u = OMPL2ARMA(control);
+  
   colvec uStd = eta_ % u + sigma_;
+  
   mat P_Un = diagmat(square(uStd));
+  
   return P_Un;
 }
 
@@ -402,17 +373,6 @@ void UnicycleMotionModel::loadParameters(const char *pathToSetupFile)
   assert( child );
   itemElement = child->ToElement();
   assert( itemElement );
-
-  /*
-  rma::colvec sigma_; // Bias standard deviation of the motion noise
-  arma::colvec eta_; // Proportional standard deviation of the motion noise
-  arma::mat    P_Wg_; // Covariance of state additive noise
-
-  double maxAngularVelocity_; //max rotational velocity
-  double maxLinearVelocity_; //max translational velocity
-  double orbitRadius_;
-  double minLinearVelocity_;
-  */
 
   double sigmaV=0;
   double etaV = 0;

@@ -89,7 +89,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">CamAruco2DObservationModel Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<!-- doxytag: class="CamAruco2DObservationModel" --><!-- doxytag: inherits="ObservationModelMethod" --><div class="dynheader">
+<!-- doxytag: class="CamAruco2DObservationModel" --><!-- doxytag: inherits="ObservationModelMethod" -->
+<p>A monocular vision based sensor model where the observations are beacons with unique ids.  
+ <a href="class_cam_aruco2_d_observation_model.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_cam_aruco2_d_observation_model_8h_source.html">CamAruco2DObservationModel.h</a>&gt;</code></p>
+<div class="dynheader">
 Inheritance diagram for CamAruco2DObservationModel:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_cam_aruco2_d_observation_model__inherit__graph.png" border="0" usemap="#_cam_aruco2_d_observation_model_inherit__map" alt="Inheritance graph"/></div>
@@ -158,7 +163,10 @@ static const int&#160;</td><td class="memItemRight" valign="bottom"><b>landmarkI
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1750ab1c5ac476d09da804e7a92576f5"></a><!-- doxytag: member="CamAruco2DObservationModel::numLandmarksForObservability" ref="a1750ab1c5ac476d09da804e7a92576f5" args="" -->
 static const int&#160;</td><td class="memItemRight" valign="bottom"><b>numLandmarksForObservability</b> = 2</td></tr>
 </table>
-<hr/><h2>Member Function Documentation</h2>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>A monocular vision based sensor model where the observations are beacons with unique ids. </p>
+<dl class="user"><dt><b>Short Description</b></dt><dd>This is an Observation model method based on the combination of a monocular camera, and visual markers with unique ids. How it works: 1. The locations of visual landmarks is known a-priori. 2. Using location of the robot and pre-known location of landmarks, it generates a noisy observation of the relative location of the landmark w.r.t the robot. </dd></dl>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a244fd43dca1734b68bf1379b2be285d2"></a><!-- doxytag: member="CamAruco2DObservationModel::getObservation" ref="a244fd43dca1734b68bf1379b2be285d2" args="(const ompl::base::State *state, bool isSimulation)" -->
 <div class="memitem">
 <div class="memproto">
@@ -211,7 +219,7 @@ static const int&#160;</td><td class="memItemRight" valign="bottom"><b>numLandma
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 31 2014 13:00:49 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 1 2014 17:06:44 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

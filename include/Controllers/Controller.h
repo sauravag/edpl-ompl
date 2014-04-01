@@ -44,6 +44,7 @@
 #include "../SpaceInformation/SpaceInformation.h"
 #include "ompl/base/Cost.h"
 #include "boost/date_time/local_time/local_time.hpp"
+#include <boost/thread.hpp>
 
 /** \brief Base class for Controller. A controller's task is to use the filter to estimate the belief robot's state and
           generate control commands using the separated controller. For example by fusing an LQR and Kalman Filter
@@ -91,8 +92,6 @@ class Controller
         /** \brief Set the space information of the planning problem */
         void setSpaceInformation(SpaceInformationPtr si) { si_ = si; }
 
-        //bool isValid();
-
         /** \brief Set the nodeReached angle.*/
         static void setNodeReachedAngle(double angle) {nodeReachedAngle_ = angle; }
 
@@ -118,29 +117,29 @@ class Controller
         std::vector<LinearSystem> lss_;
 
         /** \brief  The separated controller used to generate the commands that are sent to the robot. */
-    		SeparatedControllerType separatedController_;
+        SeparatedControllerType separatedController_;
 
         /** \brief  The filter used to estimate the robot belief. */
-    		FilterType filter_;
+    	  FilterType filter_;
 
         /** \brief  The target node to which the controller drives the robot.*/
-    		ompl::base::State *goal_;
+    	  ompl::base::State *goal_;
 
         /** \brief Tracks the current number of time steps the robot has executed to align with goal node. */
-    		int tries_;
+    	  int tries_;
 
         /** \brief If the robot's heading is deviated from the target heading by less
             than the nodeReachedAngle_ then the robot is assumed to have alligned with the target heading. Used
             for node reachability checking. */
-    		static double nodeReachedAngle_;
+    	  static double nodeReachedAngle_;
 
         /** \brief The distance at which we assume the robot has reached a target node. Reaching the exact node
             location is almost impractical for real systems. We assume the robot has reached if it is within
             a certain radius of the target. */
-    		static double nodeReachedDistance_;
+    	  static double nodeReachedDistance_;
 
         /** \brief  The max number of tries to align with target node. */
-    		static double maxTries_;
+      	static double maxTries_;
 
         /** \brief  The maximum deviation from the nominal trajectory beyond which the robot must replan.*/
         static double nominalTrajDeviationThreshold_;
@@ -151,10 +150,9 @@ class Controller
         double maxExecTime_;
 
         /** \brief  The debug mode, if true, controller is verbose.*/
-    		bool debug_;
+      	bool debug_;
 
 };
-
 
 
 template <class SeparatedControllerType, class FilterType>
@@ -177,6 +175,7 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
 {
 
   goal_ = si_->allocState();
+
   si_->copyState(goal_, goal);
 
   lss_.reserve(nominalXs.size());
@@ -202,7 +201,7 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
   //nominalXs is scaled by <3> to allow a bit more steps for robot to execute edge.
   //Otherwise may not get good performance
   maxExecTime_ = ceil(nominalXs.size()*3);
-  //obstacleMarkerObserved_ = false;
+
   debug_ = false;
 
 }
@@ -218,11 +217,10 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
   unsigned int k = 0;
 
-  /*
-    HOW TO SET INITAL VALUE OF COST
-    cost = 1 ,for time based only if time per execution is "1"
-    cost = 0.01 , for covariance based
-  */
+
+  //HOW TO SET INITAL VALUE OF COST
+  //cost = 1 ,for time based only if time per execution is "1"
+  //cost = 0.01 , for covariance based
   double cost = 0.01;
 
   ompl::base::State *internalState = si_->allocState();
@@ -238,13 +236,10 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
     si_->copyState(internalState, endState);
 
-    // if the propagated state is not valid, return
-    if( !si_->checkTrueStateValidity())
+    // if the propagated state is not valid, return false
+    if(!si_->checkTrueStateValidity())
     {
-      //cout << k << " of " << m_maxExecTime << " steps used." << endl;
-      //isFailed = true;
-      //failureCode = -1;
-      return false;
+        return false;
     }
 
     if(k<lss_.size())
@@ -256,33 +251,19 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     arma::colvec endStateVec = endState->as<StateType>()->getArmaData();
     arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
 
-    if(debug_)
-    {
-        std::cout<<"The nominal trajectory point is:" <<nomXVec<<std::endl;
-        std::cout<<"The current state is           :"<<endStateVec<<std::endl;
-        std::cout<<"The deviation from nominal trajectory is: "<<abs(norm(deviation,2))<<std::endl;
-        //std::cout<<"The size of LSS is :"<<lss_.size()<<std::endl;
-        //std::cout<<"The k is : "<<k<<std::endl;
-        std::cin.get();
-    }
-
     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
-      //isFailed = true;
-      //failureCode = -3;
       return false;
     }
 
     k++;
 
-     //Increment cost by:
-     //-> 0.01 for time based
-     //-> trace(Covariance) for FIRM
-
+    //Increment cost by:
+    //-> 0.01 for time based
+    //-> trace(Covariance) for FIRM
     cost += arma::trace(endState->as<StateType>()->getCovariance());
 
-    //if(debug_) cout<<"Trace of covariance: "<<arma::trace(endState->as<StateType>()->getCovariance())<<std::endl;
-    if(!constructionMode) sleep(0.1);
+    if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(100));
   }
 
   executionCost.v = cost;
@@ -294,16 +275,14 @@ template <class SeparatedControllerType, class FilterType>
 void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
 {
 
-  //std::cout << "Do not forget is_reliable for feedback controls." << std::endl;
-
   ompl::control::Control* control = separatedController_.generateFeedbackControl(state/*, t*/);
 
   si_->applyControl(control);
 
   ObservationType zCorrected = si_->getObservation();
 
-  LinearSystem current;// = lss_[_t];
-  LinearSystem next; //= lss_[_t+1];
+  LinearSystem current;
+  LinearSystem next;
 
   current = next = LinearSystem(si_,goal_,
                                 si_->getMotionModel()->getZeroControl(),
@@ -370,8 +349,7 @@ ompl::base::State* Controller<SeparatedControllerType, FilterType>::Stabilize(co
 }
 
 template <class SeparatedControllerType, class FilterType>
-bool Controller<SeparatedControllerType, FilterType>::isTerminated(const ompl::base::State *state,
-                                                                   const size_t t )
+bool Controller<SeparatedControllerType, FilterType>::isTerminated(const ompl::base::State *state, const size_t t )
 {
 
   using namespace arma;
@@ -379,9 +357,6 @@ bool Controller<SeparatedControllerType, FilterType>::isTerminated(const ompl::b
   colvec diff = state->as<StateType>()->getArmaData() - goal_->as<StateType>()->getArmaData();
 
   double distance_to_goal = norm(diff.subvec(0,1),2);
-
-  //std::cout<<"The distance to goal is: "<<distance_to_goal<<std::endl;
-  //std::usleep(1e5);
 
   if( distance_to_goal > nodeReachedDistance_)   {
       return false;
@@ -392,7 +367,6 @@ bool Controller<SeparatedControllerType, FilterType>::isTerminated(const ompl::b
 
     if( abs(diff[2]) > nodeReachedAngle_*boost::math::constants::pi<double>()/180 && tries_ < maxTries_ )
     {
-      //cout<<"m_tries :"<<m_tries<<endl;
       tries_++;
       return false;
     }
@@ -403,30 +377,5 @@ bool Controller<SeparatedControllerType, FilterType>::isTerminated(const ompl::b
   return true;
 
 }
-
-
-/*
-template <class SeparatedControllerType, class FilterType>
-bool Controller<SeparatedControllerType, FilterType>::isValid()
-{
-
-  ValidityCheckerPointer vc = this->GetMPProblem()->GetValidityChecker(m_vcLabel);
-  Environment* env = this->GetMPProblem()->GetEnvironment();
-  StatClass* stats = this->GetMPProblem()->GetStatClass();
-  string callee = this->GetName();
-  CDInfo cdInfo;
-
-  for(size_t i = 0; i < lss_.size(); ++i) {
-    CfgType x = lss_[i].GetX();
-
-    if(!x.InBoundary(env) || !vc->IsValid(x, env, *stats, cdInfo, &callee)) {
-      return false;
-    }
-  }
-
-
-  return true;
-}
-*/
 
 #endif

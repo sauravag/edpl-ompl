@@ -95,7 +95,6 @@
 		<Unit filename="include/Visualization/Window.h" />
 		<Unit filename="include/Weight/FIRMWeight.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="src/Controller/Controller.cpp" />
 		<Unit filename="src/Filters/ExtendedKF.cpp" />
 		<Unit filename="src/Filters/LinearizedKF.cpp" />
 		<Unit filename="src/LocalPlanner/MotionModelLP.cpp" />

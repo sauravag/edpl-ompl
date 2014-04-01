@@ -126,11 +126,11 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f75bddc5fb799e7daab008f415bd1fa"></a><!-- doxytag: member="LinearSystem::LinearSystem" ref="a3f75bddc5fb799e7daab008f415bd1fa" args="()" -->
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_linear_system.html#a3f75bddc5fb799e7daab008f415bd1fa">LinearSystem</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6f05277076a4302dbcfa9646232871dc"></a><!-- doxytag: member="LinearSystem::LinearSystem" ref="a6f05277076a4302dbcfa9646232871dc" args="(const ompl::base::State *state, const ompl::control::Control *control, MotionModelPointer motionModel, ObservationModelPointer observationModel)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_linear_system.html#a6f05277076a4302dbcfa9646232871dc">LinearSystem</a> (const ompl::base::State *state, const ompl::control::Control *control, MotionModelPointer motionModel, ObservationModelPointer observationModel)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a340ddf5ee44bbf851ceaca67f4404048"></a><!-- doxytag: member="LinearSystem::LinearSystem" ref="a340ddf5ee44bbf851ceaca67f4404048" args="(const firm::SpaceInformation::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control *control, MotionModelPointer motionModel, ObservationModelPointer observationModel)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_linear_system.html#a340ddf5ee44bbf851ceaca67f4404048">LinearSystem</a> (const firm::SpaceInformation::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control *control, MotionModelPointer motionModel, ObservationModelPointer observationModel)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a428c800b858ed6c6d63230c64e470208"></a><!-- doxytag: member="LinearSystem::LinearSystem" ref="a428c800b858ed6c6d63230c64e470208" args="(const ompl::base::State *state, const ompl::control::Control *control, const ObservationType &amp;obs, MotionModelPointer motionModel, ObservationModelPointer observationModel)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_linear_system.html#a428c800b858ed6c6d63230c64e470208">LinearSystem</a> (const ompl::base::State *state, const ompl::control::Control *control, const ObservationType &amp;obs, MotionModelPointer motionModel, ObservationModelPointer observationModel)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeaaa65cf19822ff7e12312cf37ce721f"></a><!-- doxytag: member="LinearSystem::LinearSystem" ref="aeaaa65cf19822ff7e12312cf37ce721f" args="(const firm::SpaceInformation::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control *control, const ObservationType &amp;obs, MotionModelPointer motionModel, ObservationModelPointer observationModel)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_linear_system.html#aeaaa65cf19822ff7e12312cf37ce721f">LinearSystem</a> (const firm::SpaceInformation::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control *control, const ObservationType &amp;obs, MotionModelPointer motionModel, ObservationModelPointer observationModel)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7d556441c0f68f6ccfdde32b72f888b6"></a><!-- doxytag: member="LinearSystem::getX" ref="a7d556441c0f68f6ccfdde32b72f888b6" args="()" -->
 ompl::base::State *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_linear_system.html#a7d556441c0f68f6ccfdde32b72f888b6">getX</a> ()</td></tr>
@@ -158,6 +158,9 @@ arma::mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the observation noise covariance. <br/></td></tr>
 <tr><td colspan="2"><h2><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4d5364a7af5e313c08c0f29cd520d6c2"></a><!-- doxytag: member="LinearSystem::si_" ref="a4d5364a7af5e313c08c0f29cd520d6c2" args="" -->
+firm::SpaceInformation::SpaceInformationPtr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_linear_system.html#a4d5364a7af5e313c08c0f29cd520d6c2">si_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to space information. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c0d8d1a986bd267171d8c821e173d1e"></a><!-- doxytag: member="LinearSystem::x_" ref="a0c0d8d1a986bd267171d8c821e173d1e" args="" -->
 ompl::base::State *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e">x_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The state at which the linear system is constructed. <br/></td></tr>
@@ -204,7 +207,7 @@ ObservationModelPointer&#160;</td><td class="memItemRight" valign="bottom"><a cl
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 31 2014 13:00:50 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 1 2014 17:06:45 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

@@ -93,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Feedback Information RoadMap planner.  
  <a href="class_f_i_r_m.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="_f_i_r_m_8h_source.html">FIRM.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_f_i_r_m-old-v2_8h_source.html">FIRM-old-v2.h</a>&gt;</code></p>
 
 <p><a href="class_f_i_r_m-members.html">List of all members.</a></p>
 <table class="memberdecls">
@@ -146,6 +146,51 @@ typedef boost::function<br class="typebreak"/>
 &lt; std::vector&lt; Vertex &gt;<br class="typebreak"/>
  &amp;(const Vertex)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e">ConnectionStrategy</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A function returning the milestones that should be attempted to connect to. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_controller.html">Controller</a>&lt; <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>, <br class="typebreak"/>
+<a class="el" href="class_extended_k_f.html">ExtendedKF</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adf37596ffd4dbf633d7cd0f27347d15c"></a><!-- doxytag: member="FIRM::NodeControllerType" ref="adf37596ffd4dbf633d7cd0f27347d15c" args="" -->
+typedef <a class="el" href="class_controller.html">Controller</a>&lt; <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>, <br class="typebreak"/>
+<a class="el" href="class_linearized_k_f.html">LinearizedKF</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>NodeControllerType</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef boost::adjacency_list<br class="typebreak"/>
+&lt; boost::vecS, boost::vecS, <br class="typebreak"/>
+boost::bidirectionalS, <br class="typebreak"/>
+boost::property<br class="typebreak"/>
+&lt; <a class="el" href="struct_f_i_r_m_1_1vertex__state__t.html">vertex_state_t</a>, <br class="typebreak"/>
+ompl::base::State <br class="typebreak"/>
+*, boost::property<br class="typebreak"/>
+&lt; <a class="el" href="struct_f_i_r_m_1_1vertex__total__connection__attempts__t.html">vertex_total_connection_attempts_t</a>, <br class="typebreak"/>
+unsigned int, boost::property<br class="typebreak"/>
+&lt; <a class="el" href="struct_f_i_r_m_1_1vertex__successful__connection__attempts__t.html">vertex_successful_connection_attempts_t</a>, <br class="typebreak"/>
+unsigned int, boost::property<br class="typebreak"/>
+&lt; <a class="el" href="struct_f_i_r_m_1_1vertex__flags__t.html">vertex_flags_t</a>, unsigned int, <br class="typebreak"/>
+boost::property<br class="typebreak"/>
+&lt; boost::vertex_predecessor_t, <br class="typebreak"/>
+unsigned long int, <br class="typebreak"/>
+boost::property<br class="typebreak"/>
+&lt; boost::vertex_rank_t, <br class="typebreak"/>
+unsigned long int &gt;<br class="typebreak"/>
+ &gt; &gt; &gt; &gt; &gt;, boost::property<br class="typebreak"/>
+&lt; boost::edge_weight_t, <br class="typebreak"/>
+<a class="el" href="class_f_i_r_m_weight.html">FIRMWeight</a>, boost::property<br class="typebreak"/>
+&lt; boost::edge_index_t, <br class="typebreak"/>
+unsigned int, boost::property<br class="typebreak"/>
+&lt; <a class="el" href="struct_f_i_r_m_1_1edge__flags__t.html">edge_flags_t</a>, unsigned int &gt; &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The underlying roadmap graph.  <a href="#a687e9f4243b22c30ee1fa5da22a85053"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a07eb05796ed64797c900b193aafa9031"></a><!-- doxytag: member="FIRM::Vertex" ref="a07eb05796ed64797c900b193aafa9031" args="" -->
+typedef boost::graph_traits<br class="typebreak"/>
+&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a> &gt;::vertex_descriptor&#160;</td><td class="memItemRight" valign="bottom"><b>Vertex</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a88889998bf429572821d467eb44c67c6"></a><!-- doxytag: member="FIRM::Edge" ref="a88889998bf429572821d467eb44c67c6" args="" -->
+typedef boost::graph_traits<br class="typebreak"/>
+&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a> &gt;::edge_descriptor&#160;</td><td class="memItemRight" valign="bottom"><b>Edge</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a687705deb489cff3a2d40b7bec6bdc29"></a><!-- doxytag: member="FIRM::RoadmapNeighbors" ref="a687705deb489cff3a2d40b7bec6bdc29" args="" -->
+typedef boost::shared_ptr<br class="typebreak"/>
+&lt; ompl::NearestNeighbors<br class="typebreak"/>
+&lt; Vertex &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>RoadmapNeighbors</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a15cfbcaf52c0bdd5e6c1a969bbf7ea1e"></a><!-- doxytag: member="FIRM::ConnectionStrategy" ref="a15cfbcaf52c0bdd5e6c1a969bbf7ea1e" args="" -->
+typedef boost::function<br class="typebreak"/>
+&lt; std::vector&lt; Vertex &gt;<br class="typebreak"/>
+ &amp;(const Vertex)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e">ConnectionStrategy</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A function returning the milestones that should be attempted to connect to. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2482eee2e5248d5bff3b3b56e5a593b3"></a><!-- doxytag: member="FIRM::ConnectionFilter" ref="a2482eee2e5248d5bff3b3b56e5a593b3" args="" -->
 typedef boost::function&lt; bool(const <br class="typebreak"/>
 Vertex &amp;, const Vertex &amp;)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a2482eee2e5248d5bff3b3b56e5a593b3">ConnectionFilter</a></td></tr>
@@ -155,10 +200,55 @@ Vertex &amp;, const Vertex &amp;)&gt;&#160;</td><td class="memItemRight" valign=
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adf37596ffd4dbf633d7cd0f27347d15c"></a><!-- doxytag: member="FIRM::NodeControllerType" ref="adf37596ffd4dbf633d7cd0f27347d15c" args="" -->
 typedef <a class="el" href="class_controller.html">Controller</a>&lt; <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>, <br class="typebreak"/>
 <a class="el" href="class_linearized_k_f.html">LinearizedKF</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>NodeControllerType</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef boost::adjacency_list<br class="typebreak"/>
+&lt; boost::vecS, boost::vecS, <br class="typebreak"/>
+boost::bidirectionalS, <br class="typebreak"/>
+boost::property<br class="typebreak"/>
+&lt; <a class="el" href="struct_f_i_r_m_1_1vertex__state__t.html">vertex_state_t</a>, <br class="typebreak"/>
+ompl::base::State <br class="typebreak"/>
+*, boost::property<br class="typebreak"/>
+&lt; <a class="el" href="struct_f_i_r_m_1_1vertex__total__connection__attempts__t.html">vertex_total_connection_attempts_t</a>, <br class="typebreak"/>
+unsigned int, boost::property<br class="typebreak"/>
+&lt; <a class="el" href="struct_f_i_r_m_1_1vertex__successful__connection__attempts__t.html">vertex_successful_connection_attempts_t</a>, <br class="typebreak"/>
+unsigned int, boost::property<br class="typebreak"/>
+&lt; <a class="el" href="struct_f_i_r_m_1_1vertex__flags__t.html">vertex_flags_t</a>, unsigned int, <br class="typebreak"/>
+boost::property<br class="typebreak"/>
+&lt; boost::vertex_predecessor_t, <br class="typebreak"/>
+unsigned long int, <br class="typebreak"/>
+boost::property<br class="typebreak"/>
+&lt; boost::vertex_rank_t, <br class="typebreak"/>
+unsigned long int &gt;<br class="typebreak"/>
+ &gt; &gt; &gt; &gt; &gt;, boost::property<br class="typebreak"/>
+&lt; boost::edge_weight_t, <br class="typebreak"/>
+<a class="el" href="class_f_i_r_m_weight.html">FIRMWeight</a>, boost::property<br class="typebreak"/>
+&lt; boost::edge_index_t, <br class="typebreak"/>
+unsigned int, boost::property<br class="typebreak"/>
+&lt; <a class="el" href="struct_f_i_r_m_1_1edge__flags__t.html">edge_flags_t</a>, unsigned int &gt; &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The underlying roadmap graph.  <a href="#a687e9f4243b22c30ee1fa5da22a85053"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a07eb05796ed64797c900b193aafa9031"></a><!-- doxytag: member="FIRM::Vertex" ref="a07eb05796ed64797c900b193aafa9031" args="" -->
+typedef boost::graph_traits<br class="typebreak"/>
+&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a> &gt;::vertex_descriptor&#160;</td><td class="memItemRight" valign="bottom"><b>Vertex</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a88889998bf429572821d467eb44c67c6"></a><!-- doxytag: member="FIRM::Edge" ref="a88889998bf429572821d467eb44c67c6" args="" -->
+typedef boost::graph_traits<br class="typebreak"/>
+&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a> &gt;::edge_descriptor&#160;</td><td class="memItemRight" valign="bottom"><b>Edge</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a687705deb489cff3a2d40b7bec6bdc29"></a><!-- doxytag: member="FIRM::RoadmapNeighbors" ref="a687705deb489cff3a2d40b7bec6bdc29" args="" -->
+typedef boost::shared_ptr<br class="typebreak"/>
+&lt; ompl::NearestNeighbors<br class="typebreak"/>
+&lt; Vertex &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>RoadmapNeighbors</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a15cfbcaf52c0bdd5e6c1a969bbf7ea1e"></a><!-- doxytag: member="FIRM::ConnectionStrategy" ref="a15cfbcaf52c0bdd5e6c1a969bbf7ea1e" args="" -->
+typedef boost::function<br class="typebreak"/>
+&lt; std::vector&lt; Vertex &gt;<br class="typebreak"/>
+ &amp;(const Vertex)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e">ConnectionStrategy</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A function returning the milestones that should be attempted to connect to. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_controller.html">Controller</a>&lt; <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>, <br class="typebreak"/>
+<a class="el" href="class_extended_k_f.html">ExtendedKF</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adf37596ffd4dbf633d7cd0f27347d15c"></a><!-- doxytag: member="FIRM::NodeControllerType" ref="adf37596ffd4dbf633d7cd0f27347d15c" args="" -->
+typedef <a class="el" href="class_controller.html">Controller</a>&lt; <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>, <br class="typebreak"/>
+<a class="el" href="class_linearized_k_f.html">LinearizedKF</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>NodeControllerType</b></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a45dfdcb347763c633bf46ee653c35ce9"></a><!-- doxytag: member="FIRM::FIRM" ref="a45dfdcb347763c633bf46ee653c35ce9" args="(const firm::SpaceInformation::SpaceInformationPtr &amp;si, bool debugMode=false, bool starStrategy=false)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a45dfdcb347763c633bf46ee653c35ce9">FIRM</a> (const firm::SpaceInformation::SpaceInformationPtr &amp;si, bool debugMode=false, bool starStrategy=false)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a451aef223259f497ec178ad8447d04d5"></a><!-- doxytag: member="FIRM::FIRM" ref="a451aef223259f497ec178ad8447d04d5" args="(const firm::SpaceInformation::SpaceInformationPtr &amp;si, bool debugMode=false)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a451aef223259f497ec178ad8447d04d5">FIRM</a> (const firm::SpaceInformation::SpaceInformationPtr &amp;si, bool debugMode=false)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a09a7ff97d8202a82ca7f6dddfd7ba185"></a><!-- doxytag: member="FIRM::setProblemDefinition" ref="a09a7ff97d8202a82ca7f6dddfd7ba185" args="(const ompl::base::ProblemDefinitionPtr &amp;pdef)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setProblemDefinition</b> (const ompl::base::ProblemDefinitionPtr &amp;pdef)</td></tr>
@@ -167,8 +257,6 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setProblemDef
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a87b6c094c21b956a469a2b69cd387c"></a><!-- doxytag: member="FIRM::setMaxNearestNeighbors" ref="a2a87b6c094c21b956a469a2b69cd387c" args="(unsigned int k)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a2a87b6c094c21b956a469a2b69cd387c">setMaxNearestNeighbors</a> (unsigned int k)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function that sets the connection strategy to the default one with k nearest neighbors. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a3f85ba51a7c3b62b75df7f7c16064cec">setConnectionFilter</a> (const <a class="el" href="class_f_i_r_m.html#a2482eee2e5248d5bff3b3b56e5a593b3">ConnectionFilter</a> &amp;connectionFilter)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the function that can reject a milestone connection.  <a href="#a3f85ba51a7c3b62b75df7f7c16064cec"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f2e6a8c5dac3a0629f1dd0ac2313b9c"></a><!-- doxytag: member="FIRM::constructRoadmap" ref="a5f2e6a8c5dac3a0629f1dd0ac2313b9c" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a5f2e6a8c5dac3a0629f1dd0ac2313b9c">constructRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">While the termination condition allows, this function will construct the roadmap (using <a class="el" href="class_f_i_r_m.html#a947186c6e6be0b513efe0e0b476fef88" title="If the user desires, the roadmap can be improved for the given time (seconds). The solve() method wil...">growRoadmap()</a> and <a class="el" href="class_f_i_r_m.html#ad9cd5472a8bd1b1fcb83763128f7fd75" title="Attempt to connect disjoint components in the roadmap using random bouncing motions (the PRM expansio...">expandRoadmap()</a>, maintaining a 2:1 ratio for growing/expansion of roadmap) <br/></td></tr>
@@ -178,12 +266,6 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8e741b0af39a64d34dcfa4f29c0e509"></a><!-- doxytag: member="FIRM::growRoadmap" ref="ae8e741b0af39a64d34dcfa4f29c0e509" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ae8e741b0af39a64d34dcfa4f29c0e509">growRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the user desires, the roadmap can be improved until a given condition is true. The solve() method will also improve the roadmap, as needed. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9cd5472a8bd1b1fcb83763128f7fd75"></a><!-- doxytag: member="FIRM::expandRoadmap" ref="ad9cd5472a8bd1b1fcb83763128f7fd75" args="(double expandTime)" -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ad9cd5472a8bd1b1fcb83763128f7fd75">expandRoadmap</a> (double expandTime)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to connect disjoint components in the roadmap using random bouncing motions (the PRM expansion step) for the given time (seconds). <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac520fbbb43b0e3100498aa29117f0b9"></a><!-- doxytag: member="FIRM::expandRoadmap" ref="aac520fbbb43b0e3100498aa29117f0b9" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aac520fbbb43b0e3100498aa29117f0b9">expandRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to connect disjoint components in the roadmap using random bouncing motions (the PRM expansion step) until the given condition evaluates true. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a02f3c98de4840594193ba5bf7ff3ca63"></a><!-- doxytag: member="FIRM::solve" ref="a02f3c98de4840594193ba5bf7ff3ca63" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
 virtual ompl::base::PlannerStatus&#160;</td><td class="memItemRight" valign="bottom"><b>solve</b> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf7c24814ea6b8cad9cad350dea66560"></a><!-- doxytag: member="FIRM::clearQuery" ref="acf7c24814ea6b8cad9cad350dea66560" args="(void)" -->
@@ -205,7 +287,105 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a558fbb0135ab096d3cd06e65b88533de">milestoneCount</a> (void) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute distance between two milestones (this is simply distance between the states of the milestones) <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad6df82888d88ab8479f92f9f3e453c2e"></a><!-- doxytag: member="FIRM::getNearestNeighbors" ref="ad6df82888d88ab8479f92f9f3e453c2e" args="(void)" -->
+const RoadmapNeighbors &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ad6df82888d88ab8479f92f9f3e453c2e">getNearestNeighbors</a> (void)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the nearest neighbor structure. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae448791d4c9af9016bc9d5e9de166f0e"></a><!-- doxytag: member="FIRM::executeFeedback" ref="ae448791d4c9af9016bc9d5e9de166f0e" args="(void)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ae448791d4c9af9016bc9d5e9de166f0e">executeFeedback</a> (void)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the generated policy on the system. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a45dfdcb347763c633bf46ee653c35ce9"></a><!-- doxytag: member="FIRM::FIRM" ref="a45dfdcb347763c633bf46ee653c35ce9" args="(const firm::SpaceInformation::SpaceInformationPtr &amp;si, bool debugMode=false, bool starStrategy=false)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a45dfdcb347763c633bf46ee653c35ce9">FIRM</a> (const firm::SpaceInformation::SpaceInformationPtr &amp;si, bool debugMode=false, bool starStrategy=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeff5c0ced89bd2968b74693c2f7b5b5e"></a><!-- doxytag: member="FIRM::setProblemDefinition" ref="aeff5c0ced89bd2968b74693c2f7b5b5e" args="(const ompl::base::ProblemDefinitionPtr &amp;pdef)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setProblemDefinition</b> (const ompl::base::ProblemDefinitionPtr &amp;pdef)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a8017d1847e682f39c2cbce33e904af57">setConnectionStrategy</a> (const <a class="el" href="class_f_i_r_m.html#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e">ConnectionStrategy</a> &amp;connectionStrategy)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the connection strategy function that specifies the milestones that connection attempts will be made to for a given milestone.  <a href="#a8017d1847e682f39c2cbce33e904af57"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a87b6c094c21b956a469a2b69cd387c"></a><!-- doxytag: member="FIRM::setMaxNearestNeighbors" ref="a2a87b6c094c21b956a469a2b69cd387c" args="(unsigned int k)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a2a87b6c094c21b956a469a2b69cd387c">setMaxNearestNeighbors</a> (unsigned int k)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function that sets the connection strategy to the default one with k nearest neighbors. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a3f85ba51a7c3b62b75df7f7c16064cec">setConnectionFilter</a> (const <a class="el" href="class_f_i_r_m.html#a2482eee2e5248d5bff3b3b56e5a593b3">ConnectionFilter</a> &amp;connectionFilter)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the function that can reject a milestone connection.  <a href="#a3f85ba51a7c3b62b75df7f7c16064cec"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc3bbc65d304168baaa5cce5f8fd8f86"></a><!-- doxytag: member="FIRM::constructRoadmap" ref="adc3bbc65d304168baaa5cce5f8fd8f86" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#adc3bbc65d304168baaa5cce5f8fd8f86">constructRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">While the termination condition allows, this function will construct the roadmap (using <a class="el" href="class_f_i_r_m.html#a947186c6e6be0b513efe0e0b476fef88" title="If the user desires, the roadmap can be improved for the given time (seconds). The solve() method wil...">growRoadmap()</a> and <a class="el" href="class_f_i_r_m.html#ad9cd5472a8bd1b1fcb83763128f7fd75" title="Attempt to connect disjoint components in the roadmap using random bouncing motions (the PRM expansio...">expandRoadmap()</a>, maintaining a 2:1 ratio for growing/expansion of roadmap) <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a734b40c9cde0a238b252c7447595f12c"></a><!-- doxytag: member="FIRM::growRoadmap" ref="a734b40c9cde0a238b252c7447595f12c" args="(double growTime)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a734b40c9cde0a238b252c7447595f12c">growRoadmap</a> (double growTime)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the user desires, the roadmap can be improved for the given time (seconds). The solve() method will also improve the roadmap, as needed. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca987eb185a342df77af1d6f4b5719f8"></a><!-- doxytag: member="FIRM::growRoadmap" ref="aca987eb185a342df77af1d6f4b5719f8" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aca987eb185a342df77af1d6f4b5719f8">growRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the user desires, the roadmap can be improved until a given condition is true. The solve() method will also improve the roadmap, as needed. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9cd5472a8bd1b1fcb83763128f7fd75"></a><!-- doxytag: member="FIRM::expandRoadmap" ref="ad9cd5472a8bd1b1fcb83763128f7fd75" args="(double expandTime)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ad9cd5472a8bd1b1fcb83763128f7fd75">expandRoadmap</a> (double expandTime)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to connect disjoint components in the roadmap using random bouncing motions (the PRM expansion step) for the given time (seconds). <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac520fbbb43b0e3100498aa29117f0b9"></a><!-- doxytag: member="FIRM::expandRoadmap" ref="aac520fbbb43b0e3100498aa29117f0b9" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aac520fbbb43b0e3100498aa29117f0b9">expandRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to connect disjoint components in the roadmap using random bouncing motions (the PRM expansion step) until the given condition evaluates true. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4490bf7d770637936f990ee96eeaeb89"></a><!-- doxytag: member="FIRM::solve" ref="a4490bf7d770637936f990ee96eeaeb89" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
+virtual ompl::base::PlannerStatus&#160;</td><td class="memItemRight" valign="bottom"><b>solve</b> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf7c24814ea6b8cad9cad350dea66560"></a><!-- doxytag: member="FIRM::clearQuery" ref="acf7c24814ea6b8cad9cad350dea66560" args="(void)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clearQuery</b> (void)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0028d56cac8cd7970b77836993a9d6fb"></a><!-- doxytag: member="FIRM::clear" ref="a0028d56cac8cd7970b77836993a9d6fb" args="(void)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> (void)</td></tr>
+<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="a8dd7c5ed3fa065f5f37d79bc1d220474"></a><!-- doxytag: member="FIRM::setNearestNeighbors" ref="a8dd7c5ed3fa065f5f37d79bc1d220474" args="(void)" -->
+template&lt;template&lt; typename T &gt; class NN&gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a8dd7c5ed3fa065f5f37d79bc1d220474">setNearestNeighbors</a> (void)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a different nearest neighbors datastructure. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5c5c1fff3029a554dfddfd95bed17b10"></a><!-- doxytag: member="FIRM::setup" ref="a5c5c1fff3029a554dfddfd95bed17b10" args="(void)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setup</b> (void)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aacad0b0dfc1413f78c6dc76fdbac9ce7"></a><!-- doxytag: member="FIRM::getRoadmap" ref="aacad0b0dfc1413f78c6dc76fdbac9ce7" args="(void) const " -->
+const <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getRoadmap</b> (void) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9a98fdb0da781d77fe6ff9a55e8a7a34"></a><!-- doxytag: member="FIRM::distanceFunction" ref="a9a98fdb0da781d77fe6ff9a55e8a7a34" args="(const Vertex a, const Vertex b) const " -->
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a9a98fdb0da781d77fe6ff9a55e8a7a34">distanceFunction</a> (const Vertex a, const Vertex b) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute distance between two milestones (this is simply distance between the states of the milestones) <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a558fbb0135ab096d3cd06e65b88533de"></a><!-- doxytag: member="FIRM::milestoneCount" ref="a558fbb0135ab096d3cd06e65b88533de" args="(void) const " -->
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a558fbb0135ab096d3cd06e65b88533de">milestoneCount</a> (void) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute distance between two milestones (this is simply distance between the states of the milestones) <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad6df82888d88ab8479f92f9f3e453c2e"></a><!-- doxytag: member="FIRM::getNearestNeighbors" ref="ad6df82888d88ab8479f92f9f3e453c2e" args="(void)" -->
 const RoadmapNeighbors &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getNearestNeighbors</b> (void)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae448791d4c9af9016bc9d5e9de166f0e"></a><!-- doxytag: member="FIRM::executeFeedback" ref="ae448791d4c9af9016bc9d5e9de166f0e" args="(void)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ae448791d4c9af9016bc9d5e9de166f0e">executeFeedback</a> (void)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the generated policy on the system. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a451aef223259f497ec178ad8447d04d5"></a><!-- doxytag: member="FIRM::FIRM" ref="a451aef223259f497ec178ad8447d04d5" args="(const firm::SpaceInformation::SpaceInformationPtr &amp;si, bool debugMode=false)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a451aef223259f497ec178ad8447d04d5">FIRM</a> (const firm::SpaceInformation::SpaceInformationPtr &amp;si, bool debugMode=false)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeff5c0ced89bd2968b74693c2f7b5b5e"></a><!-- doxytag: member="FIRM::setProblemDefinition" ref="aeff5c0ced89bd2968b74693c2f7b5b5e" args="(const ompl::base::ProblemDefinitionPtr &amp;pdef)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setProblemDefinition</b> (const ompl::base::ProblemDefinitionPtr &amp;pdef)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a8017d1847e682f39c2cbce33e904af57">setConnectionStrategy</a> (const <a class="el" href="class_f_i_r_m.html#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e">ConnectionStrategy</a> &amp;connectionStrategy)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the connection strategy function that specifies the milestones that connection attempts will be made to for a given milestone.  <a href="#a8017d1847e682f39c2cbce33e904af57"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a87b6c094c21b956a469a2b69cd387c"></a><!-- doxytag: member="FIRM::setMaxNearestNeighbors" ref="a2a87b6c094c21b956a469a2b69cd387c" args="(unsigned int k)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a2a87b6c094c21b956a469a2b69cd387c">setMaxNearestNeighbors</a> (unsigned int k)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function that sets the connection strategy to the default one with k nearest neighbors. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc3bbc65d304168baaa5cce5f8fd8f86"></a><!-- doxytag: member="FIRM::constructRoadmap" ref="adc3bbc65d304168baaa5cce5f8fd8f86" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#adc3bbc65d304168baaa5cce5f8fd8f86">constructRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">While the termination condition allows, this function will construct the roadmap (using <a class="el" href="class_f_i_r_m.html#a947186c6e6be0b513efe0e0b476fef88" title="If the user desires, the roadmap can be improved for the given time (seconds). The solve() method wil...">growRoadmap()</a> and <a class="el" href="class_f_i_r_m.html#ad9cd5472a8bd1b1fcb83763128f7fd75" title="Attempt to connect disjoint components in the roadmap using random bouncing motions (the PRM expansio...">expandRoadmap()</a>, maintaining a 2:1 ratio for growing/expansion of roadmap) <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a734b40c9cde0a238b252c7447595f12c"></a><!-- doxytag: member="FIRM::growRoadmap" ref="a734b40c9cde0a238b252c7447595f12c" args="(double growTime)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a734b40c9cde0a238b252c7447595f12c">growRoadmap</a> (double growTime)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the user desires, the roadmap can be improved for the given time (seconds). The solve() method will also improve the roadmap, as needed. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca987eb185a342df77af1d6f4b5719f8"></a><!-- doxytag: member="FIRM::growRoadmap" ref="aca987eb185a342df77af1d6f4b5719f8" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aca987eb185a342df77af1d6f4b5719f8">growRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the user desires, the roadmap can be improved until a given condition is true. The solve() method will also improve the roadmap, as needed. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4490bf7d770637936f990ee96eeaeb89"></a><!-- doxytag: member="FIRM::solve" ref="a4490bf7d770637936f990ee96eeaeb89" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
+virtual ompl::base::PlannerStatus&#160;</td><td class="memItemRight" valign="bottom"><b>solve</b> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf7c24814ea6b8cad9cad350dea66560"></a><!-- doxytag: member="FIRM::clearQuery" ref="acf7c24814ea6b8cad9cad350dea66560" args="(void)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clearQuery</b> (void)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0028d56cac8cd7970b77836993a9d6fb"></a><!-- doxytag: member="FIRM::clear" ref="a0028d56cac8cd7970b77836993a9d6fb" args="(void)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> (void)</td></tr>
+<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="a8dd7c5ed3fa065f5f37d79bc1d220474"></a><!-- doxytag: member="FIRM::setNearestNeighbors" ref="a8dd7c5ed3fa065f5f37d79bc1d220474" args="(void)" -->
+template&lt;template&lt; typename T &gt; class NN&gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a8dd7c5ed3fa065f5f37d79bc1d220474">setNearestNeighbors</a> (void)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a different nearest neighbors datastructure. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5c5c1fff3029a554dfddfd95bed17b10"></a><!-- doxytag: member="FIRM::setup" ref="a5c5c1fff3029a554dfddfd95bed17b10" args="(void)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setup</b> (void)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aacad0b0dfc1413f78c6dc76fdbac9ce7"></a><!-- doxytag: member="FIRM::getRoadmap" ref="aacad0b0dfc1413f78c6dc76fdbac9ce7" args="(void) const " -->
+const <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getRoadmap</b> (void) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9a98fdb0da781d77fe6ff9a55e8a7a34"></a><!-- doxytag: member="FIRM::distanceFunction" ref="a9a98fdb0da781d77fe6ff9a55e8a7a34" args="(const Vertex a, const Vertex b) const " -->
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a9a98fdb0da781d77fe6ff9a55e8a7a34">distanceFunction</a> (const Vertex a, const Vertex b) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute distance between two milestones (this is simply distance between the states of the milestones) <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a558fbb0135ab096d3cd06e65b88533de"></a><!-- doxytag: member="FIRM::milestoneCount" ref="a558fbb0135ab096d3cd06e65b88533de" args="(void) const " -->
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a558fbb0135ab096d3cd06e65b88533de">milestoneCount</a> (void) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute distance between two milestones (this is simply distance between the states of the milestones) <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad6df82888d88ab8479f92f9f3e453c2e"></a><!-- doxytag: member="FIRM::getNearestNeighbors" ref="ad6df82888d88ab8479f92f9f3e453c2e" args="(void)" -->
+const RoadmapNeighbors &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ad6df82888d88ab8479f92f9f3e453c2e">getNearestNeighbors</a> (void)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the nearest neighbor structure. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae448791d4c9af9016bc9d5e9de166f0e"></a><!-- doxytag: member="FIRM::executeFeedback" ref="ae448791d4c9af9016bc9d5e9de166f0e" args="(void)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ae448791d4c9af9016bc9d5e9de166f0e">executeFeedback</a> (void)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the generated policy on the system. <br/></td></tr>
@@ -214,9 +394,9 @@ Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af6951ffec04529fd8da990978d7d8d19"></a><!-- doxytag: member="FIRM::freeMemory" ref="af6951ffec04529fd8da990978d7d8d19" args="(void)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#af6951ffec04529fd8da990978d7d8d19">freeMemory</a> (void)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Free all the memory allocated by the planner. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6b72ace6d1708b25bf8c7f69331ae82b"></a><!-- doxytag: member="FIRM::addMilestone" ref="a6b72ace6d1708b25bf8c7f69331ae82b" args="(ompl::base::State *state)" -->
-virtual Vertex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a6b72ace6d1708b25bf8c7f69331ae82b">addMilestone</a> (ompl::base::State *state)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a milestone for a given state (<em>state</em>), store it in the nearest neighbors data structure and then connect it to the roadmap in accordance to the connection strategy. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a052496dfed6f8d2a7526bb3dfa63a1ea"></a><!-- doxytag: member="FIRM::addStateToGraph" ref="a052496dfed6f8d2a7526bb3dfa63a1ea" args="(ompl::base::State *state)" -->
+virtual Vertex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a052496dfed6f8d2a7526bb3dfa63a1ea">addStateToGraph</a> (ompl::base::State *state)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a graph node for a given state (<em>state</em>), store it in the nearest neighbors data structure and then connect it to the roadmap in accordance to the connection strategy. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34535f25e4f3fb645fb65d57e3faf01b"></a><!-- doxytag: member="FIRM::uniteComponents" ref="a34535f25e4f3fb645fb65d57e3faf01b" args="(Vertex m1, Vertex m2)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a34535f25e4f3fb645fb65d57e3faf01b">uniteComponents</a> (Vertex m1, Vertex m2)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Make two milestones (<em>m1</em> and <em>m2</em>) be part of the same connected component. The component with fewer elements will get the id of the component with more elements. <br/></td></tr>
@@ -225,11 +405,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if two milestones (<em>m1</em> and <em>m2</em>) are part of the same connected component. This is not a const function since we use incremental connected components from boost. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae33b03b6c78466e4a47f7b6d9f59d7f8"></a><!-- doxytag: member="FIRM::growRoadmap" ref="ae33b03b6c78466e4a47f7b6d9f59d7f8" args="(const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::State *workState)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ae33b03b6c78466e4a47f7b6d9f59d7f8">growRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::State *workState)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Randomly sample the state space, add and connect milestones in the roadmap. Stop this process when the termination condition <em>ptc</em> returns true. Use <em>workState</em> as temporary memory. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab0c4511064a0cd59f5b5ad756879c4ef"></a><!-- doxytag: member="FIRM::expandRoadmap" ref="ab0c4511064a0cd59f5b5ad756879c4ef" args="(const ompl::base::PlannerTerminationCondition &amp;ptc, std::vector&lt; ompl::base::State * &gt; &amp;workStates)" -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ab0c4511064a0cd59f5b5ad756879c4ef">expandRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc, std::vector&lt; ompl::base::State * &gt; &amp;workStates)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to connect disjoint components in the roadmap using random bounding motions (the PRM expansion step) <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a4c909fc53ceeeecb6992ccebf0ab60d6">checkForSolution</a> (const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::PathPtr &amp;solution)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Randomly sample the state space, add and connect nodes in the roadmap. Stop this process when the termination condition. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c909fc53ceeeecb6992ccebf0ab60d6"></a><!-- doxytag: member="FIRM::checkForSolution" ref="a4c909fc53ceeeecb6992ccebf0ab60d6" args="(const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::PathPtr &amp;solution)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a4c909fc53ceeeecb6992ccebf0ab60d6">checkForSolution</a> (const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::PathPtr &amp;solution)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread that checks for solution. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab237fb0d7978ef4156769fc7c1d77b2b"></a><!-- doxytag: member="FIRM::haveSolution" ref="ab237fb0d7978ef4156769fc7c1d77b2b" args="(const std::vector&lt; Vertex &gt; &amp;starts, const std::vector&lt; Vertex &gt; &amp;goals, ompl::base::PathPtr &amp;solution)" -->
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ab237fb0d7978ef4156769fc7c1d77b2b">haveSolution</a> (const std::vector&lt; Vertex &gt; &amp;starts, const std::vector&lt; Vertex &gt; &amp;goals, ompl::base::PathPtr &amp;solution)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if there exists a solution, i.e., there exists a pair of milestones such that the first is in <em>start</em> and the second is in <em>goal</em>, and the two milestones are in the same connected component. If a solution is found, the path is saved. <br/></td></tr>
@@ -237,12 +416,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a341a81deb4e550fbacf6c239a801d2a8">addedNewSolution</a> (void) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of the addedSolution_ member. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual ompl::base::PathPtr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a28ff922dfb8df66dbb82a6b6078959a0">constructFeedbackPath</a> (const Vertex &amp;start, const Vertex &amp;goal)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Given two milestones from the same connected component, construct a path connecting them and set it as the solution.  <a href="#a28ff922dfb8df66dbb82a6b6078959a0"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a feedback.  <a href="#a28ff922dfb8df66dbb82a6b6078959a0"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9774dc171985f4521c02b5db8552397f"></a><!-- doxytag: member="FIRM::addEdgeToGraph" ref="a9774dc171985f4521c02b5db8552397f" args="(const Vertex a, const Vertex b)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a9774dc171985f4521c02b5db8552397f">addEdgeToGraph</a> (const Vertex a, const Vertex b)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add an edge from vertex a to b in graph. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb96d1cd6665cf4da65a41f580932103"></a><!-- doxytag: member="FIRM::generateControllersWithEdgeCost" ref="acb96d1cd6665cf4da65a41f580932103" args="(ompl::base::State *startNodeState, ompl::base::State *targetNodeState, EdgeControllerType &amp;edgeController, NodeControllerType &amp;nodeController)" -->
-virtual <a class="el" href="class_f_i_r_m_weight.html">FIRMWeight</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#acb96d1cd6665cf4da65a41f580932103">generateControllersWithEdgeCost</a> (ompl::base::State *startNodeState, ompl::base::State *targetNodeState, <a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a> &amp;edgeController, <a class="el" href="class_controller.html">NodeControllerType</a> &amp;nodeController)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f58525bdbc4277a3dae5242aa5efc04"></a><!-- doxytag: member="FIRM::generateEdgeControllerWithCost" ref="a0f58525bdbc4277a3dae5242aa5efc04" args="(ompl::base::State *startNodeState, ompl::base::State *targetNodeState, EdgeControllerType &amp;edgeController)" -->
+virtual <a class="el" href="class_f_i_r_m_weight.html">FIRMWeight</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a0f58525bdbc4277a3dae5242aa5efc04">generateEdgeControllerWithCost</a> (ompl::base::State *startNodeState, ompl::base::State *targetNodeState, <a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a> &amp;edgeController)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the cost of the edge. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abfccb43f41872b8da9a4609c1748d21f"></a><!-- doxytag: member="FIRM::generateEdgeController" ref="abfccb43f41872b8da9a4609c1748d21f" args="(const ompl::base::State *start, const ompl::base::State *target, EdgeControllerType &amp;edgeController)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#abfccb43f41872b8da9a4609c1748d21f">generateEdgeController</a> (const ompl::base::State *start, const ompl::base::State *target, <a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a> &amp;edgeController)</td></tr>
@@ -259,6 +438,106 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>sendFeedbackEdgesToVi
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a44321fba1c038c1f43ccfeccf9a1c44c"></a><!-- doxytag: member="FIRM::getUpdatedNodeCostToGo" ref="a44321fba1c038c1f43ccfeccf9a1c44c" args="(Vertex node)" -->
 std::pair&lt; typename FIRM::Edge, <br class="typebreak"/>
 double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a44321fba1c038c1f43ccfeccf9a1c44c">getUpdatedNodeCostToGo</a> (Vertex node)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the new cost to go from a node. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af6951ffec04529fd8da990978d7d8d19"></a><!-- doxytag: member="FIRM::freeMemory" ref="af6951ffec04529fd8da990978d7d8d19" args="(void)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#af6951ffec04529fd8da990978d7d8d19">freeMemory</a> (void)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Free all the memory allocated by the planner. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6b72ace6d1708b25bf8c7f69331ae82b"></a><!-- doxytag: member="FIRM::addMilestone" ref="a6b72ace6d1708b25bf8c7f69331ae82b" args="(ompl::base::State *state)" -->
+virtual Vertex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a6b72ace6d1708b25bf8c7f69331ae82b">addMilestone</a> (ompl::base::State *state)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a milestone for a given state (<em>state</em>), store it in the nearest neighbors data structure and then connect it to the roadmap in accordance to the connection strategy. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34535f25e4f3fb645fb65d57e3faf01b"></a><!-- doxytag: member="FIRM::uniteComponents" ref="a34535f25e4f3fb645fb65d57e3faf01b" args="(Vertex m1, Vertex m2)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a34535f25e4f3fb645fb65d57e3faf01b">uniteComponents</a> (Vertex m1, Vertex m2)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Make two milestones (<em>m1</em> and <em>m2</em>) be part of the same connected component. The component with fewer elements will get the id of the component with more elements. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2045f113f0755ae8eeac2c35c7c08d41"></a><!-- doxytag: member="FIRM::sameComponent" ref="a2045f113f0755ae8eeac2c35c7c08d41" args="(Vertex m1, Vertex m2)" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a2045f113f0755ae8eeac2c35c7c08d41">sameComponent</a> (Vertex m1, Vertex m2)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if two milestones (<em>m1</em> and <em>m2</em>) are part of the same connected component. This is not a const function since we use incremental connected components from boost. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4ffee3e504973b2f2a37b6b40c1cd214"></a><!-- doxytag: member="FIRM::growRoadmap" ref="a4ffee3e504973b2f2a37b6b40c1cd214" args="(const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::State *workState)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a4ffee3e504973b2f2a37b6b40c1cd214">growRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::State *workState)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Randomly sample the state space, add and connect milestones in the roadmap. Stop this process when the termination condition <em>ptc</em> returns true. Use <em>workState</em> as temporary memory. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab0c4511064a0cd59f5b5ad756879c4ef"></a><!-- doxytag: member="FIRM::expandRoadmap" ref="ab0c4511064a0cd59f5b5ad756879c4ef" args="(const ompl::base::PlannerTerminationCondition &amp;ptc, std::vector&lt; ompl::base::State * &gt; &amp;workStates)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ab0c4511064a0cd59f5b5ad756879c4ef">expandRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc, std::vector&lt; ompl::base::State * &gt; &amp;workStates)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to connect disjoint components in the roadmap using random bounding motions (the PRM expansion step) <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a4c909fc53ceeeecb6992ccebf0ab60d6">checkForSolution</a> (const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::PathPtr &amp;solution)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab237fb0d7978ef4156769fc7c1d77b2b"></a><!-- doxytag: member="FIRM::haveSolution" ref="ab237fb0d7978ef4156769fc7c1d77b2b" args="(const std::vector&lt; Vertex &gt; &amp;starts, const std::vector&lt; Vertex &gt; &amp;goals, ompl::base::PathPtr &amp;solution)" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ab237fb0d7978ef4156769fc7c1d77b2b">haveSolution</a> (const std::vector&lt; Vertex &gt; &amp;starts, const std::vector&lt; Vertex &gt; &amp;goals, ompl::base::PathPtr &amp;solution)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if there exists a solution, i.e., there exists a pair of milestones such that the first is in <em>start</em> and the second is in <em>goal</em>, and the two milestones are in the same connected component. If a solution is found, the path is saved. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a341a81deb4e550fbacf6c239a801d2a8"></a><!-- doxytag: member="FIRM::addedNewSolution" ref="a341a81deb4e550fbacf6c239a801d2a8" args="(void) const " -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a341a81deb4e550fbacf6c239a801d2a8">addedNewSolution</a> (void) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of the addedSolution_ member. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual ompl::base::PathPtr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a6a5bc8f73d3440780f68ba2ed2fae8c3">constructFeedbackPath</a> (const Vertex &amp;start, const Vertex &amp;goal)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Given two milestones from the same connected component, construct a path connecting them and set it as the solution.  <a href="#a6a5bc8f73d3440780f68ba2ed2fae8c3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af72f67131d7d663468bca975acf6530f"></a><!-- doxytag: member="FIRM::addEdgeToGraph" ref="af72f67131d7d663468bca975acf6530f" args="(const Vertex a, const Vertex b)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#af72f67131d7d663468bca975acf6530f">addEdgeToGraph</a> (const Vertex a, const Vertex b)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add an edge from vertex a to b in graph. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb96d1cd6665cf4da65a41f580932103"></a><!-- doxytag: member="FIRM::generateControllersWithEdgeCost" ref="acb96d1cd6665cf4da65a41f580932103" args="(ompl::base::State *startNodeState, ompl::base::State *targetNodeState, EdgeControllerType &amp;edgeController, NodeControllerType &amp;nodeController)" -->
+virtual <a class="el" href="class_f_i_r_m_weight.html">FIRMWeight</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#acb96d1cd6665cf4da65a41f580932103">generateControllersWithEdgeCost</a> (ompl::base::State *startNodeState, ompl::base::State *targetNodeState, <a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a> &amp;edgeController, <a class="el" href="class_controller.html">NodeControllerType</a> &amp;nodeController)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the cost of the edge. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a776783fea0cacfa2d00f7b8876fe1679"></a><!-- doxytag: member="FIRM::generateEdgeController" ref="a776783fea0cacfa2d00f7b8876fe1679" args="(const ompl::base::State *start, const ompl::base::State *target, EdgeControllerType &amp;edgeController)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a776783fea0cacfa2d00f7b8876fe1679">generateEdgeController</a> (const ompl::base::State *start, const ompl::base::State *target, <a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a> &amp;edgeController)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the edge controller that drives the robot from start to end of edge. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ace29a4cc91f7232235931fa4bded8809"></a><!-- doxytag: member="FIRM::generateNodeController" ref="ace29a4cc91f7232235931fa4bded8809" args="(const ompl::base::State *state, NodeControllerType &amp;nodeController)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ace29a4cc91f7232235931fa4bded8809">generateNodeController</a> (const ompl::base::State *state, <a class="el" href="class_controller.html">NodeControllerType</a> &amp;nodeController)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the node controller that stabilizes the robot to the node. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe1c42e65c3382e1089324c1ab6306b6"></a><!-- doxytag: member="FIRM::solveDynamicProgram" ref="afe1c42e65c3382e1089324c1ab6306b6" args="(const Vertex goalVertex)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#afe1c42e65c3382e1089324c1ab6306b6">solveDynamicProgram</a> (const Vertex goalVertex)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves the dynamic program to return a feedback policy. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4003d4144f6c32e9eaba79f292ec9ce4"></a><!-- doxytag: member="FIRM::addStateToVisualization" ref="a4003d4144f6c32e9eaba79f292ec9ce4" args="(ompl::base::State *state)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addStateToVisualization</b> (ompl::base::State *state)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8d9e316c11b1e2ff52b5ff65996d3a01"></a><!-- doxytag: member="FIRM::sendFeedbackEdgesToViz" ref="a8d9e316c11b1e2ff52b5ff65996d3a01" args="()" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>sendFeedbackEdgesToViz</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a63fbfe74dd4ac52c0cb0526ab9cf63bb"></a><!-- doxytag: member="FIRM::getUpdatedNodeCostToGo" ref="a63fbfe74dd4ac52c0cb0526ab9cf63bb" args="(Vertex node)" -->
+std::pair&lt; typename FIRM::Edge, <br class="typebreak"/>
+double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a63fbfe74dd4ac52c0cb0526ab9cf63bb">getUpdatedNodeCostToGo</a> (Vertex node)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the new cost to go from a node. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af6951ffec04529fd8da990978d7d8d19"></a><!-- doxytag: member="FIRM::freeMemory" ref="af6951ffec04529fd8da990978d7d8d19" args="(void)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#af6951ffec04529fd8da990978d7d8d19">freeMemory</a> (void)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Free all the memory allocated by the planner. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec36e02fd978f7ed5a2de1ad23593341"></a><!-- doxytag: member="FIRM::addStateToGraph" ref="aec36e02fd978f7ed5a2de1ad23593341" args="(ompl::base::State *state)" -->
+virtual Vertex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aec36e02fd978f7ed5a2de1ad23593341">addStateToGraph</a> (ompl::base::State *state)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a graph node for a given state (<em>state</em>), store it in the nearest neighbors data structure and then connect it to the roadmap in accordance to the connection strategy. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34535f25e4f3fb645fb65d57e3faf01b"></a><!-- doxytag: member="FIRM::uniteComponents" ref="a34535f25e4f3fb645fb65d57e3faf01b" args="(Vertex m1, Vertex m2)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a34535f25e4f3fb645fb65d57e3faf01b">uniteComponents</a> (Vertex m1, Vertex m2)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Make two milestones (<em>m1</em> and <em>m2</em>) be part of the same connected component. The component with fewer elements will get the id of the component with more elements. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2045f113f0755ae8eeac2c35c7c08d41"></a><!-- doxytag: member="FIRM::sameComponent" ref="a2045f113f0755ae8eeac2c35c7c08d41" args="(Vertex m1, Vertex m2)" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a2045f113f0755ae8eeac2c35c7c08d41">sameComponent</a> (Vertex m1, Vertex m2)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if two milestones (<em>m1</em> and <em>m2</em>) are part of the same connected component. This is not a const function since we use incremental connected components from boost. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4ffee3e504973b2f2a37b6b40c1cd214"></a><!-- doxytag: member="FIRM::growRoadmap" ref="a4ffee3e504973b2f2a37b6b40c1cd214" args="(const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::State *workState)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a4ffee3e504973b2f2a37b6b40c1cd214">growRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::State *workState)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Randomly sample the state space, add and connect nodes in the roadmap. Stop this process when the termination condition. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c909fc53ceeeecb6992ccebf0ab60d6"></a><!-- doxytag: member="FIRM::checkForSolution" ref="a4c909fc53ceeeecb6992ccebf0ab60d6" args="(const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::PathPtr &amp;solution)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a4c909fc53ceeeecb6992ccebf0ab60d6">checkForSolution</a> (const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::PathPtr &amp;solution)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread that checks for solution. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a937a58c35d6f8d5c26d09acbcc340d9a"></a><!-- doxytag: member="FIRM::existsPolicy" ref="a937a58c35d6f8d5c26d09acbcc340d9a" args="(const std::vector&lt; Vertex &gt; &amp;starts, const std::vector&lt; Vertex &gt; &amp;goals, ompl::base::PathPtr &amp;solution)" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a937a58c35d6f8d5c26d09acbcc340d9a">existsPolicy</a> (const std::vector&lt; Vertex &gt; &amp;starts, const std::vector&lt; Vertex &gt; &amp;goals, ompl::base::PathPtr &amp;solution)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if there exists a policy, i.e., The given pair of <em>start</em> and <em>goal</em>, are in the same connected component. If a feedback policy is found, it is saved. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a341a81deb4e550fbacf6c239a801d2a8"></a><!-- doxytag: member="FIRM::addedNewSolution" ref="a341a81deb4e550fbacf6c239a801d2a8" args="(void) const " -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a341a81deb4e550fbacf6c239a801d2a8">addedNewSolution</a> (void) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of the addedSolution_ member. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6a5bc8f73d3440780f68ba2ed2fae8c3"></a><!-- doxytag: member="FIRM::constructFeedbackPath" ref="a6a5bc8f73d3440780f68ba2ed2fae8c3" args="(const Vertex &amp;start, const Vertex &amp;goal)" -->
+virtual ompl::base::PathPtr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a6a5bc8f73d3440780f68ba2ed2fae8c3">constructFeedbackPath</a> (const Vertex &amp;start, const Vertex &amp;goal)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a feedback. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af72f67131d7d663468bca975acf6530f"></a><!-- doxytag: member="FIRM::addEdgeToGraph" ref="af72f67131d7d663468bca975acf6530f" args="(const Vertex a, const Vertex b)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#af72f67131d7d663468bca975acf6530f">addEdgeToGraph</a> (const Vertex a, const Vertex b)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add an edge from vertex a to b in graph. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaf77735db7879f41753c687eee488860"></a><!-- doxytag: member="FIRM::generateEdgeControllerWithCost" ref="aaf77735db7879f41753c687eee488860" args="(ompl::base::State *startNodeState, ompl::base::State *targetNodeState, EdgeControllerType &amp;edgeController)" -->
+virtual <a class="el" href="class_f_i_r_m_weight.html">FIRMWeight</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aaf77735db7879f41753c687eee488860">generateEdgeControllerWithCost</a> (ompl::base::State *startNodeState, ompl::base::State *targetNodeState, <a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a> &amp;edgeController)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the cost of the edge. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a776783fea0cacfa2d00f7b8876fe1679"></a><!-- doxytag: member="FIRM::generateEdgeController" ref="a776783fea0cacfa2d00f7b8876fe1679" args="(const ompl::base::State *start, const ompl::base::State *target, EdgeControllerType &amp;edgeController)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a776783fea0cacfa2d00f7b8876fe1679">generateEdgeController</a> (const ompl::base::State *start, const ompl::base::State *target, <a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a> &amp;edgeController)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the edge controller that drives the robot from start to end of edge. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ace29a4cc91f7232235931fa4bded8809"></a><!-- doxytag: member="FIRM::generateNodeController" ref="ace29a4cc91f7232235931fa4bded8809" args="(const ompl::base::State *state, NodeControllerType &amp;nodeController)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ace29a4cc91f7232235931fa4bded8809">generateNodeController</a> (const ompl::base::State *state, <a class="el" href="class_controller.html">NodeControllerType</a> &amp;nodeController)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the node controller that stabilizes the robot to the node. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe1c42e65c3382e1089324c1ab6306b6"></a><!-- doxytag: member="FIRM::solveDynamicProgram" ref="afe1c42e65c3382e1089324c1ab6306b6" args="(const Vertex goalVertex)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#afe1c42e65c3382e1089324c1ab6306b6">solveDynamicProgram</a> (const Vertex goalVertex)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves the dynamic program to return a feedback policy. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4003d4144f6c32e9eaba79f292ec9ce4"></a><!-- doxytag: member="FIRM::addStateToVisualization" ref="a4003d4144f6c32e9eaba79f292ec9ce4" args="(ompl::base::State *state)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addStateToVisualization</b> (ompl::base::State *state)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8d9e316c11b1e2ff52b5ff65996d3a01"></a><!-- doxytag: member="FIRM::sendFeedbackEdgesToViz" ref="a8d9e316c11b1e2ff52b5ff65996d3a01" args="()" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>sendFeedbackEdgesToViz</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a63fbfe74dd4ac52c0cb0526ab9cf63bb"></a><!-- doxytag: member="FIRM::getUpdatedNodeCostToGo" ref="a63fbfe74dd4ac52c0cb0526ab9cf63bb" args="(Vertex node)" -->
+std::pair&lt; typename FIRM::Edge, <br class="typebreak"/>
+double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a63fbfe74dd4ac52c0cb0526ab9cf63bb">getUpdatedNodeCostToGo</a> (Vertex node)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the new cost to go from a node. <br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -277,41 +556,41 @@ RoadmapNeighbors&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac954812b235fc64b57ea319bec7c80bb"></a><!-- doxytag: member="FIRM::g_" ref="ac954812b235fc64b57ea319bec7c80bb" args="" -->
 <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ac954812b235fc64b57ea319bec7c80bb">g_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Connectivity graph. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a333c7dec34b4c0977f85424b9fc3dc21"></a><!-- doxytag: member="FIRM::startM_" ref="a333c7dec34b4c0977f85424b9fc3dc21" args="" -->
-std::vector&lt; Vertex &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a333c7dec34b4c0977f85424b9fc3dc21">startM_</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a68e900eda3c1969b678d6d4a97720e71"></a><!-- doxytag: member="FIRM::startM_" ref="a68e900eda3c1969b678d6d4a97720e71" args="" -->
+std::vector&lt; Vertex &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a68e900eda3c1969b678d6d4a97720e71">startM_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of start milestones. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeb59b6121e120e14f30c58e567ec6a4c"></a><!-- doxytag: member="FIRM::goalM_" ref="aeb59b6121e120e14f30c58e567ec6a4c" args="" -->
-std::vector&lt; Vertex &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aeb59b6121e120e14f30c58e567ec6a4c">goalM_</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9583f5f480a2051d82c3f54efb6ab7ca"></a><!-- doxytag: member="FIRM::goalM_" ref="a9583f5f480a2051d82c3f54efb6ab7ca" args="" -->
+std::vector&lt; Vertex &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a9583f5f480a2051d82c3f54efb6ab7ca">goalM_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of goal milestones. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f27981600a6b5ee4c5124b8f9bc640b"></a><!-- doxytag: member="FIRM::stateProperty_" ref="a8f27981600a6b5ee4c5124b8f9bc640b" args="" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa4c014630cbac8a6eb961f22416aa8a4"></a><!-- doxytag: member="FIRM::stateProperty_" ref="aa4c014630cbac8a6eb961f22416aa8a4" args="" -->
 boost::property_map&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a>, <br class="typebreak"/>
-<a class="el" href="struct_f_i_r_m_1_1vertex__state__t.html">vertex_state_t</a> &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a8f27981600a6b5ee4c5124b8f9bc640b">stateProperty_</a></td></tr>
+<a class="el" href="struct_f_i_r_m_1_1vertex__state__t.html">vertex_state_t</a> &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aa4c014630cbac8a6eb961f22416aa8a4">stateProperty_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access to the internal ompl::base::state at each Vertex. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5651af4be68cf84115fbf6fe4b2c958d"></a><!-- doxytag: member="FIRM::totalConnectionAttemptsProperty_" ref="a5651af4be68cf84115fbf6fe4b2c958d" args="" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef115c8ff78263ed3881059195fc0211"></a><!-- doxytag: member="FIRM::totalConnectionAttemptsProperty_" ref="aef115c8ff78263ed3881059195fc0211" args="" -->
 boost::property_map&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a>, <br class="typebreak"/>
 <a class="el" href="struct_f_i_r_m_1_1vertex__total__connection__attempts__t.html">vertex_total_connection_attempts_t</a> &gt;<br class="typebreak"/>
-::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a5651af4be68cf84115fbf6fe4b2c958d">totalConnectionAttemptsProperty_</a></td></tr>
+::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aef115c8ff78263ed3881059195fc0211">totalConnectionAttemptsProperty_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access to the number of total connection attempts for a vertex. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9d31e5b2a0bf5921fb1c8f43e55338b"></a><!-- doxytag: member="FIRM::successfulConnectionAttemptsProperty_" ref="ad9d31e5b2a0bf5921fb1c8f43e55338b" args="" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab351ce8f9c5c3592ff65b648a1b3822c"></a><!-- doxytag: member="FIRM::successfulConnectionAttemptsProperty_" ref="ab351ce8f9c5c3592ff65b648a1b3822c" args="" -->
 boost::property_map&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a>, <br class="typebreak"/>
 <a class="el" href="struct_f_i_r_m_1_1vertex__successful__connection__attempts__t.html">vertex_successful_connection_attempts_t</a> &gt;<br class="typebreak"/>
-::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ad9d31e5b2a0bf5921fb1c8f43e55338b">successfulConnectionAttemptsProperty_</a></td></tr>
+::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ab351ce8f9c5c3592ff65b648a1b3822c">successfulConnectionAttemptsProperty_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access to the number of successful connection attempts for a vertex. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aebe2eb302b9af9ced9bc26f03d369297"></a><!-- doxytag: member="FIRM::weightProperty_" ref="aebe2eb302b9af9ced9bc26f03d369297" args="" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a457d816e43fdd20af3cd58c48a69505c"></a><!-- doxytag: member="FIRM::weightProperty_" ref="a457d816e43fdd20af3cd58c48a69505c" args="" -->
 boost::property_map&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a>, <br class="typebreak"/>
-boost::edge_weight_t &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aebe2eb302b9af9ced9bc26f03d369297">weightProperty_</a></td></tr>
+boost::edge_weight_t &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a457d816e43fdd20af3cd58c48a69505c">weightProperty_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access to the weights of each Edge. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a81eba4eb39bce397127a9d41cf0b5cd2"></a><!-- doxytag: member="FIRM::edgeIDProperty_" ref="a81eba4eb39bce397127a9d41cf0b5cd2" args="" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a573e2287409ae82f34bcee4f5738d74a"></a><!-- doxytag: member="FIRM::edgeIDProperty_" ref="a573e2287409ae82f34bcee4f5738d74a" args="" -->
 boost::property_map&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a>, <br class="typebreak"/>
-boost::edge_index_t &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a81eba4eb39bce397127a9d41cf0b5cd2">edgeIDProperty_</a></td></tr>
+boost::edge_index_t &gt;::type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a573e2287409ae82f34bcee4f5738d74a">edgeIDProperty_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Access to the indices of each Edge. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adbe52d3e291fc164ff9338765534e7ce"></a><!-- doxytag: member="FIRM::disjointSets_" ref="adbe52d3e291fc164ff9338765534e7ce" args="" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac7a425258d6ec9b4184c64b4eba8a24b"></a><!-- doxytag: member="FIRM::disjointSets_" ref="ac7a425258d6ec9b4184c64b4eba8a24b" args="" -->
 boost::disjoint_sets<br class="typebreak"/>
 &lt; boost::property_map&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a>, <br class="typebreak"/>
 boost::vertex_rank_t &gt;::type, <br class="typebreak"/>
 boost::property_map&lt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">Graph</a>, <br class="typebreak"/>
 boost::vertex_predecessor_t &gt;<br class="typebreak"/>
-::type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#adbe52d3e291fc164ff9338765534e7ce">disjointSets_</a></td></tr>
+::type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ac7a425258d6ec9b4184c64b4eba8a24b">disjointSets_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Data structure that maintains the connected components. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a517174c1ae349153df76f81f2ba2b2f1"></a><!-- doxytag: member="FIRM::maxEdgeID_" ref="a517174c1ae349153df76f81f2ba2b2f1" args="" -->
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a517174c1ae349153df76f81f2ba2b2f1">maxEdgeID_</a></td></tr>
@@ -319,9 +598,6 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0fcb0aef9c9101c4569f5b6bb5f576ae"></a><!-- doxytag: member="FIRM::connectionStrategy_" ref="a0fcb0aef9c9101c4569f5b6bb5f576ae" args="" -->
 <a class="el" href="class_f_i_r_m.html#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e">ConnectionStrategy</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a0fcb0aef9c9101c4569f5b6bb5f576ae">connectionStrategy_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that returns the milestones to attempt connections with. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ad7ac389f9e8b0e483826833c32da95"></a><!-- doxytag: member="FIRM::connectionFilter_" ref="a0ad7ac389f9e8b0e483826833c32da95" args="" -->
-<a class="el" href="class_f_i_r_m.html#a2482eee2e5248d5bff3b3b56e5a593b3">ConnectionFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a0ad7ac389f9e8b0e483826833c32da95">connectionFilter_</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that can reject a milestone connection. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a42cc77417338d946478f5a71e6bd5b70"></a><!-- doxytag: member="FIRM::userSetConnectionStrategy_" ref="a42cc77417338d946478f5a71e6bd5b70" args="" -->
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a42cc77417338d946478f5a71e6bd5b70">userSetConnectionStrategy_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag indicating whether the employed connection strategy was set by the user (or defaults are assumed) <br/></td></tr>
@@ -338,17 +614,17 @@ boost::mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 const <br class="typebreak"/>
 firm::SpaceInformation::SpaceInformationPtr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#afd4f91dc510bf7b5b68b4da5cfd90718">siF_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The base::SpaceInformation cast as <a class="el" href="classfirm_1_1_space_information.html">firm::SpaceInformation</a>, for convenience. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abfacc68b478054d0b99a3965d33d718a"></a><!-- doxytag: member="FIRM::edgeControllers_" ref="abfacc68b478054d0b99a3965d33d718a" args="" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a47d8d0e04faf98787e5c1f9ec6859fbc"></a><!-- doxytag: member="FIRM::edgeControllers_" ref="a47d8d0e04faf98787e5c1f9ec6859fbc" args="" -->
 std::map&lt; Edge, <br class="typebreak"/>
-<a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#abfacc68b478054d0b99a3965d33d718a">edgeControllers_</a></td></tr>
+<a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a47d8d0e04faf98787e5c1f9ec6859fbc">edgeControllers_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A table that stores the edge controllers according to the edges. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac80211b920fb34ee04779c9af2c0d1c4"></a><!-- doxytag: member="FIRM::nodeControllers_" ref="ac80211b920fb34ee04779c9af2c0d1c4" args="" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a93f8fe7008fb117d283d510876a249c6"></a><!-- doxytag: member="FIRM::nodeControllers_" ref="a93f8fe7008fb117d283d510876a249c6" args="" -->
 std::map&lt; Vertex, <br class="typebreak"/>
-<a class="el" href="class_controller.html">NodeControllerType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ac80211b920fb34ee04779c9af2c0d1c4">nodeControllers_</a></td></tr>
+<a class="el" href="class_controller.html">NodeControllerType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a93f8fe7008fb117d283d510876a249c6">nodeControllers_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A table that stores the node controllers according to the node (vertex) ids. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2da49edf6ea58f4116cd3c31022bd693"></a><!-- doxytag: member="FIRM::costToGo_" ref="a2da49edf6ea58f4116cd3c31022bd693" args="" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a44d15ba1ffcb963bf840935ee8a030e2"></a><!-- doxytag: member="FIRM::costToGo_" ref="a44d15ba1ffcb963bf840935ee8a030e2" args="" -->
 std::map&lt; Vertex, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>costToGo_</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aae9e2e83177ef121adc36ef7f9e5d16d"></a><!-- doxytag: member="FIRM::feedback_" ref="aae9e2e83177ef121adc36ef7f9e5d16d" args="" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0d6d7d7d1942e83f48b4897929a533f2"></a><!-- doxytag: member="FIRM::feedback_" ref="a0d6d7d7d1942e83f48b4897929a533f2" args="" -->
 std::map&lt; Vertex, Edge &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>feedback_</b></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17cff52eb2c31715ab8341b9daea1a3f"></a><!-- doxytag: member="FIRM::numParticles_" ref="a17cff52eb2c31715ab8341b9daea1a3f" args="" -->
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a17cff52eb2c31715ab8341b9daea1a3f">numParticles_</a></td></tr>
@@ -358,12 +634,15 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>debug_</b></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="add9de6c5accdea0f9b6d1ff458350036"></a><!-- doxytag: member="FIRM::minFIRMNodes_" ref="add9de6c5accdea0f9b6d1ff458350036" args="" -->
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#add9de6c5accdea0f9b6d1ff458350036">minFIRMNodes_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The minimum number of nodes that should be sampled. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ad7ac389f9e8b0e483826833c32da95"></a><!-- doxytag: member="FIRM::connectionFilter_" ref="a0ad7ac389f9e8b0e483826833c32da95" args="" -->
+<a class="el" href="class_f_i_r_m.html#a2482eee2e5248d5bff3b3b56e5a593b3">ConnectionFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a0ad7ac389f9e8b0e483826833c32da95">connectionFilter_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that can reject a milestone connection. <br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Feedback Information RoadMap planner. </p>
 <p><a class="anchor" id="FIRM"></a> </p>
-<dl class="user"><dt><b>Short description</b></dt><dd>Feedback Information RoadMap is a method that generates a graph in belief space and returns a policy that guides that robot from the start to goal.</dd></dl>
-<dl class="user"><dt><b>External documentation</b></dt><dd>A. Agha-mohammadi, Suman Chakravorty, Nancy Amato, "FIRM: Sampling-based Feedback Motion Planning Under Motion 
+<dl class="user"><dt><b>Short description</b></dt><dd>Feedback Information RoadMap (<a class="el" href="class_f_i_r_m.html" title="Feedback Information RoadMap planner.">FIRM</a>), is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic roadmap methods. The crucial feature of <a class="el" href="class_f_i_r_m.html" title="Feedback Information RoadMap planner.">FIRM</a> is that the costs associated with the edges are independent of each other, and in this sense it is the first method that generates a graph in belief space that preserves the optimal substructure property. From a practical point of view, <a class="el" href="class_f_i_r_m.html" title="Feedback Information RoadMap planner.">FIRM</a> is a robust and reliable planning framework. It is robust since the solution is a feedback and there is no need for expensive replanning. It is reliable because accurate collision probabilities can be computed along the edges. In addition, <a class="el" href="class_f_i_r_m.html" title="Feedback Information RoadMap planner.">FIRM</a> is a scalable framework, where the complexity of planning with <a class="el" href="class_f_i_r_m.html" title="Feedback Information RoadMap planner.">FIRM</a> is a constant multiplier of the complexity of planning with PRM.</dd></dl>
+<dl class="user"><dt><b>External documentation</b></dt><dd>A. Agha-mohammadi, Suman Chakravorty, Nancy Amato, "FIRM: Sampling-based Feedback Motion Planning Under Motion
    Uncertainty and Imperfect Measurements", International Journal of Robotics Research, 33(2):268-304, February 2014</dd></dl>
 <p><a href="http://www.mit.edu/~aliagha/Web/pubpdfs/2014.Ali.Suman.ea.IJRR_FIRM.pdf">[PDF]</a> </p>
 </div><hr/><h2>Member Typedef Documentation</h2>
@@ -378,6 +657,66 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div>
 <div class="memdoc">
 <p>Defining the edge and node controller types </p>
+
+</div>
+</div>
+<a class="anchor" id="a70abcb24fbc9f836b94119f65c8f8a37"></a><!-- doxytag: member="FIRM::EdgeControllerType" ref="a70abcb24fbc9f836b94119f65c8f8a37" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_controller.html">Controller</a>&lt;<a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>, <a class="el" href="class_extended_k_f.html">ExtendedKF</a>&gt; <a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">FIRM::EdgeControllerType</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Defining the edge and node controller types </p>
+
+</div>
+</div>
+<a class="anchor" id="a70abcb24fbc9f836b94119f65c8f8a37"></a><!-- doxytag: member="FIRM::EdgeControllerType" ref="a70abcb24fbc9f836b94119f65c8f8a37" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_controller.html">Controller</a>&lt;<a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>, <a class="el" href="class_extended_k_f.html">ExtendedKF</a>&gt; <a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">FIRM::EdgeControllerType</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Defining the edge and node controller types </p>
+
+</div>
+</div>
+<a class="anchor" id="a687e9f4243b22c30ee1fa5da22a85053"></a><!-- doxytag: member="FIRM::Graph" ref="a687e9f4243b22c30ee1fa5da22a85053" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef boost::adjacency_list&lt; boost::vecS, boost::vecS, boost::bidirectionalS, boost::property &lt; <a class="el" href="struct_f_i_r_m_1_1vertex__state__t.html">vertex_state_t</a>, ompl::base::State*, boost::property &lt; <a class="el" href="struct_f_i_r_m_1_1vertex__total__connection__attempts__t.html">vertex_total_connection_attempts_t</a>, unsigned int, boost::property &lt; <a class="el" href="struct_f_i_r_m_1_1vertex__successful__connection__attempts__t.html">vertex_successful_connection_attempts_t</a>, unsigned int, boost::property &lt; <a class="el" href="struct_f_i_r_m_1_1vertex__flags__t.html">vertex_flags_t</a>, unsigned int, boost::property &lt; boost::vertex_predecessor_t, unsigned long int, boost::property &lt; boost::vertex_rank_t, unsigned long int &gt; &gt; &gt; &gt; &gt; &gt;, boost::property &lt; boost::edge_weight_t, <a class="el" href="class_f_i_r_m_weight.html">FIRMWeight</a> , boost::property &lt; boost::edge_index_t, unsigned int, boost::property &lt; <a class="el" href="struct_f_i_r_m_1_1edge__flags__t.html">edge_flags_t</a>, unsigned int &gt; &gt; &gt; &gt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">FIRM::Graph</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>The underlying roadmap graph. </p>
+<dl class="user"><dt><b>Edges are directed and have a weight property called FIRMWeight. This weight property</b></dt><dd>stores information about the edge controller identification, transition probability and execution cost. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a687e9f4243b22c30ee1fa5da22a85053"></a><!-- doxytag: member="FIRM::Graph" ref="a687e9f4243b22c30ee1fa5da22a85053" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef boost::adjacency_list&lt; boost::vecS, boost::vecS, boost::bidirectionalS, boost::property &lt; <a class="el" href="struct_f_i_r_m_1_1vertex__state__t.html">vertex_state_t</a>, ompl::base::State*, boost::property &lt; <a class="el" href="struct_f_i_r_m_1_1vertex__total__connection__attempts__t.html">vertex_total_connection_attempts_t</a>, unsigned int, boost::property &lt; <a class="el" href="struct_f_i_r_m_1_1vertex__successful__connection__attempts__t.html">vertex_successful_connection_attempts_t</a>, unsigned int, boost::property &lt; <a class="el" href="struct_f_i_r_m_1_1vertex__flags__t.html">vertex_flags_t</a>, unsigned int, boost::property &lt; boost::vertex_predecessor_t, unsigned long int, boost::property &lt; boost::vertex_rank_t, unsigned long int &gt; &gt; &gt; &gt; &gt; &gt;, boost::property &lt; boost::edge_weight_t, <a class="el" href="class_f_i_r_m_weight.html">FIRMWeight</a> , boost::property &lt; boost::edge_index_t, unsigned int, boost::property &lt; <a class="el" href="struct_f_i_r_m_1_1edge__flags__t.html">edge_flags_t</a>, unsigned int &gt; &gt; &gt; &gt; <a class="el" href="class_f_i_r_m.html#a687e9f4243b22c30ee1fa5da22a85053">FIRM::Graph</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>The underlying roadmap graph. </p>
+<dl class="user"><dt><b>Edges are directed and have a weight property called FIRMWeight. This weight property</b></dt><dd>stores information about the edge controller identification, transition probability and execution cost. </dd></dl>
 
 </div>
 </div>
@@ -451,10 +790,39 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div>
 <div class="memdoc">
 
-<p>Given two milestones from the same connected component, construct a path connecting them and set it as the solution. </p>
-<p>Given a solution represented as a vector of predecesors in the roadmap, construct a geometric path</p>
+<p>Construct a feedback. </p>
 <p>ompl::base::PathPtr FIRM::constructSolution(const Vertex &amp;start, const Vertex &amp;goal) {</p>
 <p>} </p>
+
+</div>
+</div>
+<a class="anchor" id="a6a5bc8f73d3440780f68ba2ed2fae8c3"></a><!-- doxytag: member="FIRM::constructFeedbackPath" ref="a6a5bc8f73d3440780f68ba2ed2fae8c3" args="(const Vertex &amp;start, const Vertex &amp;goal)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual ompl::base::PathPtr <a class="el" href="class_f_i_r_m.html#a28ff922dfb8df66dbb82a6b6078959a0">FIRM::constructFeedbackPath</a> </td>
+          <td>(</td>
+          <td class="paramtype">const Vertex &amp;&#160;</td>
+          <td class="paramname"><em>start</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Vertex &amp;&#160;</td>
+          <td class="paramname"><em>goal</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Given two milestones from the same connected component, construct a path connecting them and set it as the solution. </p>
+<p>Given a solution represented as a vector of predecesors in the roadmap, construct a geometric path </p>
 
 </div>
 </div>
@@ -510,6 +878,58 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
+<a class="anchor" id="a8017d1847e682f39c2cbce33e904af57"></a><!-- doxytag: member="FIRM::setConnectionStrategy" ref="a8017d1847e682f39c2cbce33e904af57" args="(const ConnectionStrategy &amp;connectionStrategy)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_i_r_m.html#a8017d1847e682f39c2cbce33e904af57">FIRM::setConnectionStrategy</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_i_r_m.html#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e">ConnectionStrategy</a> &amp;&#160;</td>
+          <td class="paramname"><em>connectionStrategy</em></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the connection strategy function that specifies the milestones that connection attempts will be made to for a given milestone. </p>
+<dl class="user"><dt><b>The behavior and performance of PRM can be changed drastically</b></dt><dd>by varying the number and properties of the milestones that are connected to each other.</dd></dl>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pdef</td><td>A function that takes a milestone as an argument and returns a collection of other milestones to which a connection attempt must be made. The default connection strategy is to connect a milestone's 10 closest neighbors. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a8017d1847e682f39c2cbce33e904af57"></a><!-- doxytag: member="FIRM::setConnectionStrategy" ref="a8017d1847e682f39c2cbce33e904af57" args="(const ConnectionStrategy &amp;connectionStrategy)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_i_r_m.html#a8017d1847e682f39c2cbce33e904af57">FIRM::setConnectionStrategy</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_i_r_m.html#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e">ConnectionStrategy</a> &amp;&#160;</td>
+          <td class="paramname"><em>connectionStrategy</em></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the connection strategy function that specifies the milestones that connection attempts will be made to for a given milestone. </p>
+<dl class="user"><dt><b>The behavior and performance of PRM can be changed drastically</b></dt><dd>by varying the number and properties of the milestones that are connected to each other.</dd></dl>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pdef</td><td>A function that takes a milestone as an argument and returns a collection of other milestones to which a connection attempt must be made. The default connection strategy is to connect a milestone's 10 closest neighbors. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a7ffdc57247b8f40899646195750b6a20"></a><!-- doxytag: member="FIRM::solveDynamicProgram" ref="a7ffdc57247b8f40899646195750b6a20" args="(const Vertex goalVertex)" -->
 <div class="memitem">
 <div class="memproto">
@@ -531,7 +951,11 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
+<li>include/Planner/<a class="el" href="_f_i_r_m-old-v2_8h_source.html">FIRM-old-v2.h</a></li>
+<li>include/Planner/<a class="el" href="_f_i_r_m-old_8h_source.html">FIRM-old.h</a></li>
 <li>include/Planner/<a class="el" href="_f_i_r_m_8h_source.html">FIRM.h</a></li>
+<li>src/Planner/FIRM-old-v2.cpp</li>
+<li>src/Planner/FIRM-old.cpp</li>
 <li>src/Planner/FIRM.cpp</li>
 </ul>
 </div><!-- contents -->
@@ -552,7 +976,7 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 31 2014 13:00:50 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 1 2014 17:06:44 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

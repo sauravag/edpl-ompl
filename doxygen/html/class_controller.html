@@ -133,8 +133,9 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a50a65edd2cf9fcce0cca465cbc3d527d"></a><!-- doxytag: member="Controller::Controller" ref="a50a65edd2cf9fcce0cca465cbc3d527d" args="(const ompl::base::State *goal, const std::vector&lt; ompl::base::State * &gt; &amp;nominalXs, const std::vector&lt; ompl::control::Control * &gt; &amp;nominalUs, const firm::SpaceInformation::SpaceInformationPtr si)" -->
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a50a65edd2cf9fcce0cca465cbc3d527d">Controller</a> (const ompl::base::State *goal, const std::vector&lt; ompl::base::State * &gt; &amp;nominalXs, const std::vector&lt; ompl::control::Control * &gt; &amp;nominalUs, const firm::SpaceInformation::SpaceInformationPtr si)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a01cbbc1435d0a4ed8733332bef6d7342">Execute</a> (const ompl::base::State *startState, ompl::base::State *endState, ompl::base::Cost &amp;executionCost, bool constructionMode=true)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute the controller i.e. take the system from start to end state of edge.  <a href="#a01cbbc1435d0a4ed8733332bef6d7342"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a01cbbc1435d0a4ed8733332bef6d7342"></a><!-- doxytag: member="Controller::Execute" ref="a01cbbc1435d0a4ed8733332bef6d7342" args="(const ompl::base::State *startState, ompl::base::State *endState, ompl::base::Cost &amp;executionCost, bool constructionMode=true)" -->
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#a01cbbc1435d0a4ed8733332bef6d7342">Execute</a> (const ompl::base::State *startState, ompl::base::State *endState, ompl::base::Cost &amp;executionCost, bool constructionMode=true)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute the controller i.e. take the system from start to end state of edge. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba227cad46f73fab5fcf37b41cae71a9"></a><!-- doxytag: member="Controller::Stabilize" ref="aba227cad46f73fab5fcf37b41cae71a9" args="(const ompl::base::State *startState)" -->
 virtual ompl::base::State *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_controller.html#aba227cad46f73fab5fcf37b41cae71a9">Stabilize</a> (const ompl::base::State *startState)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Stabilize the system to an existing <a class="el" href="class_f_i_r_m.html" title="Feedback Information RoadMap planner.">FIRM</a> node. <br/></td></tr>
@@ -213,53 +214,9 @@ static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 class Controller&lt; SeparatedControllerType, FilterType &gt;</h3>
 
 <p>Base class for <a class="el" href="class_controller.html" title="Base class for Controller. A controller&#39;s task is to use the filter to estimate the belief robot&#39;s st...">Controller</a>. A controller's task is to use the filter to estimate the belief robot's state and generate control commands using the separated controller. For example by fusing an LQR and Kalman Filter we generate an LQG controller. </p>
-</div><hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a01cbbc1435d0a4ed8733332bef6d7342"></a><!-- doxytag: member="Controller::Execute" ref="a01cbbc1435d0a4ed8733332bef6d7342" args="(const ompl::base::State *startState, ompl::base::State *endState, ompl::base::Cost &amp;executionCost, bool constructionMode=true)" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class SeparatedControllerType , class FilterType &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="class_controller.html">Controller</a>&lt; SeparatedControllerType, FilterType &gt;::<a class="el" href="class_controller.html#a01cbbc1435d0a4ed8733332bef6d7342">Execute</a> </td>
-          <td>(</td>
-          <td class="paramtype">const ompl::base::State *&#160;</td>
-          <td class="paramname"><em>startState</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">ompl::base::State *&#160;</td>
-          <td class="paramname"><em>endState</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">ompl::base::Cost &amp;&#160;</td>
-          <td class="paramname"><em>executionCost</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>constructionMode</em> = <code>true</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Execute the controller i.e. take the system from start to end state of edge. </p>
-<p>Increment cost by: -&gt; 0.01 for time based -&gt; trace(Covariance) for <a class="el" href="class_f_i_r_m.html" title="Feedback Information RoadMap planner.">FIRM</a></p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+</div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>include/Controllers/<a class="el" href="_controller_8h_source.html">Controller.h</a></li>
+<li>src/Controllers/Controller.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- window showing the filter options -->
@@ -279,7 +236,7 @@ template&lt;class SeparatedControllerType , class FilterType &gt; </div>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 31 2014 13:00:49 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 1 2014 17:06:44 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

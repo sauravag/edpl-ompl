@@ -34,12 +34,6 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-/////////////////////////////////////////////
-// Abstract class interface for motion models
-// This class defines the operations that can be performed on motion models,
-// as well as the data they are expected to have
-/////////////////////////////////////////////
-
 #ifndef MOTIONMODELMETHOD_
 #define MOTIONMODELMETHOD_
 
@@ -48,6 +42,10 @@
 #include "ompl/control/Control.h"
 #include "ompl/control/spaces/RealVectorControlSpace.h"
 #include "ompl/control/SpaceInformation.h"
+
+/**
+ \brief Abstract class interface for defining a motion model.
+**/
 
 class MotionModelMethod
 {
@@ -62,15 +60,8 @@ class MotionModelMethod
 		typedef arma::mat     JacobianType;
         typedef boost::shared_ptr<MotionModelMethod> MotionModelPointer;
 
-        ///////////////////////////////////////////
-        //		Constructors and destructors 			 //
-        ///////////////////////////////////////////
-        //Default constructor
-        //MotionModelMethod() : stateDim_(0), controlDim_(0), noiseDim_(0) {}
-
-
+        /** \brief Constructor */
 		MotionModelMethod(const ompl::control::SpaceInformationPtr si, int nDim=0):
-        //TODO: can the noise dimension actually be different from the control dimension?
             si_(si),
 			stateDim_(si->getStateDimension()),
 			controlDim_((si->getControlSpace())->getDimension()),
@@ -86,60 +77,62 @@ class MotionModelMethod
 
         }
 
+        /** \brief Set the timestep for motion. */
         void setTimeStep(double timeStep){ dt_ = timeStep;}
 
-		//Destructor
+		/** \brief Destructor */
 		virtual ~MotionModelMethod() {};
 
 
-		//Produce the next state, given the current state, a control and a noise
-		//Implementation is specific to particular motion model
+		/** \brief Propagate the system to the next state, given the current state, a control and a noise. */
 		virtual void Evolve(const ompl::base::State *state, const ompl::control::Control *control, const NoiseType& w, ompl::base::State *result) = 0;
 
-		//Generate open loop control between two specified Cfgs/states
-		//Implementation is specific to particular motion model
+		/** \brief  Generate open loop control that drives robot from start to end state. */
 		virtual void generateOpenLoopControls(const ompl::base::State *startState,
                                               const ompl::base::State *endState,
                                               std::vector<ompl::control::Control*> &openLoopControls) = 0;
 
 
 
-		//Generate noise according to specified state and control input
-		//Appears to be common to all motion models
+		/** \brief Generate noise according to specified state and control input. */
 		virtual NoiseType generateNoise(const ompl::base::State *state, const ompl::control::Control* control) = 0;
 
-		// df/dx
+		/** \brief Calculate the state transition Jacobian i.e. df/dx where f is the transition function and x is the state. */
 		virtual JacobianType
 		getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
-		// df/du
+		
+        /** \brief Calculate the control transition Jacobian i.e. df/du where f is the transition function and u is the control. */
 		virtual JacobianType
 		getControlJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
-		// df/dw
+		
+        /** \brief Calculate the noise transition Jacobian i.e. df/dw where f is the transition function and w is the noise. */
 		virtual JacobianType
 		getNoiseJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
 
+        /** \brief Calculate the process noise covariance. */
 		virtual arma::mat
 		processNoiseCovariance(const ompl::base::State *state, const ompl::control::Control* control) = 0;
 
-        // Get zero control which affects no change on the robot
+        /** \brief Get zero control which produces no change in the robot state. */
 		virtual ompl::control::Control* getZeroControl() { return zeroControl_; }
 
-		// Zero noise
-		virtual const NoiseType& getZeroNoise()     { return zeroNoise_; }
+		/** \brief Get the zero noise. */
+		virtual const NoiseType& getZeroNoise()  { return zeroNoise_; }
 
+        /** \brief Get the control dimension. */
         virtual const size_t controlDim()           { return controlDim_; }
 
-
+        /** \brief Get the time step value. */
         virtual double getTimestepSize() { return dt_; }
 
-        // Convert a control from OMPL format to armadillo vector
+        /** \brief Convert a control from OMPL format to armadillo vector. */
         arma::colvec OMPL2ARMA(const ompl::control::Control *control)
         {
-            //std::cout<<"OMPL2ARMA Printing the control :"<<std::endl;
-            //si_->printControl(control, std::cout);
 
             arma::colvec u(2);
+
             if(!control) control = si_->allocControl();
+
             const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
 
             for (unsigned int i = 0; i < controlDim_; i++)
@@ -149,34 +142,39 @@ class MotionModelMethod
 
             return u;
         }
+
+        /** \brief Convert a control from aradillo vector to ompl::control::Control* . */
         void ARMA2OMPL(arma::colvec u, ompl::control::Control *control)
         {
-            //const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
             if(!control) control = si_->allocControl();
+            
             for (unsigned int i = 0; i < controlDim_; i++)
             {
                 control->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = u[i];
             }
-            //std::cout<<"ARMA2OMPL Printing the control :"<<std::endl;
-            //si_->printControl(control, std::cout);
         }
 
 	protected:
 
+        /** \brief A pointer to the space information. */
 	    ompl::control::SpaceInformationPtr si_;
 
+        /** \brief Dimension of the system state. */
 		const unsigned int stateDim_;
 
-		//control vector dimension is specific to each motion model subclass
+		/** \brief control vector dimension is specific to each motion model subclass. */
 		const unsigned int controlDim_;
+
+        /** \brief Zero control. */
 		ompl::control::Control* zeroControl_;
 
-		//noise vector dimension is specific to each motion model subclass
+		/** \brief noise vector dimension is specific to each motion model subclass. */
 		const int noiseDim_;
+
+        /** \brief Zero noise. */
 		NoiseType zeroNoise_;
 
-		//timestep size, which is used to generate the next state by applying
-		//a control for that period of time
+		/** \brief timestep size, used to generate the next state by applying a control for this period of time. */
 		double dt_;
 
 };

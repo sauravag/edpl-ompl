@@ -91,7 +91,6 @@ namespace ompl
 FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode) :
     ompl::base::Planner(si, "FIRM"),
     siF_(si),
-    debug_(debugMode),
     stateProperty_(boost::get(vertex_state_t(), g_)),
     totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), g_)),
     successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), g_)),
@@ -220,7 +219,7 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
 void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
                                             ompl::base::PathPtr &solution)
 {
-    ompl::base::GoalSampleableRegion *goal = static_cast<ompl::base::GoalSampleableRegion*>(pdef_->getGoal().get());
+
     while (!ptc && !addedSolution_)
     {
         // Check for any new goal states
@@ -231,18 +230,17 @@ void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
                 goalM_.push_back(addStateToGraph(si_->cloneState(st)));
         }
         */
-        addedSolution_ = haveSolution(startM_, goalM_, solution);
+        addedSolution_ = existsPolicy(startM_, goalM_, solution);
 
         if (!addedSolution_)
             boost::this_thread::sleep(boost::posix_time::milliseconds(10e3));
     }
 }
 
-bool FIRM::haveSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals, ompl::base::PathPtr &solution)
+bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals, ompl::base::PathPtr &solution)
 {
     ompl::base::Goal *g = pdef_->getGoal().get();
     ompl::base::Cost sol_cost(0.0);
-    bool sol_cost_set = false;
 
     if(boost::num_vertices(g_) < 8) return false;
 
@@ -394,18 +392,13 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state)
             totalConnectionAttemptsProperty_[n]++;
             if (si_->checkMotion(stateProperty_[m], stateProperty_[n]))
             {
-                if(debug_)
-                {
-                    std::cout<<"The 2 states to create an edge \n";
-                    si_->printState(stateProperty_[m]);
-                    si_->printState(stateProperty_[n]);
-                }
                 successfulConnectionAttemptsProperty_[m]++;
                 successfulConnectionAttemptsProperty_[n]++;
+                
                 addEdgeToGraph(m, n);
                 addEdgeToGraph(n, m);
+                
                 uniteComponents(m, n);
-
             }
         }
     }
@@ -452,10 +445,12 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
     const FIRMWeight weight = generateEdgeControllerWithCost(stateProperty_[a], stateProperty_[b], edgeController);
 
     assert(edgeController.getGoal() && "The generated controller has no goal");
+    
     const unsigned int id = maxEdgeID_++;
 
     const Graph::edge_property_type properties(weight, id);
 
+    // create an edge with the edge weight property
     std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
 
     edgeControllers_[newEdge.first] = edgeController;
@@ -465,19 +460,7 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
 
 FIRMWeight FIRM::generateEdgeControllerWithCost(ompl::base::State* startNodeState, ompl::base::State* targetNodeState, EdgeControllerType &edgeController)
 {
-    assert(targetNodeState && "The target node state in monte carlo sim func is null !!");
-    assert(startNodeState != targetNodeState && "generateControllersWithEdgeCost: The start and goal are same");
 
-    if(debug_)
-    {
-        std::cout<<"The 2 states to connect for edge are: "<<std::endl;
-        std::cout<<"Start  : \n"<<std::endl;
-        std::cout<<startNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
-        std::cout<<"End  : \n"<<std::endl;
-        std::cout<<targetNodeState->as<SE2BeliefSpace::StateType>()->getArmaData();
-        //std::cout<<"Press Enter and wait "<<std::endl;
-        //std::cin.get();
-    }
     double successCount = 0;
 
     // initialize costs to 0
@@ -489,11 +472,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(ompl::base::State* startNodeStat
 
     for(unsigned int i=0; i< numParticles_;i++)
     {
-
-        //bool isCollided = false;
         //cout << "MonteCarlo Simulation particle number "<< i<<endl;
-        //double tempWeight=0;
-
         siF_->setTrueState(startNodeState);
         siF_->setBelief(startNodeState);
 
@@ -506,11 +485,6 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(ompl::base::State* startNodeStat
 
            edgeCost.v = edgeCost.v + pcost.v ;
 
-            if(debug_)
-            {
-                std::cout<<"The cost at particle: "<<i<<"  is : "<<edgeCost.v<<std::endl;
-                //std::cin.get();
-            }
         }
 
     }
@@ -519,14 +493,6 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(ompl::base::State* startNodeStat
     else edgeCost.v = ompl::magic::EXTREMELY_HIGH_EDGE_COST; // extremely high cost if no particle could succeed, we can also simply not add this edge
 
     double transitionProbability = successCount / numParticles_ ;
-
-    if(debug_)
-    {
-        std::cout<<"Edge Cost :"<<edgeCost.v<<std::endl;
-        std::cout<<"Transition Prob: "<<transitionProbability<<std::endl;
-        //std::cout<<"Press Enter"<<std::endl;
-        //std::cin.get();
-    }
 
     FIRMWeight weight(edgeCost.v, transitionProbability);
 
@@ -571,7 +537,6 @@ void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeCont
 
    if(siF_->getObservationModel()->isStateObservable(node))
    {
-        //if(debug_) std::cout<<"The node is observable, constructing node controller \n"<<std::endl;
         // Contruct a linear kalman filter
         LinearizedKF linearizedKF(siF_);
 
@@ -594,7 +559,6 @@ void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeCont
     }
     else
     {
-        //if(debug_) std::cout<<"The node is NOT observable, constructing horrendous node controller \n"<<std::endl;
         // Compute a high stationary cov at node state
         int stateDim = si_->getStateDimension();
         arma::mat stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
@@ -620,9 +584,9 @@ arma::colvec MapToColvec(const Map& _m) {
 
 void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 {
-    using namespace arma;
+    OMPL_INFORM("Solving DP");
 
-    if(debug_) std::cout << "Started solving Dynamic Optimization (Programming)" << std::endl;
+    using namespace arma;
 
     float discountFactor = ompl::magic::DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR;
 
@@ -659,8 +623,6 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
     {
         nIter++;
 
-        if(debug_) cout<<" Iteration in DP :"<<nIter<<endl;
-
         foreach(Vertex v, boost::vertices(g_))
         {
             //value for goal node stays the same
@@ -678,18 +640,10 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
         convergenceCondition = (norm(MapToColvec(costToGo_)-MapToColvec(newCostToGo), "inf") <= ompl::magic::DP_CONVERGENCE_THRESHOLD);
 
-        if(debug_)
-        {
-            cout<<" The new computed costToGo  :"<<endl<<MapToColvec(newCostToGo)<<endl;
-            cout<<"Press Enter"<<endl;
-            //std::cin.get();
-        }
-
-        costToGo_.swap(newCostToGo);   // Equivalent to "m_costToGo = newCostToGo"
+        costToGo_.swap(newCostToGo);   // Equivalent to costToGo_ = newCostToGo
 
     }
 
-    if(debug_) cout<<"DP Solved "<<endl;
 }
 
 
@@ -725,8 +679,6 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(FIRM::Vertex 
     DoubleValueComp dvc;
     std::pair<Edge,double> bestCandidate =   *min_element(candidateCostToGo.begin(), candidateCostToGo.end(), dvc );
 
-    //if(debug_) std::cout<<" The best candidate cost is: "<<bestCandidate.second<<std::endl;
-    //cin.get();
     return bestCandidate;
 
 }
@@ -735,42 +687,11 @@ void FIRM::executeFeedback(void)
 {
     sendFeedbackEdgesToViz();
 
-    if(boost::num_edges(g_) == 0)
-    {
-        std::cout<<"There are no edges !! Press Enter";
-        std::cin.get();
-    }
     Vertex start = startM_[0];
     Vertex goal  = goalM_[0] ;
 
     siF_->setTrueState(stateProperty_[start]);
     siF_->setBelief(stateProperty_[start]);
-
-    if(debug_)
-    {
-        std::cout<<"The number of edges in the graph are :"<<boost::num_edges(g_)<<std::endl;
-        std::cout<<"Printing out the nodes in the graph \n";
-        foreach(Vertex v, boost::vertices(g_))
-        {
-            si_->printState(stateProperty_[v]);
-        }
-
-
-    }
-
-    assert(feedback_.size() > 0  && "There is no feedback generated ");
-
-    if(debug_)
-    {
-      std::cout<<"The planner start state is: \n" ;
-      si_->printState(stateProperty_[start]);
-      ompl::base::State *goalState = siF_->allocState();
-      goalState = stateProperty_[goal];
-      std::cout<<"The planner goal state is:  \n";
-      si_->printState(goalState);
-      std::cout<<"Press ENTER \n";
-      std::cin.get();
-    }
 
     Vertex currentVertex =  start;
 
@@ -781,48 +702,25 @@ void FIRM::executeFeedback(void)
 
     ompl::base::State *cendState = si_->allocState();
 
-    if(debug_) OMPL_INFORM("Running policy execution");
+    OMPL_INFORM("Running policy execution");
 
     while(currentVertex != goal)
     {
         Edge e = feedback_[currentVertex];
         controller = edgeControllers_[e];
         ompl::base::Cost cost;
-        //assert(controller.getGoal() && "The controller does not have a goal !");
-
-        if(debug_)
-        {
-            std::cout<<"executeFeedback: The start of the controller is : \n" <<stateProperty_[currentVertex]->as<SE2BeliefSpace::StateType>()->getArmaData();
-            std::cout<<"executeFeedback: The controller's goal state is: (Press Enter)  \n"<<(controller.getGoal())->as<SE2BeliefSpace::StateType>()->getArmaData();
-            //std::cin.get();
-        }
 
         if(controller.Execute(cstartState, cendState, cost, false))
         {
-            if(debug_) std::cout<<"executeFeedback: Controller was successful in execution (Press Enter) \n";
-            //std::cin.get();
             currentVertex = boost::target(e, g_);
         }
         else
         {
-            if(debug_) std::cout<<"executeFeedback: Controller was NOT successful in execution (Press Enter)  \n";
-            //std::cin.get();
             currentVertex = addStateToGraph(cendState);
             solveDynamicProgram(goal);
         }
         si_->copyState(cstartState, cendState);
-        //std::cout<<"Press Enter \n";
-        //std::cin.get();
-    }
 
-    if(debug_)
-    {
-        using namespace std;
-
-        cout<<"executeFeedback: The final filtered State from controller is :"<<cendState->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
-        cout<<"executeFeedback: the final commanded state was :"<<stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->getArmaData()<<endl;
-        cout<<"Press enter "<<endl;
-        //std::cin.get();
     }
 
 

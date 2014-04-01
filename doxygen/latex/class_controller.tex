@@ -59,7 +59,8 @@ firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr {\bfseries \-Space\-In
 \hypertarget{class_controller_a50a65edd2cf9fcce0cca465cbc3d527d}{\hyperlink{class_controller_a50a65edd2cf9fcce0cca465cbc3d527d}{\-Controller} (const ompl\-::base\-::\-State $\ast$goal, const std\-::vector$<$ ompl\-::base\-::\-State $\ast$ $>$ \&nominal\-Xs, const std\-::vector$<$ ompl\-::control\-::\-Control $\ast$ $>$ \&nominal\-Us, const firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_controller_a50a65edd2cf9fcce0cca465cbc3d527d}
 
 \begin{DoxyCompactList}\small\item\em \-Constructor. \end{DoxyCompactList}\item 
-virtual bool \hyperlink{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\-Execute} (const ompl\-::base\-::\-State $\ast$start\-State, ompl\-::base\-::\-State $\ast$end\-State, ompl\-::base\-::\-Cost \&execution\-Cost, bool construction\-Mode=true)
+\hypertarget{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{virtual bool \hyperlink{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\-Execute} (const ompl\-::base\-::\-State $\ast$start\-State, ompl\-::base\-::\-State $\ast$end\-State, ompl\-::base\-::\-Cost \&execution\-Cost, bool construction\-Mode=true)}\label{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}
+
 \begin{DoxyCompactList}\small\item\em \-Execute the controller i.\-e. take the system from start to end state of edge. \end{DoxyCompactList}\item 
 \hypertarget{class_controller_aba227cad46f73fab5fcf37b41cae71a9}{virtual ompl\-::base\-::\-State $\ast$ \hyperlink{class_controller_aba227cad46f73fab5fcf37b41cae71a9}{\-Stabilize} (const ompl\-::base\-::\-State $\ast$start\-State)}\label{class_controller_aba227cad46f73fab5fcf37b41cae71a9}
 
@@ -143,23 +144,7 @@ virtual bool \hyperlink{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\-Ex
 
 \-Base class for \hyperlink{class_controller}{\-Controller}. \-A controller's task is to use the filter to estimate the belief robot's state and generate control commands using the separated controller. \-For example by fusing an \-L\-Q\-R and \-Kalman \-Filter we generate an \-L\-Q\-G controller. 
 
-\subsection{\-Member \-Function \-Documentation}
-\hypertarget{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}{\index{\-Controller@{\-Controller}!\-Execute@{\-Execute}}
-\index{\-Execute@{\-Execute}!Controller@{\-Controller}}
-\subsubsection[{\-Execute}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Separated\-Controller\-Type , class Filter\-Type $>$ bool {\bf \-Controller}$<$ \-Separated\-Controller\-Type, \-Filter\-Type $>$\-::{\bf \-Execute} (
-\begin{DoxyParamCaption}
-\item[{const ompl\-::base\-::\-State $\ast$}]{start\-State, }
-\item[{ompl\-::base\-::\-State $\ast$}]{end\-State, }
-\item[{ompl\-::base\-::\-Cost \&}]{execution\-Cost, }
-\item[{bool}]{construction\-Mode = {\ttfamily true}}
-\end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}\label{class_controller_a01cbbc1435d0a4ed8733332bef6d7342}
-
-
-\-Execute the controller i.\-e. take the system from start to end state of edge. 
-
-\-Increment cost by\-: -\/$>$ 0.\-01 for time based -\/$>$ trace(\-Covariance) for \hyperlink{class_f_i_r_m}{\-F\-I\-R\-M}
-
-\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
 \item 
-include/\-Controllers/\-Controller.\-h\end{DoxyCompactItemize}
+include/\-Controllers/\-Controller.\-h\item 
+src/\-Controllers/\-Controller.\-cpp\end{DoxyCompactItemize}

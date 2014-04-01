@@ -3,6 +3,15 @@
 }
 
 
+\-A monocular vision based sensor model where the observations are beacons with unique ids.  
+
+
+
+
+{\ttfamily \#include $<$\-Cam\-Aruco2\-D\-Observation\-Model.\-h$>$}
+
+
+
 \-Inheritance diagram for \-Cam\-Aruco2\-D\-Observation\-Model\-:\nopagebreak
 \begin{figure}[H]
 \begin{center}
@@ -95,6 +104,14 @@
 \hypertarget{class_cam_aruco2_d_observation_model_a1750ab1c5ac476d09da804e7a92576f5}{static const int {\bfseries num\-Landmarks\-For\-Observability} = 2}\label{class_cam_aruco2_d_observation_model_a1750ab1c5ac476d09da804e7a92576f5}
 
 \end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\-A monocular vision based sensor model where the observations are beacons with unique ids. 
+
+\begin{DoxyParagraph}{\-Short \-Description}
+\-This is an \-Observation model method based on the combination of a monocular camera, and visual markers with unique ids. \-How it works\-: 1. \-The locations of visual landmarks is known a-\/priori. 2. \-Using location of the robot and pre-\/known location of landmarks, it generates a noisy observation of the relative location of the landmark w.\-r.\-t the robot. 
+\end{DoxyParagraph}
 
 
 \subsection{\-Member \-Function \-Documentation}

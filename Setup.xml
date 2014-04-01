@@ -20,9 +20,6 @@
 <landmark id = 99 x = 16.1036 y = 0 theta = 0.5 />
 <landmark id = 83 x = 16.3728 y = 1.3462 theta = 1 />
 <landmark id = 12 x = 15.8244 y = 2.8129 theta = -0.82874 />
-<landmark id = 54 x = 2.1718 y = 6.5662 theta = 1 />
-<landmark id = 24 x = 2.1718 y = 6.8456 theta = 1 />
-<landmark id = 53 x = 2.1718 y = 7.125 theta = 1 />
 <landmark id = 16 x = 0.0508 y = 8.0569 theta = 0 />
 <landmark id = 15 x = 0.0508 y = 5.6159 theta = 0 />
 <landmark id = 145 x = 0.0508 y = 5.3365 theta = 0 />
@@ -52,8 +49,6 @@
 <landmark id = 11 x = 13.1572 y = 2.2784 theta = -0.5 />
 <landmark id = 68 x = 13.4366 y = 2.2784 theta = -0.5 />
 <landmark id = 210 x = 14.8463 y = 2.2784 theta = -0.5 />
-<landmark id = 90 x = 13.7541 y = 4.9454 theta = 0.5 />
-<landmark id = 91 x = 13.1953 y = 4.9454 theta = 0.5 />
 <landmark id = 159 x = 2.4892 y = 5.494 theta = 0.5 /> 
 <landmark id = 158 x = 6.0706 y = 5.494 theta = 0.5 />
 <landmark id = 157 x = 9.3624 y = 5.4026 theta = 0.5 /> 
@@ -62,7 +57,6 @@
 <landmark id = 162 x = 6.6727 y = 6.3325 theta = -0.5 />
 <landmark id = 165 x = 4.5364 y = 2.2784 theta = -0.5 />
 <landmark id = 166 x = 11.8161 y = 2.2784 theta = -0.5 />
-<landmark id = 151 x = 2.1717 y = 5.3543 theta = 1 />
 <landmark id = 55 x = 2.1717 y = 4.7701 theta = 1 />
 <landmark id = 23 x = 2.1717 y = 4.4907 theta = 1 />
 <landmark id = 56 x = 2.1717 y = 4.2113 theta = 1 />
@@ -99,7 +93,13 @@
 <landmark id = 82 x = 16.3728 y = 1.6256 theta = 1 />
 <landmark id = 85 x = 15.9676 y = 2.573 theta = -0.82874 />
 <landmark id = 84 x = 15.6812 y = 3.0528 theta = -0.82874 />
-<landmark id = 86 x = 13.4747 y = 4.9454 theta = 0.5 /-->
+<landmark id = 86 x = 13.4747 y = 4.9454 theta = 0.5 />
+<landmark id = 151 x = 2.1717 y = 5.3543 theta = 1 />
+<landmark id = 54 x = 2.1718 y = 6.5662 theta = 1 />
+<landmark id = 24 x = 2.1718 y = 6.8456 theta = 1 />
+<landmark id = 53 x = 2.1718 y = 7.125 theta = 1 />
+<landmark id = 90 x = 13.7541 y = 4.9454 theta = 0.5 />
+<landmark id = 91 x = 13.1953 y = 4.9454 theta = 0.5 /-->
 
 <ObservationModels>
 	<CamAruco2DObservationModel
@@ -131,7 +131,7 @@
 	  /> <!--No Noise--> 
 	<UnicycleMotionModel
 		sigmaV="0.0012"
-		etaV="0.003"
+		etaV="0.05"
     sigmaOmega="0.001"
     etaOmega="0.03"
 		P_Wg_filename=""

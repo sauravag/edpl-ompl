@@ -168,7 +168,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     //glBegin(GL_TRIANGLE_FAN);
     glBegin(GL_LINES);
     //glVertex2f((*this)[0], (*this)[1]);
-    for(int i = 0; i < transformed.n_cols; ++i)
+    for(unsigned int i = 0; i < transformed.n_cols; ++i)
     {
         glVertex2f(transformed(0,i), transformed(1,i));
     }
@@ -287,7 +287,7 @@ void Visualizer::drawGraphBeliefNodes()
 
 void Visualizer::drawGraphEdges()
 {
-    for(int i=0; i<graphEdges_.size();i++)
+    for(unsigned int i=0; i<graphEdges_.size();i++)
     {
         drawEdge(graphEdges_[i].first,graphEdges_[i].second);
     }
@@ -315,9 +315,7 @@ void Visualizer::drawFeedbackEdges()
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
         double costFactor = sqrt(i->cost/maxCost);
-        double minColor = 0.2;
         glColor3d(costFactor,1.0-costFactor,0.0);
-        //glColor3d(1.0,1.0,0.0);
         glLineWidth(3.0);
             drawEdge(i->source, i->target);
         glLineWidth(1.f);

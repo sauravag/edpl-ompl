@@ -106,13 +106,7 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
 
 }
 
-/*
-  For each landmark that is seen by the camera (or sensor), produces a the prediction based on the previous state estimate
-  observation that is the range and bearing
-  of the given Cfg from that landmark
-  Result is the concatenation of all such observations
-  Obs dim is 2n x 1 , where "n" is the number of landarks and "2" is the size of each landmark
-*/
+
 typename CamAruco2DObservationModel::ObservationType
 CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg)
 {

@@ -122,106 +122,101 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00040"></a>00040 <span class="preprocessor">#include &quot;../ObservationModels/ObservationModelMethod.h&quot;</span>
 <a name="l00041"></a>00041 <span class="preprocessor">#include &lt;ompl/base/SpaceInformation.h&gt;</span>
 <a name="l00042"></a>00042 <span class="preprocessor">#include &quot;armadillo&quot;</span>
-<a name="l00043"></a>00043 
-<a name="l00051"></a><a class="code" href="class_linear_system.html">00051</a> <span class="keyword">class </span><a class="code" href="class_linear_system.html" title="The linear system class.">LinearSystem</a>
-<a name="l00052"></a>00052 {
-<a name="l00053"></a>00053 
-<a name="l00054"></a>00054   <span class="keyword">public</span>:
-<a name="l00055"></a>00055     <span class="keyword">typedef</span> <a class="code" href="class_s_e2_belief_space.html">MotionModelMethod::SpaceType</a> <a class="code" href="class_s_e2_belief_space.html">SpaceType</a>;
-<a name="l00056"></a>00056     <span class="keyword">typedef</span> <a class="code" href="class_s_e2_belief_space_1_1_state_type.html" title="A belief in SE(2): (x, y, yaw, covariance)">MotionModelMethod::StateType</a> <a class="code" href="class_s_e2_belief_space_1_1_state_type.html" title="A belief in SE(2): (x, y, yaw, covariance)">StateType</a>;
-<a name="l00057"></a>00057         <span class="keyword">typedef</span> MotionModelMethod::MotionModelPointer MotionModelPointer;
-<a name="l00058"></a>00058         <span class="keyword">typedef</span> ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
-<a name="l00059"></a>00059         <span class="keyword">typedef</span> arma::mat ControlType;
-<a name="l00060"></a>00060     <span class="keyword">typedef</span> arma::mat MotionNoiseType;
-<a name="l00061"></a>00061     <span class="keyword">typedef</span> arma::mat ObservationType;
-<a name="l00062"></a>00062     <span class="keyword">typedef</span> arma::mat ObsNoiseType;
-<a name="l00063"></a>00063     <span class="keyword">typedef</span> arma::mat MotionJacobianType;
-<a name="l00064"></a>00064     <span class="keyword">typedef</span> arma::mat ObsJacobianType;
-<a name="l00065"></a>00065 
-<a name="l00067"></a><a class="code" href="class_linear_system.html#a3f75bddc5fb799e7daab008f415bd1fa">00067</a>         <a class="code" href="class_linear_system.html#a3f75bddc5fb799e7daab008f415bd1fa" title="Constructor.">LinearSystem</a>() {}
-<a name="l00068"></a>00068 
-<a name="l00070"></a><a class="code" href="class_linear_system.html#a6f05277076a4302dbcfa9646232871dc">00070</a>     <a class="code" href="class_linear_system.html#a3f75bddc5fb799e7daab008f415bd1fa" title="Constructor.">LinearSystem</a> (<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control,
-<a name="l00071"></a>00071                   MotionModelPointer motionModel, ObservationModelPointer observationModel):
-<a name="l00072"></a>00072                   <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>(control), <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>(motionModel), <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>(observationModel)
-<a name="l00073"></a>00073     {
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075       <span class="keyword">using namespace </span>arma;
-<a name="l00076"></a>00076 
-<a name="l00077"></a>00077       assert(<a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>);
-<a name="l00078"></a>00078 
-<a name="l00079"></a>00079       ompl::base::StateSpacePtr space(<span class="keyword">new</span> <a class="code" href="class_s_e2_belief_space.html">SpaceType</a>());
-<a name="l00080"></a>00080 
-<a name="l00081"></a>00081       ompl::base::SpaceInformationPtr si(<span class="keyword">new</span> ompl::base::SpaceInformation(space));
-<a name="l00082"></a>00082       <a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a> = si-&gt;cloneState(state);
+<a name="l00043"></a>00043 <span class="preprocessor">#include &quot;../SpaceInformation/SpaceInformation.h&quot;</span>
+<a name="l00044"></a>00044 
+<a name="l00052"></a><a class="code" href="class_linear_system.html">00052</a> <span class="keyword">class </span><a class="code" href="class_linear_system.html" title="The linear system class.">LinearSystem</a>
+<a name="l00053"></a>00053 {
+<a name="l00054"></a>00054 
+<a name="l00055"></a>00055   <span class="keyword">public</span>:
+<a name="l00056"></a>00056     <span class="keyword">typedef</span> <a class="code" href="class_s_e2_belief_space.html">MotionModelMethod::SpaceType</a> <a class="code" href="class_s_e2_belief_space.html">SpaceType</a>;
+<a name="l00057"></a>00057     <span class="keyword">typedef</span> <a class="code" href="class_s_e2_belief_space_1_1_state_type.html" title="A belief in SE(2): (x, y, yaw, covariance)">MotionModelMethod::StateType</a> <a class="code" href="class_s_e2_belief_space_1_1_state_type.html" title="A belief in SE(2): (x, y, yaw, covariance)">StateType</a>;
+<a name="l00058"></a>00058         <span class="keyword">typedef</span> MotionModelMethod::MotionModelPointer MotionModelPointer;
+<a name="l00059"></a>00059         <span class="keyword">typedef</span> ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
+<a name="l00060"></a>00060         <span class="keyword">typedef</span> arma::mat ControlType;
+<a name="l00061"></a>00061     <span class="keyword">typedef</span> arma::mat MotionNoiseType;
+<a name="l00062"></a>00062     <span class="keyword">typedef</span> arma::mat ObservationType;
+<a name="l00063"></a>00063     <span class="keyword">typedef</span> arma::mat ObsNoiseType;
+<a name="l00064"></a>00064     <span class="keyword">typedef</span> arma::mat MotionJacobianType;
+<a name="l00065"></a>00065     <span class="keyword">typedef</span> arma::mat ObsJacobianType;
+<a name="l00066"></a>00066 
+<a name="l00068"></a><a class="code" href="class_linear_system.html#a3f75bddc5fb799e7daab008f415bd1fa">00068</a>         <a class="code" href="class_linear_system.html#a3f75bddc5fb799e7daab008f415bd1fa" title="Constructor.">LinearSystem</a>() {}
+<a name="l00069"></a>00069 
+<a name="l00071"></a><a class="code" href="class_linear_system.html#a340ddf5ee44bbf851ceaca67f4404048">00071</a>     <a class="code" href="class_linear_system.html#a3f75bddc5fb799e7daab008f415bd1fa" title="Constructor.">LinearSystem</a> (<span class="keyword">const</span> firm::SpaceInformation::SpaceInformationPtr si, <span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control,
+<a name="l00072"></a>00072                   MotionModelPointer motionModel, ObservationModelPointer observationModel):
+<a name="l00073"></a>00073                   <a class="code" href="class_linear_system.html#a4d5364a7af5e313c08c0f29cd520d6c2" title="Pointer to space information.">si_</a>(si),<a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>(control), <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>(motionModel), <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>(observationModel)
+<a name="l00074"></a>00074     {
+<a name="l00075"></a>00075 
+<a name="l00076"></a>00076       <span class="keyword">using namespace </span>arma;
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078       <a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a> = <a class="code" href="class_linear_system.html#a4d5364a7af5e313c08c0f29cd520d6c2" title="Pointer to space information.">si_</a>-&gt;cloneState(state);
+<a name="l00079"></a>00079 
+<a name="l00080"></a>00080       <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a> = <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;getZeroNoise();
+<a name="l00081"></a>00081 
+<a name="l00082"></a>00082       colvec junknoise = arma::zeros&lt;colvec&gt;(1); <span class="comment">// this is just useless junk that we are creating just so that we don&#39;t need to change interface to observationmodel functions</span>
 <a name="l00083"></a>00083 
-<a name="l00084"></a>00084       <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a> = <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;getZeroNoise();
+<a name="l00084"></a>00084       <a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb" title="The observation noise.">v_</a> = junknoise;
 <a name="l00085"></a>00085 
-<a name="l00086"></a>00086       colvec junknoise = arma::zeros&lt;colvec&gt;(1); <span class="comment">// this is just useless junk that we are creating just so that we don&#39;t need to change interface to observationmodel functions</span>
+<a name="l00086"></a>00086     }
 <a name="l00087"></a>00087 
-<a name="l00088"></a>00088       <a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb" title="The observation noise.">v_</a> = junknoise;
-<a name="l00089"></a>00089  
-<a name="l00090"></a>00090     }
-<a name="l00091"></a>00091 
-<a name="l00093"></a><a class="code" href="class_linear_system.html#a428c800b858ed6c6d63230c64e470208">00093</a>     <a class="code" href="class_linear_system.html#a3f75bddc5fb799e7daab008f415bd1fa" title="Constructor.">LinearSystem</a> (<span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> ObservationType&amp; obs,
-<a name="l00094"></a>00094       MotionModelPointer motionModel,
-<a name="l00095"></a>00095       ObservationModelPointer observationModel):
-<a name="l00096"></a>00096       <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>(control), <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>(motionModel),
-<a name="l00097"></a>00097       <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>(observationModel)
-<a name="l00098"></a>00098     {
+<a name="l00089"></a><a class="code" href="class_linear_system.html#aeaaa65cf19822ff7e12312cf37ce721f">00089</a>     <a class="code" href="class_linear_system.html#a3f75bddc5fb799e7daab008f415bd1fa" title="Constructor.">LinearSystem</a> (<span class="keyword">const</span> firm::SpaceInformation::SpaceInformationPtr si, <span class="keyword">const</span> ompl::base::State *state, <span class="keyword">const</span> ompl::control::Control* control, <span class="keyword">const</span> ObservationType&amp; obs,
+<a name="l00090"></a>00090       MotionModelPointer motionModel,
+<a name="l00091"></a>00091       ObservationModelPointer observationModel):
+<a name="l00092"></a>00092       <a class="code" href="class_linear_system.html#a4d5364a7af5e313c08c0f29cd520d6c2" title="Pointer to space information.">si_</a>(si),<a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>(control), <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>(motionModel),
+<a name="l00093"></a>00093       <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>(observationModel)
+<a name="l00094"></a>00094     {
+<a name="l00095"></a>00095 
+<a name="l00096"></a>00096       <span class="keyword">using namespace </span>arma;
+<a name="l00097"></a>00097 
+<a name="l00098"></a>00098       <a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a> = <a class="code" href="class_linear_system.html#a4d5364a7af5e313c08c0f29cd520d6c2" title="Pointer to space information.">si_</a>-&gt;cloneState(state);
 <a name="l00099"></a>00099 
-<a name="l00100"></a>00100       <span class="keyword">using namespace </span>arma;
-<a name="l00101"></a>00101       assert(<a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>);
-<a name="l00102"></a>00102 
-<a name="l00103"></a>00103       ompl::base::StateSpacePtr space(<span class="keyword">new</span> <a class="code" href="class_s_e2_belief_space.html">SpaceType</a>());
-<a name="l00104"></a>00104       ompl::base::SpaceInformationPtr si(<span class="keyword">new</span> ompl::base::SpaceInformation(space));
-<a name="l00105"></a>00105       <a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a> = si-&gt;cloneState(state);
-<a name="l00106"></a>00106 
-<a name="l00107"></a>00107       ObservationType observation = obs;
-<a name="l00108"></a>00108 
-<a name="l00109"></a>00109       <a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20" title="Observation at the state.">z_</a> = observation; <span class="comment">// using the ids from outside</span>
-<a name="l00110"></a>00110 
-<a name="l00111"></a>00111       <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a> = <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;getZeroNoise();
-<a name="l00112"></a>00112 
-<a name="l00113"></a>00113       colvec junknoise = arma::zeros&lt;colvec&gt;(1); <span class="comment">// this is just junk that we are creating just so that we don&#39;t need to change interface to observationmodel functions</span>
-<a name="l00114"></a>00114       
-<a name="l00115"></a>00115       <a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb" title="The observation noise.">v_</a> = junknoise;
-<a name="l00116"></a>00116 
-<a name="l00117"></a>00117     }
-<a name="l00118"></a>00118 
-<a name="l00120"></a><a class="code" href="class_linear_system.html#a7d556441c0f68f6ccfdde32b72f888b6">00120</a>     ompl::base::State* <a class="code" href="class_linear_system.html#a7d556441c0f68f6ccfdde32b72f888b6" title="Return the state at which this system was constructed.">getX</a>() {<span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>; }
-<a name="l00121"></a>00121 
-<a name="l00123"></a><a class="code" href="class_linear_system.html#aa9b7cdb3f9e09902fbe9b1d65d932edb">00123</a>     arma::mat <a class="code" href="class_linear_system.html#aa9b7cdb3f9e09902fbe9b1d65d932edb" title="Get the state transition jacobian.">getA</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;getStateJacobian(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>, <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a>); }
-<a name="l00124"></a>00124     
-<a name="l00126"></a><a class="code" href="class_linear_system.html#af1a0b99cb2b4e30eb61b1bee328fb0bd">00126</a>     arma::mat <a class="code" href="class_linear_system.html#af1a0b99cb2b4e30eb61b1bee328fb0bd" title="Get the control jacobian for the state transition.">getB</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;getControlJacobian(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>, <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a>); }
-<a name="l00127"></a>00127     
-<a name="l00129"></a><a class="code" href="class_linear_system.html#aaadd9d063ecdb4afb67ae4522cf921a7">00129</a>     arma::mat <a class="code" href="class_linear_system.html#aaadd9d063ecdb4afb67ae4522cf921a7" title="Get the noise jacobian in the state transition.">getG</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;getNoiseJacobian(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>, <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a>); }
-<a name="l00130"></a>00130     
-<a name="l00132"></a><a class="code" href="class_linear_system.html#ab95733398800308c2e69522d37f2a005">00132</a>     arma::mat <a class="code" href="class_linear_system.html#ab95733398800308c2e69522d37f2a005" title="Get the process noise covariance for the state transition.">getQ</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;processNoiseCovariance(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>); }
-<a name="l00133"></a>00133 
-<a name="l00135"></a><a class="code" href="class_linear_system.html#a678fe164168013e7a4a4fc97e6716fa6">00135</a>     arma::mat <a class="code" href="class_linear_system.html#a678fe164168013e7a4a4fc97e6716fa6" title="Get the jacobian for the observation.">getH</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>-&gt;getObservationJacobian(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb" title="The observation noise.">v_</a>, <a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20" title="Observation at the state.">z_</a>);}
-<a name="l00136"></a>00136 
-<a name="l00138"></a><a class="code" href="class_linear_system.html#a4b69f2e4c7b6144c6abb8abf725ce063">00138</a>     arma::mat <a class="code" href="class_linear_system.html#a4b69f2e4c7b6144c6abb8abf725ce063" title="Get the observation noise jacobian.">getM</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>-&gt;getNoiseJacobian(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb" title="The observation noise.">v_</a>, <a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20" title="Observation at the state.">z_</a>); }
-<a name="l00139"></a>00139 
-<a name="l00141"></a><a class="code" href="class_linear_system.html#aaad4f742dcb61f776d5de952977a745e">00141</a>     arma::mat <a class="code" href="class_linear_system.html#aaad4f742dcb61f776d5de952977a745e" title="Get the observation noise covariance.">getR</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>-&gt;getObservationNoiseCovariance(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20" title="Observation at the state.">z_</a>); }
-<a name="l00142"></a>00142 
-<a name="l00143"></a>00143   <span class="keyword">private</span>:
-<a name="l00144"></a>00144 
-<a name="l00146"></a><a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e">00146</a>     ompl::base::State *<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>;
-<a name="l00147"></a>00147     
-<a name="l00149"></a><a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115">00149</a>     <span class="keyword">const</span> ompl::control::Control* <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>;
-<a name="l00150"></a>00150     
-<a name="l00152"></a><a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03">00152</a>     MotionNoiseType <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a>;
-<a name="l00153"></a>00153     
-<a name="l00155"></a><a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb">00155</a>     ObsNoiseType <a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb" title="The observation noise.">v_</a>;
-<a name="l00156"></a>00156 
-<a name="l00158"></a><a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20">00158</a>     ObservationType <a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20" title="Observation at the state.">z_</a>;
-<a name="l00159"></a>00159 
-<a name="l00161"></a><a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322">00161</a>     MotionModelPointer <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>;
+<a name="l00100"></a>00100       ObservationType observation = obs;
+<a name="l00101"></a>00101 
+<a name="l00102"></a>00102       <a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20" title="Observation at the state.">z_</a> = observation; <span class="comment">// using the ids from outside</span>
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104       <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a> = <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;getZeroNoise();
+<a name="l00105"></a>00105 
+<a name="l00106"></a>00106       colvec junknoise = arma::zeros&lt;colvec&gt;(1); <span class="comment">// this is just junk that we are creating just so that we don&#39;t need to change interface to observationmodel functions</span>
+<a name="l00107"></a>00107 
+<a name="l00108"></a>00108       <a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb" title="The observation noise.">v_</a> = junknoise;
+<a name="l00109"></a>00109 
+<a name="l00110"></a>00110     }
+<a name="l00111"></a>00111 
+<a name="l00113"></a><a class="code" href="class_linear_system.html#a7d556441c0f68f6ccfdde32b72f888b6">00113</a>     ompl::base::State* <a class="code" href="class_linear_system.html#a7d556441c0f68f6ccfdde32b72f888b6" title="Return the state at which this system was constructed.">getX</a>() {<span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>; }
+<a name="l00114"></a>00114 
+<a name="l00116"></a><a class="code" href="class_linear_system.html#aa9b7cdb3f9e09902fbe9b1d65d932edb">00116</a>     arma::mat <a class="code" href="class_linear_system.html#aa9b7cdb3f9e09902fbe9b1d65d932edb" title="Get the state transition jacobian.">getA</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;getStateJacobian(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>, <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a>); }
+<a name="l00117"></a>00117 
+<a name="l00119"></a><a class="code" href="class_linear_system.html#af1a0b99cb2b4e30eb61b1bee328fb0bd">00119</a>     arma::mat <a class="code" href="class_linear_system.html#af1a0b99cb2b4e30eb61b1bee328fb0bd" title="Get the control jacobian for the state transition.">getB</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;getControlJacobian(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>, <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a>); }
+<a name="l00120"></a>00120 
+<a name="l00122"></a><a class="code" href="class_linear_system.html#aaadd9d063ecdb4afb67ae4522cf921a7">00122</a>     arma::mat <a class="code" href="class_linear_system.html#aaadd9d063ecdb4afb67ae4522cf921a7" title="Get the noise jacobian in the state transition.">getG</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;getNoiseJacobian(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>, <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a>); }
+<a name="l00123"></a>00123 
+<a name="l00125"></a><a class="code" href="class_linear_system.html#ab95733398800308c2e69522d37f2a005">00125</a>     arma::mat <a class="code" href="class_linear_system.html#ab95733398800308c2e69522d37f2a005" title="Get the process noise covariance for the state transition.">getQ</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>-&gt;processNoiseCovariance(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>); }
+<a name="l00126"></a>00126 
+<a name="l00128"></a><a class="code" href="class_linear_system.html#a678fe164168013e7a4a4fc97e6716fa6">00128</a>     arma::mat <a class="code" href="class_linear_system.html#a678fe164168013e7a4a4fc97e6716fa6" title="Get the jacobian for the observation.">getH</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>-&gt;getObservationJacobian(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb" title="The observation noise.">v_</a>, <a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20" title="Observation at the state.">z_</a>);}
+<a name="l00129"></a>00129 
+<a name="l00131"></a><a class="code" href="class_linear_system.html#a4b69f2e4c7b6144c6abb8abf725ce063">00131</a>     arma::mat <a class="code" href="class_linear_system.html#a4b69f2e4c7b6144c6abb8abf725ce063" title="Get the observation noise jacobian.">getM</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>-&gt;getNoiseJacobian(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb" title="The observation noise.">v_</a>, <a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20" title="Observation at the state.">z_</a>); }
+<a name="l00132"></a>00132 
+<a name="l00134"></a><a class="code" href="class_linear_system.html#aaad4f742dcb61f776d5de952977a745e">00134</a>     arma::mat <a class="code" href="class_linear_system.html#aaad4f742dcb61f776d5de952977a745e" title="Get the observation noise covariance.">getR</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>-&gt;getObservationNoiseCovariance(<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>, <a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20" title="Observation at the state.">z_</a>); }
+<a name="l00135"></a>00135 
+<a name="l00136"></a>00136   <span class="keyword">private</span>:
+<a name="l00137"></a>00137 
+<a name="l00139"></a><a class="code" href="class_linear_system.html#a4d5364a7af5e313c08c0f29cd520d6c2">00139</a>     firm::SpaceInformation::SpaceInformationPtr <a class="code" href="class_linear_system.html#a4d5364a7af5e313c08c0f29cd520d6c2" title="Pointer to space information.">si_</a>;
+<a name="l00140"></a>00140 
+<a name="l00142"></a><a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e">00142</a>     ompl::base::State *<a class="code" href="class_linear_system.html#a0c0d8d1a986bd267171d8c821e173d1e" title="The state at which the linear system is constructed.">x_</a>;
+<a name="l00143"></a>00143 
+<a name="l00145"></a><a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115">00145</a>     <span class="keyword">const</span> ompl::control::Control* <a class="code" href="class_linear_system.html#a5b5cb60bca40f61e6b4a6ac3afe56115" title="The control applied at the internal state.">u_</a>;
+<a name="l00146"></a>00146 
+<a name="l00148"></a><a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03">00148</a>     MotionNoiseType <a class="code" href="class_linear_system.html#ab3909105492e1b8f55919584d9f99a03" title="The motion noise.">w_</a>;
+<a name="l00149"></a>00149 
+<a name="l00151"></a><a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb">00151</a>     ObsNoiseType <a class="code" href="class_linear_system.html#a41f05f9ef0c2e5e69a0b0c2d50d983bb" title="The observation noise.">v_</a>;
+<a name="l00152"></a>00152 
+<a name="l00154"></a><a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20">00154</a>     ObservationType <a class="code" href="class_linear_system.html#a8d402083ec5c55357a11ec8e780bcf20" title="Observation at the state.">z_</a>;
+<a name="l00155"></a>00155 
+<a name="l00157"></a><a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322">00157</a>     MotionModelPointer <a class="code" href="class_linear_system.html#a6ae00f368bfa21a8dfe0d6855bfc1322" title="Pointer to the motion model that models the state transition.">motionModel_</a>;
+<a name="l00158"></a>00158 
+<a name="l00160"></a><a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b">00160</a>     ObservationModelPointer <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>;
+<a name="l00161"></a>00161 };
 <a name="l00162"></a>00162 
-<a name="l00164"></a><a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b">00164</a>     ObservationModelPointer <a class="code" href="class_linear_system.html#a6aacc355010106de6f65f66c8dfa301b" title="Pointer to the observation model that models the sensor measurement.">observationModel_</a>;
-<a name="l00165"></a>00165 };
-<a name="l00166"></a>00166 
-<a name="l00167"></a>00167 <span class="preprocessor">#endif</span>
+<a name="l00163"></a>00163 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -240,7 +235,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 31 2014 13:00:49 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 1 2014 17:06:44 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

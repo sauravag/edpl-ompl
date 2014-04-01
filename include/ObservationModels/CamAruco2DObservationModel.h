@@ -39,17 +39,17 @@
 
 #include "ObservationModelMethod.h"
 #include <boost/math/constants/constants.hpp>
-/*
-Observation model method based on the combination of a monocular camera,
-and visual markers with unique ids.
+/**
+  @par Short Description
+  This is an Observation model method based on the combination of a monocular camera,
+  and visual markers with unique ids.
+  How it works:
+  1. The locations of visual landmarks is known a-priori.
+  2. Using location of the robot and pre-known location of landmarks, it generates a noisy observation
+     of the relative location of the landmark w.r.t the robot.
 
-How it works:
-
-1. The locations of visual landmarks is known a-priori.
-2. Using location of the robot and pre-known location of landmarks, it generates a noisy observation
-   of the relative location of the landmark w.r.t the robot.
+  \brief A monocular vision based sensor model where the observations are beacons with unique ids.
 */
-
 class CamAruco2DObservationModel : public ObservationModelMethod
 {
 
@@ -65,27 +65,18 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     typedef ObservationModelMethod::ObservationType ObservationType;
     typedef ObservationModelMethod::NoiseType ObsNoiseType;
     typedef arma::mat JacobianType;
-    //typedef boost::shared_ptr<CamAruco2DObservationModel> ObservationModelPointer;
 
     // z = h(x,v)
     // get the observation for a given configuration,
     // corrupted by noise from a given distribution
-
+    /** \brief Constructor */
     CamAruco2DObservationModel(const char *pathToSetupFile) : ObservationModelMethod()
     {
-      // TODO: Create a function which sets up the obs model by loading landmarks and noise paramters
-      // Load landmarks in construction
 
       // initialize etaPhi_, etaD_, sigma_;
       this->loadLandmarks(pathToSetupFile);
       this->loadParameters(pathToSetupFile);
     }
-
-    //CamAruco2DObservationModel(typename MPTraits::MPProblemType* _problem, XMLNodeReader& _node);
-
-
-    //void PrintOptions(ostream& _out);
-    //void ParseXML(XMLNodeReader& _node);
 
     ObservationType getObservation(const ompl::base::State *state, bool isSimulation);
 
@@ -116,7 +107,5 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     void loadLandmarks(const char *pathToSetupFile);
     void loadParameters(const char *pathToSetupFile);
 };
-
-
 
 #endif

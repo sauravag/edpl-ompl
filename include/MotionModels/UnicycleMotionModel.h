@@ -56,66 +56,74 @@ class UnicycleMotionModel : public MotionModelMethod
     typedef typename MotionModelMethod::ControlType ControlType;
     typedef typename MotionModelMethod::NoiseType NoiseType;
     typedef typename MotionModelMethod::JacobianType JacobianType;
-    //typedef boost::shared_ptr<UnicycleMotionModel> MotionModelPointer;
-
-    //Default constructor
-    //UnicycleMotionModel() {}
 
     // XML-based constructor
     UnicycleMotionModel(const ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) :
     MotionModelMethod(si, motionNoiseDim)
     {
 
-      //In here, should check if the cfg type is compatible with this
-      //motion model, and exit with error otherwise
+       //In here, should check if the cfg type is compatible with this
+       //motion model, and exit with error otherwise
         this->loadParameters(pathToSetupFile);
 
     }
 
+    /** \brief Destructor. */
     ~UnicycleMotionModel() {}
 
+    /** \brief Propagate the system to the next state, given the current state, a control and a noise. */
     void Evolve(const ompl::base::State *state, const ompl::control::Control *control, const NoiseType& w, ompl::base::State *result);
 
+
+    /** \brief  Generate open loop control that drives robot from start to end state. */
     void generateOpenLoopControls(const ompl::base::State *startState,
                                                   const ompl::base::State *endState,
                                                   std::vector<ompl::control::Control*> &openLoopControls);
 
+    /** \brief Generate noise according to specified state and control input. */
     NoiseType generateNoise(const ompl::base::State *state, const ompl::control::Control* control);
 
-    // df/dx
-    JacobianType
-    getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
-    // df/du
-    JacobianType
-    getControlJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
-    // df/dw
-    JacobianType
-    getNoiseJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
+    /** \brief Calculate the state transition Jacobian i.e. df/dx where f is the transition function and x is the state. */
+    JacobianType getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
+    
+    /** \brief Calculate the control transition Jacobian i.e. df/du where f is the transition function and u is the control. */
+    JacobianType getControlJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
+    
+    /** \brief Calculate the noise transition Jacobian i.e. df/dw where f is the transition function and w is the noise. */
+    JacobianType getNoiseJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
 
+    /** \brief Calculate the process noise covariance. */    
     arma::mat processNoiseCovariance(const ompl::base::State *state, const ompl::control::Control* control);
-
-    /*
-    bool GenerateOrbit(const CfgType& _start,
-      vector<CfgType>& _intermediates,
-      vector<ControlType>& _controls);
-    */
 
   private:
 
+    /** \brief Generate the control noise covariance.*/
     arma::mat controlNoiseCovariance(const ompl::control::Control* control);
+
+    /** \brief Load parameters from XML. */
     void loadParameters(const char *pathToSetupFile);
 
-    //mat EvolveContinuous(const ompl::base::State *state, const ControlType& _u, const NoiseType& _w);
+    /** \brief Bias standard deviation of the motion noise */
+    arma::colvec sigma_; // 
+    
+    /** \brief Proportional standard deviation of the motion noise */
+    arma::colvec eta_; // 
+    
+    /** \brief  Covariance of state additive noise */
+    arma::mat    P_Wg_; //
 
-    //double m_robotBaseLength; // rear wheel axle length
-    arma::colvec sigma_; // Bias standard deviation of the motion noise
-    arma::colvec eta_; // Proportional standard deviation of the motion noise
-    arma::mat    P_Wg_; // Covariance of state additive noise
-
-    double maxAngularVelocity_; //max rotational velocity
-    double maxLinearVelocity_; //max translational velocity
+    /** \brief max rotational velocity */
+    double maxAngularVelocity_; //
+    
+    /** \brief max translational velocity */
+    double maxLinearVelocity_; //
+    
+    /** \brief max translational velocity */
     double orbitRadius_;
+    
+    /** \brief min translational velocity */
     double minLinearVelocity_;
-    std::string vcMethod_;
+
 };
+
 #endif

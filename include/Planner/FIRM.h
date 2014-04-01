@@ -56,7 +56,6 @@
 #include "../Path/FeedbackPath.h"
 #include "../ConnectionStrategy/FStrategy.h"
 #include "../Path/FeedbackPath.h"
-//#include "ompl/geometric/planners/prm/PRM.h"
 
 /**
    @anchor FIRM
@@ -221,6 +220,7 @@ public:
         return boost::num_vertices(g_);
     }
 
+    /** \brief Get the nearest neighbor structure */
     const RoadmapNeighbors& getNearestNeighbors(void)
     {
         return nn_;
@@ -228,31 +228,34 @@ public:
 
      /** \brief Executes the generated policy on the system */
     void executeFeedback(void);
+
 protected:
 
     /** \brief Free all the memory allocated by the planner */
     void freeMemory(void);
 
-    /** \brief Construct a milestone for a given state (\e state), store it in the nearest neighbors data structure
+    /** \brief Construct a graph node for a given state (\e state), store it in the nearest neighbors data structure
         and then connect it to the roadmap in accordance to the connection strategy. */
     virtual Vertex addStateToGraph(ompl::base::State *state);
 
-    /** \brief Make two milestones (\e m1 and \e m2) be part of the same connected component. The component with fewer elements will get the id of the component with more elements. */
+    /** \brief Make two milestones (\e m1 and \e m2) be part of the same connected component. The component with fewer 
+        elements will get the id of the component with more elements. */
     void uniteComponents(Vertex m1, Vertex m2);
 
-    /** \brief Check if two milestones (\e m1 and \e m2) are part of the same connected component. This is not a const function since we use incremental connected components from boost */
+    /** \brief Check if two milestones (\e m1 and \e m2) are part of the same connected component. This is not a const 
+        function since we use incremental connected components from boost */
     bool sameComponent(Vertex m1, Vertex m2);
 
-    /** \brief Randomly sample the state space, add and connect milestones
-         in the roadmap. Stop this process when the termination condition
-         \e ptc returns true.  Use \e workState as temporary memory. */
+    /** \brief Randomly sample the state space, add and connect nodes
+         in the roadmap. Stop this process when the termination condition*/
     virtual void growRoadmap(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::State *workState);
 
-    /** Thread that checks for solution */
+    /** \brief Thread that checks for solution */
     void checkForSolution(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::PathPtr &solution);
 
-    /** \brief Check if there exists a solution, i.e., there exists a pair of milestones such that the first is in \e start and the second is in \e goal, and the two milestones are in the same connected component. If a solution is found, the path is saved. */
-    bool haveSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals, ompl::base::PathPtr &solution);
+    /** \brief Check if there exists a policy, i.e., The given pair of \e start and \e goal, 
+       are in the same connected component. If a feedback policy is found, it is saved. */
+    bool existsPolicy(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals, ompl::base::PathPtr &solution);
 
     /** \brief Returns the value of the addedSolution_ member. */
     bool addedNewSolution(void) const;
@@ -362,8 +365,6 @@ protected:
 
     /** \brief The number of particles to use for monte carlo simulations*/
     unsigned int numParticles_;
-
-    bool debug_;
 
     /** \brief The minimum number of nodes that should be sampled. */
     unsigned int minFIRMNodes_;
