@@ -34,7 +34,6 @@ var searchData=
   ['sety',['setY',['../class_s_e2_belief_space_1_1_state_type.html#a26d653e2790a61a3ba36158e3afeb930',1,'SE2BeliefSpace::StateType']]],
   ['setyaw',['setYaw',['../class_s_e2_belief_space_1_1_state_type.html#a86f79402419f759c39ee3d6bfd7b375f',1,'SE2BeliefSpace::StateType']]],
   ['size',['Size',['../class_ti_xml_printer.html#ad01375ae9199bd2f48252eaddce3039d',1,'TiXmlPrinter']]],
-  ['solve',['solve',['../class_f_i_r_m.html#a02f3c98de4840594193ba5bf7ff3ca63',1,'FIRM']]],
   ['solvedynamicprogram',['solveDynamicProgram',['../class_f_i_r_m.html#a7ffdc57247b8f40899646195750b6a20',1,'FIRM']]],
   ['stabilize',['Stabilize',['../class_controller.html#aba227cad46f73fab5fcf37b41cae71a9',1,'Controller']]],
   ['standalone',['Standalone',['../class_ti_xml_declaration.html#a9ff06afc033d7ef730ec7c6825b97ad9',1,'TiXmlDeclaration']]]

@@ -1,4 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$class_actuation_system_method.html" title="ActuationSystemMethod" alt="" coords="5,5,171,35"/>
-<area shape="rect" id="node3" href="$class_simulated_actuation_system.html" title="SimulatedActuationSystem" alt="" coords="220,5,399,35"/>
+<area shape="rect" id="node1" href="$class_controller.html" title="Base class for Controller. A controller&#39;s task is to use the filter to estimate the belief robot&#39;s st..." alt="" coords="5,5,317,35"/>
 </map>

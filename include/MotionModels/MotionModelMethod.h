@@ -69,7 +69,7 @@ class MotionModelMethod
         //MotionModelMethod() : stateDim_(0), controlDim_(0), noiseDim_(0) {}
 
 
-		MotionModelMethod(ompl::control::SpaceInformationPtr si, int nDim=0):
+		MotionModelMethod(const ompl::control::SpaceInformationPtr si, int nDim=0):
         //TODO: can the noise dimension actually be different from the control dimension?
             si_(si),
 			stateDim_(si->getStateDimension()),
@@ -79,7 +79,7 @@ class MotionModelMethod
 			dt_(0.0)
         {
             zeroControl_ = si_->allocControl();
-            for(int i = 0; i < controlDim_ ; i++)
+            for(unsigned int i = 0; i < controlDim_ ; i++)
             {
                 zeroControl_->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = 0;
             }

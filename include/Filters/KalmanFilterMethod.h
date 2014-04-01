@@ -61,7 +61,7 @@ class KalmanFilterMethod
   	KalmanFilterMethod() {}
 
     /** \brief  Constructor. */
-  	KalmanFilterMethod (firm::SpaceInformation::SpaceInformationPtr si):
+  	KalmanFilterMethod (const firm::SpaceInformation::SpaceInformationPtr si):
   	si_(si), observationModel_(si->getObservationModel()), motionModel_(si->getMotionModel()){}
 
   	//virtual ~KalmanFilterMethod() {}
@@ -110,11 +110,11 @@ class KalmanFilterMethod
         /** \brief Pointer to the space information.*/
         firm::SpaceInformation::SpaceInformationPtr si_;
 
-        /** \brief Pointer to the motion model. */
-        MotionModelPointer motionModel_;
-
         /** \brief Pointer to the observation model.*/
         ObservationModelPointer observationModel_;
+
+        /** \brief Pointer to the motion model. */
+        MotionModelPointer motionModel_;
 
 };
 

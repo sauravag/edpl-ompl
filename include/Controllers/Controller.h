@@ -42,6 +42,8 @@
 #include "../MotionModels/MotionModelMethod.h"
 #include "../ObservationModels/ObservationModelMethod.h"
 #include "../SpaceInformation/SpaceInformation.h"
+#include "ompl/base/Cost.h"
+#include "boost/date_time/local_time/local_time.hpp"
 
 /** \brief Base class for Controller. A controller's task is to use the filter to estimate the belief robot's state and
           generate control commands using the separated controller. For example by fusing an LQR and Kalman Filter
@@ -59,7 +61,7 @@ class Controller
         typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
         typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
 
-        /** \brief Constructor */ 
+        /** \brief Constructor */
         Controller() {};
 
         /** \brief Constructor */
@@ -108,11 +110,11 @@ class Controller
 
     private:
 
-        /** \brief The pointer to the space information. */ 
+        /** \brief The pointer to the space information. */
         SpaceInformationPtr si_; // Instead of the actuation system, in OMPL we have the spaceinformation
-    		
+
         /** \brief  The vector of linear systems. The linear systems basically represent the system state
-                    at a point in the open loop trajectory.*/ 
+                    at a point in the open loop trajectory.*/
         std::vector<LinearSystem> lss_;
 
         /** \brief  The separated controller used to generate the commands that are sent to the robot. */
@@ -127,13 +129,13 @@ class Controller
         /** \brief Tracks the current number of time steps the robot has executed to align with goal node. */
     		int tries_;
 
-        /** \brief If the robot's heading is deviated from the target heading by less 
+        /** \brief If the robot's heading is deviated from the target heading by less
             than the nodeReachedAngle_ then the robot is assumed to have alligned with the target heading. Used
             for node reachability checking. */
     		static double nodeReachedAngle_;
 
-        /** \brief The distance at which we assume the robot has reached a target node. Reaching the exact node 
-            location is almost impractical for real systems. We assume the robot has reached if it is within 
+        /** \brief The distance at which we assume the robot has reached a target node. Reaching the exact node
+            location is almost impractical for real systems. We assume the robot has reached if it is within
             a certain radius of the target. */
     		static double nodeReachedDistance_;
 
@@ -144,7 +146,7 @@ class Controller
         static double nominalTrajDeviationThreshold_;
 
         /** \brief  The maximum time for which a controller can be executed. We need this bound as we cannot let a controller
-                    execute indefinitely. This avoids situations when the robot has deviated or collided and the current 
+                    execute indefinitely. This avoids situations when the robot has deviated or collided and the current
                     controller is no longer capable of driving the robot to the goal.*/
         double maxExecTime_;
 
@@ -152,6 +154,8 @@ class Controller
     		bool debug_;
 
 };
+
+
 
 template <class SeparatedControllerType, class FilterType>
 double Controller<SeparatedControllerType, FilterType>::nodeReachedAngle_ = -1;
@@ -180,7 +184,7 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
   for(size_t i=0; i<nominalXs.size(); ++i)
   {
 
-    LinearSystem ls(nominalXs[i], nominalUs[i], si_->getMotionModel(), si_->getObservationModel());
+    LinearSystem ls(si_, nominalXs[i], nominalUs[i], si_->getMotionModel(), si_->getObservationModel());
 
     lss_.push_back(ls);
   }
@@ -193,14 +197,12 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
   FilterType filter(si);
   filter_ = filter;
 
-  //lastNominalPoint = actuationSystem_->getMotionModel()->Evolve(_nominalXs.back(),
-  //_nominalUs.back(), actuationSystem_->getMotionModel()->GetZeroNoise());
   tries_ = 0;
 
   //nominalXs is scaled by <3> to allow a bit more steps for robot to execute edge.
   //Otherwise may not get good performance
   maxExecTime_ = ceil(nominalXs.size()*3);
-  obstacleMarkerObserved_ = false;
+  //obstacleMarkerObserved_ = false;
   debug_ = false;
 
 }
@@ -230,7 +232,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
   while(!this->isTerminated(endState, k))
   {
-    //std::cout << "time: "<< k << std::endl;
+    using namespace std;
+
     this->Evolve(internalState, k, endState) ;
 
     si_->copyState(internalState, endState);
@@ -253,7 +256,6 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     arma::colvec endStateVec = endState->as<StateType>()->getArmaData();
     arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
 
-    /*
     if(debug_)
     {
         std::cout<<"The nominal trajectory point is:" <<nomXVec<<std::endl;
@@ -263,7 +265,6 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         //std::cout<<"The k is : "<<k<<std::endl;
         std::cin.get();
     }
-    */
 
     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
@@ -274,14 +275,14 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
     k++;
 
-    /**
-     Increment cost by:
-     -> 0.01 for time based
-     -> trace(Covariance) for FIRM
-    */
+     //Increment cost by:
+     //-> 0.01 for time based
+     //-> trace(Covariance) for FIRM
+
     cost += arma::trace(endState->as<StateType>()->getCovariance());
 
     //if(debug_) cout<<"Trace of covariance: "<<arma::trace(endState->as<StateType>()->getCovariance())<<std::endl;
+    if(!constructionMode) sleep(0.1);
   }
 
   executionCost.v = cost;
@@ -290,23 +291,21 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 }
 
 template <class SeparatedControllerType, class FilterType>
-void
-Controller<SeparatedControllerType, FilterType>::
-Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
+void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
 {
 
   //std::cout << "Do not forget is_reliable for feedback controls." << std::endl;
+
   ompl::control::Control* control = separatedController_.generateFeedbackControl(state/*, t*/);
 
   si_->applyControl(control);
 
   ObservationType zCorrected = si_->getObservation();
 
-  //cout << "Observation Z: " << endl << Z << endl;
   LinearSystem current;// = lss_[_t];
   LinearSystem next; //= lss_[_t+1];
 
-  current = next = LinearSystem(goal_,
+  current = next = LinearSystem(si_,goal_,
                                 si_->getMotionModel()->getZeroControl(),
                                 zCorrected,
                                 si_->getMotionModel(),
@@ -331,8 +330,8 @@ Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
   filter_.Evolve(state, control, zCorrected, current, next, nextBelief);
 
   si_->copyState(nextState, nextBelief);
-  si_->setBelief(nextBelief);
 
+  si_->setBelief(nextBelief);
 }
 
 
@@ -340,8 +339,8 @@ template <class SeparatedControllerType, class FilterType>
 ompl::base::State* Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base::State *startState)
 {
 
-    int k =0;
-    double cost=0;
+    //int k =0;
+    //double cost=0;
 
     ompl::base::StateSpacePtr space(new SpaceType());
     ompl::base::State  *b = space->allocState();

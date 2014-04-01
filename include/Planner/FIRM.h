@@ -56,25 +56,25 @@
 #include "../Path/FeedbackPath.h"
 #include "../ConnectionStrategy/FStrategy.h"
 #include "../Path/FeedbackPath.h"
-//#include "../SpaceInformation/SpaceInformation.h"
-//#include "../Visualization/Visualizer.h"
-
-namespace base
-{
-    // Forward declare for use in implementation
-    OMPL_CLASS_FORWARD(OptimizationObjective);
-}
+//#include "ompl/geometric/planners/prm/PRM.h"
 
 /**
    @anchor FIRM
    @par Short description
-   Feedback Information RoadMap is a method that generates a graph in belief space 
-   and returns a policy that guides that robot from the start to goal.
+    Feedback Information RoadMap (FIRM), is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic
+    roadmap methods. The crucial feature of FIRM is that the costs associated with the edges are independent of each
+    other, and in this sense it is the first method that generates a graph in belief space that preserves the optimal
+    substructure property. From a practical point of view, FIRM is a robust and reliable planning framework.
+    It is robust since the solution is a feedback and there is no need for expensive replanning. It is reliable
+    because accurate collision probabilities can be computed along the edges. In addition, FIRM is a scalable framework,
+    where the complexity of planning with FIRM is a constant multiplier of the complexity of planning
+    with PRM.
 
    @par External documentation
-   Please refer to the publications at Ali's research page.
-  
-   <a href="http://www.mit.edu/~aliagha/Web/publications.htm">[Link to Ali Agha's publications]</a>
+   A. Agha-mohammadi, Suman Chakravorty, Nancy Amato, "FIRM: Sampling-based Feedback Motion Planning Under Motion
+   Uncertainty and Imperfect Measurements", International Journal of Robotics Research, 33(2):268-304, February 2014
+
+   <a href="http://www.mit.edu/~aliagha/Web/pubpdfs/2014.Ali.Suman.ea.IJRR_FIRM.pdf">[PDF]</a>
 */
 
 /** \brief Feedback Information RoadMap planner */
@@ -106,8 +106,8 @@ public:
     /**
      @brief The underlying roadmap graph.
 
-     @par Edges are directed and have a weight property called FIRMWeight. This weight property 
-          stores information about the edge controller identification, transition probability and 
+     @par Edges are directed and have a weight property called FIRMWeight. This weight property
+          stores information about the edge controller identification, transition probability and
           execution cost.
      */
     typedef boost::adjacency_list <
@@ -118,7 +118,7 @@ public:
         boost::property < vertex_flags_t, unsigned int,
         boost::property < boost::vertex_predecessor_t, unsigned long int,
         boost::property < boost::vertex_rank_t, unsigned long int > > > > > >,
-        boost::property < boost::edge_weight_t, FIRMWeight /* ompl::base::Cost */,
+        boost::property < boost::edge_weight_t, FIRMWeight ,
         boost::property < boost::edge_index_t, unsigned int,
         boost::property < edge_flags_t, unsigned int > > >
     > Graph;
@@ -133,18 +133,12 @@ public:
      */
     typedef boost::function<std::vector<Vertex>&(const Vertex)> ConnectionStrategy;
 
-    /** @brief A function that can reject connections.
-     This is called after previous connections from the neighbor list
-     have been added to the roadmap.
-     */
-    typedef boost::function<bool(const Vertex&, const Vertex&)> ConnectionFilter;
-
     /** Defining the edge and node controller types*/
     typedef Controller<RHCICreate, ExtendedKF> EdgeControllerType;
     typedef Controller<RHCICreate, LinearizedKF> NodeControllerType;
 
     /** \brief Constructor */
-    FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode=false, bool starStrategy = false);
+    FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode=false);
 
     virtual ~FIRM(void);
 
@@ -173,25 +167,7 @@ public:
      */
     void setMaxNearestNeighbors(unsigned int k);
 
-    /** \brief Set the function that can reject a milestone connection.
-
-     \par The given function is called immediately before a connection
-     is checked for collision and added to the roadmap. Other neighbors
-     may have already been connected before this function is called.
-     This allows certain heuristics that use the structure of the
-     roadmap (like connected components or useful cycles) to be
-     implemented by changing this function.
-
-     \param connectionFilter A function that takes the new milestone,
-     a neighboring milestone and returns whether a connection should be
-     attempted.
-     */
-    void setConnectionFilter(const ConnectionFilter& connectionFilter)
-    {
-        connectionFilter_ = connectionFilter;
-    }
-
-    virtual void getPlannerData(ompl::base::PlannerData &data) const;
+    //virtual void getPlannerData(ompl::base::PlannerData &data) const;
 
     /** \brief While the termination condition allows, this function will construct the roadmap (using growRoadmap() and expandRoadmap(),
         maintaining a 2:1 ratio for growing/expansion of roadmap) */
@@ -206,16 +182,6 @@ public:
         improved until a given condition is true. The solve()
         method will also improve the roadmap, as needed.*/
     virtual void growRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
-
-    /** \brief Attempt to connect disjoint components in the roadmap
-        using random bouncing motions (the PRM expansion step) for the
-        given time (seconds). */
-    virtual void expandRoadmap(double expandTime);
-
-    /** \brief Attempt to connect disjoint components in the roadmap
-        using random bouncing motions (the PRM expansion step) until the
-        given condition evaluates true. */
-    virtual void expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
 
     /** \brief  */
     virtual ompl::base::PlannerStatus solve(const ompl::base::PlannerTerminationCondition &ptc);
@@ -269,7 +235,7 @@ protected:
 
     /** \brief Construct a milestone for a given state (\e state), store it in the nearest neighbors data structure
         and then connect it to the roadmap in accordance to the connection strategy. */
-    virtual Vertex addMilestone(ompl::base::State *state);
+    virtual Vertex addStateToGraph(ompl::base::State *state);
 
     /** \brief Make two milestones (\e m1 and \e m2) be part of the same connected component. The component with fewer elements will get the id of the component with more elements. */
     void uniteComponents(Vertex m1, Vertex m2);
@@ -282,11 +248,6 @@ protected:
          \e ptc returns true.  Use \e workState as temporary memory. */
     virtual void growRoadmap(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::State *workState);
 
-    /** \brief Attempt to connect disjoint components in the
-        roadmap using random bounding motions (the PRM
-        expansion step) */
-    virtual void expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc, std::vector<ompl::base::State*> &workStates);
-
     /** Thread that checks for solution */
     void checkForSolution(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::PathPtr &solution);
 
@@ -296,20 +257,16 @@ protected:
     /** \brief Returns the value of the addedSolution_ member. */
     bool addedNewSolution(void) const;
 
-    /** \brief Given two milestones from the same connected component, construct a path connecting them and set it as the solution */
-    //virtual ompl::base::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
-
-    /** \brief Given a solution represented as a vector of predecesors in the roadmap, construct a geometric path */
+    /** \brief Construct a feedback */
     virtual ompl::base::PathPtr constructFeedbackPath(const Vertex &start, const Vertex &goal);
 
     /** \brief Add an edge from vertex a to b in graph */
     virtual void addEdgeToGraph(const Vertex a, const Vertex b);
 
     /** \brief Generates the cost of the edge */
-    virtual FIRMWeight generateControllersWithEdgeCost(ompl::base::State* startNodeState,
+    virtual FIRMWeight generateEdgeControllerWithCost(ompl::base::State* startNodeState,
                                                              ompl::base::State* targetNodeState,
-                                                             EdgeControllerType &edgeController,
-                                                             NodeControllerType &nodeController);
+                                                             EdgeControllerType &edgeController);
 
     /** \brief Generates the edge controller that drives the robot from start to end of edge */
     virtual void generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, EdgeControllerType &edgeController);
@@ -377,9 +334,6 @@ protected:
     /** \brief Function that returns the milestones to attempt connections with */
     ConnectionStrategy                                     connectionStrategy_;
 
-    /** \brief Function that can reject a milestone connection */
-    ConnectionFilter                                       connectionFilter_;
-
     /** \brief Flag indicating whether the employed connection strategy was set by the user (or defaults are assumed) */
     bool                                                   userSetConnectionStrategy_;
 
@@ -391,12 +345,6 @@ protected:
 
     /** \brief Mutex to guard access to the Graph member (g_) */
     mutable boost::mutex                                   graphMutex_;
-
-    /** \brief Objective cost function for PRM graph edges */
-    ompl::base::OptimizationObjectivePtr                         opt_;
-
-    /** \brief Given two vertices, returns a heuristic on the cost of the path connecting them. This method wraps OptimizationObjective::motionCostHeuristic */
-    ompl::base::Cost costHeuristic(Vertex u, Vertex v) const;
 
     /** \brief The base::SpaceInformation cast as firm::SpaceInformation, for convenience */
     const firm::SpaceInformation::SpaceInformationPtr            siF_;
@@ -411,11 +359,13 @@ protected:
 
     // This feedback will eventually be in a feedbackpath class
     std::map <Vertex, Edge> feedback_;
+
     /** \brief The number of particles to use for monte carlo simulations*/
     unsigned int numParticles_;
 
     bool debug_;
 
+    /** \brief The minimum number of nodes that should be sampled. */
     unsigned int minFIRMNodes_;
 
 };

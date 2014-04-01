@@ -57,7 +57,7 @@ class ExtendedKF : public  KalmanFilterMethod
   	ExtendedKF() { }
 
     /** \brief  Constructor */
-  	ExtendedKF(firm::SpaceInformation::SpaceInformationPtr si): KalmanFilterMethod(si) {}
+  	ExtendedKF(const firm::SpaceInformation::SpaceInformationPtr si): KalmanFilterMethod(si) {}
 
   	/** \brief  Gets as input belief and control, returns predicted belief if control
   	            were to be applied to the robot. Also called the Prior. */
@@ -83,7 +83,7 @@ class ExtendedKF : public  KalmanFilterMethod
 
     /** \brief  Compute the covariance for a given linear system. A linear system describes a robot's state at a point in
                 an open loop trajectory. Helps to understand the expected uncertainty at a point in the trajectory.*/
-  	arma::mat computeStationaryCovariance (const LinearSystem& ls) {}
+  	arma::mat computeStationaryCovariance (const LinearSystem& ls) {return arma::zeros(3,3);}
 
 };
 

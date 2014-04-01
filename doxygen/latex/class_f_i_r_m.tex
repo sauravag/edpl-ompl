@@ -64,13 +64,15 @@ $<$ ompl\-::\-Nearest\-Neighbors\*
 $<$ \-Vertex $>$ $>$ {\bfseries \-Roadmap\-Neighbors}}\label{class_f_i_r_m_a687705deb489cff3a2d40b7bec6bdc29}
 
 \item 
-typedef boost\-::function\*
+\hypertarget{class_f_i_r_m_a15cfbcaf52c0bdd5e6c1a969bbf7ea1e}{typedef boost\-::function\*
 $<$ std\-::vector$<$ \-Vertex $>$\*
- \&(const \-Vertex)$>$ \hyperlink{class_f_i_r_m_a15cfbcaf52c0bdd5e6c1a969bbf7ea1e}{\-Connection\-Strategy}
+ \&(const \-Vertex)$>$ \hyperlink{class_f_i_r_m_a15cfbcaf52c0bdd5e6c1a969bbf7ea1e}{\-Connection\-Strategy}}\label{class_f_i_r_m_a15cfbcaf52c0bdd5e6c1a969bbf7ea1e}
+
 \begin{DoxyCompactList}\small\item\em \-A function returning the milestones that should be attempted to connect to. \end{DoxyCompactList}\item 
-typedef boost\-::function$<$ bool(const \*
-\-Vertex \&, const \-Vertex \&)$>$ \hyperlink{class_f_i_r_m_a2482eee2e5248d5bff3b3b56e5a593b3}{\-Connection\-Filter}
-\begin{DoxyCompactList}\small\item\em \-A function that can reject connections. \end{DoxyCompactList}\item 
+\hypertarget{class_f_i_r_m_a2482eee2e5248d5bff3b3b56e5a593b3}{typedef boost\-::function$<$ bool(const \*
+\-Vertex \&, const \-Vertex \&)$>$ \hyperlink{class_f_i_r_m_a2482eee2e5248d5bff3b3b56e5a593b3}{\-Connection\-Filter}}\label{class_f_i_r_m_a2482eee2e5248d5bff3b3b56e5a593b3}
+
+\begin{DoxyCompactList}\small\item\em \-A function that can reject connections. \-This is called after previous connections from the neighbor list have been added to the roadmap. \end{DoxyCompactList}\item 
 typedef \hyperlink{class_controller}{\-Controller}$<$ \hyperlink{class_r_h_c_i_create}{\-R\-H\-C\-I\-Create}, \*
 \hyperlink{class_extended_k_f}{\-Extended\-K\-F} $>$ \hyperlink{class_f_i_r_m_a70abcb24fbc9f836b94119f65c8f8a37}{\-Edge\-Controller\-Type}
 \item 
@@ -94,30 +96,27 @@ void \hyperlink{class_f_i_r_m_a8017d1847e682f39c2cbce33e904af57}{set\-Connection
 \begin{DoxyCompactList}\small\item\em \-Convenience function that sets the connection strategy to the default one with k nearest neighbors. \end{DoxyCompactList}\item 
 void \hyperlink{class_f_i_r_m_a3f85ba51a7c3b62b75df7f7c16064cec}{set\-Connection\-Filter} (const \hyperlink{class_f_i_r_m_a2482eee2e5248d5bff3b3b56e5a593b3}{\-Connection\-Filter} \&connection\-Filter)
 \begin{DoxyCompactList}\small\item\em \-Set the function that can reject a milestone connection. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_aedf1364d36f3934d5e47656a6d8e7d65}{virtual void {\bfseries get\-Planner\-Data} (ompl\-::base\-::\-Planner\-Data \&data) const }\label{class_f_i_r_m_aedf1364d36f3934d5e47656a6d8e7d65}
-
-\item 
 \hypertarget{class_f_i_r_m_a5f2e6a8c5dac3a0629f1dd0ac2313b9c}{virtual void \hyperlink{class_f_i_r_m_a5f2e6a8c5dac3a0629f1dd0ac2313b9c}{construct\-Roadmap} (const ompl\-::base\-::\-Planner\-Termination\-Condition \&ptc)}\label{class_f_i_r_m_a5f2e6a8c5dac3a0629f1dd0ac2313b9c}
 
 \begin{DoxyCompactList}\small\item\em \-While the termination condition allows, this function will construct the roadmap (using \hyperlink{class_f_i_r_m_a947186c6e6be0b513efe0e0b476fef88}{grow\-Roadmap()} and \hyperlink{class_f_i_r_m_ad9cd5472a8bd1b1fcb83763128f7fd75}{expand\-Roadmap()}, maintaining a 2\-:1 ratio for growing/expansion of roadmap) \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_a947186c6e6be0b513efe0e0b476fef88}{virtual void \hyperlink{class_f_i_r_m_a947186c6e6be0b513efe0e0b476fef88}{grow\-Roadmap} (double grow\-Time)}\label{class_f_i_r_m_a947186c6e6be0b513efe0e0b476fef88}
 
-\begin{DoxyCompactList}\small\item\em \-If the user desires, the roadmap can be improved for the given time (seconds). \-The \hyperlink{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}{solve()} method will also improve the roadmap, as needed. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em \-If the user desires, the roadmap can be improved for the given time (seconds). \-The solve() method will also improve the roadmap, as needed. \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_ae8e741b0af39a64d34dcfa4f29c0e509}{virtual void \hyperlink{class_f_i_r_m_ae8e741b0af39a64d34dcfa4f29c0e509}{grow\-Roadmap} (const ompl\-::base\-::\-Planner\-Termination\-Condition \&ptc)}\label{class_f_i_r_m_ae8e741b0af39a64d34dcfa4f29c0e509}
 
-\begin{DoxyCompactList}\small\item\em \-If the user desires, the roadmap can be improved until a given condition is true. \-The \hyperlink{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}{solve()} method will also improve the roadmap, as needed. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em \-If the user desires, the roadmap can be improved until a given condition is true. \-The solve() method will also improve the roadmap, as needed. \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_ad9cd5472a8bd1b1fcb83763128f7fd75}{virtual void \hyperlink{class_f_i_r_m_ad9cd5472a8bd1b1fcb83763128f7fd75}{expand\-Roadmap} (double expand\-Time)}\label{class_f_i_r_m_ad9cd5472a8bd1b1fcb83763128f7fd75}
 
 \begin{DoxyCompactList}\small\item\em \-Attempt to connect disjoint components in the roadmap using random bouncing motions (the \-P\-R\-M expansion step) for the given time (seconds). \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_aac520fbbb43b0e3100498aa29117f0b9}{virtual void \hyperlink{class_f_i_r_m_aac520fbbb43b0e3100498aa29117f0b9}{expand\-Roadmap} (const ompl\-::base\-::\-Planner\-Termination\-Condition \&ptc)}\label{class_f_i_r_m_aac520fbbb43b0e3100498aa29117f0b9}
 
 \begin{DoxyCompactList}\small\item\em \-Attempt to connect disjoint components in the roadmap using random bouncing motions (the \-P\-R\-M expansion step) until the given condition evaluates true. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}{virtual ompl\-::base\-::\-Planner\-Status \hyperlink{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}{solve} (const ompl\-::base\-::\-Planner\-Termination\-Condition \&ptc)}\label{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}
+\hypertarget{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}{virtual ompl\-::base\-::\-Planner\-Status {\bfseries solve} (const ompl\-::base\-::\-Planner\-Termination\-Condition \&ptc)}\label{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}
 
-\begin{DoxyCompactList}\small\item\em \-Function that can solve the motion planning problem. \-Grows a roadmap using \hyperlink{class_f_i_r_m_a5f2e6a8c5dac3a0629f1dd0ac2313b9c}{construct\-Roadmap()}. \-This function can be called multiple times on the same problem, without calling clear() in between. \-This allows the planner to continue work for more time on an unsolved problem, for example. \-Start and goal states from the currently specified \-Problem\-Definition are cached. \-This means that between calls to \hyperlink{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}{solve()}, input states are only added, not removed. \-When using \-P\-R\-M as a multi-\/query planner, the input states should be however cleared, without clearing the roadmap itself. \-This can be done using the \hyperlink{class_f_i_r_m_acf7c24814ea6b8cad9cad350dea66560}{clear\-Query()} function. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_acf7c24814ea6b8cad9cad350dea66560}{void \hyperlink{class_f_i_r_m_acf7c24814ea6b8cad9cad350dea66560}{clear\-Query} (void)}\label{class_f_i_r_m_acf7c24814ea6b8cad9cad350dea66560}
+\item 
+\hypertarget{class_f_i_r_m_acf7c24814ea6b8cad9cad350dea66560}{void {\bfseries clear\-Query} (void)}\label{class_f_i_r_m_acf7c24814ea6b8cad9cad350dea66560}
 
-\begin{DoxyCompactList}\small\item\em \-Clear the query previously loaded from the \-Problem\-Definition. \-Subsequent calls to \hyperlink{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}{solve()} will reuse the previously computed roadmap, but will clear the set of input states constructed by the previous call to \hyperlink{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}{solve()}. \-This enables multi-\/query functionality for \-P\-R\-M. \end{DoxyCompactList}\item 
+\item 
 \hypertarget{class_f_i_r_m_afe5298e85713c7a736d6b8936f7171af}{virtual void {\bfseries clear} (void)}\label{class_f_i_r_m_afe5298e85713c7a736d6b8936f7171af}
 
 \item 
@@ -148,7 +147,8 @@ void \hyperlink{class_f_i_r_m_a3f85ba51a7c3b62b75df7f7c16064cec}{set\-Connection
 \hypertarget{class_f_i_r_m_af6951ffec04529fd8da990978d7d8d19}{void \hyperlink{class_f_i_r_m_af6951ffec04529fd8da990978d7d8d19}{free\-Memory} (void)}\label{class_f_i_r_m_af6951ffec04529fd8da990978d7d8d19}
 
 \begin{DoxyCompactList}\small\item\em \-Free all the memory allocated by the planner. \end{DoxyCompactList}\item 
-virtual \-Vertex \hyperlink{class_f_i_r_m_a6b72ace6d1708b25bf8c7f69331ae82b}{add\-Milestone} (ompl\-::base\-::\-State $\ast$state)
+\hypertarget{class_f_i_r_m_a6b72ace6d1708b25bf8c7f69331ae82b}{virtual \-Vertex \hyperlink{class_f_i_r_m_a6b72ace6d1708b25bf8c7f69331ae82b}{add\-Milestone} (ompl\-::base\-::\-State $\ast$state)}\label{class_f_i_r_m_a6b72ace6d1708b25bf8c7f69331ae82b}
+
 \begin{DoxyCompactList}\small\item\em \-Construct a milestone for a given state ({\itshape state\/}), store it in the nearest neighbors data structure and then connect it to the roadmap in accordance to the connection strategy. \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_a34535f25e4f3fb645fb65d57e3faf01b}{void \hyperlink{class_f_i_r_m_a34535f25e4f3fb645fb65d57e3faf01b}{unite\-Components} (\-Vertex m1, \-Vertex m2)}\label{class_f_i_r_m_a34535f25e4f3fb645fb65d57e3faf01b}
 
@@ -184,8 +184,7 @@ virtual ompl\-::base\-::\-Path\-Ptr \hyperlink{class_f_i_r_m_a28ff922dfb8df66dbb
 \hypertarget{class_f_i_r_m_a1856164aa0dba82e6cfad26a4ef5a7fe}{virtual void \hyperlink{class_f_i_r_m_a1856164aa0dba82e6cfad26a4ef5a7fe}{generate\-Node\-Controller} (const ompl\-::base\-::\-State $\ast$state, \hyperlink{class_controller}{\-Node\-Controller\-Type} \&node\-Controller)}\label{class_f_i_r_m_a1856164aa0dba82e6cfad26a4ef5a7fe}
 
 \begin{DoxyCompactList}\small\item\em \-Generates the node controller that stabilizes the robot to the node. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_a7ffdc57247b8f40899646195750b6a20}{virtual void \hyperlink{class_f_i_r_m_a7ffdc57247b8f40899646195750b6a20}{solve\-Dynamic\-Program} (const \-Vertex goal\-Vertex)}\label{class_f_i_r_m_a7ffdc57247b8f40899646195750b6a20}
-
+virtual void \hyperlink{class_f_i_r_m_a7ffdc57247b8f40899646195750b6a20}{solve\-Dynamic\-Program} (const \-Vertex goal\-Vertex)
 \begin{DoxyCompactList}\small\item\em \-Solves the dynamic program to return a feedback policy. \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_a4003d4144f6c32e9eaba79f292ec9ce4}{void {\bfseries add\-State\-To\-Visualization} (ompl\-::base\-::\-State $\ast$state)}\label{class_f_i_r_m_a4003d4144f6c32e9eaba79f292ec9ce4}
 
@@ -196,10 +195,7 @@ virtual ompl\-::base\-::\-Path\-Ptr \hyperlink{class_f_i_r_m_a28ff922dfb8df66dbb
 \hypertarget{class_f_i_r_m_a44321fba1c038c1f43ccfeccf9a1c44c}{std\-::pair$<$ typename \-F\-I\-R\-M\-::\-Edge, \*
 double $>$ \hyperlink{class_f_i_r_m_a44321fba1c038c1f43ccfeccf9a1c44c}{get\-Updated\-Node\-Cost\-To\-Go} (\-Vertex node)}\label{class_f_i_r_m_a44321fba1c038c1f43ccfeccf9a1c44c}
 
-\begin{DoxyCompactList}\small\item\em \-Calculates the new cost to go from a node. \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_a18aa9a3e98fd03d5654ffd3ebc7ca9ff}{ompl\-::base\-::\-Cost \hyperlink{class_f_i_r_m_a18aa9a3e98fd03d5654ffd3ebc7ca9ff}{cost\-Heuristic} (\-Vertex u, \-Vertex v) const }\label{class_f_i_r_m_a18aa9a3e98fd03d5654ffd3ebc7ca9ff}
-
-\begin{DoxyCompactList}\small\item\em \-Given two vertices, returns a heuristic on the cost of the path connecting them. \-This method wraps \-Optimization\-Objective\-::motion\-Cost\-Heuristic. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em \-Calculates the new cost to go from a node. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{\-Protected \-Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -271,13 +267,10 @@ boost\-::vertex\-\_\-predecessor\-\_\-t $>$\*
 \begin{DoxyCompactList}\small\item\em \-Random number generator. \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_afc413ddef9b66cd337c0e19c6ba79d84}{bool \hyperlink{class_f_i_r_m_afc413ddef9b66cd337c0e19c6ba79d84}{added\-Solution\-\_\-}}\label{class_f_i_r_m_afc413ddef9b66cd337c0e19c6ba79d84}
 
-\begin{DoxyCompactList}\small\item\em \-A flag indicating that a solution has been added during \hyperlink{class_f_i_r_m_a02f3c98de4840594193ba5bf7ff3ca63}{solve()} \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em \-A flag indicating that a solution has been added during solve() \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_ae71c316b447bb7b404dc27c8d673fd55}{boost\-::mutex \hyperlink{class_f_i_r_m_ae71c316b447bb7b404dc27c8d673fd55}{graph\-Mutex\-\_\-}}\label{class_f_i_r_m_ae71c316b447bb7b404dc27c8d673fd55}
 
 \begin{DoxyCompactList}\small\item\em \-Mutex to guard access to the \-Graph member (g\-\_\-) \end{DoxyCompactList}\item 
-\hypertarget{class_f_i_r_m_aac6a297cb2f700d31396b8cd5a88e81b}{ompl\-::base\-::\-Optimization\-Objective\-Ptr \hyperlink{class_f_i_r_m_aac6a297cb2f700d31396b8cd5a88e81b}{opt\-\_\-}}\label{class_f_i_r_m_aac6a297cb2f700d31396b8cd5a88e81b}
-
-\begin{DoxyCompactList}\small\item\em \-Objective cost function for \-P\-R\-M graph edges. \end{DoxyCompactList}\item 
 \hypertarget{class_f_i_r_m_afd4f91dc510bf7b5b68b4da5cfd90718}{const \*
 firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \hyperlink{class_f_i_r_m_afd4f91dc510bf7b5b68b4da5cfd90718}{si\-F\-\_\-}}\label{class_f_i_r_m_afd4f91dc510bf7b5b68b4da5cfd90718}
 
@@ -302,9 +295,9 @@ firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \hyperlink{class_f_i_r
 \hypertarget{class_f_i_r_m_a7fc88496b950b90b92876dea03b3102f}{bool {\bfseries debug\-\_\-}}\label{class_f_i_r_m_a7fc88496b950b90b92876dea03b3102f}
 
 \item 
-\hypertarget{class_f_i_r_m_add9de6c5accdea0f9b6d1ff458350036}{unsigned int {\bfseries min\-F\-I\-R\-M\-Nodes\-\_\-}}\label{class_f_i_r_m_add9de6c5accdea0f9b6d1ff458350036}
+\hypertarget{class_f_i_r_m_add9de6c5accdea0f9b6d1ff458350036}{unsigned int \hyperlink{class_f_i_r_m_add9de6c5accdea0f9b6d1ff458350036}{min\-F\-I\-R\-M\-Nodes\-\_\-}}\label{class_f_i_r_m_add9de6c5accdea0f9b6d1ff458350036}
 
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em \-The minimum number of nodes that should be sampled. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{\-Detailed \-Description}
@@ -313,31 +306,15 @@ firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \hyperlink{class_f_i_r
 \label{class_f_i_r_m_FIRM}%
 \hypertarget{class_f_i_r_m_FIRM}{}%
  \begin{DoxyParagraph}{\-Short description}
-\-Feedback \-Information \-Road\-Map is a method that generates a graph in belief space and generates a policy that guides that robot from the start to goal.
+\-Feedback \-Information \-Road\-Map is a method that generates a graph in belief space and returns a policy that guides that robot from the start to goal.
 \end{DoxyParagraph}
 \begin{DoxyParagraph}{\-External documentation}
-\-Please refer to the publications at \-Ali's research page.
+\-A. \-Agha-\/mohammadi, \-Suman \-Chakravorty, \-Nancy \-Amato, \char`\"{}\-F\-I\-R\-M\-: Sampling-\/based Feedback Motion Planning Under Motion 
+   Uncertainty and Imperfect Measurements\char`\"{}, \-International \-Journal of \-Robotics \-Research, 33(2)\-:268-\/304, \-February 2014
 \end{DoxyParagraph}
-\href{http://www.mit.edu/~aliagha/Web/publications.htm}{\tt \mbox{[}\-Link to \-Ali \-Agha's \-Research \-Page\mbox{]}} 
+\href{http://www.mit.edu/~aliagha/Web/pubpdfs/2014.Ali.Suman.ea.IJRR_FIRM.pdf}{\tt \mbox{[}\-P\-D\-F\mbox{]}} 
 
 \subsection{\-Member \-Typedef \-Documentation}
-\hypertarget{class_f_i_r_m_a2482eee2e5248d5bff3b3b56e5a593b3}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!\-Connection\-Filter@{\-Connection\-Filter}}
-\index{\-Connection\-Filter@{\-Connection\-Filter}!FIRM@{\-F\-I\-R\-M}}
-\subsubsection[{\-Connection\-Filter}]{\setlength{\rightskip}{0pt plus 5cm}typedef boost\-::function$<$bool(const \-Vertex\&, const \-Vertex\&)$>$ {\bf \-F\-I\-R\-M\-::\-Connection\-Filter}}}\label{class_f_i_r_m_a2482eee2e5248d5bff3b3b56e5a593b3}
-
-
-\-A function that can reject connections. 
-
-\-This is called after previous connections from the neighbor list have been added to the roadmap. \hypertarget{class_f_i_r_m_a15cfbcaf52c0bdd5e6c1a969bbf7ea1e}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!\-Connection\-Strategy@{\-Connection\-Strategy}}
-\index{\-Connection\-Strategy@{\-Connection\-Strategy}!FIRM@{\-F\-I\-R\-M}}
-\subsubsection[{\-Connection\-Strategy}]{\setlength{\rightskip}{0pt plus 5cm}typedef boost\-::function$<$std\-::vector$<$\-Vertex$>$\&(const \-Vertex)$>$ {\bf \-F\-I\-R\-M\-::\-Connection\-Strategy}}}\label{class_f_i_r_m_a15cfbcaf52c0bdd5e6c1a969bbf7ea1e}
-
-
-\-A function returning the milestones that should be attempted to connect to. 
-
-\begin{DoxyNote}{\-Note}
-\-Can't use the prefered boost\-::function syntax here because the \-Python bindings don't like it. 
-\end{DoxyNote}
 \hypertarget{class_f_i_r_m_a70abcb24fbc9f836b94119f65c8f8a37}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!\-Edge\-Controller\-Type@{\-Edge\-Controller\-Type}}
 \index{\-Edge\-Controller\-Type@{\-Edge\-Controller\-Type}!FIRM@{\-F\-I\-R\-M}}
 \subsubsection[{\-Edge\-Controller\-Type}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf \-Controller}$<${\bf \-R\-H\-C\-I\-Create}, {\bf \-Extended\-K\-F}$>$ {\bf \-F\-I\-R\-M\-::\-Edge\-Controller\-Type}}}\label{class_f_i_r_m_a70abcb24fbc9f836b94119f65c8f8a37}
@@ -348,30 +325,13 @@ firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \hyperlink{class_f_i_r
 
 \-The underlying roadmap graph. 
 
-\begin{DoxyParagraph}{\-Any \-B\-G\-L graph representation could be used here. \-Because we}
-expect the roadmap to be sparse (m$<$n$^\wedge$2), an adjacency\-\_\-list is more appropriate than an adjacency\-\_\-matrix.
-\end{DoxyParagraph}
-\begin{DoxyParagraph}{\-Obviously, a ompl\-:\-:base\-:\-:\-State$\ast$ vertex property is required.}
-\-The incremental connected components algorithm requires vertex\-\_\-predecessor\-\_\-t and vertex\-\_\-rank\-\_\-t properties. \-If boost\-::vec\-S is not used for vertex storage, then there must also be a boost\-:vertex\-\_\-index\-\_\-t property manually added.
-\end{DoxyParagraph}
-\begin{DoxyParagraph}{\-Edges are directed and have a weight property.}
-
+\begin{DoxyParagraph}{\-Edges are directed and have a weight property called \-F\-I\-R\-M\-Weight. \-This weight property}
+stores information about the edge controller identification, transition probability and execution cost. 
 \end{DoxyParagraph}
 
 
 \subsection{\-Member \-Function \-Documentation}
-\hypertarget{class_f_i_r_m_a6b72ace6d1708b25bf8c7f69331ae82b}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!add\-Milestone@{add\-Milestone}}
-\index{add\-Milestone@{add\-Milestone}!FIRM@{\-F\-I\-R\-M}}
-\subsubsection[{add\-Milestone}]{\setlength{\rightskip}{0pt plus 5cm}\-F\-I\-R\-M\-::\-Vertex {\bf \-F\-I\-R\-M\-::add\-Milestone} (
-\begin{DoxyParamCaption}
-\item[{ompl\-::base\-::\-State $\ast$}]{state}
-\end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily  \mbox{[}protected, virtual\mbox{]}}}}\label{class_f_i_r_m_a6b72ace6d1708b25bf8c7f69331ae82b}
-
-
-\-Construct a milestone for a given state ({\itshape state\/}), store it in the nearest neighbors data structure and then connect it to the roadmap in accordance to the connection strategy. 
-
-if(boost\-::num\-\_\-vertices(g\-\_\-) $>$ 1 ) \{ foreach(\-Vertex v, boost\-::vertices(g\-\_\-)) \{ if(state == state\-Property\-\_\-\mbox{[}v\mbox{]}) return v; \} \}\hypertarget{class_f_i_r_m_a4c909fc53ceeeecb6992ccebf0ab60d6}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!check\-For\-Solution@{check\-For\-Solution}}
+\hypertarget{class_f_i_r_m_a4c909fc53ceeeecb6992ccebf0ab60d6}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!check\-For\-Solution@{check\-For\-Solution}}
 \index{check\-For\-Solution@{check\-For\-Solution}!FIRM@{\-F\-I\-R\-M}}
 \subsubsection[{check\-For\-Solution}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-F\-I\-R\-M\-::check\-For\-Solution} (
 \begin{DoxyParamCaption}
@@ -433,7 +393,18 @@ by varying the number and properties of the milestones that are connected to eac
 {\em pdef} & \-A function that takes a milestone as an argument and returns a collection of other milestones to which a connection attempt must be made. \-The default connection strategy is to connect a milestone's 10 closest neighbors. \\
 \hline
 \end{DoxyParams}
+\hypertarget{class_f_i_r_m_a7ffdc57247b8f40899646195750b6a20}{\index{\-F\-I\-R\-M@{\-F\-I\-R\-M}!solve\-Dynamic\-Program@{solve\-Dynamic\-Program}}
+\index{solve\-Dynamic\-Program@{solve\-Dynamic\-Program}!FIRM@{\-F\-I\-R\-M}}
+\subsubsection[{solve\-Dynamic\-Program}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf \-F\-I\-R\-M\-::solve\-Dynamic\-Program} (
+\begin{DoxyParamCaption}
+\item[{const \-Vertex}]{goal\-Vertex}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}protected, virtual\mbox{]}}}}\label{class_f_i_r_m_a7ffdc57247b8f40899646195750b6a20}
 
+
+\-Solves the dynamic program to return a feedback policy. 
+
+-\/-\/\-N\-O\-T\-E\-S-\/-\/ \-Assign a high cost to go initially for all nodes that are not in the goal connected component. \-For nodes that are in the goal cc, we assign goal cost to go for the goal and init cost to go for all other nodes.
 
 \-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
 \item 

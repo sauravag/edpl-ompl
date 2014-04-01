@@ -131,7 +131,7 @@ void plan(void)
     pdef->setStartAndGoalStates(start, goal);
 
     // create a planner for the defined space
-    ob::PlannerPtr planner(new FIRM(si, true));
+    ob::PlannerPtr planner(new FIRM(si, false));
 
     // set the problem we are trying to solve for the planner
     planner->setProblemDefinition(pdef);
@@ -151,7 +151,7 @@ void plan(void)
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = planner->solve(2000);
+    ob::PlannerStatus solved = planner->solve(100);
 
     cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 

@@ -141,13 +141,15 @@ typedef boost::graph_traits<br class="typebreak"/>
 typedef boost::shared_ptr<br class="typebreak"/>
 &lt; ompl::NearestNeighbors<br class="typebreak"/>
 &lt; Vertex &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>RoadmapNeighbors</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef boost::function<br class="typebreak"/>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a15cfbcaf52c0bdd5e6c1a969bbf7ea1e"></a><!-- doxytag: member="FIRM::ConnectionStrategy" ref="a15cfbcaf52c0bdd5e6c1a969bbf7ea1e" args="" -->
+typedef boost::function<br class="typebreak"/>
 &lt; std::vector&lt; Vertex &gt;<br class="typebreak"/>
  &amp;(const Vertex)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e">ConnectionStrategy</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A function returning the milestones that should be attempted to connect to.  <a href="#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef boost::function&lt; bool(const <br class="typebreak"/>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A function returning the milestones that should be attempted to connect to. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2482eee2e5248d5bff3b3b56e5a593b3"></a><!-- doxytag: member="FIRM::ConnectionFilter" ref="a2482eee2e5248d5bff3b3b56e5a593b3" args="" -->
+typedef boost::function&lt; bool(const <br class="typebreak"/>
 Vertex &amp;, const Vertex &amp;)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a2482eee2e5248d5bff3b3b56e5a593b3">ConnectionFilter</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A function that can reject connections.  <a href="#a2482eee2e5248d5bff3b3b56e5a593b3"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A function that can reject connections. This is called after previous connections from the neighbor list have been added to the roadmap. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_controller.html">Controller</a>&lt; <a class="el" href="class_r_h_c_i_create.html">RHCICreate</a>, <br class="typebreak"/>
 <a class="el" href="class_extended_k_f.html">ExtendedKF</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a70abcb24fbc9f836b94119f65c8f8a37">EdgeControllerType</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adf37596ffd4dbf633d7cd0f27347d15c"></a><!-- doxytag: member="FIRM::NodeControllerType" ref="adf37596ffd4dbf633d7cd0f27347d15c" args="" -->
@@ -167,17 +169,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function that sets the connection strategy to the default one with k nearest neighbors. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a3f85ba51a7c3b62b75df7f7c16064cec">setConnectionFilter</a> (const <a class="el" href="class_f_i_r_m.html#a2482eee2e5248d5bff3b3b56e5a593b3">ConnectionFilter</a> &amp;connectionFilter)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the function that can reject a milestone connection.  <a href="#a3f85ba51a7c3b62b75df7f7c16064cec"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aedf1364d36f3934d5e47656a6d8e7d65"></a><!-- doxytag: member="FIRM::getPlannerData" ref="aedf1364d36f3934d5e47656a6d8e7d65" args="(ompl::base::PlannerData &amp;data) const " -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>getPlannerData</b> (ompl::base::PlannerData &amp;data) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f2e6a8c5dac3a0629f1dd0ac2313b9c"></a><!-- doxytag: member="FIRM::constructRoadmap" ref="a5f2e6a8c5dac3a0629f1dd0ac2313b9c" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a5f2e6a8c5dac3a0629f1dd0ac2313b9c">constructRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">While the termination condition allows, this function will construct the roadmap (using <a class="el" href="class_f_i_r_m.html#a947186c6e6be0b513efe0e0b476fef88" title="If the user desires, the roadmap can be improved for the given time (seconds). The solve() method wil...">growRoadmap()</a> and <a class="el" href="class_f_i_r_m.html#ad9cd5472a8bd1b1fcb83763128f7fd75" title="Attempt to connect disjoint components in the roadmap using random bouncing motions (the PRM expansio...">expandRoadmap()</a>, maintaining a 2:1 ratio for growing/expansion of roadmap) <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a947186c6e6be0b513efe0e0b476fef88"></a><!-- doxytag: member="FIRM::growRoadmap" ref="a947186c6e6be0b513efe0e0b476fef88" args="(double growTime)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a947186c6e6be0b513efe0e0b476fef88">growRoadmap</a> (double growTime)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the user desires, the roadmap can be improved for the given time (seconds). The <a class="el" href="class_f_i_r_m.html#a02f3c98de4840594193ba5bf7ff3ca63" title="Function that can solve the motion planning problem. Grows a roadmap using constructRoadmap(). This function can be called multiple times on the same problem, without calling clear() in between. This allows the planner to continue work for more time on an unsolved problem, for example. Start and goal states from the currently specified ProblemDefinition are cached. This means that between calls to solve(), input states are only added, not removed. When using PRM as a multi-query planner, the input states should be however cleared, without clearing the roadmap itself. This can be done using the clearQuery() function.">solve()</a> method will also improve the roadmap, as needed. <br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the user desires, the roadmap can be improved for the given time (seconds). The solve() method will also improve the roadmap, as needed. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8e741b0af39a64d34dcfa4f29c0e509"></a><!-- doxytag: member="FIRM::growRoadmap" ref="ae8e741b0af39a64d34dcfa4f29c0e509" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ae8e741b0af39a64d34dcfa4f29c0e509">growRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the user desires, the roadmap can be improved until a given condition is true. The <a class="el" href="class_f_i_r_m.html#a02f3c98de4840594193ba5bf7ff3ca63" title="Function that can solve the motion planning problem. Grows a roadmap using constructRoadmap(). This function can be called multiple times on the same problem, without calling clear() in between. This allows the planner to continue work for more time on an unsolved problem, for example. Start and goal states from the currently specified ProblemDefinition are cached. This means that between calls to solve(), input states are only added, not removed. When using PRM as a multi-query planner, the input states should be however cleared, without clearing the roadmap itself. This can be done using the clearQuery() function.">solve()</a> method will also improve the roadmap, as needed. <br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the user desires, the roadmap can be improved until a given condition is true. The solve() method will also improve the roadmap, as needed. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9cd5472a8bd1b1fcb83763128f7fd75"></a><!-- doxytag: member="FIRM::expandRoadmap" ref="ad9cd5472a8bd1b1fcb83763128f7fd75" args="(double expandTime)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ad9cd5472a8bd1b1fcb83763128f7fd75">expandRoadmap</a> (double expandTime)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to connect disjoint components in the roadmap using random bouncing motions (the PRM expansion step) for the given time (seconds). <br/></td></tr>
@@ -185,11 +185,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aac520fbbb43b0e3100498aa29117f0b9">expandRoadmap</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to connect disjoint components in the roadmap using random bouncing motions (the PRM expansion step) until the given condition evaluates true. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a02f3c98de4840594193ba5bf7ff3ca63"></a><!-- doxytag: member="FIRM::solve" ref="a02f3c98de4840594193ba5bf7ff3ca63" args="(const ompl::base::PlannerTerminationCondition &amp;ptc)" -->
-virtual ompl::base::PlannerStatus&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a02f3c98de4840594193ba5bf7ff3ca63">solve</a> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that can solve the motion planning problem. Grows a roadmap using <a class="el" href="class_f_i_r_m.html#a5f2e6a8c5dac3a0629f1dd0ac2313b9c" title="While the termination condition allows, this function will construct the roadmap (using growRoadmap()...">constructRoadmap()</a>. This function can be called multiple times on the same problem, without calling clear() in between. This allows the planner to continue work for more time on an unsolved problem, for example. Start and goal states from the currently specified ProblemDefinition are cached. This means that between calls to <a class="el" href="class_f_i_r_m.html#a02f3c98de4840594193ba5bf7ff3ca63" title="Function that can solve the motion planning problem. Grows a roadmap using constructRoadmap(). This function can be called multiple times on the same problem, without calling clear() in between. This allows the planner to continue work for more time on an unsolved problem, for example. Start and goal states from the currently specified ProblemDefinition are cached. This means that between calls to solve(), input states are only added, not removed. When using PRM as a multi-query planner, the input states should be however cleared, without clearing the roadmap itself. This can be done using the clearQuery() function.">solve()</a>, input states are only added, not removed. When using PRM as a multi-query planner, the input states should be however cleared, without clearing the roadmap itself. This can be done using the <a class="el" href="class_f_i_r_m.html#acf7c24814ea6b8cad9cad350dea66560" title="Clear the query previously loaded from the ProblemDefinition. Subsequent calls to solve() will reuse ...">clearQuery()</a> function. <br/></td></tr>
+virtual ompl::base::PlannerStatus&#160;</td><td class="memItemRight" valign="bottom"><b>solve</b> (const ompl::base::PlannerTerminationCondition &amp;ptc)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf7c24814ea6b8cad9cad350dea66560"></a><!-- doxytag: member="FIRM::clearQuery" ref="acf7c24814ea6b8cad9cad350dea66560" args="(void)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#acf7c24814ea6b8cad9cad350dea66560">clearQuery</a> (void)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the query previously loaded from the ProblemDefinition. Subsequent calls to <a class="el" href="class_f_i_r_m.html#a02f3c98de4840594193ba5bf7ff3ca63" title="Function that can solve the motion planning problem. Grows a roadmap using constructRoadmap(). This function can be called multiple times on the same problem, without calling clear() in between. This allows the planner to continue work for more time on an unsolved problem, for example. Start and goal states from the currently specified ProblemDefinition are cached. This means that between calls to solve(), input states are only added, not removed. When using PRM as a multi-query planner, the input states should be however cleared, without clearing the roadmap itself. This can be done using the clearQuery() function.">solve()</a> will reuse the previously computed roadmap, but will clear the set of input states constructed by the previous call to <a class="el" href="class_f_i_r_m.html#a02f3c98de4840594193ba5bf7ff3ca63" title="Function that can solve the motion planning problem. Grows a roadmap using constructRoadmap(). This function can be called multiple times on the same problem, without calling clear() in between. This allows the planner to continue work for more time on an unsolved problem, for example. Start and goal states from the currently specified ProblemDefinition are cached. This means that between calls to solve(), input states are only added, not removed. When using PRM as a multi-query planner, the input states should be however cleared, without clearing the roadmap itself. This can be done using the clearQuery() function.">solve()</a>. This enables multi-query functionality for PRM. <br/></td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clearQuery</b> (void)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe5298e85713c7a736d6b8936f7171af"></a><!-- doxytag: member="FIRM::clear" ref="afe5298e85713c7a736d6b8936f7171af" args="(void)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> (void)</td></tr>
 <tr><td class="memTemplParams" colspan="2"><a class="anchor" id="a8dd7c5ed3fa065f5f37d79bc1d220474"></a><!-- doxytag: member="FIRM::setNearestNeighbors" ref="a8dd7c5ed3fa065f5f37d79bc1d220474" args="(void)" -->
@@ -216,8 +214,9 @@ Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af6951ffec04529fd8da990978d7d8d19"></a><!-- doxytag: member="FIRM::freeMemory" ref="af6951ffec04529fd8da990978d7d8d19" args="(void)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#af6951ffec04529fd8da990978d7d8d19">freeMemory</a> (void)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Free all the memory allocated by the planner. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual Vertex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a6b72ace6d1708b25bf8c7f69331ae82b">addMilestone</a> (ompl::base::State *state)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a milestone for a given state (<em>state</em>), store it in the nearest neighbors data structure and then connect it to the roadmap in accordance to the connection strategy.  <a href="#a6b72ace6d1708b25bf8c7f69331ae82b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6b72ace6d1708b25bf8c7f69331ae82b"></a><!-- doxytag: member="FIRM::addMilestone" ref="a6b72ace6d1708b25bf8c7f69331ae82b" args="(ompl::base::State *state)" -->
+virtual Vertex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a6b72ace6d1708b25bf8c7f69331ae82b">addMilestone</a> (ompl::base::State *state)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a milestone for a given state (<em>state</em>), store it in the nearest neighbors data structure and then connect it to the roadmap in accordance to the connection strategy. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34535f25e4f3fb645fb65d57e3faf01b"></a><!-- doxytag: member="FIRM::uniteComponents" ref="a34535f25e4f3fb645fb65d57e3faf01b" args="(Vertex m1, Vertex m2)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a34535f25e4f3fb645fb65d57e3faf01b">uniteComponents</a> (Vertex m1, Vertex m2)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Make two milestones (<em>m1</em> and <em>m2</em>) be part of the same connected component. The component with fewer elements will get the id of the component with more elements. <br/></td></tr>
@@ -251,9 +250,8 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1856164aa0dba82e6cfad26a4ef5a7fe"></a><!-- doxytag: member="FIRM::generateNodeController" ref="a1856164aa0dba82e6cfad26a4ef5a7fe" args="(const ompl::base::State *state, NodeControllerType &amp;nodeController)" -->
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a1856164aa0dba82e6cfad26a4ef5a7fe">generateNodeController</a> (const ompl::base::State *state, <a class="el" href="class_controller.html">NodeControllerType</a> &amp;nodeController)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the node controller that stabilizes the robot to the node. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ffdc57247b8f40899646195750b6a20"></a><!-- doxytag: member="FIRM::solveDynamicProgram" ref="a7ffdc57247b8f40899646195750b6a20" args="(const Vertex goalVertex)" -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a7ffdc57247b8f40899646195750b6a20">solveDynamicProgram</a> (const Vertex goalVertex)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves the dynamic program to return a feedback policy. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a7ffdc57247b8f40899646195750b6a20">solveDynamicProgram</a> (const Vertex goalVertex)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves the dynamic program to return a feedback policy.  <a href="#a7ffdc57247b8f40899646195750b6a20"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4003d4144f6c32e9eaba79f292ec9ce4"></a><!-- doxytag: member="FIRM::addStateToVisualization" ref="a4003d4144f6c32e9eaba79f292ec9ce4" args="(ompl::base::State *state)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addStateToVisualization</b> (ompl::base::State *state)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8d9e316c11b1e2ff52b5ff65996d3a01"></a><!-- doxytag: member="FIRM::sendFeedbackEdgesToViz" ref="a8d9e316c11b1e2ff52b5ff65996d3a01" args="()" -->
@@ -262,9 +260,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>sendFeedbackEdgesToVi
 std::pair&lt; typename FIRM::Edge, <br class="typebreak"/>
 double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a44321fba1c038c1f43ccfeccf9a1c44c">getUpdatedNodeCostToGo</a> (Vertex node)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the new cost to go from a node. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a18aa9a3e98fd03d5654ffd3ebc7ca9ff"></a><!-- doxytag: member="FIRM::costHeuristic" ref="a18aa9a3e98fd03d5654ffd3ebc7ca9ff" args="(Vertex u, Vertex v) const " -->
-ompl::base::Cost&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#a18aa9a3e98fd03d5654ffd3ebc7ca9ff">costHeuristic</a> (Vertex u, Vertex v) const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Given two vertices, returns a heuristic on the cost of the path connecting them. This method wraps OptimizationObjective::motionCostHeuristic. <br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1381ddffa42b0bf2d36dc9c6d9d1da9d"></a><!-- doxytag: member="FIRM::starStrategy_" ref="a1381ddffa42b0bf2d36dc9c6d9d1da9d" args="" -->
@@ -335,13 +330,10 @@ ompl::RNG&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Random number generator. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afc413ddef9b66cd337c0e19c6ba79d84"></a><!-- doxytag: member="FIRM::addedSolution_" ref="afc413ddef9b66cd337c0e19c6ba79d84" args="" -->
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#afc413ddef9b66cd337c0e19c6ba79d84">addedSolution_</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A flag indicating that a solution has been added during <a class="el" href="class_f_i_r_m.html#a02f3c98de4840594193ba5bf7ff3ca63" title="Function that can solve the motion planning problem. Grows a roadmap using constructRoadmap(). This function can be called multiple times on the same problem, without calling clear() in between. This allows the planner to continue work for more time on an unsolved problem, for example. Start and goal states from the currently specified ProblemDefinition are cached. This means that between calls to solve(), input states are only added, not removed. When using PRM as a multi-query planner, the input states should be however cleared, without clearing the roadmap itself. This can be done using the clearQuery() function.">solve()</a> <br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A flag indicating that a solution has been added during solve() <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae71c316b447bb7b404dc27c8d673fd55"></a><!-- doxytag: member="FIRM::graphMutex_" ref="ae71c316b447bb7b404dc27c8d673fd55" args="" -->
 boost::mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#ae71c316b447bb7b404dc27c8d673fd55">graphMutex_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Mutex to guard access to the Graph member (g_) <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac6a297cb2f700d31396b8cd5a88e81b"></a><!-- doxytag: member="FIRM::opt_" ref="aac6a297cb2f700d31396b8cd5a88e81b" args="" -->
-ompl::base::OptimizationObjectivePtr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#aac6a297cb2f700d31396b8cd5a88e81b">opt_</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Objective cost function for PRM graph edges. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd4f91dc510bf7b5b68b4da5cfd90718"></a><!-- doxytag: member="FIRM::siF_" ref="afd4f91dc510bf7b5b68b4da5cfd90718" args="" -->
 const <br class="typebreak"/>
 firm::SpaceInformation::SpaceInformationPtr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#afd4f91dc510bf7b5b68b4da5cfd90718">siF_</a></td></tr>
@@ -364,47 +356,17 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7fc88496b950b90b92876dea03b3102f"></a><!-- doxytag: member="FIRM::debug_" ref="a7fc88496b950b90b92876dea03b3102f" args="" -->
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>debug_</b></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="add9de6c5accdea0f9b6d1ff458350036"></a><!-- doxytag: member="FIRM::minFIRMNodes_" ref="add9de6c5accdea0f9b6d1ff458350036" args="" -->
-unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>minFIRMNodes_</b></td></tr>
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_i_r_m.html#add9de6c5accdea0f9b6d1ff458350036">minFIRMNodes_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The minimum number of nodes that should be sampled. <br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Feedback Information RoadMap planner. </p>
 <p><a class="anchor" id="FIRM"></a> </p>
-<dl class="user"><dt><b>Short description</b></dt><dd>Feedback Information RoadMap is a method that generates a graph in belief space and generates a policy that guides that robot from the start to goal.</dd></dl>
-<dl class="user"><dt><b>External documentation</b></dt><dd>Please refer to the publications at Ali's research page.</dd></dl>
-<p><a href="http://www.mit.edu/~aliagha/Web/publications.htm">[Link to Ali Agha's Research Page]</a> </p>
+<dl class="user"><dt><b>Short description</b></dt><dd>Feedback Information RoadMap is a method that generates a graph in belief space and returns a policy that guides that robot from the start to goal.</dd></dl>
+<dl class="user"><dt><b>External documentation</b></dt><dd>A. Agha-mohammadi, Suman Chakravorty, Nancy Amato, "FIRM: Sampling-based Feedback Motion Planning Under Motion 
+   Uncertainty and Imperfect Measurements", International Journal of Robotics Research, 33(2):268-304, February 2014</dd></dl>
+<p><a href="http://www.mit.edu/~aliagha/Web/pubpdfs/2014.Ali.Suman.ea.IJRR_FIRM.pdf">[PDF]</a> </p>
 </div><hr/><h2>Member Typedef Documentation</h2>
-<a class="anchor" id="a2482eee2e5248d5bff3b3b56e5a593b3"></a><!-- doxytag: member="FIRM::ConnectionFilter" ref="a2482eee2e5248d5bff3b3b56e5a593b3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef boost::function&lt;bool(const Vertex&amp;, const Vertex&amp;)&gt; <a class="el" href="class_f_i_r_m.html#a2482eee2e5248d5bff3b3b56e5a593b3">FIRM::ConnectionFilter</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>A function that can reject connections. </p>
-<p>This is called after previous connections from the neighbor list have been added to the roadmap. </p>
-
-</div>
-</div>
-<a class="anchor" id="a15cfbcaf52c0bdd5e6c1a969bbf7ea1e"></a><!-- doxytag: member="FIRM::ConnectionStrategy" ref="a15cfbcaf52c0bdd5e6c1a969bbf7ea1e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef boost::function&lt;std::vector&lt;Vertex&gt;&amp;(const Vertex)&gt; <a class="el" href="class_f_i_r_m.html#a15cfbcaf52c0bdd5e6c1a969bbf7ea1e">FIRM::ConnectionStrategy</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>A function returning the milestones that should be attempted to connect to. </p>
-<dl class="note"><dt><b>Note:</b></dt><dd>Can't use the prefered boost::function syntax here because the Python bindings don't like it. </dd></dl>
-
-</div>
-</div>
 <a class="anchor" id="a70abcb24fbc9f836b94119f65c8f8a37"></a><!-- doxytag: member="FIRM::EdgeControllerType" ref="a70abcb24fbc9f836b94119f65c8f8a37" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -431,33 +393,11 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>minFIRMNodes_
 <div class="memdoc">
 
 <p>The underlying roadmap graph. </p>
-<dl class="user"><dt><b>Any BGL graph representation could be used here. Because we</b></dt><dd>expect the roadmap to be sparse (m&lt;n^2), an adjacency_list is more appropriate than an adjacency_matrix.</dd></dl>
-<dl class="user"><dt><b>Obviously, a ompl::base::State* vertex property is required.</b></dt><dd>The incremental connected components algorithm requires vertex_predecessor_t and vertex_rank_t properties. If boost::vecS is not used for vertex storage, then there must also be a boost:vertex_index_t property manually added.</dd></dl>
-<dl class="user"><dt><b>Edges are directed and have a weight property.</b></dt><dd></dd></dl>
+<dl class="user"><dt><b>Edges are directed and have a weight property called FIRMWeight. This weight property</b></dt><dd>stores information about the edge controller identification, transition probability and execution cost. </dd></dl>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a6b72ace6d1708b25bf8c7f69331ae82b"></a><!-- doxytag: member="FIRM::addMilestone" ref="a6b72ace6d1708b25bf8c7f69331ae82b" args="(ompl::base::State *state)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">FIRM::Vertex <a class="el" href="class_f_i_r_m.html#a6b72ace6d1708b25bf8c7f69331ae82b">FIRM::addMilestone</a> </td>
-          <td>(</td>
-          <td class="paramtype">ompl::base::State *&#160;</td>
-          <td class="paramname"><em>state</em></td><td>)</td>
-          <td><code> [protected, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Construct a milestone for a given state (<em>state</em>), store it in the nearest neighbors data structure and then connect it to the roadmap in accordance to the connection strategy. </p>
-<p>if(boost::num_vertices(g_) &gt; 1 ) { foreach(Vertex v, boost::vertices(g_)) { if(state == stateProperty_[v]) return v; } }</p>
-
-</div>
-</div>
 <a class="anchor" id="a4c909fc53ceeeecb6992ccebf0ab60d6"></a><!-- doxytag: member="FIRM::checkForSolution" ref="a4c909fc53ceeeecb6992ccebf0ab60d6" args="(const ompl::base::PlannerTerminationCondition &amp;ptc, ompl::base::PathPtr &amp;solution)" -->
 <div class="memitem">
 <div class="memproto">
@@ -570,6 +510,26 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>minFIRMNodes_
 
 </div>
 </div>
+<a class="anchor" id="a7ffdc57247b8f40899646195750b6a20"></a><!-- doxytag: member="FIRM::solveDynamicProgram" ref="a7ffdc57247b8f40899646195750b6a20" args="(const Vertex goalVertex)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_i_r_m.html#a7ffdc57247b8f40899646195750b6a20">FIRM::solveDynamicProgram</a> </td>
+          <td>(</td>
+          <td class="paramtype">const Vertex&#160;</td>
+          <td class="paramname"><em>goalVertex</em></td><td>)</td>
+          <td><code> [protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Solves the dynamic program to return a feedback policy. </p>
+<p>--NOTES-- Assign a high cost to go initially for all nodes that are not in the goal connected component. For nodes that are in the goal cc, we assign goal cost to go for the goal and init cost to go for all other nodes.</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>include/Planner/<a class="el" href="_f_i_r_m_8h_source.html">FIRM.h</a></li>
 <li>src/Planner/FIRM.cpp</li>
@@ -592,7 +552,7 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>minFIRMNodes_
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 29 2014 20:53:18 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Mar 31 2014 13:00:50 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

@@ -40,12 +40,13 @@
 #include "../ObservationModels/ObservationModelMethod.h"
 #include <ompl/base/SpaceInformation.h>
 #include "armadillo"
+#include "../SpaceInformation/SpaceInformation.h"
 
 /**
     @par Description of the Linear System Class
-    A Linear System is a construct which is used to store information about the system at a given state in the 
+    A Linear System is a construct which is used to store information about the system at a given state in the
     open loop trajectory. It is used to compute and retrieve the Jacobians at the particular state.
-    and  
+    and
  */
 /** \brief The linear system class. */
 class LinearSystem
@@ -67,42 +68,34 @@ class LinearSystem
   	LinearSystem() {}
 
     /** \brief  Constructor.*/
-    LinearSystem (const ompl::base::State *state, const ompl::control::Control* control,
+    LinearSystem (const firm::SpaceInformation::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control* control,
                   MotionModelPointer motionModel, ObservationModelPointer observationModel):
-                  u_(control), motionModel_(motionModel), observationModel_(observationModel)
+                  si_(si),u_(control), motionModel_(motionModel), observationModel_(observationModel)
     {
 
       using namespace arma;
 
-      assert(observationModel_);
-
-      ompl::base::StateSpacePtr space(new SpaceType());
-
-      ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
-      x_ = si->cloneState(state);
+      x_ = si_->cloneState(state);
 
       w_ = motionModel_->getZeroNoise();
 
       colvec junknoise = arma::zeros<colvec>(1); // this is just useless junk that we are creating just so that we don't need to change interface to observationmodel functions
 
       v_ = junknoise;
- 
+
     }
 
     /** \brief  Constructor.*/
-    LinearSystem (const ompl::base::State *state, const ompl::control::Control* control, const ObservationType& obs,
+    LinearSystem (const firm::SpaceInformation::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control* control, const ObservationType& obs,
       MotionModelPointer motionModel,
       ObservationModelPointer observationModel):
-      u_(control), motionModel_(motionModel),
+      si_(si),u_(control), motionModel_(motionModel),
       observationModel_(observationModel)
     {
 
       using namespace arma;
-      assert(observationModel_);
 
-      ompl::base::StateSpacePtr space(new SpaceType());
-      ompl::base::SpaceInformationPtr si(new ompl::base::SpaceInformation(space));
-      x_ = si->cloneState(state);
+      x_ = si_->cloneState(state);
 
       ObservationType observation = obs;
 
@@ -111,7 +104,7 @@ class LinearSystem
       w_ = motionModel_->getZeroNoise();
 
       colvec junknoise = arma::zeros<colvec>(1); // this is just junk that we are creating just so that we don't need to change interface to observationmodel functions
-      
+
       v_ = junknoise;
 
     }
@@ -121,13 +114,13 @@ class LinearSystem
 
     /** \brief  Get the state transition jacobian. */
     arma::mat getA() const { return motionModel_->getStateJacobian(x_, u_, w_); }
-    
+
     /** \brief  Get the control jacobian for the state transition. */
     arma::mat getB() const { return motionModel_->getControlJacobian(x_, u_, w_); }
-    
+
     /** \brief  Get the noise jacobian in the state transition. */
     arma::mat getG() const { return motionModel_->getNoiseJacobian(x_, u_, w_); }
-    
+
     /** \brief  Get the process noise covariance for the state transition. */
     arma::mat getQ() const { return motionModel_->processNoiseCovariance(x_, u_); }
 
@@ -142,15 +135,18 @@ class LinearSystem
 
   private:
 
+    /** \brief Pointer to space information. */
+    firm::SpaceInformation::SpaceInformationPtr si_;
+
     /** \brief  The state at which the linear system is constructed.*/
     ompl::base::State *x_;
-    
+
     /** \brief  The control applied at the internal state. */
     const ompl::control::Control* u_;
-    
+
     /** \brief  The motion noise. */
     MotionNoiseType w_;
-    
+
     /** \brief  The observation noise. */
     ObsNoiseType v_;
 

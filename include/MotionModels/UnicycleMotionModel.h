@@ -62,7 +62,7 @@ class UnicycleMotionModel : public MotionModelMethod
     //UnicycleMotionModel() {}
 
     // XML-based constructor
-    UnicycleMotionModel(ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) :
+    UnicycleMotionModel(const ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) :
     MotionModelMethod(si, motionNoiseDim)
     {
 

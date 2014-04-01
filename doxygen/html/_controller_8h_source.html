@@ -175,7 +175,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00109"></a>00109     <span class="keyword">private</span>:
 <a name="l00110"></a>00110 
 <a name="l00112"></a><a class="code" href="class_controller.html#a34912a3b87662649231e2d096882c454">00112</a>         SpaceInformationPtr <a class="code" href="class_controller.html#a34912a3b87662649231e2d096882c454" title="The pointer to the space information.">si_</a>; <span class="comment">// Instead of the actuation system, in OMPL we have the spaceinformation</span>
-<a name="l00113"></a>00113                 
+<a name="l00113"></a>00113 
 <a name="l00116"></a><a class="code" href="class_controller.html#acb68b603afc759b4e62b8c6db8125671">00116</a>         std::vector&lt;LinearSystem&gt; <a class="code" href="class_controller.html#acb68b603afc759b4e62b8c6db8125671" title="The vector of linear systems. The linear systems basically represent the system state at a point in t...">lss_</a>;
 <a name="l00117"></a>00117 
 <a name="l00119"></a><a class="code" href="class_controller.html#a040da727bdc40ab69f0c3e4033bc9df9">00119</a>                 SeparatedControllerType <a class="code" href="class_controller.html#a040da727bdc40ab69f0c3e4033bc9df9" title="The separated controller used to generate the commands that are sent to the robot.">separatedController_</a>;
@@ -247,7 +247,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00200"></a>00200   <span class="comment">//nominalXs is scaled by &lt;3&gt; to allow a bit more steps for robot to execute edge.</span>
 <a name="l00201"></a>00201   <span class="comment">//Otherwise may not get good performance</span>
 <a name="l00202"></a>00202   <a class="code" href="class_controller.html#aeddadf542e253ff266e596eb0574c3de" title="The maximum time for which a controller can be executed. We need this bound as we cannot let a contro...">maxExecTime_</a> = ceil(nominalXs.size()*3);
-<a name="l00203"></a>00203   obstacleMarkerObserved_ = <span class="keyword">false</span>;
+<a name="l00203"></a>00203   <span class="comment">//obstacleMarkerObserved_ = false;</span>
 <a name="l00204"></a>00204   <a class="code" href="class_controller.html#a1288c6ee79e962bba7421ffb59bae047" title="The debug mode, if true, controller is verbose.">debug_</a> = <span class="keyword">false</span>;
 <a name="l00205"></a>00205 
 <a name="l00206"></a>00206 }
@@ -382,8 +382,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00340"></a><a class="code" href="class_controller.html#aba227cad46f73fab5fcf37b41cae71a9">00340</a> ompl::base::State* <a class="code" href="class_controller.html#aba227cad46f73fab5fcf37b41cae71a9" title="Stabilize the system to an existing FIRM node.">Controller&lt;SeparatedControllerType, FilterType&gt;::Stabilize</a>(<span class="keyword">const</span> ompl::base::State *startState)
 <a name="l00341"></a>00341 {
 <a name="l00342"></a>00342 
-<a name="l00343"></a>00343     <span class="keywordtype">int</span> k =0;
-<a name="l00344"></a>00344     <span class="keywordtype">double</span> cost=0;
+<a name="l00343"></a>00343     <span class="comment">//int k =0;</span>
+<a name="l00344"></a>00344     <span class="comment">//double cost=0;</span>
 <a name="l00345"></a>00345 
 <a name="l00346"></a>00346     ompl::base::StateSpacePtr space(<span class="keyword">new</span> <a class="code" href="class_s_e2_belief_space.html">SpaceType</a>());
 <a name="l00347"></a>00347     ompl::base::State  *b = space-&gt;allocState();
@@ -491,7 +491,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Mar 29 2014 20:53:17 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Mar 31 2014 13:00:49 for FIRM-OMPL by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

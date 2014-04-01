@@ -35,6 +35,8 @@
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #include "../../include/Filters/ExtendedKF.h"
+#include "boost/date_time/local_time/local_time.hpp"
+
 /*
 ExtendedKF::ExtendedKF(MotionModelPointer motionModel,
 ObservationModelPointer observationModel) :
@@ -110,7 +112,7 @@ void ExtendedKF::Evolve(const ompl::base::State *belief,
 
   using namespace arma;
 
-  LinearSystem lsPredicted(belief, control, this->motionModel_, this->observationModel_) ;
+  LinearSystem lsPredicted(si_, belief, control, this->motionModel_, this->observationModel_) ;
 
   ompl::base::State *bPred = si_->allocState();
 
@@ -122,7 +124,7 @@ void ExtendedKF::Evolve(const ompl::base::State *belief,
     return;
   }
 
-  LinearSystem lsUpdated(bPred, control, obs, this->motionModel_, this->observationModel_) ;
+  LinearSystem lsUpdated(si_, bPred, control, obs, this->motionModel_, this->observationModel_) ;
 
   Update(bPred, obs, lsUpdated, evolvedState);
 

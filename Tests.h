@@ -223,6 +223,8 @@ void TestMotionModel()
 
     ompl::control::Control* u;
 
+    u = si->allocControl();
+
     mm.ARMA2OMPL(uvec, u);
 
     colvec noise = mm.generateNoise(from, u);
@@ -329,7 +331,7 @@ void TestKalmanFilter()
 
     LinearSystem dummy;
 
-    for(int i=0; i< openLoopControls.size() ; i++)
+    for(unsigned int i=0; i< openLoopControls.size() ; i++)
     {
         colvec w = mm->generateNoise(from, openLoopControls[i]);
         mm->Evolve(from, openLoopControls[i], w, nextState);
@@ -462,7 +464,7 @@ void TestRHCICreate()
 
 }
 
-
+/*
 void TestController()
 {
 
@@ -568,7 +570,7 @@ void TestController()
     cout<<"Controller passed tests only if the values make sense to you!"<<endl;
 
 }
-
+*/
 /*
 void TestFIRMWeight()
 {

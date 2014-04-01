@@ -55,7 +55,7 @@ class LinearizedKF : public KalmanFilterMethod
     LinearizedKF() { }
 
     /** \brief  Constructor.*/
-    LinearizedKF(firm::SpaceInformation::SpaceInformationPtr si) : KalmanFilterMethod(si) {}
+    LinearizedKF(const firm::SpaceInformation::SpaceInformationPtr si) : KalmanFilterMethod(si) {}
 
     /** \brief  Gets as input belief and control, returns predicted belief if control
             were to be applied to the robot. Also called the Prior. */
