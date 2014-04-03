@@ -105,6 +105,8 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     //Function to load landmarks from XML file into the object
     void loadLandmarks(const char *pathToSetupFile);
+    
+
     void loadParameters(const char *pathToSetupFile);
 };
 

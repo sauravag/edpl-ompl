@@ -81,8 +81,8 @@
 #include "include/Controllers/Controller.h"
 
 // Samplers
-//#include "include/Samplers/GaussianValidBeliefSampler.h"
-//#include "include/Samplers/UniformValidBeliefSampler.h"
+#include "include/Samplers/GaussianValidBeliefSampler.h"
+#include "include/Samplers/UniformValidBeliefSampler.h"
 
 // Validity checkers
 #include "include/ValidityCheckers/FIRMValidityChecker.h"

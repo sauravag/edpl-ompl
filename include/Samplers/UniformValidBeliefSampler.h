@@ -39,7 +39,6 @@
 
 #include "ompl/base/ValidStateSampler.h"
 #include "ompl/base/StateSampler.h"
-#include "../ActuationSystems/ActuationSystemMethod.h"
 #include "../SpaceInformation/SpaceInformation.h"
 
 /*
@@ -55,7 +54,7 @@ class UniformValidBeliefSampler : public ompl::base::ValidStateSampler
     //typedef ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
 
     /** \brief Constructor */
-    UniformValidBeliefSampler(const firm::SpaceInformation *si);
+    UniformValidBeliefSampler(const ompl::base::SpaceInformation *si);
 
     virtual ~UniformValidBeliefSampler(void)
     {

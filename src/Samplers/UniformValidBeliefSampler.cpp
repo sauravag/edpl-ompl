@@ -39,10 +39,10 @@
 #include "ompl/tools/config/MagicConstants.h"
 
 
-UniformValidBeliefSampler::UniformValidBeliefSampler(const SpaceInformation *si) :
+UniformValidBeliefSampler::UniformValidBeliefSampler(const ompl::base::SpaceInformation *si) :
     ValidStateSampler(si), sampler_(si->allocStateSampler())
 {
-    name_ = "uniform";
+    name_ = "uniformBelief";
 }
 
 bool UniformValidBeliefSampler::sample(State *state)
@@ -77,5 +77,5 @@ bool UniformValidBeliefSampler::isObservable(ompl::base::State *state)
     //if(observationModel_->isStateObservable(state)) std::cout<<"Observable"<<std::endl;
     //else std::cout<<"Not Observable"<<std::endl;
     //return observationModel_->isStateObservable(state);
-    return si_->getObservationModel()->isStateObservable(state);
+    return true;//si_->getObservationModel()->isStateObservable(state);
 }

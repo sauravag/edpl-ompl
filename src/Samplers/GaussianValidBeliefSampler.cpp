@@ -104,7 +104,7 @@ bool GaussianValidBeliefSampler::sampleNear(ompl::base::State *state, const ompl
 
 bool GaussianValidBeliefSampler::isObservable(ompl::base::State *state)
 {
-    return observationModel_->isStateObservable(state);
+    return true;//observationModel_->isStateObservable(state);
 
 }
 

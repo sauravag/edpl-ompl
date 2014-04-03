@@ -85,6 +85,8 @@
 		<Unit filename="include/OptimizationObjectives/FIRMOptimizationObjective.h" />
 		<Unit filename="include/Path/FeedbackPath.h" />
 		<Unit filename="include/Planner/FIRM.h" />
+		<Unit filename="include/Samplers/GaussianValidBeliefSampler.h" />
+		<Unit filename="include/Samplers/UniformValidBeliefSampler.h" />
 		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
 		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />
 		<Unit filename="include/SpaceInformation/SpaceInformation.h" />
@@ -103,6 +105,8 @@
 		<Unit filename="src/ObservationModels/CamAruco2DObservationModel.cpp" />
 		<Unit filename="src/Path/FeedbackPath.cpp" />
 		<Unit filename="src/Planner/FIRM.cpp" />
+		<Unit filename="src/Samplers/GaussianValidBeliefSampler.cpp" />
+		<Unit filename="src/Samplers/UniformValidBeliefSampler.cpp" />
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
 		<Unit filename="src/SpaceInformation/SpaceInformation.cpp" />
 		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />

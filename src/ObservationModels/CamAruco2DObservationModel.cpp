@@ -198,12 +198,9 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const arma::colvec xVec, cons
 
     range = d;
     bearing = landmark_bearing;
-    if( abs(landmark_bearing) < fov && d < maxrange  ){
-      //cout<<"Theta Landmark is :" <<thetaLandmark*180/boost::math::constants::pi<double>()<<endl;
-      //cout<<"The robot heading is :"<<xVec[2]*180/boost::math::constants::pi<double>()<<endl;
-      //cout<<" viewing angle of landmark is :"<<_viewingAngle*180/boost::math::constants::pi<double>() <<"  degrees"<<endl;
-      assert(abs(viewingAngle) <= boost::math::constants::pi<double>() / 2 );
-        //cout<<"----Landmark #"<<_l[0]<<" is visible-----"<<endl;
+    if( abs(landmark_bearing) < fov && d < maxrange  )
+    {
+       assert(abs(viewingAngle) <= boost::math::constants::pi<double>() / 2 );
       return true;//ArePointsCovisible(_x, _l);
     }
 

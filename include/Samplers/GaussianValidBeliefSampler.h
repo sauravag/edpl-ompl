@@ -39,7 +39,6 @@
 
 #include "ompl/base/ValidStateSampler.h"
 #include "ompl/base/StateSampler.h"
-#include "../ActuationSystems/ActuationSystemMethod.h"
 #include "../SpaceInformation/SpaceInformation.h"
 
 /*
@@ -54,7 +53,7 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
     //typedef ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
 
     /** \brief Constructor */
-    GaussianValidBeliefSampler(const firm::SpaceInformation *si);
+    GaussianValidBeliefSampler(const ompl::base::SpaceInformation *si);
 
     virtual ~GaussianValidBeliefSampler(void)
     {

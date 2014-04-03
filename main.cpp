@@ -28,24 +28,23 @@ bool isStateValid(const ob::State *state)
 
     return om->isStateObservable(state);
 }
-/**
+/*
 ob::ValidStateSamplerPtr allocGaussianValidBeliefSampler(const firm::SpaceInformation *si)
 {
     // we can perform any additional setup / configuration of a sampler here,
     // but there is nothing to tweak in case of the ObstacleBasedValidStateSampler.
     return ob::ValidStateSamplerPtr(new GaussianValidBeliefSampler(si));
 }
-
-ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const firm::SpaceInformation *si)
-{
-    // we can perform any additional setup / configuration of a sampler here,
-    // but there is nothing to tweak in case of the ObstacleBasedValidStateSampler.
-    //ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
-    UniformValidBeliefSampler *unisampler = new UniformValidBeliefSampler(si);
-    //unisampler->setObservationModel(om);
-    return ob::ValidStateSamplerPtr(unisampler);
-}
 */
+ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const ompl::base::SpaceInformation *si)
+{
+
+    //ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+    //UniformValidBeliefSampler *unisampler = new UniformValidBeliefSampler(si);
+    //unisampler->setObservationModel(om);
+    return ob::ValidStateSamplerPtr(new UniformValidBeliefSampler(si));
+}
+
 void plan(void)
 {
     typedef SE2BeliefSpace::StateType StateType;
@@ -86,15 +85,15 @@ void plan(void)
     si->setMotionValidator(ob::MotionValidatorPtr(new ob::DiscreteMotionValidator(si)));
 
     //set the state sampler
-    //si->setValidStateSamplerAllocator(allocUniformValidBeliefSampler);
+    si->setValidStateSamplerAllocator(allocUniformValidBeliefSampler);
 
     //set the state propagator
     si->setStatePropagator(oc::StatePropagatorPtr(new UnicycleStatePropagator(si))) ;
 
-    ob::ValidStateSamplerPtr   simpleSampler;
+    //ob::ValidStateSamplerPtr   simpleSampler;
 
     // allocate a valid state sampler, by default, a uniform sampler is allocated
-    simpleSampler = si->allocValidStateSampler();
+    //simpleSampler = si->allocValidStateSampler();
 
     // create a random start state
     ob::State *start = statespace->allocState();
