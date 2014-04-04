@@ -235,7 +235,7 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
 void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
                                             ompl::base::PathPtr &solution)
 {
-
+    boost::this_thread::sleep(boost::posix_time::seconds(90));
     while (!ptc && !addedSolution_)
     {
         // Check for any new goal states
@@ -249,7 +249,7 @@ void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
         addedSolution_ = existsPolicy(startM_, goalM_, solution);
 
         if (!addedSolution_)
-            boost::this_thread::sleep(boost::posix_time::milliseconds(90e3));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(20e3));
     }
 }
 

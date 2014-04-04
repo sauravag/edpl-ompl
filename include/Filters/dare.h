@@ -93,10 +93,13 @@ inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, 
   for(int i = 0; i < n_Z; ++i) {
 
     //get eigenvalues outside unit circle
-    if( (eigval(i).real()*eigval(i).real() +
-    eigval(i).imag()*eigval(i).imag()  ) > 1) {
-
+    if( (eigval(i).real()*eigval(i).real() + eigval(i).imag()*eigval(i).imag()  ) > 1)
+    {
+      //std::cout<<"VR:  \n"<<VR.submat(span::all, span(i,i))<<std::endl;
+      //std::cout<<"Span(i,i) :"<<span(i,i)<<std::endl;
+      //std::cout<<"C1 :" <<c1 <<std::endl;
       tempZ.submat(span::all, span(c1,c1)) = VR.submat(span::all, span(i,i));
+
       c1++;
     }
   }

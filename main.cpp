@@ -161,7 +161,7 @@ void plan(void)
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = planner->solve(100);
+    ob::PlannerStatus solved = planner->solve(600);
 
     cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 
