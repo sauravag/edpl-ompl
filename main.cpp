@@ -28,22 +28,33 @@ bool isStateValid(const ob::State *state)
 
     return om->isStateObservable(state);
 }
+
 /*
-ob::ValidStateSamplerPtr allocGaussianValidBeliefSampler(const firm::SpaceInformation *si)
+ob::ValidStateSamplerPtr allocGaussianValidBeliefSampler(const ompl::base::SpaceInformation *si)
 {
     // we can perform any additional setup / configuration of a sampler here,
     // but there is nothing to tweak in case of the ObstacleBasedValidStateSampler.
-    return ob::ValidStateSamplerPtr(new GaussianValidBeliefSampler(si));
+    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel("/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+    //MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(*si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
+
+    GaussianValidBeliefSampler *sampler = new GaussianValidBeliefSampler(si);
+    //sampler->setMotionModel(mm);
+    sampler->setObservationModel(om);
+    return ob::ValidStateSamplerPtr(sampler);
 }
 */
-ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const ompl::base::SpaceInformation *si)
+
+/*
+ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const ompl::base::SpaceInformation *si, const MotionModelMethod::MotionModelPointer mm,
+                                                        const ObservationModelMethod::ObservationModelPointer om)
 {
 
-    //ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
-    //UniformValidBeliefSampler *unisampler = new UniformValidBeliefSampler(si);
-    //unisampler->setObservationModel(om);
-    return ob::ValidStateSamplerPtr(new UniformValidBeliefSampler(si));
+    UniformValidBeliefSampler *unisampler = new UniformValidBeliefSampler(si);
+    unisampler->setObservationModel(om);
+    unisampler->setMotionModel(mm);
+    return ob::ValidStateSamplerPtr(unisampler);
 }
+*/
 
 void plan(void)
 {
@@ -85,7 +96,7 @@ void plan(void)
     si->setMotionValidator(ob::MotionValidatorPtr(new ob::DiscreteMotionValidator(si)));
 
     //set the state sampler
-    si->setValidStateSamplerAllocator(allocUniformValidBeliefSampler);
+    //si->setValidStateSamplerAllocator(allocGaussianValidBeliefSampler);
 
     //set the state propagator
     si->setStatePropagator(oc::StatePropagatorPtr(new UnicycleStatePropagator(si))) ;

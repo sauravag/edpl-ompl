@@ -68,7 +68,7 @@ class LinearSystem
   	LinearSystem() {}
 
     /** \brief  Constructor.*/
-    LinearSystem (const firm::SpaceInformation::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control* control,
+    LinearSystem (const ompl::base::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control* control,
                   MotionModelPointer motionModel, ObservationModelPointer observationModel):
                   si_(si),u_(control), motionModel_(motionModel), observationModel_(observationModel)
     {
@@ -86,7 +86,7 @@ class LinearSystem
     }
 
     /** \brief  Constructor.*/
-    LinearSystem (const firm::SpaceInformation::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control* control, const ObservationType& obs,
+    LinearSystem (const ompl::base::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control* control, const ObservationType& obs,
       MotionModelPointer motionModel,
       ObservationModelPointer observationModel):
       si_(si),u_(control), motionModel_(motionModel),
@@ -136,7 +136,8 @@ class LinearSystem
   private:
 
     /** \brief Pointer to space information. */
-    firm::SpaceInformation::SpaceInformationPtr si_;
+    //firm::SpaceInformation::SpaceInformationPtr si_;
+    ompl::base::SpaceInformationPtr si_;
 
     /** \brief  The state at which the linear system is constructed.*/
     ompl::base::State *x_;

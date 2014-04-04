@@ -63,6 +63,13 @@
 <landmark id = 57 x = 2.1717 y = 3.2309 theta = 1 />
 <landmark id = 58 x = 2.1717 y = 2.9515 theta = 1 />
 <landmark id = 22 x = 2.1717 y = 2.6721 theta = 1 />
+<landmark id = 90 x = 13.7541 y = 4.9454 theta = 0.5 />
+<landmark id = 91 x = 13.1953 y = 4.9454 theta = 0.5 />
+<landmark id = 1000 x = 6   y = 7 theta = 0 />
+<landmark id = 1001 x = 6.3 y = 7 theta = 0 />
+<landmark id = 1002 x = 11   y = 7 theta = 0 />
+<landmark id = 1003 x = 11.3 y = 7 theta = 0 />
+<landmark id = 1004 x = 11.7 y = 7 theta = 0 />
 </LandmarkList>
 <!--landmark id = 146 x = 3.1115 y = 5.494 theta = 0.5 />
 <landmark id = 133 x = 4.431 y = 5.2654 theta = 0.5 />
@@ -97,9 +104,7 @@
 <landmark id = 151 x = 2.1717 y = 5.3543 theta = 1 />
 <landmark id = 54 x = 2.1718 y = 6.5662 theta = 1 />
 <landmark id = 24 x = 2.1718 y = 6.8456 theta = 1 />
-<landmark id = 53 x = 2.1718 y = 7.125 theta = 1 />
-<landmark id = 90 x = 13.7541 y = 4.9454 theta = 0.5 />
-<landmark id = 91 x = 13.1953 y = 4.9454 theta = 0.5 /-->
+<landmark id = 53 x = 2.1718 y = 7.125 theta = 1 /-->
 
 <ObservationModels>
 	<CamAruco2DObservationModel

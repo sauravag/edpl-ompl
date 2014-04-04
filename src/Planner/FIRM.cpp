@@ -187,31 +187,47 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
     if (!isSetup())
         setup();
     if (!sampler_)
-        sampler_ = si_->allocValidStateSampler();
+        sampler_ = siF_->allocValidStateSampler();
 
-    ompl::base::State *workState = si_->allocState();
+    ompl::base::State *workState = siF_->allocState();
     growRoadmap (ptc, workState);
-    si_->freeState(workState);
+    siF_->freeState(workState);
 }
 
 void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                                        ompl::base::State *workState)
 {
+    using namespace arma;
+
     while (ptc == false)
     {
         // search for a valid state
         bool found = false;
+        bool stateStable = false;
+
         while (!found && ptc == false)
         {
             unsigned int attempts = 0;
             do
             {
                 found = sampler_->sample(workState);
+                stateStable = false;
+                if(found)
+                {
+                    ompl::base::State *lsState = si_->cloneState(workState);
+                    LinearSystem ls(siF_, lsState, siF_->getMotionModel()->getZeroControl(),
+                                siF_->getObservationModel()->getObservation(lsState, false), siF_->getMotionModel(), siF_->getObservationModel());
+
+                    arma::mat S;
+
+                    stateStable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
+                                ls.getM() * ls.getR() * trans(ls.getM()), S );
+                }
                 attempts++;
-            } while (attempts < ompl::magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found);
+            } while (attempts < ompl::magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found && !stateStable);
         }
         // add it as a milestone
-        if (found)
+        if (found && stateStable)
             addStateToGraph(si_->cloneState(workState));
     }
 }
@@ -233,7 +249,7 @@ void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
         addedSolution_ = existsPolicy(startM_, goalM_, solution);
 
         if (!addedSolution_)
-            boost::this_thread::sleep(boost::posix_time::milliseconds(10e3));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(90e3));
     }
 }
 
@@ -394,10 +410,10 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state)
             {
                 successfulConnectionAttemptsProperty_[m]++;
                 successfulConnectionAttemptsProperty_[n]++;
-                
+
                 addEdgeToGraph(m, n);
                 addEdgeToGraph(n, m);
-                
+
                 uniteComponents(m, n);
             }
         }
@@ -445,7 +461,7 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
     const FIRMWeight weight = generateEdgeControllerWithCost(stateProperty_[a], stateProperty_[b], edgeController);
 
     assert(edgeController.getGoal() && "The generated controller has no goal");
-    
+
     const unsigned int id = maxEdgeID_++;
 
     const Graph::edge_property_type properties(weight, id);
@@ -557,6 +573,7 @@ void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeCont
         // assign the node controller
         nodeController = ctrlr;
     }
+
     else
     {
         // Compute a high stationary cov at node state
@@ -571,6 +588,7 @@ void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeCont
         // assign the node controller
         nodeController = ctrlr;
     }
+
 }
 
 template<typename Map>

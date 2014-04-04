@@ -50,7 +50,7 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
 {
   public:
     typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
-    //typedef ActuationSystemMethod::ActuationSystemPointer ActuationSystemPointer;
+    typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
 
     /** \brief Constructor */
     GaussianValidBeliefSampler(const ompl::base::SpaceInformation *si);
@@ -77,19 +77,20 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
       stddev_ = stddev;
     }
 
-    /**
-    void setObservationModel(ObservationModelPointer om)
+
+    void setObservationModel(const ObservationModelPointer om)
     {
         observationModel_ = om;
     }
-    */
+
+    void setMotionModel(const MotionModelPointer mm)
+    {
+        motionModel_ = mm;
+    }
 
 
   protected:
-    /** brief Checks if the sample is observable
-        i.e. If it can observe sufficient landmarks
-        Ideally, observability check should be performed in the filter instead of obs model
-    */
+    /** brief Checks if the sample is observable i.e. If it can observe sufficient landmarks */
     bool isObservable(ompl::base::State *state);
 
     /** \brief The sampler to build upon */
@@ -98,8 +99,11 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
     /** \brief The standard deviation to use in the sampling process */
     double                  stddev_;
 
-    //ActuationSystemPointer actuationSystem_;
-    //ObservationModelPointer observationModel_;
+    /** \brief A pointer to the motion model*/
+    MotionModelPointer motionModel_;
+
+    /** \brief A pointer to the motion model of the system */
+    ObservationModelPointer observationModel_;
 };
 
 #endif

@@ -37,8 +37,8 @@
 #include "../../include/Samplers/GaussianValidBeliefSampler.h"
 #include "ompl/base/SpaceInformation.h"
 #include "ompl/tools/config/MagicConstants.h"
-
-//using namespace ompl::base;
+#include "../../include/Filters/dare.h"
+#include "../../include/LinearSystem/LinearSystem.h"
 
 GaussianValidBeliefSampler::GaussianValidBeliefSampler(const ompl::base::SpaceInformation *si) :
     ValidStateSampler(si), sampler_(si->allocStateSampler()), stddev_(si->getMaximumExtent() * ompl::magic::STD_DEV_AS_SPACE_EXTENT_FRACTION)
@@ -104,7 +104,15 @@ bool GaussianValidBeliefSampler::sampleNear(ompl::base::State *state, const ompl
 
 bool GaussianValidBeliefSampler::isObservable(ompl::base::State *state)
 {
-    return true;//observationModel_->isStateObservable(state);
+    /*
+    LinearSystem ls(si_, state, motionModel_->getZeroControl(), observationModel_->getObservation(state, false), motionModel_, observationModel_);
+
+    arma::mat S;
+
+    bool systemStable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
+                                ls.getM() * ls.getR() * trans(ls.getM()), S );
+    */
+    return true;
 
 }
 

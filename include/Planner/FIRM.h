@@ -238,11 +238,11 @@ protected:
         and then connect it to the roadmap in accordance to the connection strategy. */
     virtual Vertex addStateToGraph(ompl::base::State *state);
 
-    /** \brief Make two milestones (\e m1 and \e m2) be part of the same connected component. The component with fewer 
+    /** \brief Make two milestones (\e m1 and \e m2) be part of the same connected component. The component with fewer
         elements will get the id of the component with more elements. */
     void uniteComponents(Vertex m1, Vertex m2);
 
-    /** \brief Check if two milestones (\e m1 and \e m2) are part of the same connected component. This is not a const 
+    /** \brief Check if two milestones (\e m1 and \e m2) are part of the same connected component. This is not a const
         function since we use incremental connected components from boost */
     bool sameComponent(Vertex m1, Vertex m2);
 
@@ -253,7 +253,7 @@ protected:
     /** \brief Thread that checks for solution */
     void checkForSolution(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::PathPtr &solution);
 
-    /** \brief Check if there exists a policy, i.e., The given pair of \e start and \e goal, 
+    /** \brief Check if there exists a policy, i.e., The given pair of \e start and \e goal,
        are in the same connected component. If a feedback policy is found, it is saved. */
     bool existsPolicy(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals, ompl::base::PathPtr &solution);
 

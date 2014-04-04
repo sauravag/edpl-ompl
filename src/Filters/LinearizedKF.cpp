@@ -40,9 +40,7 @@ void LinearizedKF::Predict(const ompl::base::State *belief,
   const ompl::control::Control* control, const LinearSystem& ls, ompl::base::State *predictedState)
 {
   using namespace arma;
-  //SpaceType *space;
-  //space =  new SpaceType();
-  //ompl::base::State *predState = space->allocState();
+
   this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predictedState);
 
   mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
@@ -61,9 +59,6 @@ const LinearSystem& ls, ompl::base::State *updatedState)
 
   colvec innov = this->observationModel_->computeInnovation(belief, obs);
 
-  //ompl::base::StateSpacePtr space(new SpaceType());
-  //ompl::base::State  *estimatedState = space->allocState();
- // cout<<"innovation calculated"<<endl;
   if(!innov.n_rows || !innov.n_cols)
   {
     updatedState = si_->cloneState(belief);
@@ -80,16 +75,9 @@ const LinearSystem& ls, ompl::base::State *updatedState)
   mat KalmanGain = solve(trans(rightMatrix), trans(leftMatrix));
   KalmanGain = KalmanGain.t();
 
-  //cout<<"Kalman gain calculated"<<endl;
-
   colvec xPredVec = belief->as<StateType>()->getArmaData();
 
   colvec xEstVec = xPredVec + KalmanGain*innov;
-
-  //cout<<"The innovation (in EKF update) :"<<endl<<innov<<endl;
-  //cout<<"The Kalman Gain (in EKF update) :"<<endl<<KalmanGain<<endl;
-
-  //cout<<"New State estimated"<<endl;
 
   updatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
 
@@ -119,43 +107,31 @@ void LinearizedKF::Evolve(const ompl::base::State *belief,
   }
 
   Update(bPred, obs, lsUpdate, evolvedState);
-
-  //cout<<"Returning updated estimate from LKF"<<endl;
 }
 
 
 
 arma::mat LinearizedKF::computeStationaryCovariance (const LinearSystem& ls)
 {
-  //cout << "LinearizedKF::ComputeStationaryCovariance" << endl;
-  //cout << "Printing linear system: " << endl;
-  //cout << "A: " << ls.getA() << endl;
-  //cout << "H: " << ls.getH() << endl;
-  //cout << "Q: " << ls.getQ() << endl;
-  //cout << "G: " << ls.getG() << endl;
-  //cout << "M: " << ls.getM() << endl;
-  //cout << "R: " << ls.getR() << endl;
   using namespace arma;
 
   mat H = ls.getH();
   mat M = ls.getM();
   mat R = ls.getR();
 
-  mat Pprd = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
-    ls.getM() * ls.getR() * trans(ls.getM()) );
+  mat Pprd;
+  bool dareSolvable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
+    ls.getM() * ls.getR() * trans(ls.getM()), Pprd );
 
-  //cout << "Pprd: " << endl << Pprd << endl;
+  if(!dareSolvable) OMPL_ERROR("Dare Unsolvable: The given system state is not stable/observable.");
+
   //makes this symmetric
   Pprd = (Pprd + trans(Pprd)) / 2;
 
-  //cout << "Pprd after making symmetric: " << endl << Pprd << endl;
-
   mat Pest = Pprd - ( Pprd * H.t()) * inv( H*Pprd*H.t() + M * R * M.t(), true) * trans(Pprd * H.t()) ;
 
-  //cout << "Pest computed: " << endl << Pest << endl;
   //makes this symmetric
   Pest = (Pest + trans(Pest)) / 2;
-  //cout << "Pest after making symmetric: " << endl << Pest << endl;
 
   return Pest;
 

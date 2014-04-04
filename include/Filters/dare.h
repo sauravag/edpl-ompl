@@ -39,7 +39,7 @@
 
 
 /** \brief Solver for the Differential Algebraic Riccatti Equation. */
-inline arma::mat dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R) 
+inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R, arma::mat &S)
 {
   using namespace arma;
 
@@ -102,16 +102,18 @@ inline arma::mat dare(const arma::mat& _A, const arma::mat& _B, const arma::mat&
   }
 
   //ensure that the system is stable
-  assert(c1 == n);
+  if(c1 != n) return false;
 
   U11 = tempZ.submat(span(0,n-1), span(0,n-1));
   U21 = tempZ.submat(span(n,n_Z-1), span(0,n-1));
 
-  return U21 * inv(U11);
+  S = U21 * inv(U11);
+
+  return true; // dare was solved successfully
 }
 
 /** \brief Generate a gain using the DARE solver */
-inline arma::mat generate_gain_with_dare(const arma::mat _A, const arma::mat _B, const arma::mat _Q, const arma::mat _R) 
+inline arma::mat generate_gain_with_dare(const arma::mat _A, const arma::mat _B, const arma::mat _Q, const arma::mat _R)
 {
   using namespace arma;
 
@@ -120,11 +122,11 @@ inline arma::mat generate_gain_with_dare(const arma::mat _A, const arma::mat _B,
   mat temp1(m,n);
   mat temp2(m,m);
 
-  S = dare(_A, _B, _Q, _R);
+  bool flag = dare(_A, _B, _Q, _R, S);
   temp1 = trans(_B) * S;
   temp2 = _R + temp1 * _B;
   temp1 = inv(temp2) * temp1;
-  
+
   return (temp1 * _A);
 }
 
