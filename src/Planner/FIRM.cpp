@@ -63,12 +63,12 @@ namespace ompl
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 6;
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
 
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 200;
 
-        static const double NUM_MONTE_CARLO_PARTICLES = 10;
+        static const double NUM_MONTE_CARLO_PARTICLES = 5;
 
         static const double EXTREMELY_HIGH_EDGE_COST = 1e6;
 
@@ -107,7 +107,7 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
     specs_.optimizingPaths = true;
 
     Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
-    minFIRMNodes_ = 5;
+    minFIRMNodes_ = 10;
 }
 
 FIRM::~FIRM(void)
@@ -214,14 +214,24 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 stateStable = false;
                 if(found)
                 {
+
                     ompl::base::State *lsState = si_->cloneState(workState);
+                    std::cout<<"~The observation at this state is:  "<<siF_->getObservationModel()->getObservation(lsState, false);
                     LinearSystem ls(siF_, lsState, siF_->getMotionModel()->getZeroControl(),
                                 siF_->getObservationModel()->getObservation(lsState, false), siF_->getMotionModel(), siF_->getObservationModel());
 
                     arma::mat S;
 
-                    stateStable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
+                    try
+                    {
+                        stateStable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
                                 ls.getM() * ls.getR() * trans(ls.getM()), S );
+                    }
+                    catch(int e)
+                    {
+                        stateStable = false;
+                    }
+
                 }
                 attempts++;
             } while (attempts < ompl::magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found && !stateStable);
@@ -249,7 +259,7 @@ void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
         addedSolution_ = existsPolicy(startM_, goalM_, solution);
 
         if (!addedSolution_)
-            boost::this_thread::sleep(boost::posix_time::milliseconds(20e3));
+            boost::this_thread::sleep(boost::posix_time::seconds(30));
     }
 }
 
@@ -258,7 +268,7 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
     ompl::base::Goal *g = pdef_->getGoal().get();
     ompl::base::Cost sol_cost(0.0);
 
-    if(boost::num_vertices(g_) < 8) return false;
+    if(boost::num_vertices(g_) < minFIRMNodes_) return false;
 
     foreach (Vertex start, starts)
     {
@@ -387,7 +397,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state)
     stateProperty_[m] = state;
     NodeControllerType nodeController;
     generateNodeController(state, nodeController); // Generate the node controller
-    //nodeControllers_[m] = nodeController; // Add it to the list
+    nodeControllers_[m] = nodeController; // Add it to the list
 
     totalConnectionAttemptsProperty_[m] = 1;
     successfulConnectionAttemptsProperty_[m] = 0;

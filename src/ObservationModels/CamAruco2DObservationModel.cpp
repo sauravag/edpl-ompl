@@ -97,7 +97,6 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
         z[singleObservationDim*counter+2] = landmarkBearing + noise[1];
         z[singleObservationDim*counter+3] = landmarks_[i](3);
 
-        //cout<<"Observation set for i = "<<i<<endl;
         counter++;
     }
   }

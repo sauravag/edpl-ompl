@@ -63,11 +63,11 @@
 <landmark id = 57 x = 2.1717 y = 3.2309 theta = 1 />
 <landmark id = 58 x = 2.1717 y = 2.9515 theta = 1 />
 <landmark id = 22 x = 2.1717 y = 2.6721 theta = 1 />
-<landmark id = 1000 x = 6   y = 7.2 theta = -0.5 />
-<landmark id = 1001 x = 6.3 y = 7.2 theta = -0.5 />
-<landmark id = 1002 x = 11   y = 7.2 theta = -0.5 />
-<landmark id = 1003 x = 11.3 y = 7.2 theta = -0.5 />
-<landmark id = 1004 x = 11.7 y = 7.2 theta = -0.5 />
+<landmark id = 400 x = 6   y = 7.2 theta = -0.5 />
+<landmark id = 401 x = 6.3 y = 7.2 theta = -0.5 />
+<landmark id = 402 x = 11   y = 7.2 theta = -0.5 />
+<landmark id = 403 x = 11.3 y = 7.2 theta = -0.5 />
+<landmark id = 404 x = 11.7 y = 7.2 theta = -0.5 />
 </LandmarkList>
 <!--landmark id = 146 x = 3.1115 y = 5.494 theta = 0.5 />
 <landmark id = 133 x = 4.431 y = 5.2654 theta = 0.5 />
@@ -135,10 +135,10 @@
 		dt= 0.1
 	  /> <!--No Noise--> 
 	<UnicycleMotionModel
-		sigmaV="0.0012"
+		sigmaV="0.0022"
 		etaV="0.05"
     sigmaOmega="0.001"
-    etaOmega="0.03"
+    etaOmega="0.04"
 		P_Wg_filename=""
 		orbit_radius=5.0
 		wind_noise_pos="0.000001"

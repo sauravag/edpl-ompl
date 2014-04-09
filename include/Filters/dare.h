@@ -37,11 +37,9 @@
 #include "armadillo"
 #include <cassert>
 
-
 /** \brief Solver for the Differential Algebraic Riccatti Equation. */
-inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R, arma::mat &S)
-{
-  using namespace arma;
+inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R, arma::mat &S) {
+using namespace arma;
 
   int n = _A.n_rows, m = _B.n_cols;
   mat Z11(n,n);
@@ -73,7 +71,6 @@ inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, 
   Z.submat( span(n,2*n-1),  span(n,2*n-1) ) = Z22;
 
   //data structures to store result of generalized eigenvalue computation
-  //Col< std::complex<typename T1::pod_type> > eigval(2*n);
   cx_vec eigval(2*n);
   int n_Z = Z.n_rows;
   mat VL(n_Z, n_Z);
@@ -82,8 +79,6 @@ inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, 
   //solution to generalized eigenvalue problem
   //internally, calls Fortran's "geev" function
   eig_gen(eigval, VL, VR, Z);
-
-  //cout << "eigen values in DARE: " << eigval << endl;
 
   mat U11(n,n);
   mat U21(n,n);
@@ -95,12 +90,12 @@ inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, 
     //get eigenvalues outside unit circle
     if( (eigval(i).real()*eigval(i).real() + eigval(i).imag()*eigval(i).imag()  ) > 1)
     {
-      //std::cout<<"VR:  \n"<<VR.submat(span::all, span(i,i))<<std::endl;
-      //std::cout<<"Span(i,i) :"<<span(i,i)<<std::endl;
-      //std::cout<<"C1 :" <<c1 <<std::endl;
-      tempZ.submat(span::all, span(c1,c1)) = VR.submat(span::all, span(i,i));
 
-      c1++;
+        if(tempZ.n_cols -1 < c1) return false;
+
+        else tempZ.submat(span::all, span(c1,c1)) = VR.submat(span::all, span(i,i));
+
+        c1++;
     }
   }
 
@@ -112,7 +107,7 @@ inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, 
 
   S = U21 * inv(U11);
 
-  return true; // dare was solved successfully
+  return true; // dare solved successfuly
 }
 
 /** \brief Generate a gain using the DARE solver */
@@ -121,7 +116,7 @@ inline arma::mat generate_gain_with_dare(const arma::mat _A, const arma::mat _B,
   using namespace arma;
 
   int n = _A.n_rows, m = _B.n_cols;
-  mat S(n,n);
+  mat S;//(n,n);
   mat temp1(m,n);
   mat temp2(m,m);
 

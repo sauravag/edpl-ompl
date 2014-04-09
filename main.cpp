@@ -109,7 +109,7 @@ void plan(void)
     // create a random start state
     ob::State *start = statespace->allocState();
 
-    start->as<StateType>()->setXYYaw(15,5.5,0);
+    start->as<StateType>()->setXYYaw(15,4,0);
     //start->as<StateType>()->setXYYaw(4,1,0);
     //start->as<StateType>()->setXYYaw(6,6,0);
 
