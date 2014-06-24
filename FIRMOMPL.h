@@ -90,4 +90,6 @@
 // FIRM Optimization Objective
 //#include "include/OptimizationObjectives/FIRMOptimizationObjective.h"
 
+#include "include/Spaces/ICreateControlSampler.h"
+
 #endif

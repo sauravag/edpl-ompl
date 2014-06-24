@@ -1,6 +1,6 @@
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/geometric/SimpleSetup.h>
-
+#include <ompl/control/planners/rrt/RRT.h>
 #include <ompl/config.h>
 #include <iostream>
 #include <istream>
@@ -56,6 +56,12 @@ ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const ompl::base::SpaceI
 }
 */
 
+oc::DirectedControlSamplerPtr allocDirectedControlSampler(const ompl::control::SpaceInformation *si)
+{
+    ICreateControlSampler *csampler = new ICreateControlSampler(si);
+    return ompl::control::DirectedControlSamplerPtr(csampler);
+}
+
 void plan(void)
 {
     typedef SE2BeliefSpace::StateType StateType;
@@ -100,9 +106,10 @@ void plan(void)
 
     //set the state propagator
     si->setStatePropagator(oc::StatePropagatorPtr(new UnicycleStatePropagator(si))) ;
-
+    si->setPropagationStepSize(0.1); // this is the duration that a control is applied
+    si->setMinMaxControlDuration(1,50); // minimum and maximum integer multiples of timestep that can be applied
     //ob::ValidStateSamplerPtr   simpleSampler;
-
+    si->setDirectedControlSamplerAllocator(allocDirectedControlSampler);
     // allocate a valid state sampler, by default, a uniform sampler is allocated
     //simpleSampler = si->allocValidStateSampler();
 
@@ -140,8 +147,12 @@ void plan(void)
     // set the start and goal states
     pdef->setStartAndGoalStates(start, goal);
 
+
     // create a planner for the defined space
-    ob::PlannerPtr planner(new FIRM(si, false));
+    //ob::PlannerPtr planner(new FIRM(si, false));
+
+    // RRT planner
+    ob::PlannerPtr planner(new oc::RRT(si));
 
     // set the problem we are trying to solve for the planner
     planner->setProblemDefinition(pdef);
@@ -161,7 +172,7 @@ void plan(void)
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = planner->solve(600);
+    ob::PlannerStatus solved = planner->solve(10);
 
     cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 

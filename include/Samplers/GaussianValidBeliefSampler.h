@@ -41,9 +41,7 @@
 #include "ompl/base/StateSampler.h"
 #include "../SpaceInformation/SpaceInformation.h"
 
-/*
-The state validity checker function should check collision and observability
-*/
+/* The state validity checker function should check collision and observability */
 
 /** \brief Generate valid samples using the Gaussian sampling strategy */
 class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
@@ -59,10 +57,10 @@ class GaussianValidBeliefSampler : public ompl::base::ValidStateSampler
     {
     }
 
-    // Samples a new node
+    /** \brief Samples a new node */
     virtual bool sample(ompl::base::State *state);
 
-    // samples a new node near some state at some distance
+    /** \brief samples a new node near some state at some distance */
     virtual bool sampleNear(ompl::base::State *state, const ompl::base::State *near, const double distance);
 
     /** \brief Get the standard deviation used when sampling */

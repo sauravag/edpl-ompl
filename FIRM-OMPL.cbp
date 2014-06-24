@@ -17,6 +17,7 @@
 					<Add directory="/usr/include/qt4/QtCore" />
 					<Add directory="/usr/include/qt4" />
 					<Add directory="/usr/include/qt4/QtGui" />
+					<Add directory="/usr/include/qt4/Qt" />
 					<Add directory="/home/saurav/Research/Development/FIRMApplication/FIRM/utils/mathtool" />
 					<Add directory="/usr/include" />
 				</Compiler>
@@ -90,6 +91,7 @@
 		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
 		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />
 		<Unit filename="include/SpaceInformation/SpaceInformation.h" />
+		<Unit filename="include/Spaces/ICreateControlSampler.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
 		<Unit filename="include/ValidityCheckers/FIRMValidityChecker.h" />
 		<Unit filename="include/Visualization/GLWidget.h" />
@@ -109,6 +111,7 @@
 		<Unit filename="src/Samplers/UniformValidBeliefSampler.cpp" />
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
 		<Unit filename="src/SpaceInformation/SpaceInformation.cpp" />
+		<Unit filename="src/Spaces/ICreateControlSampler.cpp" />
 		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />
 		<Unit filename="src/Visualization/GLWidget.cpp" />
 		<Unit filename="src/Visualization/Visualizer.cpp" />

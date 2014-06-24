@@ -100,11 +100,11 @@ class MotionModelMethod
 		/** \brief Calculate the state transition Jacobian i.e. df/dx where f is the transition function and x is the state. */
 		virtual JacobianType
 		getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
-		
+
         /** \brief Calculate the control transition Jacobian i.e. df/du where f is the transition function and u is the control. */
 		virtual JacobianType
 		getControlJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
-		
+
         /** \brief Calculate the noise transition Jacobian i.e. df/dw where f is the transition function and w is the noise. */
 		virtual JacobianType
 		getNoiseJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
@@ -147,7 +147,7 @@ class MotionModelMethod
         void ARMA2OMPL(arma::colvec u, ompl::control::Control *control)
         {
             if(!control) control = si_->allocControl();
-            
+
             for (unsigned int i = 0; i < controlDim_; i++)
             {
                 control->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = u[i];
