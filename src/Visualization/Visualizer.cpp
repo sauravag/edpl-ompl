@@ -127,12 +127,15 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
                  << fovRadius*sin(x[2] - fovAngle) 	<< endr
                  <<	0								<< endr;
         glColor3d(0.5,0.5,0.5);
+
+        //Remove comment to show field of view of robot
+        /*
         glBegin(GL_LINE_LOOP);
             glVertex3f(0,0,0);
             glVertex3f(fovRight[0], fovRight[1], 0);
             glVertex3f(fovLeft[0], fovLeft[1], 0);
         glEnd();
-
+        */
     glPopMatrix();
 
     if(trace(covariance) != 0)

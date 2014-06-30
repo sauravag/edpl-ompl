@@ -59,10 +59,18 @@ class FIRMValidityChecker : public ompl::base::StateValidityChecker
       double y_b =  2.0;
       double y_t =  5;
 
-      bool valid = true;
+      arma::colvec pos = state->as<StateType>()->getArmaData();
 
-      return !isInsideBox(state,x_l,x_r, y_b, y_t); // if inside box then not valid
+      if(pos[0]>= 0 && pos[0] <=17)
+      {
+        if(pos[1]>=0 && pos[1]<=7)
+        {
+            return !isInsideBox(state,x_l,x_r, y_b, y_t); // if inside box then not valid
+        }
+      }
+
       //return true;//siF_->getObservationModel()->isStateObservable(state);
+      return false;
     }
 
     /** \brief Checks if the state is within a bounding box */

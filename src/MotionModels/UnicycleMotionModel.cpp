@@ -120,7 +120,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
     delta_th_p_start = th_p - theta_start;
 
     // bringing the delta_th_p_start to the -PI to PI range
-    pirange(delta_th_p_start); 
+    pirange(delta_th_p_start);
 
     // turining anlge at end
     delta_th_p_end = th_end - th_p;
@@ -144,7 +144,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
     colvec u_const_rot;
     u_const_rot << 0 << endr
                 << maxAngularVelocity_*signum(delta_th_p_start) << endr;
-    
+
     int ix = 0;
     for(int j=0; j<frsi; ++j, ++ix)
     {
@@ -152,26 +152,26 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
       ARMA2OMPL(u_const_rot, tempControl);
       openLoopControls.push_back(tempControl);
     }
-    
+
     if(frsi < rsi)
     {
       ompl::control::Control *tempControl = si_->allocControl();
       ARMA2OMPL(u_const_rot*(rsi-frsi), tempControl);
       openLoopControls.push_back(tempControl);
     }
-    
+
     //Generating control signal for translation
-    
+
     const double& tsi = translation_steps;
     const double ftsi = floor(tsi);
-    
+
     static colvec u_const_trans;
-    
+
     if(u_const_trans.n_rows == 0) {
       u_const_trans << maxLinearVelocity_ << endr
                     << 0        << endr;
     }
-    
+
     for(int j=0; j<ftsi; ++j, ++ix)
     {
       ompl::control::Control *tempControl = si_->allocControl();
@@ -190,7 +190,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
     const double& rsi_end = rotation_steps_end;
     const double frsi_end = floor(rsi_end);
     colvec u_const_rot_end;
-    
+
     u_const_rot_end << 0 << endr
                 << maxAngularVelocity_*signum(delta_th_p_end) << endr;
 
@@ -200,7 +200,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
       ARMA2OMPL(u_const_rot_end, tempControl);
       openLoopControls.push_back(tempControl);
     }
-    
+
     if(frsi_end < rsi_end)
     {
       ompl::control::Control *tempControl = si_->allocControl();
@@ -293,7 +293,7 @@ UnicycleMotionModel::getNoiseJacobian(const ompl::base::State *state, const ompl
 
   const double& theta = xData[2];
 
-  
+
   //th=x(3);
   //G = [cos(th) , 0 , 1 , 0 , 0 ;  sin(th) , 0 , 0 ,1,0 ;  0 , 1 , 0 ,0,1] * sqrt(Unicycle_robot.dt);
 
@@ -333,11 +333,11 @@ arma::mat UnicycleMotionModel::controlNoiseCovariance(const ompl::control::Contr
   using namespace arma;
 
   arma::colvec u = OMPL2ARMA(control);
-  
+
   colvec uStd = eta_ % u + sigma_;
-  
+
   mat P_Un = diagmat(square(uStd));
-  
+
   return P_Un;
 }
 

@@ -50,7 +50,13 @@ void UnicycleStatePropagator::propagate(const base::State *state, const control:
 {
 
     // set the time step
-    motionModel_->setTimeStep(duration);
+    if(duration != 0.1)
+    {
+        std::cout<<"In state propagator, duration is: "<<duration<<std::endl;
+        std::cin.get();
+    }
+
+    //motionModel_->setTimeStep(duration);
 
     typedef SE2BeliefSpace::StateType StateType;
 
@@ -60,6 +66,9 @@ void UnicycleStatePropagator::propagate(const base::State *state, const control:
 
     // use the motionmodel to apply the controls
     motionModel_->Evolve(state, control, motionModel_->getZeroNoise(), result);
+
+    //std::cout<<"In state propagator"<<std::endl;
+    //std::cin.get();
 
 }
 

@@ -1,7 +1,10 @@
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/control/planners/rrt/RRT.h>
+#include <ompl/control/PathControl.h>
+#include <ompl/control/SimpleSetup.h>
 #include <ompl/config.h>
+#include <ompl/base/goals/GoalState.h>
 #include <iostream>
 #include <istream>
 #include "include/Planner/FIRM.h"
@@ -104,12 +107,13 @@ void plan(void)
     //set the state sampler
     //si->setValidStateSamplerAllocator(allocGaussianValidBeliefSampler);
 
+    si->setDirectedControlSamplerAllocator(allocDirectedControlSampler);
     //set the state propagator
     si->setStatePropagator(oc::StatePropagatorPtr(new UnicycleStatePropagator(si))) ;
     si->setPropagationStepSize(0.1); // this is the duration that a control is applied
-    si->setMinMaxControlDuration(1,50); // minimum and maximum integer multiples of timestep that can be applied
+    si->setMinMaxControlDuration(1,5); // minimum and maximum integer multiples of timestep that can be applied
     //ob::ValidStateSamplerPtr   simpleSampler;
-    si->setDirectedControlSamplerAllocator(allocDirectedControlSampler);
+
     // allocate a valid state sampler, by default, a uniform sampler is allocated
     //simpleSampler = si->allocValidStateSampler();
 
@@ -121,7 +125,7 @@ void plan(void)
     //start->as<StateType>()->setXYYaw(6,6,0);
 
     Visualizer::updateSpaceInformation(si);
-    //Visualizer::addState(start);
+    Visualizer::addState(start);
 
     //Visualizer::updateCurrentBelief(start);
     //Visualizer::updateTrueState(start);
@@ -135,7 +139,7 @@ void plan(void)
     ob::State *goal = statespace->allocState();
     goal->as<StateType>()->setXYYaw(0.4,4.8,1.57);
     //goal->as<StateType>()->setXYYaw(1.5,5.5,1.57);
-    //Visualizer::addState(goal);
+    Visualizer::addState(goal);
 
     cout<<"The goal state is:"<<endl;
     statespace->as<SE2BeliefSpace>()->printBeliefState(goal);
@@ -145,7 +149,7 @@ void plan(void)
     ob::ProblemDefinitionPtr pdef(new ob::ProblemDefinition(si));
 
     // set the start and goal states
-    pdef->setStartAndGoalStates(start, goal);
+    pdef->setStartAndGoalStates(start, goal, 1.0);
 
 
     // create a planner for the defined space
@@ -156,6 +160,9 @@ void plan(void)
 
     // set the problem we are trying to solve for the planner
     planner->setProblemDefinition(pdef);
+
+    planner->as<oc::RRT>()->setIntermediateStates(true);
+    //const oc::RRT rrt = static_cast<oc::RRT&>(*planner);
 
     //set the maximum number of nearest neighbors
     //planner->setMaxNearestNeighbors(5);
@@ -169,6 +176,8 @@ void plan(void)
     // print the problem settings
     pdef->print(std::cout);
 
+    //------------------------------------------------
+
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
@@ -176,21 +185,59 @@ void plan(void)
 
     cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 
+    cout<<"The min control duration is :"<<si->getMinControlDuration()<<endl;
+    cout<<"The max control duration is :"<<si->getMaxControlDuration()<<endl;
+
+
     if (solved)
     {
         // get the goal representation from the problem definition (not the same as the goal state)
         // and inquire about the found path
-        ob::PathPtr path = pdef->getSolutionPath();
+
+        //oc::PathControl *cpath = new oc::PathControl(si);
+
+        const ob::PathPtr &path = pdef->getSolutionPath();
+
+        oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+
+        //cpath.interpolate();
+
         std::cout << "Found solution, The path is:" << std::endl;
 
         // print the path to screen
         path->print(std::cout);
 
-        planner->as<FIRM>()->executeFeedback();
+        //planner->as<FIRM>()->executeFeedback();
+        //std::vector<ob::State*> solnStates = cpath.getStates();
+
+        //cout<<"Number of states"<<solnStates.size()<<std::endl;
+
+        si->setTrueState(start);
+        si->setBelief(start);
+
+        for(int i=0;i<cpath.getStateCount();i++)
+        {
+            Visualizer::addState(cpath.getState(i));
+        }
+
+        for(int i=0;i<cpath.getStateCount();i++)
+        {
+            si->setTrueState(start);
+            si->setBelief(cpath.getState(i));
+            //cout<<"The control duration is :"<<cpath.getControlDuration(i)<<endl;
+
+            for(int j=0;j<cpath.getControlDuration(i);j++)
+            {
+                si->applyControl(cpath.getControl(i));
+                boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+            }
+        }
+
     }
     else
         std::cout << "No solution found" << std::endl;
 
+    cout << "DONE" << std::endl;
 }
 
 int main(int argc, char *argv[])
