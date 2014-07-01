@@ -65,7 +65,9 @@ void UnicycleStatePropagator::propagate(const base::State *state, const control:
     ompl::base::State *to = si_->allocState();
 
     // use the motionmodel to apply the controls
-    motionModel_->Evolve(state, control, motionModel_->getZeroNoise(), result);
+    motionModel_->Evolve(state, control, motionModel_->getZeroNoise(), to);
+
+    si_->copyState(result,to);
 
     //std::cout<<"In state propagator"<<std::endl;
     //std::cin.get();

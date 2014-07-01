@@ -1,6 +1,7 @@
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/geometric/SimpleSetup.h>
-#include <ompl/control/planners/rrt/RRT.h>
+//#include <ompl/control/planners/rrt/RRT.h>
+#include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/control/PathControl.h>
 #include <ompl/control/SimpleSetup.h>
 #include <ompl/config.h>
@@ -111,7 +112,7 @@ void plan(void)
     //set the state propagator
     si->setStatePropagator(oc::StatePropagatorPtr(new UnicycleStatePropagator(si))) ;
     si->setPropagationStepSize(0.1); // this is the duration that a control is applied
-    si->setMinMaxControlDuration(1,5); // minimum and maximum integer multiples of timestep that can be applied
+    si->setMinMaxControlDuration(1,1000); // minimum and maximum integer multiples of timestep that can be applied
     //ob::ValidStateSamplerPtr   simpleSampler;
 
     // allocate a valid state sampler, by default, a uniform sampler is allocated
@@ -125,7 +126,7 @@ void plan(void)
     //start->as<StateType>()->setXYYaw(6,6,0);
 
     Visualizer::updateSpaceInformation(si);
-    Visualizer::addState(start);
+    //Visualizer::addState(start);
 
     //Visualizer::updateCurrentBelief(start);
     //Visualizer::updateTrueState(start);
@@ -139,7 +140,7 @@ void plan(void)
     ob::State *goal = statespace->allocState();
     goal->as<StateType>()->setXYYaw(0.4,4.8,1.57);
     //goal->as<StateType>()->setXYYaw(1.5,5.5,1.57);
-    Visualizer::addState(goal);
+    //Visualizer::addState(goal);
 
     cout<<"The goal state is:"<<endl;
     statespace->as<SE2BeliefSpace>()->printBeliefState(goal);
@@ -156,12 +157,12 @@ void plan(void)
     //ob::PlannerPtr planner(new FIRM(si, false));
 
     // RRT planner
-    ob::PlannerPtr planner(new oc::RRT(si));
+    ob::PlannerPtr planner(new ompl::geometric::RRT(si));
 
     // set the problem we are trying to solve for the planner
     planner->setProblemDefinition(pdef);
 
-    planner->as<oc::RRT>()->setIntermediateStates(true);
+    //planner->as<oc::RRT>()->setIntermediateStates(true);
     //const oc::RRT rrt = static_cast<oc::RRT&>(*planner);
 
     //set the maximum number of nearest neighbors
@@ -181,7 +182,7 @@ void plan(void)
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = planner->solve(10);
+    ob::PlannerStatus solved = planner->solve(100);
 
     cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 
@@ -198,8 +199,8 @@ void plan(void)
 
         const ob::PathPtr &path = pdef->getSolutionPath();
 
-        oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
-
+        //oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+        og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
         //cpath.interpolate();
 
         std::cout << "Found solution, The path is:" << std::endl;
@@ -215,21 +216,23 @@ void plan(void)
         si->setTrueState(start);
         si->setBelief(start);
 
-        for(int i=0;i<cpath.getStateCount();i++)
+        for(int i=0;i<gpath.getStateCount();i++)
         {
-            Visualizer::addState(cpath.getState(i));
+            Visualizer::addState(gpath.getState(i));
         }
 
-        for(int i=0;i<cpath.getStateCount();i++)
+        for(int i=0;i<gpath.getStateCount()-1;i++)
         {
-            si->setTrueState(start);
-            si->setBelief(cpath.getState(i));
+            si->setTrueState(gpath.getState(i));
+            si->setBelief(gpath.getState(i));
             //cout<<"The control duration is :"<<cpath.getControlDuration(i)<<endl;
+            vector<oc::Control*> OLC;
+            mm->generateOpenLoopControls(gpath.getState(i),gpath.getState(i+1),OLC) ;
 
-            for(int j=0;j<cpath.getControlDuration(i);j++)
+            for(int j=0;j<OLC.size();j++)
             {
-                si->applyControl(cpath.getControl(i));
-                boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+                si->applyControl(OLC[j]);
+                boost::this_thread::sleep(boost::posix_time::milliseconds(33));
             }
         }
 

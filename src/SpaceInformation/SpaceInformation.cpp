@@ -51,10 +51,18 @@ void firm::SpaceInformation::setTrueState(const ompl::base::State *state)
 
 void firm::SpaceInformation::applyControl(const ompl::control::Control *control)
 {
+    typename MotionModelMethod::NoiseType noise;
 
-    typename MotionModelMethod::NoiseType noise = motionModel_->generateNoise(trueState_, control);
+    try
+    {
+        noise = motionModel_->generateNoise(trueState_, control);
+    }
+    catch(int e)
+    {
+        noise = motionModel_->getZeroNoise();
+    }
 
-    motionModel_->Evolve(trueState_, control, noise, trueState_);
+    motionModel_->Evolve(trueState_, control, motionModel_->getZeroNoise()/*noise*/, trueState_);
 
     Visualizer::updateTrueState(trueState_);
 
