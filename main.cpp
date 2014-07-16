@@ -2,6 +2,7 @@
 #include <ompl/geometric/SimpleSetup.h>
 //#include <ompl/control/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
+#include <ompl/geometric/planners/prm/PRM.h>
 #include <ompl/control/PathControl.h>
 #include <ompl/control/SimpleSetup.h>
 #include <ompl/config.h>
@@ -59,12 +60,13 @@ ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const ompl::base::SpaceI
     return ob::ValidStateSamplerPtr(unisampler);
 }
 */
-
+/*
 oc::DirectedControlSamplerPtr allocDirectedControlSampler(const ompl::control::SpaceInformation *si)
 {
     ICreateControlSampler *csampler = new ICreateControlSampler(si);
     return ompl::control::DirectedControlSamplerPtr(csampler);
 }
+*/
 
 void plan(void)
 {
@@ -108,7 +110,7 @@ void plan(void)
     //set the state sampler
     //si->setValidStateSamplerAllocator(allocGaussianValidBeliefSampler);
 
-    si->setDirectedControlSamplerAllocator(allocDirectedControlSampler);
+    //si->setDirectedControlSamplerAllocator(allocDirectedControlSampler);
     //set the state propagator
     si->setStatePropagator(oc::StatePropagatorPtr(new UnicycleStatePropagator(si))) ;
     si->setPropagationStepSize(0.1); // this is the duration that a control is applied
@@ -154,10 +156,10 @@ void plan(void)
 
 
     // create a planner for the defined space
-    //ob::PlannerPtr planner(new FIRM(si, false));
+    ob::PlannerPtr planner(new FIRM(si, false));
 
     // RRT planner
-    ob::PlannerPtr planner(new ompl::geometric::RRT(si));
+    //ob::PlannerPtr planner(new ompl::geometric::PRM(si));
 
     // set the problem we are trying to solve for the planner
     planner->setProblemDefinition(pdef);
@@ -196,7 +198,8 @@ void plan(void)
         // and inquire about the found path
 
         //oc::PathControl *cpath = new oc::PathControl(si);
-
+        planner->as<FIRM>()->executeFeedback();
+        /*
         const ob::PathPtr &path = pdef->getSolutionPath();
 
         //oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
@@ -235,7 +238,7 @@ void plan(void)
                 boost::this_thread::sleep(boost::posix_time::milliseconds(33));
             }
         }
-
+        */
     }
     else
         std::cout << "No solution found" << std::endl;

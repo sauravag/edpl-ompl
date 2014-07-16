@@ -24,7 +24,6 @@
 				<Linker>
 					<Add library="/usr/lib/libboost_system.so" />
 					<Add library="/usr/lib/libboost_thread.so" />
-					<Add library="/usr/lib/libarmadillo.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_app.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_base.so" />
 					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_control.so" />
@@ -46,6 +45,7 @@
 					<Add library="/usr/lib/x86_64-linux-gnu/libglut.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libX11.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libQtOpenGL.so" />
+					<Add library="/usr/lib64/libarmadillo.so" />
 					<Add directory="/home/saurav/Research/Softwares/omplapp/build/Release/lib" />
 					<Add directory="/usr/lib/x86_64-linux-gnu" />
 					<Add directory="/home/saurav/Softwares/qcustomplot/qcustomplot-sharedlib/sharedlib-compilation" />
