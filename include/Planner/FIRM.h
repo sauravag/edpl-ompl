@@ -31,7 +31,8 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+
+/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal */
 
 #ifndef FIRM_PLANNER_
 #define FIRM_PLANNER_
@@ -70,8 +71,11 @@
     with PRM.
 
    @par External documentation
-   A. Agha-mohammadi, Suman Chakravorty, Nancy Amato, "FIRM: Sampling-based Feedback Motion Planning Under Motion
+   1. A. Agha-mohammadi, Suman Chakravorty, Nancy Amato, "FIRM: Sampling-based Feedback Motion Planning Under Motion
    Uncertainty and Imperfect Measurements", International Journal of Robotics Research, 33(2):268-304, February 2014
+
+   2. A. Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan, Suman Chakravorty, Daniel Tomkins, Jory Denny, Nancy Amato, "Robust Online Belief Space 
+   Planning in Changing Environments: Application to Physical Mobile Robots," In Proc. IEEE Int. Conf. Robot. Autom. (ICRA), Hong Kong, China, May 2014.
 
    <a href="http://www.mit.edu/~aliagha/Web/pubpdfs/2014.Ali.Suman.ea.IJRR_FIRM.pdf">[PDF]</a>
 */

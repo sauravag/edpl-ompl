@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+/* Authors: Saurav Agarwal */
 
 #ifndef FIRM_SPACE_INFORMATION_
 #define FIRM_SPACE_INFORMATION_

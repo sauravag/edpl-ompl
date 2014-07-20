@@ -32,7 +32,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+/* Authors: Saurav Agarwal */
+
+
 #include "../ObservationModels/ObservationModelMethod.h"
 /*
 Used to check if a state is in collission or not moreover,

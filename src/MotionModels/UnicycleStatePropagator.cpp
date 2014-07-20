@@ -31,7 +31,7 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
-/* Author: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+/* Author: Ali-akbar Agha-mohammadi, Saurav Agarwal */
 
 #include "../../include/MotionModels/UnicycleStatePropagator.h"
 #include "ompl/control/spaces/RealVectorControlSpace.h"

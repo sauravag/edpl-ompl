@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+/* Authors: Saurav Agarwal */
 
 #ifndef GAUSSIAN_VALID_BELIEF_SAMPLER_
 #define GAUSSIAN_VALID_BELIEF_SAMPLER_

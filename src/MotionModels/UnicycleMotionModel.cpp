@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+/* Authors:  Ali-akbar Agha-mohammadi, Saurav Agarwal */
 
 
 #include "../../include/Spaces/SE2BeliefSpace.h"

@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal */
 
 #ifndef UNICYCLE_MOTIONMODEL_
 #define UNICYCLE_MOTIONMODEL_

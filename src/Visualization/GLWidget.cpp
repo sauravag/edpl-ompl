@@ -32,6 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan */
+
 /* Handles all the GL functions, camera, and drawing for the general window.
  * Owns the simulation so that it can draw its contents.
  */

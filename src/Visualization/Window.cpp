@@ -32,6 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan */
 
 #include <iostream>
 #include <QtGui/QtGui>

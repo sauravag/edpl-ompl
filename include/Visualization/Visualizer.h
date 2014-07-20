@@ -32,6 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan */
+
 #ifndef FIRM_OMPL_VISUALIZER_H
 #define FIRM_OMPL_VISUALIZER_H
 

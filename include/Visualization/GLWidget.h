@@ -32,6 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan */
+
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
