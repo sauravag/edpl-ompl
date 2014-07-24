@@ -246,8 +246,8 @@ void plan(void)
         // and inquire about the found path
 
         //oc::PathControl *cpath = new oc::PathControl(si);
-        //planner->as<FIRM>()->executeFeedbackWithRollout();
-        planner->as<FIRM>()->executeFeedback();
+        planner->as<FIRM>()->executeFeedbackWithRollout();
+        //planner->as<FIRM>()->executeFeedback();
         /*
         const ob::PathPtr &path = pdef->getSolutionPath();
 
