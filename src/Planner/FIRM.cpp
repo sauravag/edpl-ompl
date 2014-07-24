@@ -386,7 +386,7 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
     si_->freeStates(xstates);
 }
 
-FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge)
+FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge, bool generateNodeController)
 {
 
     boost::mutex::scoped_lock _(graphMutex_);
