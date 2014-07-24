@@ -74,7 +74,7 @@
    1. A. Agha-mohammadi, Suman Chakravorty, Nancy Amato, "FIRM: Sampling-based Feedback Motion Planning Under Motion
    Uncertainty and Imperfect Measurements", International Journal of Robotics Research, 33(2):268-304, February 2014
 
-   2. A. Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan, Suman Chakravorty, Daniel Tomkins, Jory Denny, Nancy Amato, "Robust Online Belief Space 
+   2. A. Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan, Suman Chakravorty, Daniel Tomkins, Jory Denny, Nancy Amato, "Robust Online Belief Space
    Planning in Changing Environments: Application to Physical Mobile Robots," In Proc. IEEE Int. Conf. Robot. Autom. (ICRA), Hong Kong, China, May 2014.
 
    <a href="http://www.mit.edu/~aliagha/Web/pubpdfs/2014.Ali.Suman.ea.IJRR_FIRM.pdf">[PDF]</a>
@@ -233,6 +233,9 @@ public:
      /** \brief Executes the generated policy on the system */
     void executeFeedback(void);
 
+    /** \brief Executes the rollout policy algorithm (See ICRA '14 paper) */
+    void executeFeedbackWithRollout(void);
+
 protected:
 
     /** \brief Free all the memory allocated by the planner */
@@ -240,7 +243,7 @@ protected:
 
     /** \brief Construct a graph node for a given state (\e state), store it in the nearest neighbors data structure
         and then connect it to the roadmap in accordance to the connection strategy. */
-    virtual Vertex addStateToGraph(ompl::base::State *state);
+    virtual Vertex addStateToGraph(ompl::base::State *state, bool addReverseEdge = true);
 
     /** \brief Make two milestones (\e m1 and \e m2) be part of the same connected component. The component with fewer
         elements will get the id of the component with more elements. */
@@ -283,6 +286,9 @@ protected:
 
     /** \brief Solves the dynamic program to return a feedback policy */
     virtual void solveDynamicProgram(const Vertex goalVertex);
+
+    /** \brief Generate the rollout policy */
+    virtual Edge generateRolloutPolicy(const Vertex currentVertex);
 
     void addStateToVisualization(ompl::base::State *state) ;
 

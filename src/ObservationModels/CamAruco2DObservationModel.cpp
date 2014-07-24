@@ -50,9 +50,6 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
   //SE2BeliefSpace::StateType *tempState = static_cast<const SE2BeliefSpace::StateType*>(state);
   colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
-  //std::cout<<"CamArucoObservationModel2D, in GetObservation, xVec(2) :"<<xVec(2)<<std::endl;
-  //assert(abs(xVec(2)) <= boost::math::constants::pi<double>()+0.01);
-
   ObservationType z;
 
   int counter = 0;

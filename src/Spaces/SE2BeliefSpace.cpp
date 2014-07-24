@@ -36,6 +36,51 @@
 
 #include "../../include/Spaces/SE2BeliefSpace.h"
 
+double SE2BeliefSpace::StateType::meanNormWeight_  = -1;
+double SE2BeliefSpace::StateType::covNormWeight_   = -1;
+double SE2BeliefSpace::StateType::reachDist_   = -1;
+arma::colvec SE2BeliefSpace::StateType::normWeights_ = arma::zeros<arma::colvec>(3);
+
+bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state) const
+{
+    //std::cout<<"Checking reachability"<<std::endl;
+    // subtract the two beliefs and get the norm
+    arma::colvec stateDiff = this->getArmaData() - state->as<SE2BeliefSpace::StateType>()->getArmaData();
+
+    if(stateDiff[2] > boost::math::constants::pi<double>() )
+    {
+
+        stateDiff[2] =  (stateDiff[2] - 2*boost::math::constants::pi<double>()) ;
+    }
+    if( stateDiff[2] < -boost::math::constants::pi<double>() ){
+
+        stateDiff[2] =  stateDiff[2] + 2*boost::math::constants::pi<double>() ;
+    }
+
+    arma::mat covDiff = this->getCovariance() -  state->as<SE2BeliefSpace::StateType>()->getCovariance();
+
+    arma::colvec covDiffDiag = covDiff.diag();
+
+    // Need weighted supNorm of difference in means
+    double meanNorm = arma::norm(stateDiff % normWeights_, "inf");
+
+    double covDiagNorm = arma::norm(sqrt(abs(covDiffDiag)) % normWeights_, "inf");
+
+    double norm2 =  std::max(meanNorm*meanNormWeight_, covDiagNorm*covNormWeight_) ;
+
+    if(norm2 < reachDist_)
+    {
+        //std::cout<<"Is reachable and norm2 is  "<< norm2<<std::endl;
+        return true;
+    }
+    else
+    {
+        //std::cout<<"NOT reachable and norm2 is  "<< norm2<<std::endl;
+        return false;
+    }
+}
+
+
 ompl::base::State* SE2BeliefSpace::allocState(void) const
 {
     StateType *state = new StateType();

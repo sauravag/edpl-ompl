@@ -57,7 +57,6 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             StateType(void) : CompoundStateSpace::StateType()
             {
               covariance_ = arma::zeros<arma::mat>(3,3);
-              reachDist_ = 0;
               controllerID_ = -1;
 
             }
@@ -135,11 +134,15 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return stateVec;
             }
 
-            static double meanNormWeight_, covNormWeight_;
+            /** \brief Checks if the input state has stabilized to this state (node reachability check) */
+            bool isReached(ompl::base::State *state) const;
+
+            static double meanNormWeight_, covNormWeight_, reachDist_;
+
+            static arma::colvec normWeights_;
 
         private:
               arma::mat covariance_;
-              double reachDist_;
               size_t controllerID_;
 
         };

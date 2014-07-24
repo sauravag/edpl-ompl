@@ -108,6 +108,18 @@ void plan(void)
 {
     typedef SE2BeliefSpace::StateType StateType;
 
+    // setting the mean and norm weights (used in reachability check)
+    StateType::covNormWeight_  =  1.0;
+    StateType::meanNormWeight_ =  2.0;
+    StateType::reachDist_ =  0.1;
+
+    arma::colvec normWeights(3);
+    normWeights(0) = 2/std::pow(9,0.5); //2 / std::pow(9,0.5) ;
+    normWeights(1) = 2/std::pow(9,0.5);// 2/ std::pow(9,0.5) ;
+    normWeights(2) = 1/std::pow(9,0.5) ; // std::pow(9,0.5) ;
+
+    StateType::normWeights_ = normWeights;
+
     // construct the state space we are planning in
     ob::StateSpacePtr statespace(new SE2BeliefSpace());
 
@@ -220,7 +232,7 @@ void plan(void)
     std::cout<<"------ATTEMPTING SOLUTION------------"<<std::endl;
 
     // attempt to solve the problem within one second of planning time
-    ob::PlannerStatus solved = planner->solve(100);
+    ob::PlannerStatus solved = planner->solve(90);
 
     cout<<"------COMPLETED ATTEMPT--------------"<<std::endl;
 
@@ -234,6 +246,7 @@ void plan(void)
         // and inquire about the found path
 
         //oc::PathControl *cpath = new oc::PathControl(si);
+        //planner->as<FIRM>()->executeFeedbackWithRollout();
         planner->as<FIRM>()->executeFeedback();
         /*
         const ob::PathPtr &path = pdef->getSolutionPath();
@@ -279,6 +292,7 @@ void plan(void)
     else
         std::cout << "No solution found" << std::endl;
 
+    planner->clear();
     cout << "DONE" << std::endl;
 }
 
@@ -289,9 +303,9 @@ int main(int argc, char *argv[])
     // set static variables
     RHCICreate::setControlQueueSize(10);
     RHCICreate::setTurnOnlyDistance(0.05);
-    Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(5); // degrees
-    Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.05);// meters
-    Controller<RHCICreate, ExtendedKF>::setMaxTries(50);
+    Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(30); // degrees
+    Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.20);// meters
+    Controller<RHCICreate, ExtendedKF>::setMaxTries(200);
     Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(4.0); // meters
 
     //TestSE2BeliefSpace();

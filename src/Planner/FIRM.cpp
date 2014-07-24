@@ -386,7 +386,7 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
     si_->freeStates(xstates);
 }
 
-FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state)
+FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge)
 {
 
     boost::mutex::scoped_lock _(graphMutex_);
@@ -422,7 +422,11 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state)
                 successfulConnectionAttemptsProperty_[n]++;
 
                 addEdgeToGraph(m, n);
-                addEdgeToGraph(n, m);
+
+                if(addReverseEdge)
+                {
+                    addEdgeToGraph(n, m);
+                }
 
                 uniteComponents(m, n);
             }
@@ -754,6 +758,76 @@ void FIRM::executeFeedback(void)
 
 }
 
+void FIRM::executeFeedbackWithRollout(void)
+{
+    sendFeedbackEdgesToViz();
+
+    Vertex start = startM_[0];
+    Vertex goal  = goalM_[0] ;
+
+    siF_->setTrueState(stateProperty_[start]);
+    siF_->setBelief(stateProperty_[start]);
+
+    Vertex currentVertex =  start;
+
+    EdgeControllerType controller;
+
+    ompl::base::State *cstartState = si_->allocState();
+    si_->copyState(cstartState, stateProperty_[start]);
+
+    ompl::base::State *cendState = si_->allocState();
+
+    OMPL_INFORM("Running policy execution");
+
+    Edge e = feedback_[currentVertex];
+
+    Vertex tempVertex;
+
+    while(si_->distance(stateProperty_[currentVertex], stateProperty_[goal]) > 0.5)
+    {
+        //Edge e = feedback_[currentVertex];
+        //Vertex targetNode = boost::target(e, g_);
+
+        controller = edgeControllers_[e];
+
+        if(tempVertex)
+        {
+            boost::remove_vertex(tempVertex, g_);
+        }
+
+        ompl::base::Cost cost;
+
+        /**
+            Instead of executing the entire controller, we need to
+            execute one step, then calculate the cost to go through the neighboring nodes.
+            Whichever gives the lowest cost to go, is our new path.
+            Do this at each step.
+        */
+        controller.executeUpto(25,cstartState,cendState,cost,false);
+
+        ompl::base::State *tState = si_->allocState();
+
+        siF_->getTrueState(tState);
+
+        tempVertex = addStateToGraph(cendState, false);
+
+        //solveDynamicProgram(goal);
+
+        siF_->setTrueState(tState);
+
+        si_->freeState(tState);
+
+        e = generateRolloutPolicy(tempVertex);
+
+        sendFeedbackEdgesToViz();
+
+        si_->copyState(cstartState, cendState);
+
+    }
+
+
+}
+
 void FIRM::addStateToVisualization(ompl::base::State *state)
 {
     Visualizer::addState(state);
@@ -772,4 +846,45 @@ void FIRM::sendFeedbackEdgesToViz()
         targetVertex = boost::target(edge, g_);
         Visualizer::addFeedbackEdge(stateProperty_[sourceVertex], stateProperty_[targetVertex], 0);
   }
+}
+
+
+FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
+{
+    /**
+        For the given node, find the out edges and see the total cost of taking that edge
+
+        The cost of taking the edge is cost to go from the target of the edge + the cost of the edge itself
+    */
+    double minCost = 1e10;
+    Edge edgeToTake;
+    // Iterate over the out edges
+    foreach(Edge e, boost::out_edges(currentVertex, g_))
+    {
+
+        // Get the target node of the edge
+        Vertex targetNode = boost::target(e, g_);
+
+        // The cost to go from the target node
+        double nextNodeCostToGo = costToGo_[targetNode];
+
+        // Find the weight of the edge
+        FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, e);
+
+        // The transition prob of the edge
+        double transitionProbability  = edgeWeight.getSuccessProbability();
+
+        // the cost of taking the edge
+        double edgeCostToGo = (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*ompl::magic::OBSTACLE_COST_TO_GO) + edgeWeight.getCost();
+
+        if(edgeCostToGo < minCost)
+        {
+            minCost  = edgeCostToGo;
+            edgeToTake = e;
+
+        }
+
+    }
+
+    return edgeToTake;
 }
