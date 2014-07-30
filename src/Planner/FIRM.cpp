@@ -218,7 +218,7 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 {
 
                     ompl::base::State *lsState = si_->cloneState(workState);
-                    std::cout<<"~The observation at this state is:  "<<siF_->getObservationModel()->getObservation(lsState, false);
+
                     LinearSystem ls(siF_, lsState, siF_->getMotionModel()->getZeroControl(),
                                 siF_->getObservationModel()->getObservation(lsState, false), siF_->getMotionModel(), siF_->getObservationModel());
 

@@ -54,6 +54,14 @@ public:
     FIRM2DSetup() : ompl::app::RigidBodyGeometry(ompl::app::Motion_2D),
     ss_(ompl::base::StateSpacePtr(new SE2BeliefSpace()))
     {
+        // set static variables
+        RHCICreate::setControlQueueSize(10);
+        RHCICreate::setTurnOnlyDistance(0.05);
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(30); // degrees
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.20);// meters
+        Controller<RHCICreate, ExtendedKF>::setMaxTries(200);
+        Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(4.0); // meters
+
         // setting the mean and norm weights (used in reachability check)
         StateType::covNormWeight_  =  1.0;
         StateType::meanNormWeight_ =  2.0;
