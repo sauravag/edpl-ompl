@@ -95,6 +95,7 @@ class Visualizer
             boost::mutex::scoped_lock sl(drawMutex_);
             //ompl::base::State *tempState = si_->allocState();
             //si_->copyState(tempState, state);
+            assert(state);
             states_.push_back(si_->cloneState(state));
         }
 

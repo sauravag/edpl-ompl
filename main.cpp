@@ -34,16 +34,13 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#include <ompl/base/spaces/SE3StateSpace.h>
+#include "FIRM2DSetup.h"
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
-#include <ompl/geometric/planners/prm/PRM.h>
 #include <ompl/control/PathControl.h>
 #include <ompl/control/SimpleSetup.h>
 #include <ompl/config.h>
 #include <ompl/base/goals/GoalState.h>
-#include <iostream>
-#include <istream>
 #include "include/Planner/FIRM.h"
 #include "include/Spaces/SE2BeliefSpace.h"
 #include "FIRMOMPL.h"
@@ -53,21 +50,14 @@
 #include "include/Visualization/Window.h"
 #include "include/Visualization/Visualizer.h"
 #include <boost/thread.hpp>
+#include <iostream>
+#include <istream>
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
 namespace og = ompl::geometric;
 using namespace arma;
 using namespace std;
-
-bool isStateValid(const ob::State *state)
-{
-    //No collision check involved right now
-
-    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
-
-    return om->isStateObservable(state);
-}
 
 /*
 ob::ValidStateSamplerPtr allocGaussianValidBeliefSampler(const ompl::base::SpaceInformation *si)
@@ -82,7 +72,7 @@ ob::ValidStateSamplerPtr allocGaussianValidBeliefSampler(const ompl::base::Space
     sampler->setObservationModel(om);
     return ob::ValidStateSamplerPtr(sampler);
 }
-*/
+
 
 /*
 ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const ompl::base::SpaceInformation *si, const MotionModelMethod::MotionModelPointer mm,
@@ -94,16 +84,16 @@ ob::ValidStateSamplerPtr allocUniformValidBeliefSampler(const ompl::base::SpaceI
     unisampler->setMotionModel(mm);
     return ob::ValidStateSamplerPtr(unisampler);
 }
-*/
-/*
+
+
 oc::DirectedControlSamplerPtr allocDirectedControlSampler(const ompl::control::SpaceInformation *si)
 {
     ICreateControlSampler *csampler = new ICreateControlSampler(si);
     return ompl::control::DirectedControlSamplerPtr(csampler);
 }
-*/
 
-/** \brief a simple test case for FIRM */
+
+// a simple test case for FIRM
 void plan(void)
 {
     typedef SE2BeliefSpace::StateType StateType;
@@ -248,7 +238,7 @@ void plan(void)
         //oc::PathControl *cpath = new oc::PathControl(si);
         planner->as<FIRM>()->executeFeedbackWithRollout();
         //planner->as<FIRM>()->executeFeedback();
-        /*
+
         const ob::PathPtr &path = pdef->getSolutionPath();
 
         //oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
@@ -287,13 +277,38 @@ void plan(void)
                 boost::this_thread::sleep(boost::posix_time::milliseconds(33));
             }
         }
-        */
+
     }
     else
         std::cout << "No solution found" << std::endl;
 
     planner->clear();
     cout << "DONE" << std::endl;
+}
+*/
+void plan2()
+{
+    FIRM2DSetup mySetup;
+
+    std::string setupFilePath = "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml";
+    std::string robot_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/2D/car1_planar_robot.dae";
+    std::string env_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/2D/Maze_planar_env.dae";
+
+    mySetup.setPathToSetupFile(setupFilePath.c_str());
+
+    mySetup.setRobotMesh(robot_fname.c_str());
+
+    mySetup.setEnvironmentMesh(env_fname.c_str());
+
+     // define starting state
+    mySetup.setStartState(15,5,0);
+    mySetup.setGoalState(0.4,4.8,1.57);
+
+    if(mySetup.solve(90))
+    {
+        mySetup.executeSolution();
+    }
+
 }
 
 int main(int argc, char *argv[])
@@ -328,7 +343,7 @@ int main(int argc, char *argv[])
     window.showMaximized();
 
     //plan();
-    boost::thread solveThread(plan);
+    boost::thread solveThread(plan2);
 
     app.exec();
     solveThread.join();

@@ -243,7 +243,7 @@ protected:
 
     /** \brief Construct a graph node for a given state (\e state), store it in the nearest neighbors data structure
         and then connect it to the roadmap in accordance to the connection strategy. */
-    virtual Vertex addStateToGraph(ompl::base::State *state, bool addReverseEdge = true, bool generateNodeController=true);
+    virtual Vertex addStateToGraph(ompl::base::State *state, bool addReverseEdge = true, bool shouldCreateNodeController=true);
 
     /** \brief Make two milestones (\e m1 and \e m2) be part of the same connected component. The component with fewer
         elements will get the id of the component with more elements. */

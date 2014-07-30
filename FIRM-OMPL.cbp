@@ -24,19 +24,6 @@
 				<Linker>
 					<Add library="/usr/lib/libboost_system.so" />
 					<Add library="/usr/lib/libboost_thread.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_app.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_base.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_control.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_geometric.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.0.14.1" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl.so.9" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.0.14.1" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/libompl_app.so.9" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/py_boost_function.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_tools.so" />
-					<Add library="/home/saurav/Research/Softwares/omplapp/build/Release/lib/_util.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libQtCore.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libQtGui.so" />
 					<Add library="/home/saurav/Softwares/qcustomplot/qcustomplot-sharedlib/sharedlib-compilation/libqcustomplot.so" />
@@ -46,7 +33,9 @@
 					<Add library="/usr/lib/x86_64-linux-gnu/libX11.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libQtOpenGL.so" />
 					<Add library="/usr/lib64/libarmadillo.so" />
-					<Add directory="/home/saurav/Research/Softwares/omplapp/build/Release/lib" />
+					<Add library="/usr/local/lib/libompl.so" />
+					<Add library="/usr/local/lib/libompl_app.so" />
+					<Add directory="/usr/local/lib" />
 					<Add directory="/usr/lib/x86_64-linux-gnu" />
 					<Add directory="/home/saurav/Softwares/qcustomplot/qcustomplot-sharedlib/sharedlib-compilation" />
 				</Linker>
@@ -69,6 +58,7 @@
 			<Add option="-fexceptions" />
 			<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
 		</Compiler>
+		<Unit filename="FIRM2DSetup.h" />
 		<Unit filename="FIRMOMPL.h" />
 		<Unit filename="Tests.h" />
 		<Unit filename="include/Controllers/Controller.h" />
@@ -91,7 +81,6 @@
 		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
 		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />
 		<Unit filename="include/SpaceInformation/SpaceInformation.h" />
-		<Unit filename="include/Spaces/ICreateControlSampler.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
 		<Unit filename="include/ValidityCheckers/FIRMValidityChecker.h" />
 		<Unit filename="include/Visualization/GLWidget.h" />
@@ -111,7 +100,6 @@
 		<Unit filename="src/Samplers/UniformValidBeliefSampler.cpp" />
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
 		<Unit filename="src/SpaceInformation/SpaceInformation.cpp" />
-		<Unit filename="src/Spaces/ICreateControlSampler.cpp" />
 		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />
 		<Unit filename="src/Visualization/GLWidget.cpp" />
 		<Unit filename="src/Visualization/Visualizer.cpp" />

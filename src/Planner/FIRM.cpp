@@ -108,6 +108,8 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
     minFIRMNodes_ = 10;
+
+    Visualizer::updateSpaceInformation(siF_);
 }
 
 FIRM::~FIRM(void)
@@ -386,12 +388,13 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
     si_->freeStates(xstates);
 }
 
-FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge, bool generateNodeController)
+FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge, bool shouldCreateNodeController)
 {
 
     boost::mutex::scoped_lock _(graphMutex_);
 
     Vertex m = boost::add_vertex(g_);
+
     addStateToVisualization(state);
 
     stateProperty_[m] = state;
