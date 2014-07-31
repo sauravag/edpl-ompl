@@ -36,7 +36,7 @@
 
 #include "../../include/Spaces/SE2BeliefSpace.h"
 #include "../../include/ObservationModels/CamAruco2DObservationModel.h"
-#include "../../tinyxml/tinyxml.h"
+#include <tinyxml.h>
 #include "../../include/Visualization/Visualizer.h"
 /*
   For each landmark, produces an observation that is the range and bearing
@@ -456,7 +456,7 @@ void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
 
   if ( !loadOkay )
   {
-    printf( "Could not load setup file . Error='%s'. Exiting.\n", doc.ErrorDesc() );
+    printf( "Could not load setup file ---. Error='%s'. Exiting.\n", doc.ErrorDesc() );
 
     exit( 1 );
   }

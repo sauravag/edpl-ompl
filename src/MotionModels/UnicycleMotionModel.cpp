@@ -37,7 +37,7 @@
 
 #include "../../include/Spaces/SE2BeliefSpace.h"
 #include "../../include/MotionModels/UnicycleMotionModel.h"
-#include "../../tinyxml/tinyxml.h"
+#include <tinyxml.h>
 
 inline void pirange(double& d)
 {
@@ -351,7 +351,7 @@ void UnicycleMotionModel::loadParameters(const char *pathToSetupFile)
 
   if ( !loadOkay )
   {
-    printf( "Could not load setup file . Error='%s'. Exiting.\n", doc.ErrorDesc() );
+    printf( "Could not load setup file ++++. Error='%s'. Exiting.\n", doc.ErrorDesc() );
 
     exit( 1 );
   }
