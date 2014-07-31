@@ -51,7 +51,7 @@ using namespace std;
 #include "GL/glu.h"
 
 #include "../../include/Visualization/GLWidget.h"
-
+#define PI 3.14157
 
 GLWidget::GLWidget(QWidget *parent)
   : QGLWidget(QGLFormat(QGL::SampleBuffers), parent),

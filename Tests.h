@@ -38,7 +38,7 @@
 #define FIRM_OMPL_TESTS_
 
 #include "FIRMOMPL.h"
-#include "tinyxml.h"
+#include "tinyxml/tinyxml.h"
 
 
 namespace ob = ompl::base;

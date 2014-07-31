@@ -49,14 +49,8 @@ using namespace std;
 #define HEIGHT 600
 #endif
 
-#include "Vector.h"
-#include "Matrix.h"
-#include "Point.h"
+
 #include "Visualizer.h"
-
-
-using namespace mathtool;
-//typedef mathtool::Point<double, 3> Point3D;
 
 class GLWidget : public QGLWidget {
   Q_OBJECT

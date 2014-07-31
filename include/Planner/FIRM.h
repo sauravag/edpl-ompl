@@ -56,7 +56,6 @@
 #include "../Filters/LinearizedKF.h"
 #include "../Path/FeedbackPath.h"
 #include "../ConnectionStrategy/FStrategy.h"
-#include "../Path/FeedbackPath.h"
 
 /**
    @anchor FIRM

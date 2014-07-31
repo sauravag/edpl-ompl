@@ -12,13 +12,13 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-std=c++0x" />
 					<Add option="-g" />
 					<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
 					<Add directory="/usr/include/qt4/QtCore" />
 					<Add directory="/usr/include/qt4" />
 					<Add directory="/usr/include/qt4/QtGui" />
 					<Add directory="/usr/include/qt4/Qt" />
-					<Add directory="/home/saurav/Research/Development/FIRMApplication/FIRM/utils/mathtool" />
 					<Add directory="/usr/include" />
 				</Compiler>
 				<Linker>
@@ -26,18 +26,16 @@
 					<Add library="/usr/lib/libboost_thread.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libQtCore.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libQtGui.so" />
-					<Add library="/home/saurav/Softwares/qcustomplot/qcustomplot-sharedlib/sharedlib-compilation/libqcustomplot.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libGL.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libGLU.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libglut.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libX11.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libQtOpenGL.so" />
-					<Add library="/usr/lib64/libarmadillo.so" />
+					<Add library="/usr/lib/libarmadillo.so" />
 					<Add library="/usr/local/lib/libompl.so" />
 					<Add library="/usr/local/lib/libompl_app.so" />
 					<Add directory="/usr/local/lib" />
 					<Add directory="/usr/lib/x86_64-linux-gnu" />
-					<Add directory="/home/saurav/Softwares/qcustomplot/qcustomplot-sharedlib/sharedlib-compilation" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -61,6 +59,7 @@
 		<Unit filename="FIRM2DSetup.h" />
 		<Unit filename="FIRMOMPL.h" />
 		<Unit filename="Tests.h" />
+		<Unit filename="include/ConnectionStrategy/FStrategy.h" />
 		<Unit filename="include/Controllers/Controller.h" />
 		<Unit filename="include/Filters/ExtendedKF.h" />
 		<Unit filename="include/Filters/KalmanFilterMethod.h" />
@@ -90,11 +89,9 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Filters/ExtendedKF.cpp" />
 		<Unit filename="src/Filters/LinearizedKF.cpp" />
-		<Unit filename="src/LocalPlanner/MotionModelLP.cpp" />
 		<Unit filename="src/MotionModels/UnicycleMotionModel.cpp" />
 		<Unit filename="src/MotionModels/UnicycleStatePropagator.cpp" />
 		<Unit filename="src/ObservationModels/CamAruco2DObservationModel.cpp" />
-		<Unit filename="src/Path/FeedbackPath.cpp" />
 		<Unit filename="src/Planner/FIRM.cpp" />
 		<Unit filename="src/Samplers/GaussianValidBeliefSampler.cpp" />
 		<Unit filename="src/Samplers/UniformValidBeliefSampler.cpp" />
