@@ -63,7 +63,8 @@ void plan()
 {
     FIRM2DSetup mySetup;
 
-    std::string setupFilePath = "/Users/sauravagarwal/Desktop/Research/Development/FIRM-OMPL/Setup.xml";
+    //std::string setupFilePath = "/Users/sauravagarwal/Desktop/Research/Development/FIRM-OMPL/Setup.xml";
+    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/Setup.xml";
     std::string robot_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/2D/car1_planar_robot.dae";
     std::string env_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/2D/Maze_planar_env.dae";
 
@@ -77,9 +78,18 @@ void plan()
     mySetup.setStartState(15,5,0);
     mySetup.setGoalState(0.4,4.8,1.57);
 
-    if(mySetup.solve(90))
+    // Specify the maximum time allowed to solve problem
+    double solveTime = 90;
+
+    if(mySetup.solve(solveTime))
     {
         mySetup.executeSolution();
+    }
+    else
+    {
+        OMPL_INFORM("Unable to find Solution in given time.");
+
+        exit(1);
     }
 
 }
