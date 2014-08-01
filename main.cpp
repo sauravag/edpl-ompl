@@ -63,10 +63,9 @@ void plan()
 {
     FIRM2DSetup mySetup;
 
-    std::string setupFilePath = "/Users/sauravagarwal/Desktop/Research/Development/FIRM-OMPL/Setup.xml";
-    //std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/Setup.xml";
-    std::string robot_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/2D/car1_planar_robot.dae";
-    std::string env_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/2D/Maze_planar_env.dae";
+    std::string setupFilePath = "../../Setup.xml";
+    std::string robot_fname = "../../simpleICreate.obj";
+    std::string env_fname = "../../simpleFIRMEnv.obj";
 
     mySetup.setPathToSetupFile(setupFilePath.c_str());
 
@@ -75,8 +74,8 @@ void plan()
     mySetup.setEnvironmentMesh(env_fname.c_str());
 
      // define starting state
-    mySetup.setStartState(15,5,0);
-    mySetup.setGoalState(0.4,4.8,1.57);
+    mySetup.setStartState(16.5,4,0);
+    mySetup.setGoalState(1,3.2,1.57);
 
     // Specify the maximum time allowed to solve problem
     double solveTime = 90;

@@ -14,10 +14,14 @@
 \contentsline {subsection}{\numberline {2.1.4}SpaceInformation Class}{4}{subsection.2.1.4}
 \contentsline {subsection}{\numberline {2.1.5}The OMPL MotionValidator class}{4}{subsection.2.1.5}
 \contentsline {subsection}{\numberline {2.1.6}Using the Control Space}{4}{subsection.2.1.6}
-\contentsline {subsection}{\numberline {2.1.7}Modifications required to OMPL PRM}{4}{subsection.2.1.7}
-\contentsline {subsubsection}{Calculating Cost-To-Go}{5}{section*.3}
+\contentsline {subsubsection}{How to define an Edge}{4}{section*.3}
+\contentsline {subsection}{\numberline {2.1.7}Modifications required to OMPL PRM}{5}{subsection.2.1.7}
+\contentsline {subsubsection}{Calculating Cost-To-Go}{5}{section*.4}
+\contentsline {subsection}{\numberline {2.1.8}Find the solution path}{5}{subsection.2.1.8}
+\contentsline {subsubsection}{What was happening in ompl::PRM}{5}{section*.5}
+\contentsline {subsubsection}{What we need to do in FIRM}{5}{section*.6}
 \contentsline {section}{\numberline {2.2}Issues}{5}{section.2.2}
 \contentsline {chapter}{\numberline {3}Project Status}{6}{chapter.3}
 \contentsline {section}{\numberline {3.1}Progress}{6}{section.3.1}
 \contentsline {subsection}{\numberline {3.1.1}Completed Tasks}{6}{subsection.3.1.1}
-\contentsline {subsubsection}{Pending Tasks}{6}{section*.4}
+\contentsline {subsubsection}{Pending Tasks}{6}{section*.7}

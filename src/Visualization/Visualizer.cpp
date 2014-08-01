@@ -107,7 +107,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
         //draw a black disk
         GLUquadric *disk = gluNewQuadric();
-        gluDisk(disk, 0, 0.17, 15, 1);
+        gluDisk(disk, 0, 0.15, 15, 1);
         //glColor3ub(155, 205, 55);
         gluDeleteQuadric(disk);
         //glRotated(m_v[2], 0, 0, 1);
@@ -247,8 +247,8 @@ void Visualizer::drawEdge(const ompl::base::State* source, const ompl::base::Sta
 void Visualizer::drawEnvironmentBoundary()
 {
 
-    double xmax = 17;
-    double ymax = 7;
+    double xmax = 7.14;
+    double ymax = 3.05;
     //glTranslated(0, 0, 0);
     glColor3f(0.0f,1.0f,0.0f); //blue color
     glBegin(GL_POLYGON);
@@ -264,9 +264,9 @@ void Visualizer::drawObstacle()
 {
 
     double x_l =  2.0;
-    double x_r =  14.5;
+    double x_r =  17.5;
     double y_b =  2.0;
-    double y_t =  5;
+    double y_t =  5.0;
 
     //glTranslated(x_l, y_b, 0);
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

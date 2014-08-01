@@ -80,10 +80,10 @@ public:
         ompl::base::RealVectorBounds bounds(2);
         // set X bound
         bounds.setLow(0,0.0);
-        bounds.setHigh(0,20.0);
+        bounds.setHigh(0,700);
         //set Y bound
         bounds.setLow(1,0.0);
-        bounds.setHigh(1,20.0);
+        bounds.setHigh(1,300);
         ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space
