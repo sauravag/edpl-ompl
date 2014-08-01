@@ -346,12 +346,12 @@ void UnicycleMotionModel::loadParameters(const char *pathToSetupFile)
 {
   using namespace arma;
   // Load XML containing landmarks
-  TiXmlDocument doc(pathToSetupFile);
+  TiXmlDocument doc("/Users/sauravagarwal/Desktop/Research/Development/FIRM-OMPL/Setup.xml");//doc(pathToSetupFile);
   bool loadOkay = doc.LoadFile();
 
   if ( !loadOkay )
   {
-    printf( "Could not load setup file ++++. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+    printf( "Could not load setup file -MotionModel. Error='%s'. Exiting.\n", doc.ErrorDesc() );
 
     exit( 1 );
   }
