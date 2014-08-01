@@ -65,8 +65,8 @@ void plan()
 
     //std::string setupFilePath = "/Users/sauravagarwal/Desktop/Research/Development/FIRM-OMPL/Setup.xml";
     std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/Setup.xml";
-    std::string robot_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/2D/car1_planar_robot.dae";
-    std::string env_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/2D/Maze_planar_env.dae";
+    std::string robot_fname = "/home/saurav/Research/Development/FIRM-OMPL/simpleICreate.dae";
+    std::string env_fname = "/home/saurav/Research/Development/FIRM-OMPL/simpleFIRMEnv.dae";
 
     mySetup.setPathToSetupFile(setupFilePath.c_str());
 
@@ -75,8 +75,8 @@ void plan()
     mySetup.setEnvironmentMesh(env_fname.c_str());
 
      // define starting state
-    mySetup.setStartState(15,5,0);
-    mySetup.setGoalState(0.4,4.8,1.57);
+    mySetup.setStartState(650,200,0);
+    mySetup.setGoalState(50,80,1.57);
 
     // Specify the maximum time allowed to solve problem
     double solveTime = 90;

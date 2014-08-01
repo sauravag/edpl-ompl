@@ -118,6 +118,11 @@ to a geometric path.
  \item Will need to add 
 \end{itemize}
 
+\section{Rendering the geometry}
+
+ompl gives us a class \textbf{RenderGeometry} which should be able to render the 3D model. There could be a problem for firm because we have the
+real robot and the beliefs. So the geometry will be rendered only on the real robot. But the belief rendering will have to be done manually.
+For belief rendering we should be able to re-use the code that is already there.
 
 \section{Issues}
 Log of issues faced and discussions on their solutions.
