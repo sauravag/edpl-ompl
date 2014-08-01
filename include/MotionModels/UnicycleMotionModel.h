@@ -64,6 +64,7 @@ class UnicycleMotionModel : public MotionModelMethod
 
        //In here, should check if the cfg type is compatible with this
        //motion model, and exit with error otherwise
+       std::cout<<"Path to setup file in constructor of motion model is: "<<pathToSetupFile<<std::endl;
         this->loadParameters(pathToSetupFile);
 
     }
@@ -85,14 +86,14 @@ class UnicycleMotionModel : public MotionModelMethod
 
     /** \brief Calculate the state transition Jacobian i.e. df/dx where f is the transition function and x is the state. */
     JacobianType getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
-    
+
     /** \brief Calculate the control transition Jacobian i.e. df/du where f is the transition function and u is the control. */
     JacobianType getControlJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
-    
+
     /** \brief Calculate the noise transition Jacobian i.e. df/dw where f is the transition function and w is the noise. */
     JacobianType getNoiseJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w);
 
-    /** \brief Calculate the process noise covariance. */    
+    /** \brief Calculate the process noise covariance. */
     arma::mat processNoiseCovariance(const ompl::base::State *state, const ompl::control::Control* control);
 
   private:
@@ -104,23 +105,23 @@ class UnicycleMotionModel : public MotionModelMethod
     void loadParameters(const char *pathToSetupFile);
 
     /** \brief Bias standard deviation of the motion noise */
-    arma::colvec sigma_; // 
-    
+    arma::colvec sigma_; //
+
     /** \brief Proportional standard deviation of the motion noise */
-    arma::colvec eta_; // 
-    
+    arma::colvec eta_; //
+
     /** \brief  Covariance of state additive noise */
     arma::mat    P_Wg_; //
 
     /** \brief max rotational velocity */
     double maxAngularVelocity_; //
-    
+
     /** \brief max translational velocity */
     double maxLinearVelocity_; //
-    
+
     /** \brief max translational velocity */
     double orbitRadius_;
-    
+
     /** \brief min translational velocity */
     double minLinearVelocity_;
 

@@ -162,16 +162,7 @@ public:
         // Create an FCL state validity checker and assign to space information
         //const ompl::base::StateValidityCheckerPtr &fclSVC = allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
         //siF_->setStateValidityChecker(fclSVC);
-
         siF_->setStateValidityChecker(ompl::base::StateValidityCheckerPtr(new FIRMValidityChecker(siF_)));
-
-        ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
-
-        statePropagator_ = prop;
-
-        siF_->setStatePropagator(prop);
-        siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
-        siF_->setMinMaxControlDuration(1,1000);
 
         // provide the observation model to the space
         ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(pathToSetupFile_.c_str()));
@@ -180,6 +171,12 @@ public:
         // Provide the motion model to the space
         MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
         siF_->setMotionModel(mm);
+
+        ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
+        statePropagator_ = prop;
+        siF_->setStatePropagator(prop);
+        siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
+        siF_->setMinMaxControlDuration(1,1000);
 
         if(!start_ || !goal_)
         {

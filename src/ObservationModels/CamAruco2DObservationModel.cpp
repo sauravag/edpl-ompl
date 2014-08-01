@@ -456,7 +456,8 @@ void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
 
   if ( !loadOkay )
   {
-    printf( "Could not load setup file - ObsModel. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+
+    printf( "Could not load setup file in obs model. Error='%s'. Exiting.\n", doc.ErrorDesc() );
 
     exit( 1 );
   }

@@ -36,7 +36,7 @@
 #ifndef UNICYCLE_STATE_PROPAGATOR_
 #define UNICYCLE_STATE_PROPAGATOR_
 
-#include "ompl/control/SpaceInformation.h"
+#include "../SpaceInformation/SpaceInformation.h"
 #include "UnicycleMotionModel.h"
 
 /** \brief State propagation for a unicycle motion model.
@@ -48,7 +48,7 @@ public:
 
     /** \brief Construct representation of a unicycle state propagator.
     */
-    UnicycleStatePropagator(const ompl::control::SpaceInformationPtr &si);
+    UnicycleStatePropagator(const firm::SpaceInformation::SpaceInformationPtr &si);
 
     virtual ~UnicycleStatePropagator(void)
     {
@@ -67,6 +67,8 @@ public:
 protected:
 
     MotionModelMethod::MotionModelPointer motionModel_;
+
+    firm::SpaceInformation::SpaceInformationPtr siF_;
     /**
     You can add a simulated environment here where the controls can get applied, useful for
     showing the graphics, very similar to the concept of ActuationSystem in PMPL.

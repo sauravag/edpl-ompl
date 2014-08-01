@@ -351,7 +351,7 @@ void UnicycleMotionModel::loadParameters(const char *pathToSetupFile)
 
   if ( !loadOkay )
   {
-    printf( "Could not load setup file -MotionModel. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+    printf( "Could not load setup file in motion model. Error='%s'. Exiting.\n", doc.ErrorDesc() );
 
     exit( 1 );
   }
