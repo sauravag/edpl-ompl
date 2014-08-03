@@ -75,11 +75,11 @@ void plan()
     mySetup.setEnvironmentMesh(env_fname.c_str());
 
      // define starting state
-    mySetup.setStartState(650,200,0);
-    mySetup.setGoalState(50,80,1.57);
+    mySetup.setStartState(16,4,0);
+    mySetup.setGoalState(1.2,3,1.57);
 
     // Specify the maximum time allowed to solve problem
-    double solveTime = 90;
+    double solveTime = 120;
 
     if(mySetup.solve(solveTime))
     {
