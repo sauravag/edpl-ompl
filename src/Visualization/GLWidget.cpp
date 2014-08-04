@@ -207,11 +207,7 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER);
-    glClearColor(0.0, 1.0, 0.0, 0.0);
-    //glMatrixMode(GL_MODELVIEW);
-    ///////////////////////
-    //Set Camera
-    //////////////////////
+    glClearColor(0.0, 0.0, 0.0, 1.0);
 
     //projection
     glMatrixMode(GL_PROJECTION);

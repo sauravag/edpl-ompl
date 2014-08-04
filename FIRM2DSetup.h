@@ -98,10 +98,6 @@ public:
 
         pdef_ = prblm;
 
-        ompl::base::PlannerPtr plnr(new FIRM(siF_, false));
-
-        planner_ = plnr;
-
         start_ = siF_->allocState();
         goal_  = siF_->allocState();
 
@@ -159,10 +155,22 @@ public:
             throw ompl::Exception("Path to setup file not set!");
         }
 
+        ss_->as<SE2BeliefSpace>()->setBounds(inferEnvironmentBounds());
+
         // Create an FCL state validity checker and assign to space information
-        const ompl::base::StateValidityCheckerPtr &fclSVC = allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
+        const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
         siF_->setStateValidityChecker(fclSVC);
+
         //siF_->setStateValidityChecker(ompl::base::StateValidityCheckerPtr(new FIRMValidityChecker(siF_)));
+        siF_->setStateValidityCheckingResolution(0.01);
+
+        assert(siF_->getStateValidityCheckingResolution()==0.01);
+        /// TESTING CODE
+        ompl::base::State *temp = siF_->allocState();
+        temp->as<StateType>()->setXYYaw(5,4,0);
+        assert(!siF_->isValid(temp));
+        siF_->freeState(temp);
+        /// END TESTING CODE
 
         // provide the observation model to the space
         ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(pathToSetupFile_.c_str()));
@@ -174,8 +182,8 @@ public:
 
         ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
         statePropagator_ = prop;
-        siF_->setStatePropagator(prop);
-        siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
+        siF_->setStatePropagator(statePropagator_);
+        siF_->setPropagationStepSize(0.01); // this is the duration that a control is applied
         siF_->setMinMaxControlDuration(1,100);
 
         if(!start_ || !goal_)
@@ -184,6 +192,10 @@ public:
         }
 
         this->setStartAndGoalStates();
+
+        ompl::base::PlannerPtr plnr(new FIRM(siF_, false));
+
+        planner_ = plnr;
 
         planner_->setProblemDefinition(pdef_);
 
@@ -238,6 +250,8 @@ private:
     ompl::base::PlannerPtr planner_;
 
     ompl::base::ProblemDefinitionPtr pdef_;
+
+    ompl::base::StateValidityCheckerPtr vc_;
 
     std::string pathToSetupFile_;
 

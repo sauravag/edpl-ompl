@@ -91,16 +91,16 @@ void Visualizer::drawRobot(const ompl::base::State *state)
     else
     {
         arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
+        glPushMatrix();
         glTranslated(x[0], x[1], 0);
         glCallList(robotIndx_);
+        glPopMatrix();
     }
 }
 
 void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateType)
 {
     using namespace arma;
-
-    glTranslated(0, 0, 0);
 
     switch(stateType)
     {
@@ -109,7 +109,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
             break;
 
         case BeliefState:
-            glColor3d(0.5,0.5,0.5); // grey
+            glColor3d(0,0,1); // grey
             break;
 
         case GraphNodeState:
@@ -251,20 +251,6 @@ void Visualizer::refresh()
 
     if(currentBelief_) drawState(currentBelief_, (VZRStateType)1);
 
-    /*
-    if(renderGeom_)
-    {
-        //std::cout<<"The render result is :"<<renderGeom_->renderEnvironment()<<std::endl;
-        //renderGeom_->renderRobot();
-        //std::cin.get();
-    }
-    else
-    {
-        OMPL_INFORM("renderGeom is null");
-
-        std::cin.get();
-    }
-    */
     glPopMatrix();
 }
 
@@ -357,7 +343,7 @@ void Visualizer::drawFeedbackEdges()
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
         double costFactor = sqrt(i->cost/maxCost);
-        glColor3d(costFactor,1.0-costFactor,0.0);
+        glColor3d(1.0,1.0,0.0);
         glLineWidth(3.0);
             drawEdge(i->source, i->target);
         glLineWidth(1.f);
