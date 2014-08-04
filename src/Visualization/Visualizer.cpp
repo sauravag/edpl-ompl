@@ -54,10 +54,15 @@ std::vector<Visualizer::VZRFeedbackEdge> Visualizer::feedbackEdges_;
 
 Visualizer::VZRDrawingMode Visualizer::mode_;
 
+ompl::app::RenderGeometry* Visualizer::renderGeom_;
+
+int Visualizer::robotIndx_ = -1;
+
+int Visualizer::envIndx_   = -1;
+
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
-  //cout << "++++++++++++++++++++++++++" << endl;
-  //cout << "Drawing " << m_landmarks.size() << " landmarks" << endl;
+
   glColor3d(1.0,1.0,1.0);
 
   double scale = 0.15;
@@ -74,11 +79,28 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
     glEnd();
 
   glPopMatrix();
+
+}
+
+void Visualizer::drawRobot(const ompl::base::State *state)
+{
+     if(robotIndx_ <=0)
+    {
+        robotIndx_ = renderGeom_->renderRobot();
+    }
+    else
+    {
+        arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
+        glTranslated(x[0], x[1], 0);
+        glCallList(robotIndx_);
+    }
 }
 
 void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateType)
 {
     using namespace arma;
+
+    glTranslated(0, 0, 0);
 
     switch(stateType)
     {
@@ -103,7 +125,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     mat covariance = state->as<SE2BeliefSpace::StateType>()->getCovariance();
 
     glPushMatrix();
-        glTranslated(x[0]/100, x[1]/100, 0);
+        glTranslated(x[0], x[1], 0);
 
         //draw a black disk
         GLUquadric *disk = gluNewQuadric();
@@ -141,44 +163,44 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
     if(trace(covariance) != 0)
     {
-    double chi2 = 9.21034;
-    double magnify = 4.0; // scaled up for viewing
-    mat pos;
-    for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())
-    {
-        //cout << "th: " << th <<  endl;
-        mat tmpRow(1,2);
-        tmpRow << cos(th) << sin(th) << endr;
-        pos = join_cols(pos, tmpRow);
-    }
+        double chi2 = 9.21034;
+        double magnify = 4.0; // scaled up for viewing
+        mat pos;
+        for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())
+        {
+            //cout << "th: " << th <<  endl;
+            mat tmpRow(1,2);
+            tmpRow << cos(th) << sin(th) << endr;
+            pos = join_cols(pos, tmpRow);
+        }
 
-    pos *= sqrt(chi2);
-    pos *= magnify;
+        pos *= sqrt(chi2);
+        pos *= magnify;
 
-    //cout << "pos size: "<< pos.n_rows << " rows, " << pos.n_cols << " cols" << endl;
-    int nPoints = pos.n_rows;
+        //cout << "pos size: "<< pos.n_rows << " rows, " << pos.n_cols << " cols" << endl;
+        int nPoints = pos.n_rows;
 
-    mat K = trans(chol(covariance.submat(0,0,1,1)));
-    //cout << "K size: " << K.n_rows << " rows, " << K.n_cols << " cols " <<endl;
-    mat shift;
-    shift = join_cols((ones(1,nPoints)*x[0]),(ones(1,nPoints)*x[1]));
+        mat K = trans(chol(covariance.submat(0,0,1,1)));
+        //cout << "K size: " << K.n_rows << " rows, " << K.n_cols << " cols " <<endl;
+        mat shift;
+        shift = join_cols((ones(1,nPoints)*x[0]),(ones(1,nPoints)*x[1]));
 
-    // cout << "shift size: " << shift.n_rows << ", " << shift.n_cols << endl;
-    mat transformed = K*trans(pos) + shift;
+        // cout << "shift size: " << shift.n_rows << ", " << shift.n_cols << endl;
+        mat transformed = K*trans(pos) + shift;
 
-    glPushMatrix();
-    //glColor3d(1,0,0);
-    //glTranslated(m_mean[0], m_mean[1], 0);
-    //glBegin(GL_TRIANGLE_FAN);
-    glBegin(GL_LINES);
-    //glVertex2f((*this)[0], (*this)[1]);
-    for(unsigned int i = 0; i < transformed.n_cols; ++i)
-    {
-        glVertex2f(transformed(0,i), transformed(1,i));
-    }
-    glEnd();
+        glPushMatrix();
+        //glColor3d(1,0,0);
+        //glTranslated(m_mean[0], m_mean[1], 0);
+        //glBegin(GL_TRIANGLE_FAN);
+        glBegin(GL_LINES);
+        //glVertex2f((*this)[0], (*this)[1]);
+        for(unsigned int i = 0; i < transformed.n_cols; ++i)
+        {
+            glVertex2f(transformed(0,i), transformed(1,i));
+        }
+        glEnd();
 
-    glPopMatrix();
+        glPopMatrix();
     }
 
 }
@@ -187,14 +209,15 @@ void Visualizer::refresh()
 {
     boost::mutex::scoped_lock sl(drawMutex_);
 
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
     glPushMatrix();
 
-    drawEnvironmentBoundary();
+    drawEnvironment();
 
-    drawObstacle();
+    //drawObstacle();
     //draw roadmap based on current mode
 
     switch(mode_)
@@ -224,10 +247,24 @@ void Visualizer::refresh()
         drawLandmark(landmarks_[i]);
     }
 
-    if(trueState_) drawState(trueState_, (VZRStateType)0);
+    if(trueState_) drawRobot(trueState_);
 
     if(currentBelief_) drawState(currentBelief_, (VZRStateType)1);
 
+    /*
+    if(renderGeom_)
+    {
+        //std::cout<<"The render result is :"<<renderGeom_->renderEnvironment()<<std::endl;
+        //renderGeom_->renderRobot();
+        //std::cin.get();
+    }
+    else
+    {
+        OMPL_INFORM("renderGeom is null");
+
+        std::cin.get();
+    }
+    */
     glPopMatrix();
 }
 
@@ -244,39 +281,40 @@ void Visualizer::drawEdge(const ompl::base::State* source, const ompl::base::Sta
     glEnd();
 }
 
-void Visualizer::drawEnvironmentBoundary()
+void Visualizer::drawEnvironment()
 {
+    if(renderGeom_)
+    {
+        if(envIndx_ <= 0)
+        {
+            envIndx_ = renderGeom_->renderEnvironment();
+        }
+        else
+        {
+            glCallList(envIndx_);
+        }
 
-    double xmax = 7.14;
-    double ymax = 3.05;
-    //glTranslated(0, 0, 0);
-    glColor3f(0.0f,1.0f,0.0f); //blue color
-    glBegin(GL_POLYGON);
-            glVertex3f(0,0,0);
-            glVertex3f(0, ymax, 0);
-            glVertex3f(xmax, ymax, 0);
-            glVertex3f(xmax,0,0);
-    glEnd();
+    }
 
 }
 
 void Visualizer::drawObstacle()
 {
 
-    double x_l =  90;
-    double x_r =  590;
-    double y_b =  80.0;
-    double y_t =  200;
+    double x_l =  2.4;
+    double x_r =  15.29;
+    double y_b =  2.72;
+    double y_t =  5.13;
 
     //glTranslated(x_l, y_b, 0);
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glLoadIdentity();//load identity matrix
     glColor3f(0.0f,0.0f,1.0f); //blue color
     glBegin(GL_POLYGON);
-            glVertex3f(x_l/100,y_b/100,0);
-            glVertex3f(x_l/100, y_t/100, 0);
-            glVertex3f(x_r/100, y_t/100, 0);
-            glVertex3f(x_r/100,y_b/100,0);
+            glVertex3f(x_l,y_b,0);
+            glVertex3f(x_l, y_t, 0);
+            glVertex3f(x_r, y_t, 0);
+            glVertex3f(x_r,y_b,0);
     glEnd();
 
 }

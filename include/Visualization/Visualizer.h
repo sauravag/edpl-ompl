@@ -94,8 +94,6 @@ class Visualizer
         static void addState(ompl::base::State *state)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
-            //ompl::base::State *tempState = si_->allocState();
-            //si_->copyState(tempState, state);
             assert(state);
             states_.push_back(si_->cloneState(state));
         }
@@ -162,8 +160,23 @@ class Visualizer
             currentBelief_ = si->allocState();
         }
 
+        static void updateRenderer(ompl::app::RenderGeometry *renderer)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            renderGeom_ = renderer;
+        }
+
+        static void updateRenderer(const ompl::app::RigidBodyGeometry &rbg, const ompl::app::GeometricStateExtractor &se)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            //ompl::app::RenderGeometry rd(new ompl::app::RenderGeometry(rbg,se));
+            renderGeom_ = new ompl::app::RenderGeometry(rbg,se);
+        }
         /** \brief Draw a single landmark that is passed to this function */
         static void drawLandmark(arma::colvec& landmark);
+
+        /** \brief Draw the true robot rendering*/
+        static void drawRobot(const ompl::base::State *state);
 
         /** \brief Draw a single state that is passed to this function */
         static void drawState(const ompl::base::State* state, VZRStateType stateType);
@@ -180,12 +193,13 @@ class Visualizer
         static void drawFeedbackEdges();
 
         /** \brief Draw the X&Y bounds*/
-        static void drawEnvironmentBoundary();
+        static void drawEnvironment();
 
         static void drawObstacle();
 
         /** \brief Refresh the drawing and show latest scenario*/
         static void refresh();
+
 
     private:
 
@@ -215,6 +229,15 @@ class Visualizer
 
         /** \brief Visualizer drawing mode setting */
         static VZRDrawingMode mode_;
+
+        /** \brief The render geometry utility in ompl::app */
+        static ompl::app::RenderGeometry *renderGeom_;
+
+        /** \brief The gllistindex of the environment rendering*/
+        static int envIndx_;
+
+        /** \brief The gllistindex of the robot rendering */
+        static int robotIndx_;
 
 };
 #endif // FIRM_OMPL_VISUALIZER_H

@@ -61,29 +61,35 @@ using namespace std;
 
 void plan()
 {
-    FIRM2DSetup mySetup;
+    FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    //std::string setupFilePath = "/Users/sauravagarwal/Desktop/Research/Development/FIRM-OMPL/Setup.xml";
     std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/Setup.xml";
-    std::string robot_fname = "/home/saurav/Research/Development/FIRM-OMPL/simpleICreate.dae";
-    std::string env_fname = "/home/saurav/Research/Development/FIRM-OMPL/simpleFIRMEnv.dae";
+    std::string robot_fname = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate.obj";
+    std::string env_fname = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleFIRMEnv.obj";
 
-    mySetup.setPathToSetupFile(setupFilePath.c_str());
+    mySetup->setPathToSetupFile(setupFilePath.c_str());
 
-    mySetup.setRobotMesh(robot_fname.c_str());
+    assert(mySetup->setRobotMesh(robot_fname.c_str()));
 
-    mySetup.setEnvironmentMesh(env_fname.c_str());
+    assert(mySetup->setEnvironmentMesh(env_fname.c_str()));
 
      // define starting state
-    mySetup.setStartState(16,4,0);
-    mySetup.setGoalState(1.2,3,1.57);
+    mySetup->setStartState(16,3,0);
+    mySetup->setGoalState(1,4,1.57);
+
+    mySetup->setup();
+
+    Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
+
+    Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
 
     // Specify the maximum time allowed to solve problem
-    double solveTime = 120;
+    double solveTime = 90;
 
-    if(mySetup.solve(solveTime))
+
+    if(mySetup->solve(solveTime))
     {
-        mySetup.executeSolution();
+        mySetup->executeSolution();
     }
     else
     {

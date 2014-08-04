@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan */
+/* Authors: Aditya Mahadevan, Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
@@ -51,6 +51,8 @@ using namespace std;
 
 
 #include "Visualizer.h"
+#include <omplapp/graphics/detail/assimpGUtil.h>
+#include <omplapp/geometry/RigidBodyGeometry.h>
 
 class GLWidget : public QGLWidget {
   Q_OBJECT
@@ -118,6 +120,7 @@ class GLWidget : public QGLWidget {
 
     QString m_snapshotPath;
     QString m_framePath;
+
 };
 
 #endif

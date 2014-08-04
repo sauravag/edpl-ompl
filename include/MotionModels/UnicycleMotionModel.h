@@ -61,12 +61,7 @@ class UnicycleMotionModel : public MotionModelMethod
     UnicycleMotionModel(const ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) :
     MotionModelMethod(si, motionNoiseDim)
     {
-
-       //In here, should check if the cfg type is compatible with this
-       //motion model, and exit with error otherwise
-       std::cout<<"Path to setup file in constructor of motion model is: "<<pathToSetupFile<<std::endl;
         this->loadParameters(pathToSetupFile);
-
     }
 
     /** \brief Destructor. */

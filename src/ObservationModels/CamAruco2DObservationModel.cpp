@@ -451,7 +451,7 @@ void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
 {
   using namespace arma;
   // Load XML containing landmarks
-  TiXmlDocument doc("/Users/sauravagarwal/Desktop/Research/Development/FIRM-OMPL/Setup.xml");//doc(pathToSetupFile);
+  TiXmlDocument doc(pathToSetupFile);
   bool loadOkay = doc.LoadFile();
 
   if ( !loadOkay )

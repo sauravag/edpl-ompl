@@ -79,11 +79,11 @@ public:
         // set the bounds for the R^3 part of SE(3)
         ompl::base::RealVectorBounds bounds(2);
         // set X bound
-        bounds.setLow(0,0.0);
-        bounds.setHigh(0,700);
+        bounds.setLow(0,0.2);
+        bounds.setHigh(0,16.8);
         //set Y bound
-        bounds.setLow(1,0.0);
-        bounds.setHigh(1,300);
+        bounds.setLow(1,0.2);
+        bounds.setHigh(1,6.8);
         ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space
@@ -112,7 +112,7 @@ public:
     {
     }
 
-    const ompl::base::SpaceInformationPtr& getSpaceInformation() const
+    const firm::SpaceInformation::SpaceInformationPtr& getSpaceInformation() const
     {
         return siF_;
     }
@@ -176,7 +176,7 @@ public:
         statePropagator_ = prop;
         siF_->setStatePropagator(prop);
         siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
-        siF_->setMinMaxControlDuration(1,1000);
+        siF_->setMinMaxControlDuration(1,100);
 
         if(!start_ || !goal_)
         {

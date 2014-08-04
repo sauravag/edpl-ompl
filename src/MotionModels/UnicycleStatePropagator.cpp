@@ -50,7 +50,7 @@ void UnicycleStatePropagator::propagate(const base::State *state, const control:
     // set the time step
     if(duration != 0.1)
     {
-        std::cout<<"In state propagator, duration is: "<<duration<<std::endl;
+        std::cout<<"In state propagator, duration is: (Press Enter to Continue)"<<duration<<std::endl;
         std::cin.get();
     }
 
@@ -58,17 +58,12 @@ void UnicycleStatePropagator::propagate(const base::State *state, const control:
 
     typedef SE2BeliefSpace::StateType StateType;
 
-    //ompl::base::StateSpacePtr space(new SE2BeliefSpace());
-
     ompl::base::State *to = si_->allocState();
 
     // use the motionmodel to apply the controls
     motionModel_->Evolve(state, control, motionModel_->getZeroNoise(), to);
 
     si_->copyState(result,to);
-
-    //std::cout<<"In state propagator"<<std::endl;
-    //std::cin.get();
 
 }
 
