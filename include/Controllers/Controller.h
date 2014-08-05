@@ -77,13 +77,13 @@ class Controller
                    ompl::base::Cost &executionCost,
                    bool constructionMode=true);
 
-        /** \brief Execute the controller i.e. take the system from start to end state of edge */
+        /** \brief Execute the controller for one step */
          virtual bool executeOneStep(const ompl::base::State *startState,
                    ompl::base::State* endState,
                    ompl::base::Cost &executionCost,
                    bool constructionMode=true);
 
-        /** \brief Execute the controller i.e. take the system from start to end state of edge */
+        /** \brief Execute the controller for given number of steps */
          virtual bool executeUpto(const int numSteps, const ompl::base::State *startState,
                    ompl::base::State* endState,
                    ompl::base::Cost &executionCost,
@@ -146,12 +146,12 @@ class Controller
         /** \brief If the robot's heading is deviated from the target heading by less
             than the nodeReachedAngle_ then the robot is assumed to have alligned with the target heading. Used
             for node reachability checking. */
-    	  static double nodeReachedAngle_;
+    	static double nodeReachedAngle_;
 
         /** \brief The distance at which we assume the robot has reached a target node. Reaching the exact node
             location is almost impractical for real systems. We assume the robot has reached if it is within
             a certain radius of the target. */
-    	  static double nodeReachedDistance_;
+        static double nodeReachedDistance_;
 
         /** \brief  The max number of tries to align with target node. */
       	static double maxTries_;
