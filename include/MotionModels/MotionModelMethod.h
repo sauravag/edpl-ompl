@@ -37,11 +37,12 @@
 #ifndef MOTIONMODELMETHOD_
 #define MOTIONMODELMETHOD_
 
-#include "armadillo"
+#include <armadillo>
 #include "../Spaces/SE2BeliefSpace.h"
-#include "ompl/control/Control.h"
-#include "ompl/control/spaces/RealVectorControlSpace.h"
-#include "ompl/control/SpaceInformation.h"
+#include <ompl/control/Control.h>
+#include <ompl/control/spaces/RealVectorControlSpace.h>
+#include <ompl/control/SpaceInformation.h>
+#include <ompl/geometric/PathGeometric.h>
 
 /**
  \brief Abstract class interface for defining a motion model.
@@ -92,7 +93,9 @@ class MotionModelMethod
                                               const ompl::base::State *endState,
                                               std::vector<ompl::control::Control*> &openLoopControls) = 0;
 
-
+        /** \brief Generate open loop controls for a geometric path. */
+        virtual void generateOpenLoopControlsForPath(const ompl::geometric::PathGeometric path,
+                                              std::vector<ompl::control::Control*> &openLoopControls) = 0;
 
 		/** \brief Generate noise according to specified state and control input. */
 		virtual NoiseType generateNoise(const ompl::base::State *state, const ompl::control::Control* control) = 0;

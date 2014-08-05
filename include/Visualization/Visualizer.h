@@ -98,6 +98,13 @@ class Visualizer
             states_.push_back(si_->cloneState(state));
         }
 
+        /** \brief Clear the state container */
+        static void clearStates()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            states_.clear();
+        }
+
         /** \brief Add a Roadmap Graph edge to the visualization */
         static void addGraphEdge(const ompl::base::State *source, const ompl::base::State *target)
         {

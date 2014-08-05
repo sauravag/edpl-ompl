@@ -76,6 +76,10 @@ class UnicycleMotionModel : public MotionModelMethod
                                                   const ompl::base::State *endState,
                                                   std::vector<ompl::control::Control*> &openLoopControls);
 
+     /** \brief Generate open loop controls for a geometric path. */
+    void generateOpenLoopControlsForPath(const ompl::geometric::PathGeometric path,
+                                              std::vector<ompl::control::Control*> &openLoopControls);
+
     /** \brief Generate noise according to specified state and control input. */
     NoiseType generateNoise(const ompl::base::State *state, const ompl::control::Control* control);
 

@@ -84,7 +84,7 @@ void plan()
     Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
 
     // Specify the maximum time allowed to solve problem
-    double solveTime = 90;
+    double solveTime = 120;
 
 
     if(mySetup->solve(solveTime))

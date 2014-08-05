@@ -84,6 +84,7 @@
 		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />
 		<Unit filename="include/SpaceInformation/SpaceInformation.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
+		<Unit filename="include/Utils/FIRMUtils.h" />
 		<Unit filename="include/ValidityCheckers/FIRMValidityChecker.h" />
 		<Unit filename="include/Visualization/GLWidget.h" />
 		<Unit filename="include/Visualization/Visualizer.h" />
@@ -102,6 +103,7 @@
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
 		<Unit filename="src/SpaceInformation/SpaceInformation.cpp" />
 		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />
+		<Unit filename="src/Utils/FIRMUtils.cpp" />
 		<Unit filename="src/Visualization/GLWidget.cpp" />
 		<Unit filename="src/Visualization/Visualizer.cpp" />
 		<Unit filename="src/Visualization/Window.cpp" />

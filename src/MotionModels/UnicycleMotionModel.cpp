@@ -80,6 +80,8 @@ void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::con
 
   x += (u2*this->dt_) + (Un2*sqrt(this->dt_)) + (Wg*sqrt(this->dt_));
 
+  pirange(x[2]);
+
   result->as<StateType>()->setXYYaw(x[0],x[1],x[2]);
 }
 
@@ -206,6 +208,16 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
       ompl::control::Control *tempControl = si_->allocControl();
       ARMA2OMPL(u_const_rot_end*(rsi_end-frsi_end), tempControl);
       openLoopControls.push_back(tempControl);
+    }
+}
+
+void UnicycleMotionModel::generateOpenLoopControlsForPath(const ompl::geometric::PathGeometric path, std::vector<ompl::control::Control*> &openLoopControls)
+{
+    for(int i=0;i<path.getStateCount()-1;i++)
+    {
+        std::vector<ompl::control::Control*> olc;
+        this->generateOpenLoopControls(path.getState(i),path.getState(i+1),olc) ;
+        openLoopControls.insert(openLoopControls.end(),olc.begin(),olc.end());
     }
 }
 
