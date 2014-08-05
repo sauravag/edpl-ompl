@@ -150,9 +150,14 @@ public:
 
     void setup()
     {
-        if(pathToSetupFile_.length() == 0)
+        if(pathToSetupFile_.length() == 0 || !hasEnvironment( || hasRobot()))
         {
             throw ompl::Exception("Path to setup file not set!");
+        }
+
+        if(!hasEnvironment( || hasRobot()))
+        {
+            throw ompl::Exception("Robot/Environment mesh files not setup!");
         }
 
         ss_->as<SE2BeliefSpace>()->setBounds(inferEnvironmentBounds());
