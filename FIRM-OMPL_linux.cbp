@@ -77,6 +77,7 @@
 		<Unit filename="include/OptimizationObjectives/FIRMOptimizationObjective.h" />
 		<Unit filename="include/Path/FeedbackPath.h" />
 		<Unit filename="include/Planner/FIRM.h" />
+		<Unit filename="include/Planner/MMPolicyGenerator.h" />
 		<Unit filename="include/Samplers/GaussianValidBeliefSampler.h" />
 		<Unit filename="include/Samplers/UniformValidBeliefSampler.h" />
 		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
@@ -95,6 +96,7 @@
 		<Unit filename="src/MotionModels/UnicycleStatePropagator.cpp" />
 		<Unit filename="src/ObservationModels/CamAruco2DObservationModel.cpp" />
 		<Unit filename="src/Planner/FIRM.cpp" />
+		<Unit filename="src/Planner/MMPolicyGenerator.cpp" />
 		<Unit filename="src/Samplers/GaussianValidBeliefSampler.cpp" />
 		<Unit filename="src/Samplers/UniformValidBeliefSampler.cpp" />
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />

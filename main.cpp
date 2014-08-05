@@ -63,7 +63,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/Setup.xml";
+    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/Setup.xml";
     std::string robot_fname = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj";
     std::string env_fname = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleFIRMEnv.obj";
 

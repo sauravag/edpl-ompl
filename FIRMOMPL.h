@@ -87,6 +87,9 @@
 // Validity checkers
 #include "include/ValidityCheckers/FIRMValidityChecker.h"
 
+//Multi-Modal
+#include "include/Planner/MMPolicyGenerator.h"
+
 // FIRM Optimization Objective
 //#include "include/OptimizationObjectives/FIRMOptimizationObjective.h"
 
