@@ -29,15 +29,18 @@ References:
 Compilation
 ----------------------------------------
 The application is shared as a codeblocks project. You can use codeblocks to
-directly compile the application. Be sure to link to the correct libraries 
-and set the include paths for your compiler build settings.
+directly compile the application. For ease of use, two code::blocks projects are provided for OSX and Linux (tested on Ubuntu), 
+be sure to link to the correct libraries and set the include paths for your compiler build settings.
 
-External Depencies:
+External Depencies: [All of these are hard requirements for this app to run]
 
-1. Open Motion Planning Library 
-2. QT : For Visualization
-3. Armadillo C++ Matrix Algebra Library
-4. OpenGL
+1. Open Motion Planning Library: Excellent instructions provided on the ompl website for installation. Follow the instructions to build
+and install the full omplapp and QT will automatically be installed as part of that. 
+ 
+2. QT & OpenGL (freeglut): For Visualization
+
+3. Armadillo C++ Matrix Algebra Library: Recommended to download and build from source
+
 
 ---------------------------------------
 License:
