@@ -68,9 +68,9 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
   double scale = 0.15;
 
   glPushMatrix();
-    //glLoadIdentity();
-    glTranslated(landmark[1], landmark[2], 0);
+    glTranslated(landmark[1], landmark[2], 2.0);
     glVertex3f(0.8,0.8,0.8);
+
     glBegin(GL_TRIANGLE_FAN);
       glVertex3f(0, scale, 0);
       glVertex3f(0.5*scale, 0, 0);
@@ -91,9 +91,10 @@ void Visualizer::drawRobot(const ompl::base::State *state)
     else
     {
         arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
+
         glPushMatrix();
-        glTranslated(x[0], x[1], 0);
-        glCallList(robotIndx_);
+            glTranslated(x[0], x[1], 0);
+            glCallList(robotIndx_);
         glPopMatrix();
     }
 }
@@ -130,9 +131,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         //draw a black disk
         GLUquadric *disk = gluNewQuadric();
         gluDisk(disk, 0, 0.15, 15, 1);
-        //glColor3ub(155, 205, 55);
         gluDeleteQuadric(disk);
-        //glRotated(m_v[2], 0, 0, 1);
         glBegin(GL_LINES);
         glVertex3f(0, 0, 0);
         glVertex3f(1.0*cos(x[2]), 1.0*sin(x[2]), 0);
@@ -168,7 +167,6 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         mat pos;
         for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())
         {
-            //cout << "th: " << th <<  endl;
             mat tmpRow(1,2);
             tmpRow << cos(th) << sin(th) << endr;
             pos = join_cols(pos, tmpRow);
@@ -177,27 +175,24 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         pos *= sqrt(chi2);
         pos *= magnify;
 
-        //cout << "pos size: "<< pos.n_rows << " rows, " << pos.n_cols << " cols" << endl;
         int nPoints = pos.n_rows;
 
         mat K = trans(chol(covariance.submat(0,0,1,1)));
-        //cout << "K size: " << K.n_rows << " rows, " << K.n_cols << " cols " <<endl;
         mat shift;
+
         shift = join_cols((ones(1,nPoints)*x[0]),(ones(1,nPoints)*x[1]));
 
-        // cout << "shift size: " << shift.n_rows << ", " << shift.n_cols << endl;
         mat transformed = K*trans(pos) + shift;
 
         glPushMatrix();
-        //glColor3d(1,0,0);
-        //glTranslated(m_mean[0], m_mean[1], 0);
-        //glBegin(GL_TRIANGLE_FAN);
+
         glBegin(GL_LINES);
-        //glVertex2f((*this)[0], (*this)[1]);
+
         for(unsigned int i = 0; i < transformed.n_cols; ++i)
         {
             glVertex2f(transformed(0,i), transformed(1,i));
         }
+
         glEnd();
 
         glPopMatrix();
@@ -209,16 +204,12 @@ void Visualizer::refresh()
 {
     boost::mutex::scoped_lock sl(drawMutex_);
 
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
     glPushMatrix();
 
     drawEnvironment();
-
-    //drawObstacle();
-    //draw roadmap based on current mode
 
     switch(mode_)
     {
@@ -343,7 +334,7 @@ void Visualizer::drawFeedbackEdges()
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
         double costFactor = sqrt(i->cost/maxCost);
-        glColor3d(1.0,1.0,0.0);
+        //glColor3d(1.0,1.0,0.0);
         glLineWidth(3.0);
             drawEdge(i->source, i->target);
         glLineWidth(1.f);

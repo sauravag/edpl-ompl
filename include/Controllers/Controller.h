@@ -263,6 +263,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     // if the propagated state is not valid, return false
     if(!si_->checkTrueStateValidity())
     {
+        si_->copyState(endState, internalState);
         return false;
     }
 
@@ -277,7 +278,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
-      return false;
+         si_->copyState(endState, internalState);
+         return false;
     }
 
     k++;

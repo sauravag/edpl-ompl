@@ -207,7 +207,7 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(0.0, 1.0, 0.0, 0.5);
 
     //projection
     glMatrixMode(GL_PROJECTION);
@@ -216,16 +216,16 @@ void GLWidget::paintGL()
     //model
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0,0,3, 0,0,-5, 0,1,0);
+    //gluLookAt(0,0,3, 0,0,-5, 0,1,0);
 
     //camera at m_camPos looking down z-axis with positive y (0,1,0) as up (was
     //m_camAt with up direction of 0, 0, 1)
     if(m_view)
     {
         vector<double> pos(3);
-        pos[0] = 10.0;
-        pos[1] = 10.0;
-        gluLookAt(pos[0]+2, pos[1], 6, pos[0]+2, pos[1], 0,0, 1, 0);
+        pos[0] = 0;
+        pos[1] = 0;
+        gluLookAt(pos[0], pos[1], 0, pos[0], pos[1], 0,0, 1, 0);
     }
     else
     {
@@ -237,26 +237,7 @@ void GLWidget::paintGL()
     //Draw Next Frame
     //////////////////////
     Display::refresh();
-    /*
-    if(envIndx_ <= 0)
-    {
 
-        envIndx_ = Display::renderEnvironment();
-    }
-    else
-    {
-        glCallList(envIndx_);
-    }
-
-    if(robotIndx_ <=0)
-    {
-        robotIndx_ = Display::renderRobot();
-    }
-    else
-    {
-        glCallList(robotIndx_);
-    }
-    */
     if(m_drawAxes)
     {
         glPushMatrix();
@@ -293,7 +274,7 @@ void GLWidget::resizeGL(int width, int height)
     glViewport (0, 0, (GLsizei) width, (GLsizei) height);
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    gluPerspective(m_camZoom, (GLfloat) width/(GLfloat) height, 1.0, 1000.0);
+    gluPerspective(m_camZoom, (GLfloat) width/(GLfloat) height, 1.0, 100.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 

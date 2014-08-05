@@ -652,7 +652,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
     bool convergenceCondition = false;
 
     int nIter=0;
-    while(!convergenceCondition && nIter < 10000)
+    while(!convergenceCondition && nIter < 5000)
     {
         nIter++;
 

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="FIRM-OMPL" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/FIRM-OMPL" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++0x" />
+					<Add option="-g" />
+					<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
+					<Add directory="/usr/include/qt4/QtCore" />
+					<Add directory="/usr/include/qt4" />
+					<Add directory="/usr/include/qt4/QtGui" />
+					<Add directory="/usr/include/qt4/Qt" />
+					<Add directory="/usr/include" />
+				</Compiler>
+				<Linker>
+					<Add library="/usr/lib/libboost_system.so" />
+					<Add library="/usr/lib/libboost_thread.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libQtCore.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libQtGui.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libGL.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libGLU.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libglut.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libX11.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libQtOpenGL.so" />
+					<Add library="/usr/lib/libarmadillo.so" />
+					<Add library="/usr/local/lib/libompl.so" />
+					<Add library="/usr/local/lib/libompl_app.so" />
+					<Add library="/usr/lib/libtinyxml.so" />
+					<Add directory="/usr/local/lib" />
+					<Add directory="/usr/lib/x86_64-linux-gnu" />
+					<Add directory="/usr/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/FIRM-OMPL" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
+		</Compiler>
+		<Unit filename="FIRM2DSetup.h" />
+		<Unit filename="FIRMOMPL.h" />
+		<Unit filename="Tests.h" />
+		<Unit filename="include/ConnectionStrategy/FStrategy.h" />
+		<Unit filename="include/Controllers/Controller.h" />
+		<Unit filename="include/Filters/ExtendedKF.h" />
+		<Unit filename="include/Filters/KalmanFilterMethod.h" />
+		<Unit filename="include/Filters/LinearizedKF.h" />
+		<Unit filename="include/Filters/dare.h" />
+		<Unit filename="include/LinearSystem/LinearSystem.h" />
+		<Unit filename="include/LocalPlanners/MotionModelLP.h" />
+		<Unit filename="include/MotionModels/MotionModelMethod.h" />
+		<Unit filename="include/MotionModels/UnicycleMotionModel.h" />
+		<Unit filename="include/MotionModels/UnicycleStatePropagator.h" />
+		<Unit filename="include/ObservationModels/CamAruco2DObservationModel.h" />
+		<Unit filename="include/ObservationModels/ObservationModelMethod.h" />
+		<Unit filename="include/OptimizationObjectives/FIRMOptimizationObjective.h" />
+		<Unit filename="include/Path/FeedbackPath.h" />
+		<Unit filename="include/Planner/FIRM.h" />
+		<Unit filename="include/Samplers/GaussianValidBeliefSampler.h" />
+		<Unit filename="include/Samplers/UniformValidBeliefSampler.h" />
+		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
+		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />
+		<Unit filename="include/SpaceInformation/SpaceInformation.h" />
+		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
+		<Unit filename="include/ValidityCheckers/FIRMValidityChecker.h" />
+		<Unit filename="include/Visualization/GLWidget.h" />
+		<Unit filename="include/Visualization/Visualizer.h" />
+		<Unit filename="include/Visualization/Window.h" />
+		<Unit filename="include/Weight/FIRMWeight.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="src/Filters/ExtendedKF.cpp" />
+		<Unit filename="src/Filters/LinearizedKF.cpp" />
+		<Unit filename="src/MotionModels/UnicycleMotionModel.cpp" />
+		<Unit filename="src/MotionModels/UnicycleStatePropagator.cpp" />
+		<Unit filename="src/ObservationModels/CamAruco2DObservationModel.cpp" />
+		<Unit filename="src/Planner/FIRM.cpp" />
+		<Unit filename="src/Samplers/GaussianValidBeliefSampler.cpp" />
+		<Unit filename="src/Samplers/UniformValidBeliefSampler.cpp" />
+		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
+		<Unit filename="src/SpaceInformation/SpaceInformation.cpp" />
+		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />
+		<Unit filename="src/Visualization/GLWidget.cpp" />
+		<Unit filename="src/Visualization/Visualizer.cpp" />
+		<Unit filename="src/Visualization/Window.cpp" />
+		<Unit filename="src/Visualization/moc_GLWidget.cpp" />
+		<Unit filename="src/Visualization/moc_Window.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

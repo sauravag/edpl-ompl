@@ -161,16 +161,7 @@ public:
         const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
         siF_->setStateValidityChecker(fclSVC);
 
-        //siF_->setStateValidityChecker(ompl::base::StateValidityCheckerPtr(new FIRMValidityChecker(siF_)));
-        siF_->setStateValidityCheckingResolution(0.01);
-
-        assert(siF_->getStateValidityCheckingResolution()==0.01);
-        /// TESTING CODE
-        ompl::base::State *temp = siF_->allocState();
-        temp->as<StateType>()->setXYYaw(5,4,0);
-        assert(!siF_->isValid(temp));
-        siF_->freeState(temp);
-        /// END TESTING CODE
+        siF_->setStateValidityCheckingResolution(0.005);
 
         // provide the observation model to the space
         ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(pathToSetupFile_.c_str()));
