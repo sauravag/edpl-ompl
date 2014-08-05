@@ -150,12 +150,12 @@ public:
 
     void setup()
     {
-        if(pathToSetupFile_.length() == 0 || !hasEnvironment( || hasRobot()))
+        if(pathToSetupFile_.length() == 0)
         {
             throw ompl::Exception("Path to setup file not set!");
         }
 
-        if(!hasEnvironment( || hasRobot()))
+        if(!hasEnvironment() || !hasRobot())
         {
             throw ompl::Exception("Robot/Environment mesh files not setup!");
         }
