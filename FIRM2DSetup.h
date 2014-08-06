@@ -151,54 +151,57 @@ public:
 
     void setup()
     {
-        if(pathToSetupFile_.length() == 0)
+        if(!setup_)
         {
-            throw ompl::Exception("Path to setup file not set!");
+            if(pathToSetupFile_.length() == 0)
+            {
+                throw ompl::Exception("Path to setup file not set!");
+            }
+
+            if(!hasEnvironment() || !hasRobot())
+            {
+                throw ompl::Exception("Robot/Environment mesh files not setup!");
+            }
+
+            ss_->as<SE2BeliefSpace>()->setBounds(inferEnvironmentBounds());
+
+            // Create an FCL state validity checker and assign to space information
+            const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
+            siF_->setStateValidityChecker(fclSVC);
+
+            siF_->setStateValidityCheckingResolution(0.005);
+
+            // provide the observation model to the space
+            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(pathToSetupFile_.c_str()));
+            siF_->setObservationModel(om);
+
+            // Provide the motion model to the space
+            MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
+            siF_->setMotionModel(mm);
+
+            ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
+            statePropagator_ = prop;
+            siF_->setStatePropagator(statePropagator_);
+            siF_->setPropagationStepSize(0.01); // this is the duration that a control is applied
+            siF_->setMinMaxControlDuration(1,100);
+
+            if(!start_ || !goal_)
+            {
+                throw ompl::Exception("Start/Goal not set");
+            }
+
+            this->setStartAndGoalStates();
+
+            ompl::base::PlannerPtr plnr(new FIRM(siF_, false));
+
+            planner_ = plnr;
+
+            planner_->setProblemDefinition(pdef_);
+
+            planner_->setup();
+
+            setup_ = true;
         }
-
-        if(!hasEnvironment() || !hasRobot())
-        {
-            throw ompl::Exception("Robot/Environment mesh files not setup!");
-        }
-
-        ss_->as<SE2BeliefSpace>()->setBounds(inferEnvironmentBounds());
-
-        // Create an FCL state validity checker and assign to space information
-        const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
-        siF_->setStateValidityChecker(fclSVC);
-
-        siF_->setStateValidityCheckingResolution(0.005);
-
-        // provide the observation model to the space
-        ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(pathToSetupFile_.c_str()));
-        siF_->setObservationModel(om);
-
-        // Provide the motion model to the space
-        MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
-        siF_->setMotionModel(mm);
-
-        ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
-        statePropagator_ = prop;
-        siF_->setStatePropagator(statePropagator_);
-        siF_->setPropagationStepSize(0.01); // this is the duration that a control is applied
-        siF_->setMinMaxControlDuration(1,100);
-
-        if(!start_ || !goal_)
-        {
-            throw ompl::Exception("Start/Goal not set");
-        }
-
-        this->setStartAndGoalStates();
-
-        ompl::base::PlannerPtr plnr(new FIRM(siF_, false));
-
-        planner_ = plnr;
-
-        planner_->setProblemDefinition(pdef_);
-
-        planner_->setup();
-
-        setup_ = true;
 
     }
 

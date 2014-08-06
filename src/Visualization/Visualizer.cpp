@@ -68,7 +68,7 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
   double scale = 0.15;
 
   glPushMatrix();
-    glTranslated(landmark[1], landmark[2], 2.0);
+    glTranslated(landmark[1], landmark[2], 1.5);
     glVertex3f(0.8,0.8,0.8);
 
     glBegin(GL_TRIANGLE_FAN);
@@ -204,9 +204,8 @@ void Visualizer::refresh()
 {
     boost::mutex::scoped_lock sl(drawMutex_);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
     glPushMatrix();
 
     drawEnvironment();

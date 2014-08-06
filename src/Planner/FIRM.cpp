@@ -76,6 +76,8 @@ namespace ompl
 
         static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1;
 
+        static const int DP_MAX_ITERATIONS = 10000;
+
         static const double GOAL_COST_TO_GO = 0.0;
 
         static const double INIT_COST_TO_GO = 2.0;
@@ -635,15 +637,19 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
     */
     foreach (Vertex v, boost::vertices(g_))
     {
-        if(v == goalVertex)
+        if(boost::out_degree(v,g_) > 0 )
         {
-            costToGo_[v] = ompl::magic::GOAL_COST_TO_GO;
-            newCostToGo[v] = ompl::magic::GOAL_COST_TO_GO;
-        }
-        else
-        {
-            costToGo_[v] = ompl::magic::INIT_COST_TO_GO;
-            newCostToGo[v] = ompl::magic::INIT_COST_TO_GO;
+
+            if(v == goalVertex)
+            {
+                costToGo_[v] = ompl::magic::GOAL_COST_TO_GO;
+                newCostToGo[v] = ompl::magic::GOAL_COST_TO_GO;
+            }
+            else
+            {
+                costToGo_[v] = ompl::magic::INIT_COST_TO_GO;
+                newCostToGo[v] = ompl::magic::INIT_COST_TO_GO;
+            }
         }
     }
 
@@ -652,14 +658,14 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
     bool convergenceCondition = false;
 
     int nIter=0;
-    while(!convergenceCondition && nIter < 5000)
+    while(!convergenceCondition && nIter < ompl::magic::DP_MAX_ITERATIONS)
     {
         nIter++;
 
         foreach(Vertex v, boost::vertices(g_))
         {
-            //value for goal node stays the same
-            if( v == goalVertex)
+            //value for goal node stays the same or if has no out edges then ignore it
+            if( v == goalVertex || boost::out_degree(v,g_) < 1 )
             {
                 continue;
             }
@@ -668,6 +674,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
             std::pair<Edge,double> candidate = getUpdatedNodeCostToGo(v);
 
             feedback_[v] = candidate.first;
+
             newCostToGo[v] = candidate.second * discountFactor;
         }
 
@@ -680,15 +687,17 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 }
 
 
-struct DoubleValueComp {
+struct DoubleValueComp
+{
   template<typename KVP1, typename KVP2>
-  bool operator()(const KVP1& kvp1, const KVP2& kvp2) const {
+  bool operator()(const KVP1& kvp1, const KVP2& kvp2) const
+  {
     return kvp1.second < kvp2.second;
   }
 };
 
 
-std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(FIRM::Vertex node)
+std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::Vertex node)
 {
 
     std::map<Edge,double > candidateCostToGo;
@@ -696,7 +705,7 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(FIRM::Vertex 
     foreach(Edge e, boost::out_edges(node, g_))
     {
         // the target of given edge "e"
-        Vertex targetNode = boost::target(e, g_);
+        const Vertex targetNode = boost::target(e, g_);
 
         double nextNodeCostToGo = costToGo_[targetNode];
 
@@ -707,6 +716,8 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(FIRM::Vertex 
         double singleCostToGo = ( transitionProbability*nextNodeCostToGo + (1-transitionProbability)*ompl::magic::OBSTACLE_COST_TO_GO) + edgeWeight.getCost();
 
         candidateCostToGo[e] =  singleCostToGo ;
+
+        //candidateCostToGo.insert(std::pair<Edge,double>(e,singleCostToGo));
     }
 
     DoubleValueComp dvc;
@@ -845,6 +856,7 @@ void FIRM::sendFeedbackEdgesToViz()
         sourceVertex = i->first;
         edge = i->second;
         targetVertex = boost::target(edge, g_);
+        //TODO: some random target vertex which is not in graph is being assigned, why?
         Visualizer::addFeedbackEdge(stateProperty_[sourceVertex], stateProperty_[targetVertex], 0);
   }
 }

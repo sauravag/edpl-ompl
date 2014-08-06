@@ -294,7 +294,7 @@ protected:
     void sendFeedbackEdgesToViz();
 
     /** \brief Calculates the new cost to go from a node*/
-    std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(Vertex node);
+    std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(const Vertex node);
 
     /** \brief Flag indicating whether the default connection strategy is the Star strategy */
     bool                                                   starStrategy_;

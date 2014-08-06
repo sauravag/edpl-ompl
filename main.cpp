@@ -64,6 +64,10 @@ void plan()
     if(mySetup->solve())
     {
         mySetup->executeSolution();
+
+        OMPL_INFORM("Plan Executed Successfully");
+
+        return;
     }
     else
     {
