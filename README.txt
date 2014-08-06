@@ -41,7 +41,7 @@ and install the full omplapp and QT will automatically be installed as part of t
 
 3. Armadillo C++ Matrix Algebra Library: Recommended to download and build from source
 
-
+4. tinyxml: Needed for reading landmark/setup parameters
 ---------------------------------------
 License:
 ----------------------------------------
