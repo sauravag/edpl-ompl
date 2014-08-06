@@ -53,7 +53,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     std::vector<std::vector<ompl::control::Control*> > openLoopPolicies;
 
     // Iterate over the mode/target pairs and generate open loop controls
-    for(int i = 0; i < currentBeliefStates_.size(); i++)
+    for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
 
         //std::cout<<"Belief Number "<<i<<std::endl;
@@ -106,13 +106,13 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
     int maxGainPolicyIndx=-1;
 
-    for(int i = 0; i < openLoopPolicies.size(); i++)
+    for(unsigned int i = 0; i < openLoopPolicies.size(); i++)
     {
         ompl::base::Cost pGain;
 
         pGain.v = 0;
 
-        for(int j = 0; j < currentBeliefStates_.size(); j++)
+        for(unsigned int j = 0; j < currentBeliefStates_.size(); j++)
         {
 
             ompl::base::Cost c = executeOpenLoopPolicyOnMode(openLoopPolicies[i],currentBeliefStates_[j]);
@@ -233,7 +233,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
 
     arma::colvec obs = si_->getObservation();
 
-    for(int i = 0; i < currentBeliefStates_.size(); i++)
+    for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
         ompl::base::State *kfEstimate = si_->allocState();
 
@@ -249,7 +249,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
 
     Visualizer::clearStates();
 
-    for(int i = 0; i < currentBeliefStates_.size(); i++)
+    for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
         Visualizer::addState(currentBeliefStates_[i]);
     }
@@ -260,7 +260,7 @@ bool MMPolicyGenerator::areSimilarWeights()
 {
 
     arma::colvec w(weights_.size(),1);
-    for(int i = 0; i < weights_.size(); i++)
+    for(unsigned int i = 0; i < weights_.size(); i++)
     {
         w[i] = weights_[i];
         //std::cout<<"Weight is:"<<w[i]<<std::endl;
@@ -286,7 +286,7 @@ void MMPolicyGenerator::updateWeights()
 
     float totalWeight = 0.0;
 
-    for(int i = 0; i < currentBeliefStates_.size(); i++)
+    for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
         // compute the innovation
         arma::colvec beliefObservation =  si_->getObservationModel()->getObservation(currentBeliefStates_[i], false);
@@ -310,7 +310,7 @@ void MMPolicyGenerator::updateWeights()
     // if totalWeight becomes 0, reset to uniform distribution
     if(totalWeight==0)
     {
-        for(int i=0; i< weights_.size(); i++)
+        for(unsigned int i=0; i< weights_.size(); i++)
         {
             weights_[i] = 1.0/weights_.size();
         }
@@ -318,12 +318,12 @@ void MMPolicyGenerator::updateWeights()
     }
 
     // Normalize the weights
-     for(int i = 0; i < weights_.size(); i++)
+     for(unsigned int i = 0; i < weights_.size(); i++)
     {
         if(totalWeight!=0)
             weights_[i] =  weights_[i]/totalWeight;
     }
-      for(int i = 0; i < weights_.size(); i++)
+      for(unsigned int i = 0; i < weights_.size(); i++)
     {
         //if(weights_[i] < 1e-6 )
             //this->removeBelief(i);

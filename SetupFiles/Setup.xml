@@ -158,7 +158,29 @@
 		P_Wg_filename=""
 	  dt=0.10 
 	  V=5.0 
-	  omega="1.5708"/> <!--omega is in radians, wind_noise_ang is in degrees -->
+	  omega="1.5708"
+	  /> <!--omega is in radians, wind_noise_ang is in degrees -->
 		<!--wind_noise_pos="1.000"
 		wind_noise_ang="7.0"-->
 </MotionModels>
+<PlanningProblem>
+	<Environment
+		environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleFIRMEnv.obj"
+	/>
+	<Robot
+		robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+	/>
+	<StartPose
+		x = "16"
+		y = "3"
+		theta = "0"
+	/>
+	<GoalPose
+		x = "1"
+		y = "4"
+		theta = "1.57"
+	/>
+	<PlanningTime
+		maxTime = "120"
+	/>
+</PlanningProblem>

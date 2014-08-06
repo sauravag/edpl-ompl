@@ -35,15 +35,6 @@
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #include "FIRM2DSetup.h"
-#include <ompl/geometric/SimpleSetup.h>
-#include <ompl/geometric/planners/rrt/RRT.h>
-#include <ompl/control/PathControl.h>
-#include <ompl/control/SimpleSetup.h>
-#include <ompl/config.h>
-#include <ompl/base/goals/GoalState.h>
-#include "include/Planner/FIRM.h"
-#include "include/Spaces/SE2BeliefSpace.h"
-#include "FIRMOMPL.h"
 #include "Tests.h"
 #include <QApplication>
 #include <QtGui/QDesktopWidget>
@@ -53,10 +44,7 @@
 #include <iostream>
 #include <istream>
 
-namespace ob = ompl::base;
-namespace oc = ompl::control;
-namespace og = ompl::geometric;
-using namespace arma;
+
 using namespace std;
 
 void plan()
@@ -64,18 +52,8 @@ void plan()
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
     std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/Setup.xml";
-    std::string robot_fname = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj";
-    std::string env_fname = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleFIRMEnv.obj";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
-
-    assert(mySetup->setRobotMesh(robot_fname.c_str()));
-
-    assert(mySetup->setEnvironmentMesh(env_fname.c_str()));
-
-     // define starting state
-    mySetup->setStartState(16,3,0);
-    mySetup->setGoalState(1,4,1.57);
 
     mySetup->setup();
 
@@ -83,11 +61,7 @@ void plan()
 
     Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
 
-    // Specify the maximum time allowed to solve problem
-    double solveTime = 120;
-
-
-    if(mySetup->solve(solveTime))
+    if(mySetup->solve())
     {
         mySetup->executeSolution();
     }
@@ -108,11 +82,6 @@ int main(int argc, char *argv[])
     MyWindow window;
 
     window.resize(window.sizeHint());
-
-    int desktopArea = QApplication::desktop()->width() * \
-                            QApplication::desktop()->height();
-
-    int widgetArea = window.width() * window.height();
 
     window.showMaximized();
 

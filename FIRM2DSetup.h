@@ -39,9 +39,8 @@
 
 #include <omplapp/geometry/RigidBodyGeometry.h>
 #include "include/Planner/FIRM.h"
-//#include "include/Spaces/SE2BeliefSpace.h"
 #include "FIRMOMPL.h"
-
+#include <tinyxml.h>
 
 /** \brief Wrapper for ompl::app::RigidBodyPlanning that plans for rigid bodies in SE2BeliefSpace using FIRM */
 class FIRM2DSetup : public ompl::app::RigidBodyGeometry
@@ -116,6 +115,8 @@ public:
     void setPathToSetupFile(const std::string &path)
     {
         pathToSetupFile_  = path;
+
+        this->loadParameters();
     }
 
     void setStartState(const double X, const double Y, const double Yaw)
@@ -201,14 +202,14 @@ public:
 
     }
 
-    ompl::base::PlannerStatus solve(const double solveTime)
+    ompl::base::PlannerStatus solve()
     {
         if(!setup_)
         {
             this->setup();
         }
 
-        return planner_->solve(solveTime);
+        return planner_->solve(planningTime_);
     }
 
     void executeSolution()
@@ -227,6 +228,111 @@ protected:
     const ompl::base::State* getGeometricComponentStateInternal(const ompl::base::State *state, unsigned int /*index*/) const
     {
         return state;
+    }
+
+    void loadParameters()
+    {
+        using namespace arma;
+
+        TiXmlDocument doc(pathToSetupFile_);
+
+        bool loadOkay = doc.LoadFile();
+
+        if ( !loadOkay )
+        {
+            printf( "Could not load setup file in planning problem. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+
+            exit( 1 );
+        }
+
+        TiXmlNode* node = 0;
+
+        TiXmlElement* itemElement = 0;
+
+        node = doc.FirstChild( "PlanningProblem" );
+        assert( node );
+
+        TiXmlNode* child = 0;
+
+        // Read the env mesh file
+        child = node->FirstChild("Environment");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        std::string environmentFilePath;
+        itemElement->QueryStringAttribute("environmentFile", &environmentFilePath);
+
+        this->setEnvironmentMesh(environmentFilePath);
+
+        // Read the robot mesh file
+        child  = node->FirstChild("Robot");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        std::string robotFilePath;
+        itemElement->QueryStringAttribute("robotFile", &robotFilePath);
+
+        this->setRobotMesh(robotFilePath);
+
+        // Read the start Pose
+        child  = node->FirstChild("StartPose");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        double startX = 0,startY = 0, startTheta = 0;
+
+        itemElement->QueryDoubleAttribute("x", &startX);
+        itemElement->QueryDoubleAttribute("y", &startY);
+        itemElement->QueryDoubleAttribute("theta", &startTheta);
+
+        setStartState(startX, startY, startTheta);
+
+        // Read the Goal Pose
+        child  = node->FirstChild("GoalPose");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        double goalX = 0 , goalY = 0, goalTheta = 0;
+
+        itemElement->QueryDoubleAttribute("x", &goalX);
+        itemElement->QueryDoubleAttribute("y", &goalY);
+        itemElement->QueryDoubleAttribute("theta", &goalTheta);
+
+        setGoalState(goalX, goalY, goalTheta);
+
+        // read planning time
+        child  = node->FirstChild("PlanningTime");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        double time = 0;
+
+        itemElement->QueryDoubleAttribute("maxTime", &time) ;
+
+        planningTime_ = time;
+
+        OMPL_INFORM("Problem configuration is");
+
+        std::cout<<"Path to environment mesh"<<environmentFilePath<<std::endl;
+
+        std::cout<<"Path to robot mesh"<<robotFilePath<<std::endl;
+
+        std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
+
+        std::cout<<"Goal Pose X: "<<goalX<<" Y: "<<goalY<<" Theta: "<<goalTheta<<std::endl;
+
+        std::cout<<"Planning Time: "<<planningTime_<<" seconds"<<std::endl;
+
     }
 
 private:
@@ -250,6 +356,8 @@ private:
     ompl::base::StateValidityCheckerPtr vc_;
 
     std::string pathToSetupFile_;
+
+    double planningTime_;
 
     bool setup_;
 };

@@ -48,8 +48,7 @@ class FIRMValidityChecker : public ompl::base::StateValidityChecker
     typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
     typedef SE2BeliefSpace::StateType StateType;
 
-    FIRMValidityChecker(const firm::SpaceInformation::SpaceInformationPtr &si/**, ObservationModelPointer om*/) :
-    siF_(si), ompl::base::StateValidityChecker(si)/**, observationModel_(om)*/
+    FIRMValidityChecker(const firm::SpaceInformation::SpaceInformationPtr &si) : ompl::base::StateValidityChecker(si), siF_(si)
     {
     }
 

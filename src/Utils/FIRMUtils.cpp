@@ -38,16 +38,35 @@
 
 void FIRMUtils::normalizeAngleToPiRange(double &theta)
 {
-
+    /*
     if(theta > boost::math::constants::pi<double>() )
     {
-
         theta =  theta - 2*boost::math::constants::pi<double>();
     }
+
     if( theta < -boost::math::constants::pi<double>() )
     {
-
         theta =  theta + 2*boost::math::constants::pi<double>() ;
     }
+    */
 
+    while(theta > boost::math::constants::pi<double>())
+    {
+        theta -= 2*boost::math::constants::pi<double>();
+    }
+
+    while(theta < -boost::math::constants::pi<double>())
+    {
+        theta += 2*boost::math::constants::pi<double>();
+    }
+
+}
+
+int FIRMUtils::signum(const double d)
+{
+        if(d>0)
+            return 1;
+
+        if(d<0)
+            return -1;
 }

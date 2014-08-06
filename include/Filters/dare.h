@@ -41,94 +41,99 @@
 #include <cassert>
 
 /** \brief Solver for the Differential Algebraic Riccatti Equation. */
-inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R, arma::mat &S) {
-using namespace arma;
+inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R, arma::mat &S)
 
-  int n = _A.n_rows, m = _B.n_cols;
-  mat Z11(n,n);
-  mat Z12(n,n);
-  mat Z21(n,n);
-  mat Z22(n,n);
-  mat temp1(m,m);
-  mat temp2(n,n);
-  mat temp3(m,n);
+{
+    using namespace arma;
 
-  //pre-compute values to save recomputation
-  //"trans" takes Hermitian transpose of matrix,
-  //i.e. conjugate of elements is taken during transpose operation
-  temp1 = inv(_R);
-  temp2 = _B * temp1 * trans(_B);
+    int n = _A.n_rows, m = _B.n_cols;
+    mat Z11(n,n);
+    mat Z12(n,n);
+    mat Z21(n,n);
+    mat Z22(n,n);
+    mat temp1(m,m);
+    mat temp2(n,n);
+    mat temp3(m,n);
 
-  //construct submatrices that will constitute Hamiltonian matrix
-  Z11 = inv(_A);
-  Z21 = _Q * Z11;
-  Z12 = Z11 * temp2;
-  Z22 = trans(_A) + Z21 * temp2;
+    //pre-compute values to save recomputation
+    //"trans" takes Hermitian transpose of matrix,
+    //i.e. conjugate of elements is taken during transpose operation
+    temp1 = inv(_R);
+    temp2 = _B * temp1 * trans(_B);
 
-  mat Z(2*n, 2*n);
+    //construct submatrices that will constitute Hamiltonian matrix
+    Z11 = inv(_A);
+    Z21 = _Q * Z11;
+    Z12 = Z11 * temp2;
+    Z22 = trans(_A) + Z21 * temp2;
 
-  //construct Hamiltonian matrix in discrete case
-  Z.submat( span(0,n-1),    span(0,n-1)   ) = Z11;
-  Z.submat( span(n,2*n-1),  span(0,n-1)   ) = Z21;
-  Z.submat( span(0,n-1),    span(n,2*n-1) ) = Z12;
-  Z.submat( span(n,2*n-1),  span(n,2*n-1) ) = Z22;
+    mat Z(2*n, 2*n);
 
-  //data structures to store result of generalized eigenvalue computation
-  cx_vec eigval(2*n);
-  int n_Z = Z.n_rows;
-  mat VL(n_Z, n_Z);
-  mat VR(n_Z, n_Z);
+    //construct Hamiltonian matrix in discrete case
+    Z.submat( span(0,n-1),    span(0,n-1)   ) = Z11;
+    Z.submat( span(n,2*n-1),  span(0,n-1)   ) = Z21;
+    Z.submat( span(0,n-1),    span(n,2*n-1) ) = Z12;
+    Z.submat( span(n,2*n-1),  span(n,2*n-1) ) = Z22;
 
-  //solution to generalized eigenvalue problem
-  //internally, calls Fortran's "geev" function
-  eig_gen(eigval, VL, VR, Z);
+    //data structures to store result of generalized eigenvalue computation
+    cx_vec eigval(2*n);
+    cx_mat eigvec;
+    int n_Z = Z.n_rows;
+    mat VL(n_Z, n_Z);
+    mat VR(n_Z, n_Z);
 
-  mat U11(n,n);
-  mat U21(n,n);
-  mat tempZ(n_Z, n);
+    //solution to generalized eigenvalue problem
+    //internally, calls Fortran's "geev" function
+    eig_gen(eigval, VL, VR, Z);
 
-  int c1=0;
-  for(int i = 0; i < n_Z; ++i) {
+    mat U11(n,n);
+    mat U21(n,n);
+    mat tempZ(n_Z, n);
 
-    //get eigenvalues outside unit circle
-    if( (eigval(i).real()*eigval(i).real() + eigval(i).imag()*eigval(i).imag()  ) > 1)
+    int c1=0;
+    for(int i = 0; i < n_Z; ++i)
     {
+        //get eigenvalues outside unit circle
+        if( (eigval(i).real()*eigval(i).real() + eigval(i).imag()*eigval(i).imag()  ) > 1)
+        {
 
-        if(tempZ.n_cols -1 < c1) return false;
+            if(tempZ.n_cols -1 < c1)
+                return false;
 
-        else tempZ.submat(span::all, span(c1,c1)) = VR.submat(span::all, span(i,i));
+            else
+                tempZ.submat(span::all, span(c1,c1)) = VR.submat(span::all, span(i,i));
 
-        c1++;
+            c1++;
+        }
     }
-  }
 
-  //ensure that the system is stable
-  if(c1 != n) return false;
+    //ensure that the system is stable
+    if(c1 != n) return false;
 
-  U11 = tempZ.submat(span(0,n-1), span(0,n-1));
-  U21 = tempZ.submat(span(n,n_Z-1), span(0,n-1));
+    U11 = tempZ.submat(span(0,n-1), span(0,n-1));
+    U21 = tempZ.submat(span(n,n_Z-1), span(0,n-1));
 
-  S = U21 * inv(U11);
+    S = U21 * inv(U11);
 
-  return true; // dare solved successfuly
+    return true; // dare solved successfuly
 }
 
 /** \brief Generate a gain using the DARE solver */
 inline arma::mat generate_gain_with_dare(const arma::mat _A, const arma::mat _B, const arma::mat _Q, const arma::mat _R)
 {
-  using namespace arma;
+    using namespace arma;
 
-  int n = _A.n_rows, m = _B.n_cols;
-  mat S;//(n,n);
-  mat temp1(m,n);
-  mat temp2(m,m);
+    int n = _A.n_rows, m = _B.n_cols;
+    mat S;//(n,n);
+    mat temp1(m,n);
+    mat temp2(m,m);
 
-  bool flag = dare(_A, _B, _Q, _R, S);
-  temp1 = trans(_B) * S;
-  temp2 = _R + temp1 * _B;
-  temp1 = inv(temp2) * temp1;
+    //bool flag = dare(_A, _B, _Q, _R, S);
+    temp1 = trans(_B) * S;
+    temp2 = _R + temp1 * _B;
+    temp1 = inv(temp2) * temp1;
 
-  return (temp1 * _A);
+    return (temp1 * _A);
 }
 
 #endif

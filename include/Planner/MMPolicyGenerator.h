@@ -77,7 +77,7 @@ class MMPolicyGenerator
             weights_.clear();
             //currentBeliefStates_.insert(currentBeliefStates_.end(), states.begin(), states.end());
 
-            for(int i = 0; i < states.size(); i++)
+            for(unsigned int i = 0; i < states.size(); i++)
             {
                 currentBeliefStates_.push_back(si_->cloneState(states[i]));
                 weights_.push_back(1.0/states.size()); // assign equal weights to all
@@ -91,7 +91,7 @@ class MMPolicyGenerator
             targetStates_.clear();
             //targetStates_.insert(targetStates_.end(), states.begin(), states.end());
 
-            for(int i = 0; i < states.size(); i++)
+            for(unsigned int i = 0; i < states.size(); i++)
             {
                 targetStates_.push_back(si_->cloneState(states[i]));
             }
@@ -103,7 +103,7 @@ class MMPolicyGenerator
         {
             states.clear();
 
-            for(int i = 0; i < currentBeliefStates_.size(); i++)
+            for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
             {
                 states.push_back(si_->cloneState(currentBeliefStates_[i]));
             }

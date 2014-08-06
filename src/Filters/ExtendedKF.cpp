@@ -37,13 +37,7 @@
 #include "../../include/Filters/ExtendedKF.h"
 #include "boost/date_time/local_time/local_time.hpp"
 
-/*
-ExtendedKF::ExtendedKF(MotionModelPointer motionModel,
-ObservationModelPointer observationModel) :
-KalmanFilterMethod(motionModel, observationModel) {
-
-}
-*/
+const int ExtendedKF::covGrowthFactor_=1.1;
 
 void ExtendedKF::Predict(const ompl::base::State *belief,
   const ompl::control::Control* control,
@@ -69,10 +63,14 @@ const LinearSystem& ls, ompl::base::State *updatedState)
 
   colvec innov = this->observationModel_->computeInnovation(belief, obs);
 
- // cout<<"innovation calculated"<<endl;
   if(!innov.n_rows || !innov.n_cols)
   {
     si_->copyState(updatedState, belief);
+
+    arma::mat covTemp = updatedState->as<StateType>()->getCovariance();
+
+    updatedState->as<StateType>()->setCovariance(covTemp*covGrowthFactor_);
+
     return; // return the prediction if you don't have any innovation
   }
 
@@ -85,8 +83,6 @@ const LinearSystem& ls, ompl::base::State *updatedState)
   mat leftMatrix = covPred * trans(ls.getH());
   mat KalmanGain = solve(trans(rightMatrix), trans(leftMatrix));
   KalmanGain = KalmanGain.t();
-
-  //cout<<"Kalman gain calculated"<<endl;
 
   colvec xPredVec = belief->as<StateType>()->getArmaData();
 

@@ -43,7 +43,8 @@ class FIRMUtils
         /** \brief Normalizes angle to between -pi and pi */
         static void normalizeAngleToPiRange(double &theta);
 
-
+        /** \brief Returns the sign of the value 'd' */
+        static int signum(const double d);
 
 };
 #endif
