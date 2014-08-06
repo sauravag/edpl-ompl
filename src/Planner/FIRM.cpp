@@ -815,7 +815,7 @@ void FIRM::executeFeedbackWithRollout(void)
             Whichever gives the lowest cost to go, is our new path.
             Do this at each step.
         */
-        controller.executeUpto(25,cstartState,cendState,cost,false);
+        controller.executeUpto(100,cstartState,cendState,cost,false);
 
         ompl::base::State *tState = si_->allocState();
 

@@ -51,7 +51,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/Setup.xml";
+    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupFIRMExp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -67,7 +67,6 @@ void plan()
 
         OMPL_INFORM("Plan Executed Successfully");
 
-        return;
     }
     else
     {
