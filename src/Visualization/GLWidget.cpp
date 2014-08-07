@@ -196,6 +196,7 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
     glEnable(GL_LINE_SMOOTH);
     glShadeModel(GL_FLAT);
@@ -208,7 +209,7 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glClearColor(0.0, 1.0, 0.0, 0.5);
+    glClearColor(0.0, 1.0, 0.0, 1.0);
 
     //projection
     glMatrixMode(GL_PROJECTION);

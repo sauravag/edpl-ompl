@@ -63,22 +63,23 @@ int Visualizer::envIndx_   = -1;
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
 
-  glColor3d(1.0,1.0,1.0);
 
-  double scale = 0.15;
+    double scale = 0.15;
 
-  glPushMatrix();
-    glTranslated(landmark[1], landmark[2], 1.5);
+    glPushMatrix();
+    glTranslated(landmark[1], landmark[2], 0.0);
     glVertex3f(0.8,0.8,0.8);
 
     glBegin(GL_TRIANGLE_FAN);
-      glVertex3f(0, scale, 0);
-      glVertex3f(0.5*scale, 0, 0);
-      glVertex3f(0, -scale, 0);
-      glVertex3f(-0.5*scale, 0, 0);
+        glColor3d(1.0,1.0,1.0);
+        glVertex3f(0, scale, 0);
+        glVertex3f(0.5*scale, 0, 0);
+        glVertex3f(0, -scale, 0);
+        glVertex3f(-0.5*scale, 0, 0);
+        glColor3d(1.0,1.0,1.0);
     glEnd();
 
-  glPopMatrix();
+    glPopMatrix();
 
 }
 
@@ -205,7 +206,6 @@ void Visualizer::refresh()
     boost::mutex::scoped_lock sl(drawMutex_);
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
     glPushMatrix();
 
     drawEnvironment();

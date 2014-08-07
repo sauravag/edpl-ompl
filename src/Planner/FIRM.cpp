@@ -109,7 +109,7 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
     specs_.optimizingPaths = true;
 
     Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
-    minFIRMNodes_ = 10;
+    minFIRMNodes_ = 30;
 }
 
 FIRM::~FIRM(void)
