@@ -35,6 +35,7 @@
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #include "FIRM2DSetup.h"
+#include "MultiModalSetup.h"
 #include "Tests.h"
 #include <QApplication>
 #include <QtGui/QDesktopWidget>
@@ -77,6 +78,35 @@ void plan()
 
 }
 
+void testMultiModal()
+{
+    MultiModalSetup *mySetup(new MultiModalSetup);
+
+    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupMM1.xml";
+
+    mySetup->setPathToSetupFile(setupFilePath.c_str());
+
+    mySetup->setup();
+
+    Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
+
+    Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
+
+    if(mySetup->solve())
+    {
+        //mySetup->executeSolution();
+
+        OMPL_INFORM("Plan Executed Successfully");
+
+    }
+    else
+    {
+        OMPL_INFORM("Unable to find Solution in given time.");
+
+        exit(1);
+    }
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -88,7 +118,7 @@ int main(int argc, char *argv[])
 
     window.showMaximized();
 
-    boost::thread solveThread(plan);
+    boost::thread solveThread(testMultiModal);
 
     app.exec();
 

@@ -109,7 +109,7 @@ namespace firm
                 return this->isValid(trueState_);
             }
 
-            void applyControl(const ompl::control::Control *control);
+            void applyControl(const ompl::control::Control *control, bool withNoise = true);
 
             ObservationType getObservation() ;
 
