@@ -1,88 +1,29 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
-    <landmark id = 1 x = 2 y = 5 theta = 0.5 />
-    <landmark id = 1 x = 2 y = 0 theta = 0.5 />
-    <landmark id = 2 x = 2.2 y = 5 theta = 0.5 />
-    <landmark id = 2 x = 2.2 y = 0 theta = 0.5 />
-    <landmark id = 3 x = 3 y = 5 theta = 0.5 />
-    <landmark id = 3 x = 3 y = 0 theta = 0.5 />
-    <landmark id = 4 x = 3.2 y = 5 theta = 0.5 />
-    <landmark id = 4 x = 3.2 y = 0 theta = 0.5 />
-    <landmark id = 5 x = 4 y = 5 theta = 0.5 />
-    <landmark id = 5 x = 4 y = 0 theta = 0.5 />
-    <landmark id = 6 x = 4.2 y = 5 theta = 0.5 />
-    <landmark id = 6 x = 4.2 y = 0 theta = 0.5 />
-    <landmark id = 7 x = 5 y = 5 theta = 0.5 />
-    <landmark id = 7 x = 5 y = 0 theta = 0.5 />
-    <landmark id = 8 x = 5.2 y = 5 theta = 0.5 />
-    <landmark id = 8 x = 5.2 y = 0 theta = 0.5 />
-    <landmark id = 9 x = 6 y = 5 theta = 0.5 />
-    <landmark id = 9 x = 6 y = 0 theta = 0.5 />
-    <landmark id = 10 x = 6.2 y = 5 theta = 0.5 />
-    <landmark id = 10 x = 6.2 y = 0 theta = 0.5 />
-    <landmark id = 11 x = 7 y = 5 theta = 0.5 />
-    <landmark id = 11 x = 7 y = 0 theta = 0.5 />
-    <landmark id = 12 x = 7.2 y = 5 theta = 0.5 />
-    <landmark id = 12 x = 7.2 y = 0 theta = 0.5 />
-    <landmark id = 13 x = 8 y = 5 theta = 0.5 />
-    <landmark id = 13 x = 8 y = 0 theta = 0.5 />
-    <landmark id = 14 x = 9 y = 5 theta = 0.5 />
-    <landmark id = 14 x = 9 y = 0 theta = 0.5 />
-    <landmark id = 15 x = 10 y = 5 theta = 0.5 />
-    <landmark id = 15 x = 10 y = 0 theta = 0.5 />
-    <landmark id = 16 x = 11 y = 5 theta = 0.5 />
-    <landmark id = 16 x = 11 y = 0 theta = 0.5 />
-    <landmark id = 17 x = 12 y = 5 theta = 0.5 />
-    <landmark id = 17 x = 12 y = 0 theta = 0.5 />
-    <landmark id = 18 x = 13 y = 5 theta = 0.5 />
-    <landmark id = 18 x = 13 y = 0 theta = 0.5 />
-    <landmark id = 19 x = 14 y = 5 theta = 0.5 />
-    <landmark id = 19 x = 14 y = 0 theta = 0.5 />
-    <landmark id = 20 x = 14.5 y = 5 theta = 0.5 />
-    <landmark id = 20 x = 14.5 y = 0 theta = 0.5 />
-    <landmark id = 101 x = 2 y = 7 theta =-0.5 />
-    <landmark id = 101 x = 2 y = 2 theta =-0.5 />
-    <landmark id = 102 x = 2.2 y = 7 theta =-0.5 />
-    <landmark id = 102 x = 2.2 y = 2 theta =-0.5 />
-    <landmark id = 103 x = 3 y = 7 theta =-0.5 />
-    <landmark id = 103 x = 3 y = 2 theta =-0.5 />
-    <landmark id = 104 x = 3.2 y = 7 theta =-0.5 />
-    <landmark id = 104 x = 3.2 y = 2 theta =-0.5 />
-    <landmark id = 105 x = 4 y = 7 theta =-0.5 />
-    <landmark id = 105 x = 4 y = 2 theta =-0.5 />
-    <landmark id = 106 x = 4.2 y = 7 theta =-0.5 />
-    <landmark id = 106 x = 4.2 y = 2 theta =-0.5 />
-    <landmark id = 107 x = 5 y = 7 theta =-0.5 />
-    <landmark id = 107 x = 5 y = 2 theta =-0.5 />
-    <landmark id = 108 x = 5.2 y = 7 theta =-0.5 />
-    <landmark id = 108 x = 5.2 y = 2 theta =-0.5 />
-    <landmark id = 109 x = 6 y = 7 theta =-0.5 />
-    <landmark id = 109 x = 6 y = 2 theta =-0.5 />
-    <landmark id = 110 x = 6.2 y = 7 theta =-0.5 />
-    <landmark id = 110 x = 6.2 y = 2 theta =-0.5 />
-    <landmark id = 111 x = 7 y = 7 theta =-0.5 />
-    <landmark id = 111 x = 7 y = 2 theta =-0.5 />
-    <landmark id = 112 x = 7.2 y = 7 theta =-0.5 />
-    <landmark id = 112 x = 7.2 y = 2 theta =-0.5 />
-    <landmark id = 113 x = 8 y = 7 theta =-0.5 />
-    <landmark id = 113 x = 8 y = 2 theta =-0.5 />
-    <landmark id = 114 x = 9 y = 7 theta =-0.5 />
-    <landmark id = 114 x = 9 y = 2 theta =-0.5 />
-    <landmark id = 115 x = 10 y = 7 theta =-0.5 />
-    <landmark id = 115 x = 10 y = 2 theta =-0.5 />
-    <landmark id = 116 x = 11 y = 7 theta =-0.5 />
-    <landmark id = 116 x = 11 y = 2 theta =-0.5 />
-    <landmark id = 117 x = 12 y = 7 theta =-0.5 />
-    <landmark id = 117 x = 12 y = 2 theta =-0.5 />
-    <landmark id = 118 x = 13 y = 7 theta =-0.5 />
-    <landmark id = 118 x = 13 y = 2 theta =-0.5 />
-    <landmark id = 119 x = 14 y = 7 theta =-0.5 />
-    <landmark id = 119 x = 14 y = 2 theta =-0.5 />
-    <landmark id = 120 x = 14.5 y = 7 theta =-0.5 />
-    <landmark id = 120 x = 14.5 y = 2 theta = -0.5 />
-    <landmark id = 1000 x = 16 y = 1.5 theta = 1 />
-    <landmark id = 1001 x = 16 y = 5.5 theta = 1/>
-    <landmark id = 1024 x = 16 y = 3.5 theta = 1 />
+    <landmark id = 1 x = 2    y = 5 theta = -0.5 />
+    <landmark id = 1 x = 7.5  y = 5 theta = -0.5 />
+    <landmark id = 1 x = 13.0 y = 5 theta = -0.5 />
+    <landmark id = 2 x = 2    y = 7 theta = -0.5 />
+    <landmark id = 2 x = 7.5  y = 7 theta = -0.5 />
+    <landmark id = 2 x = 13.0 y = 7 theta = -0.5 />
+    <landmark id = 3 x = 2    y = 9 theta = -0.5 />
+    <landmark id = 3 x = 7.5  y = 9 theta = -0.5 />
+    <landmark id = 3 x = 13.0 y = 9 theta = -0.5 />
+    <landmark id = 4 x = 2    y = 11 theta = -0.5 />
+    <landmark id = 4 x = 7.5  y = 11 theta = -0.5 />
+    <landmark id = 4 x = 13.0 y = 11 theta = -0.5 />
+    <landmark id = 5 x = 2    y = 13 theta = -0.5 />
+    <landmark id = 5 x = 7.5  y = 13 theta = -0.5 />
+    <landmark id = 5 x = 13.0 y = 13 theta = -0.5 />
+    <landmark id = 6 x = 2    y = 15 theta = -0.5 />
+    <landmark id = 6 x = 7.5  y = 15 theta = -0.5 />
+    <landmark id = 6 x = 13.0 y = 15 theta = -0.5 />
+    <landmark id = 7 x = 2    y = 19 theta = -0.5 />
+    <landmark id = 7 x = 7.5  y = 19 theta = -0.5 />
+    <landmark id = 7 x = 13.0 y = 19 theta = -0.5 />
+    <landmark id = 1000 x = 2.0 y = 19.0 theta = -0.5 />
+    <landmark id = 1001 x = 7.5 y = 19.0 theta = -0.5 />
+    <landmark id = 1024 x = 13.0 y = 19.0 theta = -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel

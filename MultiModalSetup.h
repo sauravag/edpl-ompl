@@ -469,6 +469,8 @@ protected:
             itemElement->QueryDoubleAttribute("y", &y) ;
             itemElement->QueryDoubleAttribute("theta", &theta) ;
 
+            std::cout<<"Read the state :"<<x<<" "<<y<<" "<<theta<<std::endl;
+
             tempState->as<SE2BeliefSpace::StateType>()->setXYYaw(x,y,theta);
             tempState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
 
@@ -512,6 +514,8 @@ protected:
             itemElement->QueryDoubleAttribute("x", &x) ;
             itemElement->QueryDoubleAttribute("y", &y) ;
             itemElement->QueryDoubleAttribute("theta", &theta) ;
+
+            std::cout<<"Read the state :"<<x<<" "<<y<<" "<<theta<<std::endl;
 
             tempState->as<SE2BeliefSpace::StateType>()->setXYYaw(x,y,theta);
 

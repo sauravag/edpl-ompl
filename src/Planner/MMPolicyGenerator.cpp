@@ -37,7 +37,7 @@
 #include "../../include/Visualization/Visualizer.h"
 
 #define FAILURE_COST 1e6 // cost of colliding
-#define RRT_PLAN_MAX_TIME 5.0 // maximum time allowed for RRT to plan
+#define RRT_PLAN_MAX_TIME 10.0 // maximum time allowed for RRT to plan
 #define RRT_FINAL_PROXIMITY_THRESHOLD 1.0 // maximum distance for RRT to succeed
 
 void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
