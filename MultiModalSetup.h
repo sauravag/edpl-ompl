@@ -40,6 +40,7 @@
 #include <omplapp/geometry/RigidBodyGeometry.h>
 #include "include/Planner/FIRM.h"
 #include "FIRMOMPL.h"
+
 #include <tinyxml.h>
 
 #define CONVERGENCE_THRESHOLD_FIRM 2.0
@@ -206,6 +207,8 @@ public:
 
             policyGenerator_->setBeliefTargetStates(targetStates_);
 
+            siF_->setTrueState(start_);
+
             setup_ = true;
         }
 
@@ -232,7 +235,7 @@ public:
 
             policyGenerator_->generatePolicy(policy);
 
-            int rndnum = FIRMUtils::generateRandomIntegerInRange(0, policy.size()-1);
+            int rndnum = FIRMUtils::generateRandomIntegerInRange(0, 1000/*policy.size()-1*/);
 
             int hzn = rndnum > policy.size()? policy.size() : rndnum;
 
@@ -256,7 +259,7 @@ public:
 
                 if(!siF_->isValid(currentTrueState) || isConverged(bstates)) break;
 
-                boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+                boost::this_thread::sleep(boost::posix_time::milliseconds(20));
             }
         }
 

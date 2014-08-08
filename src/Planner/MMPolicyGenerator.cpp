@@ -71,9 +71,12 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             pdef->setStartAndGoalStates(currentBeliefStates_[i], targetStates_[i], RRT_FINAL_PROXIMITY_THRESHOLD);
 
+            planner->as<ompl::geometric::RRT>()->setRange(1.0);
+
             planner->setProblemDefinition(pdef);
 
             planner->setup();
+
 
             ompl::base::PlannerStatus solved = planner->solve(RRT_PLAN_MAX_TIME);
 
