@@ -183,4 +183,7 @@
 	<PlanningTime
 		maxTime = "120"
 	/>
+	<FIRMNodes
+		minNodes = "40"
+	/>
 </PlanningProblem>

@@ -232,7 +232,7 @@ public:
 
             policyGenerator_->generatePolicy(policy);
 
-            int rndnum = 50;
+            int rndnum = FIRMUtils::generateRandomIntegerInRange(0, policy.size()-1);
 
             int hzn = rndnum > policy.size()? policy.size() : rndnum;
 
@@ -424,7 +424,7 @@ protected:
 
         std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
 
-        std::cout<<"Planning Time: "<<planningTime_<<" seconds"<<std::endl;
+        std::cout<<"Planning Time: "<<planningTime_<<std::endl;
 
     }
 

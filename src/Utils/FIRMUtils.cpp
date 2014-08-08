@@ -35,20 +35,10 @@
 
 #include "../../include/Utils/FIRMUtils.h"
 #include <boost/math/constants/constants.hpp>
+#include <random>
 
 void FIRMUtils::normalizeAngleToPiRange(double &theta)
 {
-    /*
-    if(theta > boost::math::constants::pi<double>() )
-    {
-        theta =  theta - 2*boost::math::constants::pi<double>();
-    }
-
-    if( theta < -boost::math::constants::pi<double>() )
-    {
-        theta =  theta + 2*boost::math::constants::pi<double>() ;
-    }
-    */
 
     while(theta > boost::math::constants::pi<double>())
     {
@@ -69,4 +59,15 @@ int FIRMUtils::signum(const double d)
 
         if(d<0)
             return -1;
+}
+
+int FIRMUtils::generateRandomIntegerInRange(const int floor, const int ceiling)
+{
+    std::random_device rd; // obtain a random number from hardware
+
+    std::mt19937 eng(rd()); // seed the generator
+
+    std::uniform_int_distribution<> distr(floor, ceiling); // define the range
+
+    return distr(eng);
 }

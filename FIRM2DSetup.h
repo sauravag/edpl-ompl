@@ -198,6 +198,8 @@ public:
 
             planner_->setProblemDefinition(pdef_);
 
+            planner_->as<FIRM>()->setMinFIRMNodes(minNodes_);
+
             planner_->setup();
 
             setup_ = true;
@@ -324,6 +326,19 @@ protected:
 
         planningTime_ = time;
 
+        // read planning time
+        child  = node->FirstChild("FIRMNodes");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        int nodeNum = 0;
+
+        itemElement->QueryIntAttribute("minNodes", &nodeNum) ;
+
+        minNodes_ = nodeNum;
+
         OMPL_INFORM("Problem configuration is");
 
         std::cout<<"Path to environment mesh"<<environmentFilePath<<std::endl;
@@ -335,6 +350,8 @@ protected:
         std::cout<<"Goal Pose X: "<<goalX<<" Y: "<<goalY<<" Theta: "<<goalTheta<<std::endl;
 
         std::cout<<"Planning Time: "<<planningTime_<<" seconds"<<std::endl;
+
+        std::cout<<"Min Nodes: "<<minNodes_<<" seconds"<<std::endl;
 
     }
 
@@ -361,6 +378,8 @@ private:
     std::string pathToSetupFile_;
 
     double planningTime_;
+
+    unsigned int minNodes_;
 
     bool setup_;
 };
