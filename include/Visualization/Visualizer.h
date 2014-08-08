@@ -145,9 +145,12 @@ class Visualizer
         /** \brief update the robot's true state for drawing */
         static void updateTrueState(const ompl::base::State *state)
         {
-            boost::mutex::scoped_lock sl(drawMutex_);
-            if(!trueState_) trueState_ = si_->allocState();
-            si_->copyState(trueState_,state);
+            if(si_)
+            {
+                boost::mutex::scoped_lock sl(drawMutex_);
+                if(!trueState_) trueState_ = si_->allocState();
+                si_->copyState(trueState_,state);
+            }
         }
 
         /** \brief update the robot's belief for drawing */

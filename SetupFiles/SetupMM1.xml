@@ -82,7 +82,7 @@
     wind_noise_ang="7.0"-->
 </MotionModels>
 <BeliefList>
-    <belief x = 2.0  y = 6.0 theta = 1.57 />
+    <belief x = 2.0  y = 6.0 theta = 1.58 />
     <belief x = 7.5  y = 6.1 theta = 1.53 />
     <belief x = 13.0 y = 5.9 theta = 1.59 />
 </BeliefList>
@@ -99,9 +99,9 @@
         robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
     />
     <StartPose
-        x = "1"
-        y = "5"
-        theta = "0"
+        x = "1.9"
+        y = "6.1"
+        theta = "1.57"
     />
     <GoalPose
         x = "14"

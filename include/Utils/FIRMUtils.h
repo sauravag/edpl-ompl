@@ -46,5 +46,7 @@ class FIRMUtils
         /** \brief Returns the sign of the value 'd' */
         static int signum(const double d);
 
+        static int generateRandomIntegerInRange(const int floor, const int ceiling);
+
 };
 #endif

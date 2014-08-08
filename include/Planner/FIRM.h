@@ -235,6 +235,12 @@ public:
     /** \brief Executes the rollout policy algorithm (See ICRA '14 paper) */
     void executeFeedbackWithRollout(void);
 
+    /** \brief Set the minimum number of FIRM nodes */
+    void setMinFIRMNodes(const unsigned int numNodes)
+    {
+        minFIRMNodes_ = numNodes ;
+    }
+
 protected:
 
     /** \brief Free all the memory allocated by the planner */
