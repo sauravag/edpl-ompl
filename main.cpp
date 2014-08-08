@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupFIRMExp2.xml";
+    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupFIRMExp2.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -82,7 +82,7 @@ void testMultiModal()
 {
     MultiModalSetup *mySetup(new MultiModalSetup);
 
-    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupMM1.xml";
+    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupMM1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 
     window.showMaximized();
 
-    boost::thread solveThread(testMultiModal);
+    boost::thread solveThread(plan);
 
     app.exec();
 
