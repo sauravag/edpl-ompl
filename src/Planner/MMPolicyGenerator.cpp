@@ -36,9 +36,17 @@
 #include <boost/thread.hpp>
 #include "../../include/Visualization/Visualizer.h"
 
-#define FAILURE_COST 1e6 // cost of colliding
-#define RRT_PLAN_MAX_TIME 10.0 // maximum time allowed for RRT to plan
-#define RRT_FINAL_PROXIMITY_THRESHOLD 1.0 // maximum distance for RRT to succeed
+namespace ompl
+{
+    namespace magic
+    {
+        static const double COLISSION_FAILURE_COST  = 1e6;// cost of colliding
+
+        static const double RRT_PLAN_MAX_TIME = 2.0; // maximum time allowed for RRT to plan
+
+        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
+    }
+}
 
 void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
 {
@@ -56,11 +64,6 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
 
-        //std::cout<<"Belief Number "<<i<<std::endl;
-        //std::cout<<"The belief is :"<<std::endl;
-        //si_->printState(currentBeliefStates_[i]);
-        //std::cout<<"The target is :"<<std::endl;
-        //si_->printState(targetStates_[i]);
         //Generate a path for the mode/target pair
         if(si_->isValid(currentBeliefStates_[i]) /*&& si_->distance(currentBeliefStates_[i], targetStates_[i])>0.50*/)
         {
@@ -69,7 +72,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             ompl::base::ProblemDefinitionPtr pdef(new ompl::base::ProblemDefinition(si_));
 
-            pdef->setStartAndGoalStates(currentBeliefStates_[i], targetStates_[i], RRT_FINAL_PROXIMITY_THRESHOLD);
+            pdef->setStartAndGoalStates(currentBeliefStates_[i], targetStates_[i], ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
 
             planner->as<ompl::geometric::RRT>()->setRange(1.0);
 
@@ -78,7 +81,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
             planner->setup();
 
 
-            ompl::base::PlannerStatus solved = planner->solve(RRT_PLAN_MAX_TIME);
+            ompl::base::PlannerStatus solved = planner->solve(ompl::magic::RRT_PLAN_MAX_TIME);
 
 
             if(solved)
@@ -216,7 +219,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
         if(!si_->isValid(nextState))
         {
 
-            olpInfGain.v -= FAILURE_COST/(i+1); // add a high cost for collision, the sooner the robot collides, more the cost
+            olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1); // add a high cost for collision, the sooner the robot collides, more the cost
             break;//return olpCost;
         }
 
@@ -250,12 +253,15 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
 
     }
 
+    //this->updateWeights();
+
     Visualizer::clearStates();
 
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
         Visualizer::addState(currentBeliefStates_[i]);
     }
+
 
 }
 
@@ -328,8 +334,8 @@ void MMPolicyGenerator::updateWeights()
     }
       for(unsigned int i = 0; i < weights_.size(); i++)
     {
-        //if(weights_[i] < 1e-6 )
-            //this->removeBelief(i);
+        if(weights_[i] < 1e-6 )
+            this->removeBelief(i);
     }
 
 }

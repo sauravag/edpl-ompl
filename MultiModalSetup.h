@@ -43,7 +43,20 @@
 
 #include <tinyxml.h>
 
-#define CONVERGENCE_THRESHOLD_FIRM 2.0
+namespace ompl
+{
+    namespace magic
+    {
+        static const unsigned int MAX_MM_POLICY_LENGTH   = 1000;
+
+        static const float MIN_ROBOT_CLEARANCE = 0.10;
+
+        static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 100;
+
+        static const double CONVERGENCE_THRESHOLD_FIRM_MM = 2.0;
+    }
+}
+
 
 /** \brief Wrapper for ompl::app::RigidBodyPlanning that plans for rigid bodies in SE2BeliefSpace using FIRM */
 class MultiModalSetup : public ompl::app::RigidBodyGeometry
@@ -101,8 +114,6 @@ public:
         goal_  = siF_->allocState();
 
         setup_ = false;
-
-        minRobotClearance_ = 0.30;
     }
 
     virtual ~MultiModalSetup(void)
@@ -231,13 +242,14 @@ public:
 
         bstates = beliefStates_;
 
+        int counter = 0;
          while(!isConverged(bstates))
         {
             std::vector<ompl::control::Control*> policy;
 
             policyGenerator_->generatePolicy(policy);
 
-            int rndnum = FIRMUtils::generateRandomIntegerInRange(0, 1000/*policy.size()-1*/);
+            int rndnum = FIRMUtils::generateRandomIntegerInRange(0, ompl::magic::MAX_MM_POLICY_LENGTH/*policy.size()-1*/);
 
             int hzn = rndnum > policy.size()? policy.size() : rndnum;
 
@@ -253,14 +265,18 @@ public:
 
                 policyGenerator_->getCurrentBeliefStates(bstates);
 
-                if(!areValid(bstates))
-                {
-                    //bstates = tempbStates;
-                    break;
-                }
-
                 // If the robot's clearance gets below the threshold, break loop & replan
-                if(/*isConverged(bstates) ||*/ siF_->getStateValidityChecker()->clearance(currentTrueState) < minRobotClearance_) break;
+                if(!areValid(bstates) || siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE)
+                {
+                    if(counter == 0)
+                    {
+                        counter++;
+                        break;
+                    }
+
+                }
+                if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
+                    counter = 0;
 
                 //std::cout<<"Clearance :"<<siF_->getStateValidityChecker()->clearance(currentTrueState)<<std::endl;
 
@@ -300,7 +316,7 @@ public:
             }
         }
 
-        if(maxdistance <= CONVERGENCE_THRESHOLD_FIRM)
+        if(maxdistance <= ompl::magic::CONVERGENCE_THRESHOLD_FIRM_MM)
         {
             return true;
         }
@@ -316,7 +332,7 @@ public:
 
         for(int i =0 ; i< states.size(); i++)
         {
-            if(siF_->getStateValidityChecker()->clearance(states[i]) < minRobotClearance_)
+            if(siF_->getStateValidityChecker()->clearance(states[i]) < ompl::magic::MIN_ROBOT_CLEARANCE)
                 return false;
 
         }
@@ -567,7 +583,6 @@ private:
 
     MMPolicyGenerator *policyGenerator_;
 
-    double minRobotClearance_;
 };
 #endif
 

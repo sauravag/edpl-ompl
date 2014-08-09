@@ -122,18 +122,18 @@ class MMPolicyGenerator
         based on each mode to its target. Then evaluate each policy on each mode and return the best policy to be followed. We will
         then apply this policy to the true state i.e. the robot and update all the beliefs. This process would then get
         repeated.*/
-        void generatePolicy(std::vector<ompl::control::Control*> &policy);
+        virtual void generatePolicy(std::vector<ompl::control::Control*> &policy);
 
         /** \brief Runs the open loop policy on a given mode and outputs the cost*/
-        ompl::base::Cost executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls, const ompl::base::State* state);
+        virtual ompl::base::Cost executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls, const ompl::base::State* state);
 
         /** \brief advances the beliefs/modes by applying the given controls*/
-        void propagateBeliefs(const ompl::control::Control *control);
+        virtual void propagateBeliefs(const ompl::control::Control *control);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
-        void updateWeights();
+        virtual void updateWeights();
 
-        arma::colvec computeInnovation(const arma::colvec Zprd, const arma::colvec Zg);
+        virtual arma::colvec computeInnovation(const arma::colvec Zprd, const arma::colvec Zg);
 
         void removeBelief(const int Indx);
 
