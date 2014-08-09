@@ -101,6 +101,8 @@ public:
         goal_  = siF_->allocState();
 
         setup_ = false;
+
+        minRobotClearance_ = 0.30;
     }
 
     virtual ~MultiModalSetup(void)
@@ -216,7 +218,7 @@ public:
 
     bool solve()
     {
-        std::vector<ompl::base::State*> tempbStates;
+        //std::vector<ompl::base::State*> tempbStates;
 
         if(!setup_)
         {
@@ -243,7 +245,7 @@ public:
             {
                 siF_->applyControl(policy[i],true);
 
-                policyGenerator_->getCurrentBeliefStates(tempbStates);
+                //policyGenerator_->getCurrentBeliefStates(tempbStates);
 
                 policyGenerator_->propagateBeliefs(policy[i]);
 
@@ -257,7 +259,10 @@ public:
                     break;
                 }
 
-                if(!siF_->isValid(currentTrueState) || isConverged(bstates)) break;
+                // If the robot's clearance gets below the threshold, break loop & replan
+                if(/*isConverged(bstates) ||*/ siF_->getStateValidityChecker()->clearance(currentTrueState) < minRobotClearance_) break;
+
+                //std::cout<<"Clearance :"<<siF_->getStateValidityChecker()->clearance(currentTrueState)<<std::endl;
 
                 boost::this_thread::sleep(boost::posix_time::milliseconds(20));
             }
@@ -303,6 +308,7 @@ public:
         return false;
     }
 
+    /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
     bool areValid(const std::vector<ompl::base::State*> states)
     {
         if(states.size()==1)
@@ -310,8 +316,9 @@ public:
 
         for(int i =0 ; i< states.size(); i++)
         {
-            if(!siF_->isValid(states[i]))
+            if(siF_->getStateValidityChecker()->clearance(states[i]) < minRobotClearance_)
                 return false;
+
         }
 
         return true;
@@ -559,6 +566,8 @@ private:
     std::vector<ompl::base::State*> targetStates_;
 
     MMPolicyGenerator *policyGenerator_;
+
+    double minRobotClearance_;
 };
 #endif
 
