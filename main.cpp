@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 
     window.showMaximized();
 
-    boost::thread solveThread(plan);
+    boost::thread solveThread(testMultiModal);
 
     app.exec();
 

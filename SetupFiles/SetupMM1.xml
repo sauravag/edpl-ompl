@@ -23,7 +23,7 @@
     <landmark id = 7 x = 13.0 y = 19 theta = -0.5 />
     <landmark id = 1000 x = 2.0 y = 19.0 theta = -0.5 />
     <landmark id = 1001 x = 7.5 y = 19.0 theta = -0.5 />
-    <landmark id = 1024 x = 13.0 y = 19.0 theta = -0.5 />
+    <landmark id = 1002 x = 13.0 y = 19.0 theta = -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
@@ -93,10 +93,10 @@
 </TargetList>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/MMEnvExp1.obj"
+        environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/MMEnvExp1.obj"
     />
     <Robot
-        robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+        robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
     />
     <StartPose
         x = "1.9"
