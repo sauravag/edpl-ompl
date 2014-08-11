@@ -82,7 +82,7 @@ void testMultiModal()
 {
     MultiModalSetup *mySetup(new MultiModalSetup);
 
-    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupMM1.xml";
+    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupMM2b.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -94,7 +94,6 @@ void testMultiModal()
 
     if(mySetup->solve())
     {
-        //mySetup->executeSolution();
 
         OMPL_INFORM("Plan Executed Successfully");
 
@@ -117,6 +116,8 @@ int main(int argc, char *argv[])
     window.resize(window.sizeHint());
 
     window.showMaximized();
+
+    window.resetCamera();
 
     boost::thread solveThread(testMultiModal);
 

@@ -35,10 +35,19 @@
 #include "../../include/Planner/MMPolicyGenerator.h"
 #include <boost/thread.hpp>
 #include "../../include/Visualization/Visualizer.h"
+#include "../../include/Utils/FIRMUtils.h"
 
-#define FAILURE_COST 1e6 // cost of colliding
-#define RRT_PLAN_MAX_TIME 10.0 // maximum time allowed for RRT to plan
-#define RRT_FINAL_PROXIMITY_THRESHOLD 1.0 // maximum distance for RRT to succeed
+namespace ompl
+{
+    namespace magic
+    {
+        static const double COLISSION_FAILURE_COST  = 1e6;// cost of colliding
+
+        static const double RRT_PLAN_MAX_TIME = 2.0; // maximum time allowed for RRT to plan
+
+        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
+    }
+}
 
 void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
 {
@@ -56,11 +65,6 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
 
-        //std::cout<<"Belief Number "<<i<<std::endl;
-        //std::cout<<"The belief is :"<<std::endl;
-        //si_->printState(currentBeliefStates_[i]);
-        //std::cout<<"The target is :"<<std::endl;
-        //si_->printState(targetStates_[i]);
         //Generate a path for the mode/target pair
         if(si_->isValid(currentBeliefStates_[i]) /*&& si_->distance(currentBeliefStates_[i], targetStates_[i])>0.50*/)
         {
@@ -69,7 +73,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             ompl::base::ProblemDefinitionPtr pdef(new ompl::base::ProblemDefinition(si_));
 
-            pdef->setStartAndGoalStates(currentBeliefStates_[i], targetStates_[i], RRT_FINAL_PROXIMITY_THRESHOLD);
+            pdef->setStartAndGoalStates(currentBeliefStates_[i], targetStates_[i], ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
 
             planner->as<ompl::geometric::RRT>()->setRange(1.0);
 
@@ -78,7 +82,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
             planner->setup();
 
 
-            ompl::base::PlannerStatus solved = planner->solve(RRT_PLAN_MAX_TIME);
+            ompl::base::PlannerStatus solved = planner->solve(ompl::magic::RRT_PLAN_MAX_TIME);
 
 
             if(solved)
@@ -216,7 +220,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
         if(!si_->isValid(nextState))
         {
 
-            olpInfGain.v -= FAILURE_COST/(i+1); // add a high cost for collision, the sooner the robot collides, more the cost
+            olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1); // add a high cost for collision, the sooner the robot collides, more the cost
             break;//return olpCost;
         }
 
@@ -250,12 +254,15 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
 
     }
 
+    this->updateWeights();
+
     Visualizer::clearStates();
 
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
         Visualizer::addState(currentBeliefStates_[i]);
     }
+
 
 }
 
@@ -295,18 +302,22 @@ void MMPolicyGenerator::updateWeights()
         arma::colvec beliefObservation =  si_->getObservationModel()->getObservation(currentBeliefStates_[i], false);
         arma::colvec innov = this->computeInnovation(beliefObservation, trueObs);
 
-        ompl::base::State* ts = si_->allocState();
-        si_->getTrueState(ts);
-
         arma::mat covariance = arma::diagmat(arma::repmat(arma::diagmat(variance), innov.n_rows/2, innov.n_rows/2)) ;//innov.n_rows, innov.n_rows);
 
         arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
 
+        std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
+        std::cout<<"t at index #"<<i<<"   = "<<t<<std::endl;
+
         float w = std::pow(2.71828, t(0,0));//std::exp(t(0,0));
 
-        totalWeight += weights_[i]*w;
+        std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
 
         weights_[i]  = weights_[i]*w;
+
+        totalWeight += weights_[i];
+
+        std::cout<<"(innov update) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
 
     }
 
@@ -315,21 +326,29 @@ void MMPolicyGenerator::updateWeights()
     {
         for(unsigned int i=0; i< weights_.size(); i++)
         {
+            std::cout<<"(totalweight=0) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
+
             weights_[i] = 1.0/weights_.size();
         }
         return;
     }
-
-    // Normalize the weights
-     for(unsigned int i = 0; i < weights_.size(); i++)
+    else
     {
-        if(totalWeight!=0)
+        // Normalize the weights
+         for(unsigned int i = 0; i < weights_.size(); i++)
+        {
             weights_[i] =  weights_[i]/totalWeight;
+
+            std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
+        }
+         assert(weights_[0]!=0);
     }
-      for(unsigned int i = 0; i < weights_.size(); i++)
+
+    for(unsigned int i = 0; i < weights_.size(); i++)
     {
-        //if(weights_[i] < 1e-6 )
-            //this->removeBelief(i);
+
+        if(weights_[i] < 1e-6 )
+            this->removeBelief(i);
     }
 
 }
@@ -342,7 +361,14 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
     int greaterRows = Zg.n_rows >= Zprd.n_rows ? Zg.n_rows : Zprd.n_rows ;
 
-    arma::colvec innov( (landmarkInfoDim)* greaterRows /singleObservationDim ) ;
+    arma::colvec innov;
+    std::cout<<"Ground Obs:"<<Zg<<std::endl;
+    std::cout<<"Predicted obs :"<<Zprd<<std::endl;
+
+
+    std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
+
+    innov  = arma::zeros<arma::colvec>( (landmarkInfoDim)* greaterRows /singleObservationDim ) ;
 
     for(unsigned int i =0; i< greaterRows/singleObservationDim ; i++)
     {
@@ -354,13 +380,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
             double delta_theta = Zg(i*singleObservationDim + 2) - Zprd(i*singleObservationDim + 2) ;
 
-            if(delta_theta > boost::math::constants::pi<double>() ) {
-              delta_theta = delta_theta - 2*boost::math::constants::pi<double>() ;
-            }
-
-            if( delta_theta < -boost::math::constants::pi<double>() ){
-              delta_theta =  delta_theta + 2*boost::math::constants::pi<double>() ;
-            }
+            FIRMUtils::normalizeAngleToPiRange(delta_theta);
 
             innov( i*(landmarkInfoDim) + 1 ) =  delta_theta;
         }
@@ -379,18 +399,15 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
         }
 
     }
-    if(innov.n_rows==0)
-    {
-        innov = arma::zeros<arma::colvec>(2);
-
-    }
 
     return innov;
 }
 
 void MMPolicyGenerator::removeBelief(const int Indx)
 {
-    currentBeliefStates_.erase(currentBeliefStates_.begin(),currentBeliefStates_.begin()+Indx);
-    weights_.erase(weights_.begin(),weights_.begin()+Indx);
-    targetStates_.erase(targetStates_.begin(),targetStates_.begin()+Indx);
+    currentBeliefStates_.erase(currentBeliefStates_.begin()+Indx);
+
+    weights_.erase(weights_.begin()+Indx);
+
+    targetStates_.erase(targetStates_.begin()+Indx);
 }

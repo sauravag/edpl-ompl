@@ -55,6 +55,8 @@ class MyWindow : public QWidget {
     MyWindow();
 
     //~MyWindow(){};
+     //call back for buttons
+    void resetCamera();
 
   protected:
     void keyPressEvent(QKeyEvent *event);
@@ -63,8 +65,6 @@ class MyWindow : public QWidget {
     //call back for simulation
     void simulate();
 
-    //call back for buttons
-    void resetCamera();
 
   private:
     QTimer timer_; //controls framerate

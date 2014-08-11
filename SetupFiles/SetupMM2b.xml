@@ -1,13 +1,20 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
-<landmark id = 1 x = 4 y = 4 theta = 0.5 />
-<landmark id = 1 x = 10 y = 6 theta = 0.5 />
-<landmark id = 2 x = 6 y = 4 theta = 0.5 />
-<landmark id = 2 x = 12 y = 6 theta = 0.5 />
-<landmark id = 3 x = 5 y = 3 theta = 0.5 />
-<landmark id = 3 x = 11 y = 5 theta = 0.5 />
-<landmark id = 1023 x = -5 y = -5 theta = 0.5 />
-<landmark id = 1024 x =16  y = 15 theta = 0.5 />
+<landmark id = 1 x = 2.5 y = 1.0  theta = 0.0 />
+<landmark id = 1 x = 12.5 y = 1.0  theta = 0.0 />
+<landmark id = 1 x = 2.5 y = 4.0 theta = 0.0 />
+<landmark id = 1 x = 12.5 y = 4.0 theta = 0.0 />
+<landmark id = 1 x = 2.5 y = 8.0 theta = 0.0 />
+<landmark id = 1 x = 12.5 y = 8.0 theta = 0.0 />
+<landmark id = 1 x = 2.5 y = 12.0 theta = 0.0 />
+<landmark id = 1 x = 12.5 y = 12.0 theta = 0.0 />
+<landmark id = 1 x = 2.5 y = 16.0 theta = 0.0 />
+<landmark id = 1 x = 12.5 y = 16.0 theta = 0.0 />
+<landmark id = 1 x = 2.5 y = 20.0 theta = 0.0 />
+<landmark id = 1 x = 12.5 y = 20.0 theta = 0.0 />
+<landmark id = 1000 x = 7.5 y = 1.0 theta = 0.0 />
+<landmark id = 1001 x = 7.5 y = 19.0 theta = 0.0 />
+<landmark id = 1002 x = 2.5 y = 14.0 theta = 0.0 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
@@ -66,25 +73,23 @@
     wind_noise_ang="7.0"-->
 </MotionModels>
 <BeliefList>
-    <belief x = 2.0  y = 6.0 theta = 1.58 />
-    <belief x = 7.5  y = 6.1 theta = 1.53 />
-    <belief x = 13.0 y = 5.9 theta = 1.59 />
+    <belief x = 2.5  y = 10.0 theta = 1.57 />
+    <belief x = 12.5  y = 10.0 theta = 1.57 />
 </BeliefList>
 <TargetList>
-    <target x = 2.0  y = 19.0  theta = 1.57 /> 
     <target x = 7.5  y = 19.0  theta = 1.57 /> 
-    <target x = 13.0 y = 19.0  theta = 1.57 /> 
+    <target x = 7.5  y = 19.0  theta = 1.57 />
 </TargetList>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/MMEnvExp1.obj"
+        environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/MMEnvExp2.obj"
     />
     <Robot
-        robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+        robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
     />
     <StartPose
-        x = "1.9"
-        y = "6.1"
+        x = "2.50"
+        y = "10.0"
         theta = "1.57"
     />
     <GoalPose
