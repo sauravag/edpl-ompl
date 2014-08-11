@@ -39,8 +39,15 @@
 #include "../../include/Visualization/Visualizer.h"
 #include "../../include/Utils/FIRMUtils.h"
 
-#define CAMERA_HALF_FIELD_OF_VIEW 10 // degrees
-#define CAMERA_DETECTION_RANGE 2.5  // meters
+namespace ompl
+{
+    namespace magic
+    {
+        static const double CAMERA_HALF_FIELD_OF_VIEW = 10; // degrees
+
+        static const double CAMERA_DETECTION_RANGE = 2.5;// meters
+    }
+}
 
 /*
   For each landmark, produces an observation that is the range and bearing
@@ -107,18 +114,7 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
         }
     }
 
-    for(unsigned int k = 0; k< z.n_rows / singleObservationDim ;k++)
-    {
-        for(unsigned int p = 0; p< z.n_rows / singleObservationDim ;p++)
-        {
-            if(k!=p)
-            {
-                //assert(z[singleObservationDim*k]!=z[singleObservationDim*p]);
-            }
-        }
-
-    }
-  return z;//removeSpuriousObservations(z);
+  return z;
 
 }
 
@@ -196,9 +192,9 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const arma::colvec xVec, cons
 {
     using namespace arma;
 
-    double fov = CAMERA_HALF_FIELD_OF_VIEW*boost::math::constants::pi<double>()/180; // radians
+    double fov = ompl::magic::CAMERA_HALF_FIELD_OF_VIEW*boost::math::constants::pi<double>()/180; // radians
 
-    double maxrange = CAMERA_DETECTION_RANGE; // meters // NOTE: if you change this value, you must make a corresponding change in the "draw" function of the Cfg.cpp file.
+    double maxrange = ompl::magic::CAMERA_DETECTION_RANGE; // meters // NOTE: if you change this value, you must make a corresponding change in the "draw" function of the Cfg.cpp file.
 
     colvec diff =  landmark.subvec(1,2) - xVec.subvec(0,1);
 
@@ -223,6 +219,10 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const arma::colvec xVec, cons
 
     range = d;
     bearing = landmark_bearing;
+
+    //Normalize bearing to -pi to pi
+    FIRMUtils::normalizeAngleToPiRange(bearing);
+
     // This is to prevent cholesky decomposition from collapsing
     // if range less than 1 cm, limit it to 1 cm as smallest value
     if(range < 1e-2)
@@ -230,7 +230,7 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const arma::colvec xVec, cons
         range = 1e-2;
     }
 
-    if( abs(landmark_bearing) < fov && d <= maxrange  )
+    if( abs(bearing) < fov && d <= maxrange  )
     {
        assert(abs(viewingAngle) <= boost::math::constants::pi<double>() / 2 );
       return true;
@@ -606,14 +606,13 @@ void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
   }
 
   TiXmlNode* node = 0;
-  TiXmlElement* obsModelElement = 0;
+
   TiXmlElement* itemElement = 0;
 
   // Get the landmarklist node
   node = doc.FirstChild( "ObservationModels" );
   assert( node );
-  //obsModelElement  = node->ToElement(); //convert node to element
-  //assert( obsModelElement   );
+
 
   TiXmlNode* child = 0;
 
@@ -654,8 +653,6 @@ bool CamAruco2DObservationModel::isStateObservable(const ompl::base::State *stat
   using namespace arma;
 
   colvec obs = this->getObservation(state, false);
-
-  //std::cout<<"The observation at this state is :"<<obs<<std::endl;
 
   if(obs.n_rows >= numLandmarksForObservability*singleObservationDim)
       return true;
