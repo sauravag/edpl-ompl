@@ -151,9 +151,10 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
     if( !areSimilarWeights() && maxGainPolicyIndx >= 0)
     {
-        //std::cout<<"The max gain policy is :"<< maxGainPolicyIndx<<std::endl;
         OMPL_INFORM("A minimum cost policy was found");
+
         policy = openLoopPolicies[maxGainPolicyIndx];
+
         previousPolicy_ = policy;
     }
     else
@@ -161,18 +162,15 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
         if(openLoopPolicies.size()>0)
         {
             OMPL_INFORM("Weights were similar");
-            std::random_device rd; // obtain a random number from hardware
-            std::mt19937 eng(rd()); // seed the generator
-            std::uniform_int_distribution<> distr(0, openLoopPolicies.size()-1); // define the range
-            int rndp = distr(eng);
+
+            int rndp = FIRMUtils::generateRandomIntegerInRange(0, openLoopPolicies.size()-1);
+
             policy = openLoopPolicies[rndp];
-            //std::cout<<"Chose policy :"<<rndp<<std::endl;
-            //std::cin.get();
+
         }
         else
         {
             policy = previousPolicy_;
-            //std::cin.get();
         }
 
     }
@@ -208,7 +206,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
 
         si_->copyState(kfEstimate,tempState);
 
-        arma::colvec motionNoise = si_->getMotionModel()->getZeroNoise();//->generateNoise(from, openLoopControls[i]);
+        arma::colvec motionNoise = si_->getMotionModel()->getZeroNoise();
 
         si_->getMotionModel()->Evolve(tempState, controls[i], motionNoise, nextState);
 
@@ -228,7 +226,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
         {
 
             olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1); // add a high cost for collision, the sooner the robot collides, more the cost
-            break;//return olpCost;
+            break;
         }
 
     }
@@ -313,18 +311,18 @@ void MMPolicyGenerator::updateWeights()
 
         arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
 
-        std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
-        std::cout<<"t at index #"<<i<<"   = "<<t<<std::endl;
+        //std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
+        //std::cout<<"t at index #"<<i<<"   = "<<t<<std::endl;
 
         float w = std::pow(2.71828, t(0,0));//std::exp(t(0,0));
 
-        std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
+        //std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
 
         weights_[i]  = weights_[i]*w;
 
         totalWeight += weights_[i];
 
-        std::cout<<"(innov update) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
+        //std::cout<<"(innov update) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
 
     }
 
@@ -333,7 +331,7 @@ void MMPolicyGenerator::updateWeights()
     {
         for(unsigned int i=0; i< weights_.size(); i++)
         {
-            std::cout<<"(totalweight=0) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
+            //std::cout<<"(totalweight=0) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
 
             weights_[i] = 1.0/weights_.size();
         }
@@ -346,7 +344,7 @@ void MMPolicyGenerator::updateWeights()
         {
             weights_[i] =  weights_[i]/totalWeight;
 
-            std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
+            //std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
         }
          assert(weights_[0]!=0);
     }
@@ -398,11 +396,13 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
                  innov( i*(landmarkInfoDim) ) = Zg(i*singleObservationDim + 1);
                  innov( i*(landmarkInfoDim) + 1 ) =  Zg(i*singleObservationDim + 2);
             }
+            /*
             else
             {
                 innov( i*(landmarkInfoDim) ) = -Zprd(i*singleObservationDim + 1);
                 innov( i*(landmarkInfoDim) + 1 ) =  -Zprd(i*singleObservationDim + 2);
             }
+            */
         }
 
     }
