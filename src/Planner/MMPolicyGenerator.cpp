@@ -36,6 +36,11 @@
 #include <boost/thread.hpp>
 #include "../../include/Visualization/Visualizer.h"
 #include "../../include/Utils/FIRMUtils.h"
+#include <boost/foreach.hpp>
+#include "../../include/ObservationModels/CamAruco2DObservationModel.h"
+
+#define foreach BOOST_FOREACH
+#define foreach_reverse BOOST_REVERSE_FOREACH
 
 namespace ompl
 {
@@ -46,6 +51,8 @@ namespace ompl
         static const double RRT_PLAN_MAX_TIME = 2.0; // maximum time allowed for RRT to plan
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
+
+        static const double NEIGHBORHOOD_RANGE = 30.0 ; // range within which to find neighbors
     }
 }
 
@@ -362,11 +369,11 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
     int greaterRows = Zg.n_rows >= Zprd.n_rows ? Zg.n_rows : Zprd.n_rows ;
 
     arma::colvec innov;
-    std::cout<<"Ground Obs:"<<Zg<<std::endl;
-    std::cout<<"Predicted obs :"<<Zprd<<std::endl;
 
+    //std::cout<<"Ground Obs:"<<Zg<<std::endl;
+    //std::cout<<"Predicted obs :"<<Zprd<<std::endl;
 
-    std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
+    //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
 
     innov  = arma::zeros<arma::colvec>( (landmarkInfoDim)* greaterRows /singleObservationDim ) ;
 
@@ -410,4 +417,102 @@ void MMPolicyGenerator::removeBelief(const int Indx)
     weights_.erase(weights_.begin()+Indx);
 
     targetStates_.erase(targetStates_.begin()+Indx);
+}
+
+void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
+{
+    // Add state to graph
+    Vertex m = boost::add_vertex(g_);
+
+    stateProperty_[m] = state;
+
+    // Iterate over existing nodes and add edges
+    foreach (Vertex n, boost::vertices(g_))
+    {
+        if ( m!=n && stateProperty_[m]!=stateProperty_[n])
+        {
+            addEdgeToObservationGraph(m,n);
+        }
+    }
+}
+
+void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b)
+{
+    // See if there is an overlap in observation between the two vertices
+    unsigned int weight = 0;
+
+    if(getObservationOverlap(a, b, weight))
+    {
+        std::cout<<"Observations overlap"<<std::endl;
+        std::cin.get();
+        // Add edge if overlap true, with weight = number of overlaps
+        const unsigned int id = maxEdgeID_++;
+
+        const Graph::edge_property_type properties(weight, id);
+
+        // create an edge with the edge weight property
+        std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
+
+    }
+}
+
+void MMPolicyGenerator::evaluateObservationListForVertex(const Vertex v)
+{
+    // get Zero Noise Observation
+    arma::colvec obs = si_->getObservationModel()->getObservation(stateProperty_[v], false);
+
+    unsigned int singleObsSize = CamAruco2DObservationModel::singleObservationDim;
+
+    std::vector<unsigned int> obsList;
+
+    for(int i = 0; i < obs.n_rows/singleObsSize; i++)
+    {
+        obsList.push_back(obs[singleObsSize*i]);
+    }
+
+    stateObservationProperty_[v] = obsList;
+}
+
+bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
+{
+    // get the list of observations for both vertices
+    evaluateObservationListForVertex(a);
+
+    evaluateObservationListForVertex(b);
+
+    bool isOverlapping = false;
+
+    weight = 0;
+
+    // Check if there is an overlap
+    for(int i = 0; i < stateObservationProperty_[a].size(); i++)
+    {
+        for(int j= 0; j < stateObservationProperty_[b].size(); j++)
+        {
+            if(stateObservationProperty_[a][i] == stateObservationProperty_[b][j])
+            {
+                // for every overlap, increase weight
+                weight++;
+
+                isOverlapping = true;
+            }
+        }
+    }
+
+    return isOverlapping;
+}
+
+std::vector<MMPolicyGenerator::Vertex> MMPolicyGenerator::getNeighbors(const ompl::base::State *state)
+{
+    std::vector<Vertex> nn;
+
+    foreach(Vertex v, boost::vertices(g_))
+    {
+        if(si_->distance(state, stateProperty_[v]) <  ompl::magic::NEIGHBORHOOD_RANGE)
+        {
+            nn.push_back(v);
+        }
+    }
+
+    return nn;
 }

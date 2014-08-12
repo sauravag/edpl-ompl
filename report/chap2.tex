@@ -137,3 +137,26 @@ Log of issues faced and discussions on their solutions.
  \item What is the job of the validitychecker ? -> to check if a state is in collision or not. 
 
 \end{enumerate}
+
+\section{Finding the target nodes for the MMPG}
+
+\textbf{MMPolicyGenerator} should contain a boost graph, whose nodes are the nodes of the FIRM graph (no need to store the
+actual properties of the firm graph, just nodes x,y,theta and id.) Then when we add
+the vertex to the graph, we check with every other node in the graph how many overlapping
+landmarks do they see. The weight of the edge is the number of overlapping landmarks.
+Therefore higher weight means that they see more of the same thing.
+
+Then to find the target for a belief, we search for the nodes in its neighborhood(within some radius r,or some fixed
+n number of closes nodes) and repeat this process to find the neighboring nodes NN= {N_1.N_2...} for each belief.
+Then for each neighborhood, find the node in the neighborhood that has the least edgeweight to the other neighborhoods.
+
+
+The functions required would be:
+
+\begin{enumerate}
+ \item Add a node to the graph, create edges. Everytime you add a node, you need to see what landmarks it sees, then compare it to the landmarks
+      that other nodes see. So the vertex property should hold the state and list of ids of landmarks it sees.
+ \item Given N neighborhoods, find that node in each neighborhood which has minimum overlap with other neighborhoods. One simple idea would be 
+       to sum up the weights of the edges of each node with nodes in all the other nodes in the neighborhoods belonging to set N. Then
+       see which node has the lowest sum, that is the least similar in appearance to the nodes in the other neighborhoods.
+\end{enumerate}

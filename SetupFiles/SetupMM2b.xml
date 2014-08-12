@@ -77,8 +77,8 @@
     <belief x = 12.5  y = 10.0 theta = 1.57 />
 </BeliefList>
 <TargetList>
-    <target x = 7.5  y = 19.0  theta = 1.57 /> 
-    <target x = 7.5  y = 19.0  theta = 1.57 />
+    <target x = 7.0  y = 19.0  theta = 0 /> 
+    <target x = 8.0  y = 19.0  theta = 3.142 />
 </TargetList>
 <PlanningProblem>
     <Environment

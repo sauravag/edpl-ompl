@@ -55,12 +55,13 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
   static const int stateDim = 3;
   //static const int singleObservationDim = 3;
-  static const int singleObservationDim = 4; /*[ ID, Range, Bearing, Orientation of Landmark in Environment ]*/
   static const int landmarkInfoDim = 2; /*[ X, Y]*/
   static const int numLandmarksForObservability = 2;
   //static const int obsNoiseDim = 3;
 
   public:
+
+    static const int singleObservationDim = 4; /*[ ID, Range, Bearing, Orientation of Landmark in Environment ]*/
 
     typedef ObservationModelMethod::ObservationType ObservationType;
     typedef ObservationModelMethod::NoiseType ObsNoiseType;
@@ -105,7 +106,7 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     //Function to load landmarks from XML file into the object
     void loadLandmarks(const char *pathToSetupFile);
-    
+
 
     void loadParameters(const char *pathToSetupFile);
 };

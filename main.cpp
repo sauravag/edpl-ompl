@@ -101,9 +101,9 @@ void testMultiModal()
     else
     {
         OMPL_INFORM("Unable to find Solution in given time.");
-
-        exit(1);
     }
+
+    return;
 }
 
 int main(int argc, char *argv[])

@@ -35,7 +35,12 @@
 #ifndef FIRM_OMPL_MM_POLICY_GENERATOR_H
 #define FIRM_OMPL_MM_POLICY_GENERATOR_H
 
+
 #include <ompl/geometric/planners/rrt/RRT.h>
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/pending/disjoint_sets.hpp>
+#include <boost/thread.hpp>
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/control/Control.h>
 #include "../SpaceInformation/SpaceInformation.h"
@@ -52,8 +57,29 @@ class MMPolicyGenerator
 
     public:
 
+        struct vertex_state_t {
+            typedef boost::vertex_property_tag kind;
+        };
+
+        typedef boost::adjacency_list <
+            boost::vecS, boost::vecS, boost::undirectedS,
+            boost::property < vertex_state_t, ompl::base::State*>,
+            boost::property < boost::edge_weight_t, unsigned int ,
+            boost::property < boost::edge_index_t, unsigned int > >
+        > Graph;
+
+        typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
+
+        typedef boost::graph_traits<Graph>::edge_descriptor   Edge;
+
+        typedef boost::shared_ptr< ompl::NearestNeighbors<Vertex> > RoadmapNeighbors;
+
         /** \brief Constructor */
-        MMPolicyGenerator(firm::SpaceInformation::SpaceInformationPtr si):si_(si)
+        MMPolicyGenerator(firm::SpaceInformation::SpaceInformationPtr si):si_(si),
+        maxEdgeID_(0),
+        stateProperty_(boost::get(vertex_state_t(), g_)),
+        weightProperty_(boost::get(boost::edge_weight, g_)),
+        edgeIDProperty_(boost::get(boost::edge_index, g_))
         {
             previousPolicy_.push_back(si_->getMotionModel()->getZeroControl());
         }
@@ -61,13 +87,17 @@ class MMPolicyGenerator
         /** \brief Destructor */
         ~MMPolicyGenerator()
         {
-            while(!currentBeliefStates_.empty()) si_->freeState(currentBeliefStates_.back()), currentBeliefStates_.pop_back();
+            while(!currentBeliefStates_.empty())
+            {
+                si_->freeState(currentBeliefStates_.back()), currentBeliefStates_.pop_back();
+            }
 
-            //weights_.clear();
-            //currentBeliefStates_.clear();
-            //targetStates_.clear();
-            //previousPolicy_.clear();
-            //si_.reset();
+        }
+
+        /** \brief Compute distance between two milestones (this is simply distance between the states of the milestones) */
+        double distanceFunction(const Vertex a, const Vertex b) const
+        {
+            return si_->distance(stateProperty_[a], stateProperty_[b]);
         }
 
         /** \brief Set the current belief states based on robot's belief states*/
@@ -75,7 +105,6 @@ class MMPolicyGenerator
         {
             currentBeliefStates_.clear();
             weights_.clear();
-            //currentBeliefStates_.insert(currentBeliefStates_.end(), states.begin(), states.end());
 
             for(unsigned int i = 0; i < states.size(); i++)
             {
@@ -85,14 +114,20 @@ class MMPolicyGenerator
 
         }
 
+        /** \brief Add the FIRM node as a state to the observation graph*/
+        void addFIRMNodeToObservationGraph(ompl::base::State *state)
+        {
+            this->addStateToObservationGraph(si_->cloneState(state));
+        }
+
         /** \brief For each belief state, there is a target node to go to, set those here */
         void setBeliefTargetStates(const std::vector<ompl::base::State*> states)
         {
             targetStates_.clear();
-            //targetStates_.insert(targetStates_.end(), states.begin(), states.end());
 
             for(unsigned int i = 0; i < states.size(); i++)
             {
+                addFIRMNodeToObservationGraph(states[i]);
                 targetStates_.push_back(si_->cloneState(states[i]));
             }
 
@@ -149,6 +184,21 @@ class MMPolicyGenerator
 
     private:
 
+         /** \brief Add the a state to the observation graph*/
+        void addStateToObservationGraph(ompl::base::State *state);
+
+        /** \brief Add an edge between the two vertices */
+        void addEdgeToObservationGraph(const Vertex a, const Vertex b);
+
+        /** \brief Returns the list of observations that are observed from a Vertex*/
+        void evaluateObservationListForVertex(const Vertex v);
+
+        /** \brief Get the overlap in observation for two vertices*/
+        virtual bool getObservationOverlap(const Vertex a, const Vertex b, unsigned int &weight);
+
+        /** \brief Get the nodes within some radius "r" to state */
+        std::vector<Vertex> getNeighbors(const ompl::base::State *state);
+
         /** \brief Returns true if all weights are same, false otherwise*/
         bool areSimilarWeights();
 
@@ -166,6 +216,32 @@ class MMPolicyGenerator
 
         /** \brief Container for the current weights of the beliefs */
         std::vector<float> weights_;
+
+        /** \brief connectivity graph (observation graph) */
+        Graph                                                  g_;
+
+        /** \brief Access to the internal ompl::base::state at each Vertex */
+        boost::property_map<Graph, vertex_state_t>::type       stateProperty_;
+
+        /** \brief Access to the weights of each Edge */
+        boost::property_map<Graph, boost::edge_weight_t>::type weightProperty_;
+
+        /** \brief Access to the indices of each Edge */
+        boost::property_map<Graph, boost::edge_index_t>::type  edgeIDProperty_;
+
+
+        /** \brief Data structure that maintains the connected components */
+        /*boost::disjoint_sets<
+            boost::property_map<Graph, boost::vertex_rank_t>::type,
+            boost::property_map<Graph, boost::vertex_predecessor_t>::type >
+                                                                    disjointSets_;*/
+        /** \brief Stores the list of ids of landmarks that a vertex in the graph can see*/
+        std::map<Vertex, std::vector<unsigned int> > stateObservationProperty_;
+
+        /** \brief Mutex to guard access to the Graph member (g_) */
+        mutable boost::mutex                                   graphMutex_;
+
+        unsigned int maxEdgeID_;
 
 };
 #endif
