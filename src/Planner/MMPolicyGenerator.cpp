@@ -80,6 +80,10 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             ompl::base::ProblemDefinitionPtr pdef(new ompl::base::ProblemDefinition(si_));
 
+            Vertex targetVertex = findTarget(i);
+
+            std::cin.get();
+
             pdef->setStartAndGoalStates(currentBeliefStates_[i], targetStates_[i], ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
 
             planner->as<ompl::geometric::RRT>()->setRange(1.0);
@@ -515,4 +519,72 @@ std::vector<MMPolicyGenerator::Vertex> MMPolicyGenerator::getNeighbors(const omp
     }
 
     return nn;
+}
+
+MMPolicyGenerator::Vertex MMPolicyGenerator::findTarget(const unsigned int beliefStateIndx)
+{
+    // mapping from index of belief state to its neighbors
+    std::map<unsigned int, std::vector<Vertex> > setOfAllNeighbors;
+
+    // find the neighbors of all the belief States
+    for(int i=0; i < currentBeliefStates_.size(); i++)
+    {
+        std::vector<Vertex> nn;
+
+        nn = this->getNeighbors(currentBeliefStates_[i]);
+
+        setOfAllNeighbors[i] = nn; // insert in mapping
+    }
+
+    std::vector<Vertex> neighborsOfBelief = setOfAllNeighbors[beliefStateIndx];
+
+     // find the node in the required belief's neighbors that is least similar to nodes in other neighboorhoods
+    int targetNodeIndx = -1;
+    int minWeight = 1e6;
+
+    // iterate over the nodes in the required belief's neighborhood;
+    for(int i = 0; i < neighborsOfBelief.size(); i++)
+    {
+        int w = 0;
+
+        // iterate over all other neighborhoods
+        for(int j = 0; setOfAllNeighbors.size(); j++)
+        {
+            if(j != beliefStateIndx)
+            {
+                w += calculateIntersectionWithNeighbor(neighborsOfBelief[i],  setOfAllNeighbors[j]);
+            }
+        }
+
+        if(w < minWeight)
+        {
+            minWeight = w;
+            targetNodeIndx = i;
+        }
+
+    }
+
+    assert(targetNodeIndx >= 0);
+
+    return neighborsOfBelief[targetNodeIndx];
+}
+
+int MMPolicyGenerator::calculateIntersectionWithNeighbor(const Vertex v, std::vector<Vertex> neighbors)
+{
+    int w = 0;
+
+    foreach(Edge e, boost::out_edges(v, g_))
+    {
+        for(int i = 0; i < neighbors.size(); i++)
+        {
+            if(neighbors[i] == boost::target(e, g_))
+            {
+                // then get the edge weight
+                unsigned int edgeWeight =  boost::get(boost::edge_weight, g_, e);
+
+                w += edgeWeight;
+            }
+        }
+    }
+
 }

@@ -199,6 +199,12 @@ class MMPolicyGenerator
         /** \brief Get the nodes within some radius "r" to state */
         std::vector<Vertex> getNeighbors(const ompl::base::State *state);
 
+        /** \brief Find the target location for the given state*/
+        Vertex findTarget(const unsigned int beliefStateIndx);
+
+        /** \brief Find the total weight of the edges from v to nodes in the given neighbor set*/
+        int calculateIntersectionWithNeighbor(const Vertex v, std::vector<Vertex> neighbors);
+
         /** \brief Returns true if all weights are same, false otherwise*/
         bool areSimilarWeights();
 
