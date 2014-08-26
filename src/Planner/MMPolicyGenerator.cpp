@@ -52,7 +52,7 @@ namespace ompl
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 30.0 ; // range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 20.0 ; // range within which to find neighbors
     }
 }
 
@@ -63,7 +63,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     this->printWeights();
 
     // Make sure that each beliefstate has a target state
-    assert(currentBeliefStates_.size() == targetStates_.size());
+    //assert(currentBeliefStates_.size() == targetStates_.size());
 
     //container to store the sequence of controls for each mode/target pair
     std::vector<std::vector<ompl::control::Control*> > openLoopPolicies;
@@ -80,11 +80,15 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             ompl::base::ProblemDefinitionPtr pdef(new ompl::base::ProblemDefinition(si_));
 
+            std::cout<<"For belief :"<<std::endl;
+            si_->printState(currentBeliefStates_[i]);
+
             Vertex targetVertex = findTarget(i);
 
-            std::cin.get();
+            std::cout<<" Target :"<<std::endl;
+            si_->printState(stateProperty_[targetVertex]);
 
-            pdef->setStartAndGoalStates(currentBeliefStates_[i], targetStates_[i], ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
+            pdef->setStartAndGoalStates(currentBeliefStates_[i], stateProperty_[targetVertex]/*targetStates_[i]*/, ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
 
             planner->as<ompl::geometric::RRT>()->setRange(1.0);
 
@@ -425,6 +429,8 @@ void MMPolicyGenerator::removeBelief(const int Indx)
 
 void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
 {
+    //boost::mutex::scoped_lock _(graphMutex_);
+
     // Add state to graph
     Vertex m = boost::add_vertex(g_);
 
@@ -442,13 +448,15 @@ void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
 
 void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b)
 {
+    //boost::mutex::scoped_lock _(graphMutex_);
+
     // See if there is an overlap in observation between the two vertices
     unsigned int weight = 0;
 
     if(getObservationOverlap(a, b, weight))
     {
         std::cout<<"Observations overlap"<<std::endl;
-        std::cin.get();
+        //std::cin.get();
         // Add edge if overlap true, with weight = number of overlaps
         const unsigned int id = maxEdgeID_++;
 
@@ -457,7 +465,10 @@ void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b
         // create an edge with the edge weight property
         std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
 
+        //std::cout<<"Added edge to ob graph"<<std::endl;
+
     }
+
 }
 
 void MMPolicyGenerator::evaluateObservationListForVertex(const Vertex v)
@@ -479,10 +490,31 @@ void MMPolicyGenerator::evaluateObservationListForVertex(const Vertex v)
 
 bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
 {
+    std::cout<<"Calculating observation overlap for: "<<std::endl;
+    si_->printState(stateProperty_[a]);
+    si_->printState(stateProperty_[b]);
+
     // get the list of observations for both vertices
     evaluateObservationListForVertex(a);
 
     evaluateObservationListForVertex(b);
+
+
+    std::cout<<"Observations for a"<<std::endl;
+
+    for(int i=0; i < stateObservationProperty_[a].size(); i++)
+    {
+        std::cout<<stateObservationProperty_[a][i]<<std::endl;
+    }
+
+    std::cout<<"Observations for b"<<std::endl;
+    for(int i=0; i < stateObservationProperty_[b].size(); i++)
+    {
+        std::cout<<stateObservationProperty_[b][i]<<std::endl;
+    }
+
+    //std::cin.get();
+
 
     bool isOverlapping = false;
 
@@ -499,6 +531,8 @@ bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &
                 weight++;
 
                 isOverlapping = true;
+
+                //std::cout<<"Observation overlap"<<std::endl;
             }
         }
     }
@@ -547,15 +581,21 @@ MMPolicyGenerator::Vertex MMPolicyGenerator::findTarget(const unsigned int belie
     {
         int w = 0;
 
+        //std::cout<<"My neighbor : "<<i<<std::endl;
+
         // iterate over all other neighborhoods
-        for(int j = 0; setOfAllNeighbors.size(); j++)
+        for(int j = 0; j < setOfAllNeighbors.size(); j++)
         {
+
             if(j != beliefStateIndx)
             {
                 w += calculateIntersectionWithNeighbor(neighborsOfBelief[i],  setOfAllNeighbors[j]);
+
             }
         }
 
+        //std::cout<<"ob w :"<<w<<std::endl;
+        //TODO: If 2 targets have same weight, then choose the closer one
         if(w < minWeight)
         {
             minWeight = w;
@@ -580,11 +620,13 @@ int MMPolicyGenerator::calculateIntersectionWithNeighbor(const Vertex v, std::ve
             if(neighbors[i] == boost::target(e, g_))
             {
                 // then get the edge weight
-                unsigned int edgeWeight =  boost::get(boost::edge_weight, g_, e);
+                int edgeWeight =  boost::get(boost::edge_weight, g_, e);
 
+                //std::cout<<"Edge weight in og:"<<edgeWeight<<std::endl;
                 w += edgeWeight;
             }
         }
     }
 
+    return w;
 }

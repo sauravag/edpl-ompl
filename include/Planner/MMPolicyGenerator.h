@@ -127,7 +127,7 @@ class MMPolicyGenerator
 
             for(unsigned int i = 0; i < states.size(); i++)
             {
-                addFIRMNodeToObservationGraph(states[i]);
+                addFIRMNodeToObservationGraph(si_->cloneState(states[i]));
                 targetStates_.push_back(si_->cloneState(states[i]));
             }
 
