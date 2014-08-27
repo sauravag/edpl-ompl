@@ -52,7 +52,7 @@ namespace ompl
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 20.0 ; // range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 10.0 ; // range within which to find neighbors
     }
 }
 
@@ -283,11 +283,13 @@ bool MMPolicyGenerator::areSimilarWeights()
 {
 
     arma::colvec w(weights_.size(),1);
+
     for(unsigned int i = 0; i < weights_.size(); i++)
     {
         w[i] = weights_[i];
-        //std::cout<<"Weight is:"<<w[i]<<std::endl;
+        std::cout<<"Weight is:"<<w[i]<<std::endl;
     }
+
     double sd = arma::stddev(w);
 
     if(sd < 1e-6)
@@ -354,7 +356,13 @@ void MMPolicyGenerator::updateWeights()
 
             //std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
         }
-         assert(weights_[0]!=0);
+
+        if(weights_[0]==0)
+        {
+            OMPL_INFORM("Problem detected,mode 1 weight should not go to zero");
+            assert(weights_[0]!=0);
+        }
+
     }
 
     for(unsigned int i = 0; i < weights_.size(); i++)
@@ -379,6 +387,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
     //std::cout<<"Ground Obs:"<<Zg<<std::endl;
     //std::cout<<"Predicted obs :"<<Zprd<<std::endl;
 
+    //std::cin.get();
     //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
 
     innov  = arma::zeros<arma::colvec>( (landmarkInfoDim)* greaterRows /singleObservationDim ) ;
@@ -395,6 +404,8 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
             FIRMUtils::normalizeAngleToPiRange(delta_theta);
 
+            assert(abs(delta_theta) <= 2*boost::math::constants::pi<double>()) ;
+
             innov( i*(landmarkInfoDim) + 1 ) =  delta_theta;
         }
         else
@@ -403,18 +414,21 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
             {
                  innov( i*(landmarkInfoDim) ) = Zg(i*singleObservationDim + 1);
                  innov( i*(landmarkInfoDim) + 1 ) =  Zg(i*singleObservationDim + 2);
+                 assert(abs(innov( i*(landmarkInfoDim) + 1 ) ) <= 2*boost::math::constants::pi<double>()) ;
             }
-            /*
+
             else
             {
                 innov( i*(landmarkInfoDim) ) = -Zprd(i*singleObservationDim + 1);
                 innov( i*(landmarkInfoDim) + 1 ) =  -Zprd(i*singleObservationDim + 2);
             }
-            */
+
         }
 
     }
 
+    //std::cout<<"Innovation:\n" <<innov;
+    //std::cin.get();
     return innov;
 }
 

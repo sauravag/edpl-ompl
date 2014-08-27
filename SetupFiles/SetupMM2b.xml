@@ -1,19 +1,20 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
-<landmark id = 1 x = 2.5 y = 1.0  theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 1.0  theta = 0.0 />
-<landmark id = 1 x = 2.5 y = 4.0 theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 4.0 theta = 0.0 />
-<landmark id = 1 x = 2.5 y = 8.0 theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 8.0 theta = 0.0 />
-<landmark id = 1 x = 2.5 y = 12.0 theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 12.0 theta = 0.0 />
-<landmark id = 1 x = 2.5 y = 16.0 theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 16.0 theta = 0.0 />
-<landmark id = 1 x = 2.5 y = 20.0 theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 20.0 theta = 0.0 />
-<landmark id = 100 x = 7.5 y = 19.0 theta = 0.0 />
-<landmark id = 101 x = 11.5 y = 16.0 theta = 0.0 />
+<landmark id = 1 x = 2.5 y = 1.0  theta = -0.5 />
+<landmark id = 1 x = 12.5 y = 1.0  theta = -0.5 />
+<landmark id = 1 x = 2.5 y = 4.0 theta = -0.5 />
+<landmark id = 1 x = 12.5 y = 4.0 theta = -0.5 />
+<landmark id = 1 x = 2.5 y = 8.0 theta = -0.5 />
+<landmark id = 1 x = 12.5 y = 8.0 theta = -0.5 />
+<landmark id = 1 x = 2.5 y = 12.0 theta = -0.5 />
+<landmark id = 1 x = 12.5 y = 12.0 theta = -0.5 />
+<landmark id = 1 x = 2.5 y = 16.0 theta = -0.5 />
+<landmark id = 1 x = 12.5 y = 16.0 theta = -0.5 />
+<landmark id = 1 x = 2.5 y = 20.0 theta = -0.5 />
+<landmark id = 1 x = 12.5 y = 20.0 theta = -0.5 />
+<landmark id = 100 x = 7.5 y = 19.0 theta = -0.5 />
+<landmark id = 101 x = 11.5 y = 16.0 theta = -0.5 />
+<landmark id = 102 x = 2.0 y = 17.0 theta = -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
@@ -72,8 +73,8 @@
     wind_noise_ang="7.0"-->
 </MotionModels>
 <BeliefList>
-    <belief x = 2.5  y = 10.0 theta = 1.57 />
-    <belief x = 12.5  y = 10.0 theta = 1.57 />
+    <belief x = 2.5  y = 11.0 theta = 1.57 />
+    <belief x = 12.5  y = 11.0 theta = 1.57 />
 </BeliefList>
 <TargetList>
     <target x = 2.5 y = 0.5  theta = 1.57 />
@@ -82,6 +83,8 @@
     <target x = 2.5  y = 19.0 theta = 1.57 />
     <target x = 7.0  y = 19.0  theta = 0.0  /> 
     <target x = 12.5  y = 19.0  theta = 1.57 />
+    <target x = 12  y = 15.0  theta = 1.57 />
+    <target x = 2.0 y = 15.5 theta = 1.57 />
 </TargetList>
 <PlanningProblem>
     <Environment
@@ -92,7 +95,7 @@
     />
     <StartPose
         x = "2.50"
-        y = "10.0"
+        y = "11.0"
         theta = "1.57"
     />
     <GoalPose
