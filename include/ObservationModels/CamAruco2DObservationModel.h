@@ -102,6 +102,12 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     ObservationType removeSpuriousObservations(const ObservationType& Zg);
 
+    /** \brief Estimates the range and bearing from given state to landmark */
+    void calculateRangeBearingToLandmark(const arma::colvec xVec, const arma::colvec& landmark, double& range, double& bearing);
+
+    /** \brief Calculates the likelihood of an observation prediction */
+    double getDataAssociationLikelihood(const arma::colvec trueObs, const arma::colvec predictedObs);
+
     std::vector<arma::colvec> landmarks_;
 
     //Function to load landmarks from XML file into the object

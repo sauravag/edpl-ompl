@@ -321,18 +321,18 @@ void MMPolicyGenerator::updateWeights()
 
         arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
 
-        //std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
-        //std::cout<<"t at index #"<<i<<"   = "<<t<<std::endl;
+        std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
+        std::cout<<"t at index #"<<i<<"   = "<<t<<std::endl;
 
         float w = std::pow(2.71828, t(0,0));//std::exp(t(0,0));
 
-        //std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
+        std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
 
         weights_[i]  = weights_[i]*w;
 
         totalWeight += weights_[i];
 
-        //std::cout<<"(innov update) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
+        std::cout<<"(innov update) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
 
     }
 
@@ -354,7 +354,7 @@ void MMPolicyGenerator::updateWeights()
         {
             weights_[i] =  weights_[i]/totalWeight;
 
-            //std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
+            std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
         }
 
         if(weights_[0]==0)
@@ -384,8 +384,8 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
     arma::colvec innov;
 
-    //std::cout<<"Ground Obs:"<<Zg<<std::endl;
-    //std::cout<<"Predicted obs :"<<Zprd<<std::endl;
+    std::cout<<"Ground Obs:"<<Zg<<std::endl;
+    std::cout<<"Predicted obs :"<<Zprd<<std::endl;
 
     //std::cin.get();
     //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
@@ -427,7 +427,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
     }
 
-    //std::cout<<"Innovation:\n" <<innov;
+    std::cout<<"Innovation:\n" <<innov;
     //std::cin.get();
     return innov;
 }

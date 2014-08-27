@@ -37,7 +37,7 @@
 #include "../../include/Filters/ExtendedKF.h"
 #include "boost/date_time/local_time/local_time.hpp"
 
-const int ExtendedKF::covGrowthFactor_=1.1;
+const int ExtendedKF::covGrowthFactor_=1.01;
 
 void ExtendedKF::Predict(const ompl::base::State *belief,
   const ompl::control::Control* control,
@@ -67,9 +67,9 @@ const LinearSystem& ls, ompl::base::State *updatedState)
   {
     si_->copyState(updatedState, belief);
 
-    arma::mat covTemp = updatedState->as<StateType>()->getCovariance();
+    //arma::mat covTemp = updatedState->as<StateType>()->getCovariance();
 
-    updatedState->as<StateType>()->setCovariance(covTemp*covGrowthFactor_);
+    //updatedState->as<StateType>()->setCovariance(covTemp*covGrowthFactor_);
 
     return; // return the prediction if you don't have any innovation
   }

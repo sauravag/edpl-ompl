@@ -43,7 +43,7 @@ namespace ompl
 {
     namespace magic
     {
-        static const double CAMERA_HALF_FIELD_OF_VIEW = 10; // degrees
+        static const double CAMERA_HALF_FIELD_OF_VIEW = 15; // degrees
 
         static const double CAMERA_DETECTION_RANGE = 2.5;// meters
     }
@@ -139,9 +139,26 @@ bool isUnique(const arma::colvec z)
     return true;
 }
 
+double CamAruco2DObservationModel::getDataAssociationLikelihood(const arma::colvec trueObs, const arma::colvec predictedObs)
+{
+    // Find the most likely landmark to predict associated with the true observation
+    double weight = 0.0;
+
+    arma::mat covariance = arma::diagmat(arma::pow(sigma_,2));
+
+    arma::colvec innov = trueObs-predictedObs;
+
+    arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
+
+    weight = std::pow(2.71828, t(0,0));
+
+    return weight;
+}
+
 typename CamAruco2DObservationModel::ObservationType
 CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg)
 {
+    //std::cout<<"~~~~~~~~~~~~~~~~~~~~~~~ \n";
 
     using namespace arma;
 
@@ -155,42 +172,74 @@ CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *st
     {
         // The candidate landmark is the closest landmark in the list with the same ID as that of what real robot sees
         colvec candidate;
-        double minDistance = 1e6;
 
-        double landmarkRange =0, landmarkBearing = 0, viewingAngle = 0;
+        double maxLikelihood = -1.0;
+
+        double candidatelandmarkRange =0, candidatelandmarkBearing = 0;
 
         for(unsigned int i = 0; i < landmarks_.size() ; i++)
         {
-            if(landmarks_[i](0) == Zg[singleObservationDim*k])
+            if(landmarks_[i](0) == Zg[singleObservationDim*k] )
             {
-                colvec diff =  landmarks_[i].subvec(1,2) - xVec.subvec(0,1);
-                double d = norm(diff,2);
+                double landmarkRange =0, landmarkBearing = 0;
 
-                if(d <= minDistance)
+                // get range and bearing to landmark
+                this->calculateRangeBearingToLandmark(xVec, landmarks_[i], landmarkRange,landmarkBearing);
+
+                arma::colvec prediction;
+
+                prediction<<landmarkRange<<landmarkBearing<<endr;
+
+                // calculate the likelihood
+                double lkhd = getDataAssociationLikelihood(Zg.subvec(singleObservationDim*k+1,singleObservationDim*k+2), prediction);
+
+                //std::cout<<"True observation : \n"<<Zg.subvec(singleObservationDim*k+1,singleObservationDim*k+2)<<std::endl;
+                //std::cout<<"Predicted observation : \n"<<prediction<<std::endl;
+                //std::cout<<"The likelihood is: "<<lkhd<<std::endl;
+
+                if(lkhd > maxLikelihood)
                 {
                     candidate = landmarks_[i];
-                    minDistance = d;
+                    maxLikelihood = lkhd;
+                    candidatelandmarkRange = landmarkRange;
+                    candidatelandmarkBearing = landmarkBearing;
                 }
             }
 
         }
 
-        if(candidate.n_rows > 0)
-        {
-            isLandmarkVisible( xVec, candidate, landmarkRange , landmarkBearing, viewingAngle);
+        z.resize((k+1)*singleObservationDim ,  1);
+        z[singleObservationDim*k]     = candidate(0)  ; // id of the landmark
+        z[singleObservationDim*k + 1] = candidatelandmarkRange ; // distance to landmark
+        z[singleObservationDim*k+2]   = candidatelandmarkBearing  ;
+        z[singleObservationDim*k + 3] = candidate(3)  ; // orientation of the landmark
 
-            z.resize((k+1)*singleObservationDim ,  1);
-            z[singleObservationDim*k] = candidate(0)  ; // id of the landmark
-            z[singleObservationDim*k + 1] = landmarkRange ; // distance to landmark
-            z[singleObservationDim*k+2] = landmarkBearing  ;
-            z[singleObservationDim*k + 3] = candidate(3)  ; // orientation of the landmark
+        assert(abs(z[singleObservationDim*k+2]) <= boost::math::constants::pi<double>());
 
-            assert(abs(z[singleObservationDim*k+2]) <= boost::math::constants::pi<double>());
-        }
     }
 
   return z;
 
+}
+
+void CamAruco2DObservationModel::calculateRangeBearingToLandmark(const arma::colvec xVec, const arma::colvec& landmark, double& range, double& bearing)
+{
+    using namespace arma;
+
+    colvec diff =  landmark.subvec(1,2) - xVec.subvec(0,1);
+
+    //norm is the 2nd Holder norm, i.e. the Euclidean norm
+    double distance = norm(diff,2);
+
+    double robot_landmark_ray =  atan2(diff[1],diff[0]) ;
+
+    double delta_theta = robot_landmark_ray - xVec[2];
+
+    FIRMUtils::normalizeAngleToPiRange(delta_theta);
+
+    range = distance;
+
+    bearing = delta_theta;
 }
 
 bool CamAruco2DObservationModel::isLandmarkVisible(const arma::colvec xVec, const arma::colvec& landmark,
@@ -200,26 +249,16 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const arma::colvec xVec, cons
 
     double fov = ompl::magic::CAMERA_HALF_FIELD_OF_VIEW*boost::math::constants::pi<double>()/180; // radians
 
-    double maxrange = ompl::magic::CAMERA_DETECTION_RANGE; // meters // NOTE: if you change this value, you must make a corresponding change in the "draw" function of the Cfg.cpp file.
+    double maxRange = ompl::magic::CAMERA_DETECTION_RANGE; // meters // NOTE: if you change this value, you must make a corresponding change in the "draw" function of the Cfg.cpp file.
 
-    colvec diff =  landmark.subvec(1,2) - xVec.subvec(0,1);
-
-    //norm is the 2nd Holder norm, i.e. the Euclidean norm
-    double d = norm(diff,2);
-
-    double robot_landmark_ray =  atan2(diff[1],diff[0]) ;
-
-    double delta_theta = robot_landmark_ray - xVec[2];
-    FIRMUtils::normalizeAngleToPiRange(delta_theta);
+    this->calculateRangeBearingToLandmark(xVec, landmark, range , bearing);
 
     double thetaLandmark =  landmark[3]*boost::math::constants::pi<double>() ;
 
     viewingAngle = abs(acos(cos(thetaLandmark )*cos(xVec[2]) + sin(thetaLandmark )*sin(xVec[2])));
 
-     if( viewingAngle > boost::math::constants::pi<double>()/2 ) viewingAngle = abs(viewingAngle-boost::math::constants::pi<double>() );
-
-    range = d;
-    bearing = delta_theta;
+    if( viewingAngle > boost::math::constants::pi<double>()/2 )
+        viewingAngle = abs(viewingAngle-boost::math::constants::pi<double>() );
 
     // This is to prevent cholesky decomposition from collapsing
     // if range less than 1 cm, limit it to 1 cm as smallest value
@@ -228,7 +267,7 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const arma::colvec xVec, cons
         range = 1e-2;
     }
 
-    if( abs(bearing) < fov && d <= maxrange  )
+    if( abs(bearing) < fov && range <= maxRange )
     {
        assert(abs(viewingAngle) <= boost::math::constants::pi<double>() / 2 );
       return true;
