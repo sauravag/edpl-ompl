@@ -315,7 +315,7 @@ void MMPolicyGenerator::updateWeights()
 
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
-        //std::cout<<"Index #"<<i<<std::endl;
+        std::cout<<"Index #"<<i<<std::endl;
         // compute the innovation
         arma::colvec beliefObservation =  si_->getObservationModel()->getObservation(currentBeliefStates_[i], false);
 
@@ -389,8 +389,8 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
     arma::colvec innov;
 
-    //std::cout<<"Ground Obs:"<<Zg<<std::endl;
-    //std::cout<<"Predicted obs :"<<Zprd<<std::endl;
+    std::cout<<"Ground Obs:"<<Zg<<std::endl;
+    std::cout<<"Predicted obs :"<<Zprd<<std::endl;
 
     //std::cin.get();
     //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
@@ -433,7 +433,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
     }
 
-    //std::cout<<"Innovation:\n" <<innov;
+    std::cout<<"Innovation:\n" <<innov;
     //std::cin.get();
     return innov;
 }

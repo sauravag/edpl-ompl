@@ -290,7 +290,7 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const ompl::base::State *stat
         range = 1e-2;
     }
 
-    if( abs(bearing) < fov && range <= maxRange )
+    if( abs(bearing) <= fov && range <= maxRange )
     {
        assert(abs(viewingAngle) <= boost::math::constants::pi<double>() / 2 );
       return true;
