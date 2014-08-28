@@ -1,28 +1,28 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
-<landmark id = 1 x = 2.5 y = 0.0  theta = 0 />
-<landmark id = 2 x = 2.5 y = 4.0 theta = 0 />
-<landmark id = 3 x = 2.5 y = 8.0 theta = 0 />
-<landmark id = 4 x = 2.5 y = 12.0 theta = 0 />
-<landmark id = 5 x = 2.5 y = 16.0 theta = 0 />
-<landmark id = 6 x = 2.5 y = 20.0 theta = 0 />
-<landmark id = 1 x = 12.5 y = 20.0  theta = 0 />
-<landmark id = 2 x = 12.5 y = 16.0 theta = 0/>
-<landmark id = 3 x = 12.5 y = 12.0 theta = 0 />
-<landmark id = 4 x = 12.5 y = 8.0 theta = 0 />
-<landmark id = 5 x = 12.5 y = 4.0 theta = 0 />
-<landmark id = 6 x = 12.5 y = 0.0 theta = 0 />
-<landmark id = 100 x = 3.5 y = 19.0 theta = 0 />
-<landmark id = 101 x = 12.5 y = 1.0 theta = 0 />
+<landmark id = 1 x = 2.5 y = 0.0  theta = 0.5 />
+<landmark id = 2 x = 2.5 y = 4.0 theta = 0.5 />
+<landmark id = 3 x = 2.5 y = 8.0 theta = 0.5 />
+<landmark id = 4 x = 2.5 y = 12.0 theta = 0.5 />
+<landmark id = 5 x = 2.5 y = 16.0 theta = 0.5 />
+<landmark id = 6 x = 2.5 y = 20.0 theta = 0.5 />
+<landmark id = 1 x = 12.5 y = 20.0  theta = -0.5 />
+<landmark id = 2 x = 12.5 y = 16.0 theta = -0.5  />
+<landmark id = 3 x = 12.5 y = 12.0 theta = -0.5  />
+<landmark id = 4 x = 12.5 y = 8.0 theta = -0.5   />
+<landmark id = 5 x = 12.5 y = 4.0 theta = -0.5   />
+<landmark id = 6 x = 12.5 y = 0.0 theta = -0.5   />
+<landmark id = 100 x = 3.5 y = 19.0 theta = -0.5 />
+<landmark id = 101 x = 12.5 y = 1.0 theta = -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
-    sigma_range="0.10"
-    sigma_angle="1.0"
-    eta_rd="0.05"
-    eta_rphi = "0.005"
+    sigma_range="0.05"
+    sigma_angle="0.5"
+    eta_rd="0.10"
+    eta_rphi = "0.01"
     eta_thetad="0.01"
-    eta_thetaphi = "0.001"
+    eta_thetaphi = "0.01"
     camera_horizontal_fov = "45"
     vcLabel = "cd1"
   >

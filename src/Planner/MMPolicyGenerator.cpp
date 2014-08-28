@@ -364,7 +364,8 @@ void MMPolicyGenerator::updateWeights()
         if(weights_[0]==0)
         {
             OMPL_INFORM("Problem detected,mode 1 weight should not go to zero");
-            assert(weights_[0]!=0);
+            //assert(weights_[0]!=0);
+            std::cin.get();
         }
 
     }
