@@ -58,7 +58,7 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
 {
     using namespace arma;
 
-    colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
+    //colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
     ObservationType z;
 
@@ -70,7 +70,7 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
 
         double landmarkRange =0, landmarkBearing = 0, relativeAngle = 0;
 
-        if(isLandmarkVisible(xVec, landmarks_[i], landmarkRange , landmarkBearing, relativeAngle))
+        if(isLandmarkVisible(state, landmarks_[i], landmarkRange , landmarkBearing, relativeAngle))
         {
 
             //cout<<"Trying to resize"<<endl;
@@ -139,22 +139,6 @@ bool isUnique(const arma::colvec z)
     return true;
 }
 
-double CamAruco2DObservationModel::getDataAssociationLikelihood(const arma::colvec trueObs, const arma::colvec predictedObs)
-{
-    // Find the most likely landmark to predict associated with the true observation
-    double weight = 0.0;
-
-    arma::mat covariance = arma::diagmat(arma::pow(sigma_,2));
-
-    arma::colvec innov = trueObs-predictedObs;
-
-    arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
-
-    weight = std::pow(2.71828, t(0,0));
-
-    return weight;
-}
-
 typename CamAruco2DObservationModel::ObservationType
 CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg)
 {
@@ -173,45 +157,12 @@ CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *st
         // The candidate landmark is the closest landmark in the list with the same ID as that of what real robot sees
         colvec candidate;
 
-        double maxLikelihood = -1.0;
-
-        double candidatelandmarkRange =0, candidatelandmarkBearing = 0;
-
-        for(unsigned int i = 0; i < landmarks_.size() ; i++)
-        {
-            if(landmarks_[i](0) == Zg[singleObservationDim*k] )
-            {
-                double landmarkRange =0, landmarkBearing = 0;
-
-                // get range and bearing to landmark
-                this->calculateRangeBearingToLandmark(xVec, landmarks_[i], landmarkRange,landmarkBearing);
-
-                arma::colvec prediction;
-
-                prediction<<landmarkRange<<landmarkBearing<<endr;
-
-                // calculate the likelihood
-                double lkhd = getDataAssociationLikelihood(Zg.subvec(singleObservationDim*k+1,singleObservationDim*k+2), prediction);
-
-                //std::cout<<"True observation : \n"<<Zg.subvec(singleObservationDim*k+1,singleObservationDim*k+2)<<std::endl;
-                //std::cout<<"Predicted observation : \n"<<prediction<<std::endl;
-                //std::cout<<"The likelihood is: "<<lkhd<<std::endl;
-
-                if(lkhd > maxLikelihood)
-                {
-                    candidate = landmarks_[i];
-                    maxLikelihood = lkhd;
-                    candidatelandmarkRange = landmarkRange;
-                    candidatelandmarkBearing = landmarkBearing;
-                }
-            }
-
-        }
+        int candidateIndx = this->findCorresponsingLandmark(state, Zg.subvec(singleObservationDim*k,singleObservationDim*k+3), candidate);
 
         z.resize((k+1)*singleObservationDim ,  1);
         z[singleObservationDim*k]     = candidate(0)  ; // id of the landmark
-        z[singleObservationDim*k + 1] = candidatelandmarkRange ; // distance to landmark
-        z[singleObservationDim*k+2]   = candidatelandmarkBearing  ;
+        z[singleObservationDim*k + 1] = candidate(1) ;  // distance to landmark
+        z[singleObservationDim*k+2]   = candidate(2)  ; // bearing
         z[singleObservationDim*k + 3] = candidate(3)  ; // orientation of the landmark
 
         assert(abs(z[singleObservationDim*k+2]) <= boost::math::constants::pi<double>());
@@ -222,9 +173,11 @@ CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *st
 
 }
 
-void CamAruco2DObservationModel::calculateRangeBearingToLandmark(const arma::colvec xVec, const arma::colvec& landmark, double& range, double& bearing)
+void CamAruco2DObservationModel::calculateRangeBearingToLandmark(const ompl::base::State *state, const arma::colvec& landmark, double& range, double& bearing)
 {
     using namespace arma;
+
+    colvec xVec =  state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
     colvec diff =  landmark.subvec(1,2) - xVec.subvec(0,1);
 
@@ -242,16 +195,84 @@ void CamAruco2DObservationModel::calculateRangeBearingToLandmark(const arma::col
     bearing = delta_theta;
 }
 
-bool CamAruco2DObservationModel::isLandmarkVisible(const arma::colvec xVec, const arma::colvec& landmark,
+double CamAruco2DObservationModel::getDataAssociationLikelihood(const arma::colvec trueObs, const arma::colvec predictedObs)
+{
+    // Find the most likely landmark to predict associated with the true observation
+    double weight = 0.0;
+
+    arma::mat covariance = arma::diagmat(arma::pow(sigma_,2));
+
+    arma::colvec innov = trueObs-predictedObs;
+
+    arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
+
+    weight = std::pow(2.71828, t(0,0));
+
+    return weight;
+}
+
+
+int CamAruco2DObservationModel::findCorresponsingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark, arma::colvec &candidateObservation)
+{
+    using namespace arma;
+
+    int landmarkID = observedLandmark[0];
+
+    double maxLikelihood = -1.0;
+
+    double candidatelandmarkRange =0, candidatelandmarkBearing = 0;
+
+    int candidateIndx = -1;
+
+    for(unsigned int i = 0; i < landmarks_.size() ; i++)
+    {
+        if(landmarks_[i](0) == landmarkID)
+        {
+            double landmarkRange =0, landmarkBearing = 0;
+
+            // get range and bearing to landmark
+            this->calculateRangeBearingToLandmark(state, landmarks_[i], landmarkRange,landmarkBearing);
+
+            arma::colvec prediction;
+
+            prediction<<landmarkRange<<landmarkBearing<<endr;
+
+            // calculate the likelihood
+            double lkhd = getDataAssociationLikelihood(observedLandmark.subvec(1,2), prediction);
+
+            if(lkhd > maxLikelihood)
+            {
+                candidateIndx = i;
+                maxLikelihood = lkhd;
+                candidatelandmarkRange = landmarkRange;
+                candidatelandmarkBearing = landmarkBearing;
+            }
+        }
+
+    }
+
+    // The observation is id, range, bearing, orientation of the landmark
+    candidateObservation<<landmarkID<<candidatelandmarkRange<<candidatelandmarkBearing<<landmarks_[candidateIndx][3]<<endr;
+
+    assert(candidateIndx>=0);
+
+    return candidateIndx;
+
+}
+
+
+bool CamAruco2DObservationModel::isLandmarkVisible(const ompl::base::State *state, const arma::colvec& landmark,
                                                               double& range, double& bearing, double& viewingAngle)
 {
     using namespace arma;
+
+    colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
     double fov = ompl::magic::CAMERA_HALF_FIELD_OF_VIEW*boost::math::constants::pi<double>()/180; // radians
 
     double maxRange = ompl::magic::CAMERA_DETECTION_RANGE; // meters // NOTE: if you change this value, you must make a corresponding change in the "draw" function of the Cfg.cpp file.
 
-    this->calculateRangeBearingToLandmark(xVec, landmark, range , bearing);
+    this->calculateRangeBearingToLandmark(state, landmark, range , bearing);
 
     double thetaLandmark =  landmark[3]*boost::math::constants::pi<double>() ;
 
@@ -281,67 +302,56 @@ typename CamAruco2DObservationModel::JacobianType
 CamAruco2DObservationModel::getObservationJacobian(const ompl::base::State *state, const ObsNoiseType& v,
   const ObservationType& z)
 {
-  using namespace arma;
+    using namespace arma;
 
-  unsigned int number_of_landmarks = z.n_rows / singleObservationDim ;
+    unsigned int number_of_landmarks = z.n_rows / singleObservationDim ;
 
-  colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
+    colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
-  mat H( (landmarkInfoDim)* number_of_landmarks, stateDim); // Since we are passing the common id list
+    mat H( (landmarkInfoDim)* number_of_landmarks, stateDim); // Since we are passing the common id list
 
-  for(unsigned int i = 0; i < number_of_landmarks ; ++i)
-  {
-
-    int Indx=-999;
-    double minDistance = 1e6;
-    for(unsigned int j = 0; j < landmarks_.size() ; j++)
+    for(unsigned int i = 0; i < number_of_landmarks ; ++i)
     {
-        if(z(i*singleObservationDim) == landmarks_[j](0))
+        colvec candidate;
+        int Indx = this->findCorresponsingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
+        /*
+        int Indx = -999;
+        double minDistance = 1e6;
+        for(unsigned int j = 0; j < landmarks_.size() ; j++)
         {
-            colvec diff =  landmarks_[j].subvec(1,2) - xVec.subvec(0,1);
-            double d = norm(diff,2);
-
-            if(d <= minDistance)
+            if(z(i*singleObservationDim) == landmarks_[j](0))
             {
-                Indx = j;
-                minDistance = d;
+                colvec diff =  landmarks_[j].subvec(1,2) - xVec.subvec(0,1);
+                double d = norm(diff,2);
+
+                if(d <= minDistance)
+                {
+                    Indx = j;
+                    minDistance = d;
+                }
+
             }
 
         }
+        */
+        assert(Indx>=0);
+
+        colvec diff =  landmarks_[Indx].subvec(1,2) - xVec.subvec(0,1);
+
+        double phi = atan2(diff[1], diff[0]);
+
+        double r = norm(diff,2);
+
+        mat H_i((landmarkInfoDim),stateDim);
+
+        H_i <<  -cos(phi)    <<  -sin(phi)    <<   0 << endr
+            <<   sin(phi)/r  <<  -cos(phi)/r  <<  -1 << endr;
+
+        H.submat((landmarkInfoDim)*i, 0, (landmarkInfoDim)*i+1, 2) = H_i;
 
     }
 
-    /*
-    for(unsigned int j=0;j< landmarks_.size() ; j++)
-    {
-      colvec diff =  landmarks_[j].subvec(1,2) - xVec.subvec(0,1);
-      double d = norm(diff,2);
-      if( z(i*singleObservationDim) == landmarks_[j](0) && abs(z(i*singleObservationDim+1) - d) < 0.1)
-      {
-
-        Indx = j;
-        break;
-      }
-    }
-    */
-    assert(Indx>=0);
-
-    colvec diff =  landmarks_[Indx].subvec(1,2) - xVec.subvec(0,1);
-
-    double phi = atan2(diff[1], diff[0]);
-
-    double r = norm(diff,2);
-
-    mat H_i((landmarkInfoDim),stateDim);
-
-    H_i <<  -cos(phi)    <<  -sin(phi)    <<   0 << endr
-        <<   sin(phi)/r  <<  -cos(phi)/r  <<  -1 << endr;
-
-    H.submat((landmarkInfoDim)*i, 0, (landmarkInfoDim)*i+1, 2) = H_i;
-
-  }
-
-  return H;
+    return H;
 }
 
 
@@ -360,73 +370,79 @@ CamAruco2DObservationModel::getNoiseJacobian(const ompl::base::State *state, con
 }
 
 
+
 arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::base::State *state,
                                                                         const ObservationType& z)
 {
-  using namespace arma;
+    using namespace arma;
 
-  //extract state from Cfg and normalize
-  colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
+    //extract state from Cfg and normalize
+    colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
-  unsigned int number_of_landmarks = z.n_rows/singleObservationDim ;
+    unsigned int number_of_landmarks = z.n_rows/singleObservationDim ;
 
-  //generate noise scaling/shifting factors
-  colvec noise( number_of_landmarks*(landmarkInfoDim));
+    //generate noise scaling/shifting factors
+    colvec noise( number_of_landmarks*(landmarkInfoDim));
 
-  for(unsigned int i =0; i< number_of_landmarks ; i++)
-  {
-
-    int indx=0; // is the index of the landmark in the vector m_landmarks, whose id matches the id contained in _z[i]
-    double minDistance = 1e6;
-    for(unsigned int j = 0; j < landmarks_.size() ; j++)
+    for(unsigned int i =0; i< number_of_landmarks ; i++)
     {
-        if(z(i*singleObservationDim) == landmarks_[j](0))
-        {
-            colvec diff =  landmarks_[j].subvec(1,2) - xVec.subvec(0,1);
-            double d = norm(diff,2);
+        colvec candidate;
 
-            if(d <= minDistance)
+        int indx = this->findCorresponsingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
+        /*
+        int indx=0; // is the index of the landmark in the vector m_landmarks, whose id matches the id contained in _z[i]
+        double minDistance = 1e6;
+        for(unsigned int j = 0; j < landmarks_.size() ; j++)
+        {
+            if(z(i*singleObservationDim) == landmarks_[j](0))
             {
-                indx = j;
-                minDistance = d;
+                colvec diff =  landmarks_[j].subvec(1,2) - xVec.subvec(0,1);
+                double d = norm(diff,2);
+
+                if(d <= minDistance)
+                {
+                    indx = j;
+                    minDistance = d;
+                }
+
             }
 
         }
+        */
+
+        /*
+        // we find the landmark whose id matches the one in the list of common Ids
+        for(unsigned int j=0;j< landmarks_.size() ; j++)
+        {
+          colvec diff =  landmarks_[j].subvec(1,2) - xVec.subvec(0,1);
+          double d = norm(diff,2);
+
+          // id should be same, and it should be the closer landmark obviously!
+          if( z(i*singleObservationDim) == landmarks_[j](0) && abs(z(i*singleObservationDim+1)-d)<0.01){
+
+            indx = j;
+            break;
+          }
+        }
+        */
+
+        double range = candidate(1);//norm( landmarks_[indx].subvec(1,2) - xVec.subvec(0,1) , 2);
+
+        double thetaLandmark =  candidate(3)*boost::math::constants::pi<double>() ;
+
+        double viewingAngle = abs(acos(cos(thetaLandmark )*cos(xVec[2]) + sin(thetaLandmark )*sin(xVec[2])));
+
+        if( viewingAngle > boost::math::constants::pi<double>()/2 ) viewingAngle = abs(viewingAngle-boost::math::constants::pi<double>() );
+
+        noise.subvec(2*i, 2*i+1) = this->etaD_*range + this->etaPhi_*viewingAngle + this->sigma_;
 
     }
-    /*
-    // we find the landmark whose id matches the one in the list of common Ids
-    for(unsigned int j=0;j< landmarks_.size() ; j++)
-    {
-      colvec diff =  landmarks_[j].subvec(1,2) - xVec.subvec(0,1);
-      double d = norm(diff,2);
 
-      // id should be same, and it should be the closer landmark obviously!
-      if( z(i*singleObservationDim) == landmarks_[j](0) && abs(z(i*singleObservationDim+1)-d)<0.01){
+    //square the factors to get the covariances
+    noise = pow(noise,2);
 
-        indx = j;
-        break;
-      }
-    }
-    */
-
-    double range = norm( landmarks_[indx].subvec(1,2) - xVec.subvec(0,1) , 2);
-
-    double thetaLandmark =  landmarks_[indx][3]*boost::math::constants::pi<double>() ;
-
-    double viewingAngle = abs(acos(cos(thetaLandmark )*cos(xVec[2]) + sin(thetaLandmark )*sin(xVec[2])));
-
-    if( viewingAngle > boost::math::constants::pi<double>()/2 ) viewingAngle = abs(viewingAngle-boost::math::constants::pi<double>() );
-
-    noise.subvec(2*i, 2*i+1) = this->etaD_*range + this->etaPhi_*viewingAngle + this->sigma_;
-
-  }
-
-  //square the factors to get the covariances
-  noise = pow(noise,2);
-
-  //return covariance matrix generated from vector of covariances
-  return diagmat(noise);
+    //return covariance matrix generated from vector of covariances
+    return diagmat(noise);
 
 }
 /**
@@ -566,6 +582,7 @@ typename CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel:
     return Zcorrected;
 
 }
+
 
 void CamAruco2DObservationModel::loadLandmarks(const char *pathToSetupFile)
 {

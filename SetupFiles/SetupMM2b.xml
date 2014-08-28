@@ -12,17 +12,17 @@
 <landmark id = 1 x = 12.5 y = 17.0 theta = 0 />
 <landmark id = 1 x = 2.5 y = 20.0 theta = 0 />
 <landmark id = 1 x = 12.5 y = 20.0 theta = 0 />
-<landmark id = 100 x = 1.5 y = 12.0 theta = 0 />
+<landmark id = 100 x = 1.5 y = 18.0 theta = 0 />
 <landmark id = 101 x = 7.5 y = 1.0 theta = 0 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
     sigma_range="0.10"
-    sigma_angle="1.0"
+    sigma_angle="0.5"
     eta_rd="0.100"
-    eta_rphi = "0.01"
+    eta_rphi = "0.005"
     eta_thetad="0.01"
-    eta_thetaphi = "0.02"
+    eta_thetaphi = "0.01"
     camera_horizontal_fov = "45"
     vcLabel = "cd1"
   >
@@ -79,7 +79,7 @@
     <target x = 2.5 y = 0.5  theta = 1.57 />
     <target x = 12.5 y = 0.5  theta = 1.57 />
     <target x = 2.5 y = 7.0  theta = 1.57 />
-    <target x = 2.5  y = 19.0 theta = 1.57 />
+    <target x = 1.5  y = 16.0 theta = 1.57 />
     <target x = 7.0  y = 19.0  theta = 0.0  /> 
     <target x = 12.5  y = 19.0  theta = 1.57 />
     <target x = 12  y = 15.0  theta = 1.57 />
@@ -94,7 +94,7 @@
     />
     <StartPose
         x = "2.50"
-        y = "12.0"
+        y = "11.0"
         theta = "1.57"
     />
     <GoalPose

@@ -92,7 +92,7 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z);
 
-    bool isLandmarkVisible(const arma::colvec xVec, const arma::colvec& landmark, double& range, double& bearing, double& viewingAngle);
+    bool isLandmarkVisible(const ompl::base::State *state, const arma::colvec& landmark, double& range, double& bearing, double& viewingAngle);
 
     //void WriteLandmarks();
 
@@ -103,10 +103,13 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     ObservationType removeSpuriousObservations(const ObservationType& Zg);
 
     /** \brief Estimates the range and bearing from given state to landmark */
-    void calculateRangeBearingToLandmark(const arma::colvec xVec, const arma::colvec& landmark, double& range, double& bearing);
+    void calculateRangeBearingToLandmark(const ompl::base::State *state, const arma::colvec& landmark, double& range, double& bearing);
 
     /** \brief Calculates the likelihood of an observation prediction */
     double getDataAssociationLikelihood(const arma::colvec trueObs, const arma::colvec predictedObs);
+
+    /** \brief Given a landmark that the robot observes (id, range, bearing..) Find the corresponding landmark,returns the position in the landmark list  */
+    int findCorresponsingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark, arma::colvec &candidateObservation);
 
     std::vector<arma::colvec> landmarks_;
 
