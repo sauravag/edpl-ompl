@@ -43,7 +43,7 @@ namespace ompl
 {
     namespace magic
     {
-        static const double CAMERA_HALF_FIELD_OF_VIEW = 15; // degrees
+        static const double CAMERA_HALF_FIELD_OF_VIEW = 22.5; // degrees
 
         static const double CAMERA_DETECTION_RANGE = 2.5;// meters
     }
@@ -146,7 +146,7 @@ CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *st
 
     using namespace arma;
 
-    assert(isUnique(Zg));
+    //assert(isUnique(Zg));
 
     colvec xVec =  state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
@@ -200,7 +200,9 @@ double CamAruco2DObservationModel::getDataAssociationLikelihood(const arma::colv
     // Find the most likely landmark to predict associated with the true observation
     double weight = 0.0;
 
-    arma::mat covariance = arma::diagmat(arma::pow(sigma_,2));
+    arma::colvec noise = this->etaD_*trueObs(1) + this->sigma_;
+
+    arma::mat covariance = arma::diagmat(arma::pow(noise,2));
 
     arma::colvec innov = trueObs-predictedObs;
 
@@ -313,28 +315,8 @@ CamAruco2DObservationModel::getObservationJacobian(const ompl::base::State *stat
     for(unsigned int i = 0; i < number_of_landmarks ; ++i)
     {
         colvec candidate;
+
         int Indx = this->findCorresponsingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
-        /*
-        int Indx = -999;
-        double minDistance = 1e6;
-        for(unsigned int j = 0; j < landmarks_.size() ; j++)
-        {
-            if(z(i*singleObservationDim) == landmarks_[j](0))
-            {
-                colvec diff =  landmarks_[j].subvec(1,2) - xVec.subvec(0,1);
-                double d = norm(diff,2);
-
-                if(d <= minDistance)
-                {
-                    Indx = j;
-                    minDistance = d;
-                }
-
-            }
-
-        }
-        */
-        assert(Indx>=0);
 
         colvec diff =  landmarks_[Indx].subvec(1,2) - xVec.subvec(0,1);
 
@@ -389,42 +371,6 @@ arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::
         colvec candidate;
 
         int indx = this->findCorresponsingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
-        /*
-        int indx=0; // is the index of the landmark in the vector m_landmarks, whose id matches the id contained in _z[i]
-        double minDistance = 1e6;
-        for(unsigned int j = 0; j < landmarks_.size() ; j++)
-        {
-            if(z(i*singleObservationDim) == landmarks_[j](0))
-            {
-                colvec diff =  landmarks_[j].subvec(1,2) - xVec.subvec(0,1);
-                double d = norm(diff,2);
-
-                if(d <= minDistance)
-                {
-                    indx = j;
-                    minDistance = d;
-                }
-
-            }
-
-        }
-        */
-
-        /*
-        // we find the landmark whose id matches the one in the list of common Ids
-        for(unsigned int j=0;j< landmarks_.size() ; j++)
-        {
-          colvec diff =  landmarks_[j].subvec(1,2) - xVec.subvec(0,1);
-          double d = norm(diff,2);
-
-          // id should be same, and it should be the closer landmark obviously!
-          if( z(i*singleObservationDim) == landmarks_[j](0) && abs(z(i*singleObservationDim+1)-d)<0.01){
-
-            indx = j;
-            break;
-          }
-        }
-        */
 
         double range = candidate(1);//norm( landmarks_[indx].subvec(1,2) - xVec.subvec(0,1) , 2);
 

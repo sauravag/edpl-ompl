@@ -289,7 +289,7 @@ bool MMPolicyGenerator::areSimilarWeights()
     for(unsigned int i = 0; i < weights_.size(); i++)
     {
         w[i] = weights_[i];
-        std::cout<<"Weight is:"<<w[i]<<std::endl;
+        //std::cout<<"Weight is:"<<w[i]<<std::endl;
     }
 
     double sd = arma::stddev(w);
@@ -315,15 +315,17 @@ void MMPolicyGenerator::updateWeights()
 
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
+        std::cout<<"Index #"<<i<<std::endl;
         // compute the innovation
         arma::colvec beliefObservation =  si_->getObservationModel()->getObservation(currentBeliefStates_[i], false);
+
         arma::colvec innov = this->computeInnovation(beliefObservation, trueObs);
 
         arma::mat covariance = arma::diagmat(arma::repmat(arma::diagmat(variance), innov.n_rows/2, innov.n_rows/2)) ;//innov.n_rows, innov.n_rows);
 
         arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
 
-        //std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
+        std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
         //std::cout<<"t at index #"<<i<<"   = "<<t<<std::endl;
 
         float w = std::pow(2.71828, t(0,0));//std::exp(t(0,0));
@@ -386,8 +388,8 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
     arma::colvec innov;
 
-    //std::cout<<"Ground Obs:"<<Zg<<std::endl;
-    //std::cout<<"Predicted obs :"<<Zprd<<std::endl;
+    std::cout<<"Ground Obs:"<<Zg<<std::endl;
+    std::cout<<"Predicted obs :"<<Zprd<<std::endl;
 
     //std::cin.get();
     //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
@@ -418,18 +420,19 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
                  innov( i*(landmarkInfoDim) + 1 ) =  Zg(i*singleObservationDim + 2);
                  assert(abs(innov( i*(landmarkInfoDim) + 1 ) ) <= 2*boost::math::constants::pi<double>()) ;
             }
-
+            /*
             else
             {
                 innov( i*(landmarkInfoDim) ) = -Zprd(i*singleObservationDim + 1);
                 innov( i*(landmarkInfoDim) + 1 ) =  -Zprd(i*singleObservationDim + 2);
             }
+            */
 
         }
 
     }
 
-    std::cout<<"Innovation:\n" <<innov;
+    //std::cout<<"Innovation:\n" <<innov;
     //std::cin.get();
     return innov;
 }
@@ -506,7 +509,7 @@ void MMPolicyGenerator::evaluateObservationListForVertex(const Vertex v)
 
 bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
 {
-    std::cout<<"Calculating observation overlap for: "<<std::endl;
+    //std::cout<<"Calculating observation overlap for: "<<std::endl;
     si_->printState(stateProperty_[a]);
     si_->printState(stateProperty_[b]);
 
@@ -515,7 +518,7 @@ bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &
 
     evaluateObservationListForVertex(b);
 
-
+    /*
     std::cout<<"Observations for a"<<std::endl;
 
     for(int i=0; i < stateObservationProperty_[a].size(); i++)
@@ -530,7 +533,7 @@ bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &
     }
 
     //std::cin.get();
-
+    */
 
     bool isOverlapping = false;
 
