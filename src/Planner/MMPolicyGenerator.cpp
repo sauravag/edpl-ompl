@@ -42,6 +42,7 @@
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
 
+#define WEIGHT_UPDATE_COVARIANCE_MAGNIFIER 10.0
 namespace ompl
 {
     namespace magic
@@ -307,7 +308,7 @@ void MMPolicyGenerator::updateWeights()
     // true obs
     arma::colvec trueObs = si_->getObservation();
 
-    arma::colvec sigma = si_->getObservationModel()->sigma_ ;
+    arma::colvec sigma = WEIGHT_UPDATE_COVARIANCE_MAGNIFIER*si_->getObservationModel()->sigma_ ;
 
     arma::colvec variance = arma::pow(sigma,2);
 
@@ -316,21 +317,22 @@ void MMPolicyGenerator::updateWeights()
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
         std::cout<<"Index #"<<i<<std::endl;
+        si_->printState(currentBeliefStates_[i]);
         // compute the innovation
         arma::colvec beliefObservation =  si_->getObservationModel()->getObservation(currentBeliefStates_[i], false);
 
         arma::colvec innov = this->computeInnovation(beliefObservation, trueObs);
 
-        arma::mat covariance = arma::diagmat(arma::repmat(arma::diagmat(variance), innov.n_rows/2, innov.n_rows/2)) ;//innov.n_rows, innov.n_rows);
+        arma::mat covariance = arma::diagmat(arma::repmat(arma::diagmat(variance), innov.n_rows/2, innov.n_rows/2)) ;
 
         arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
 
         //std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
         //std::cout<<"t at index #"<<i<<"   = "<<t<<std::endl;
 
-        float w = std::pow(2.71828, t(0,0));//std::exp(t(0,0));
+        float w = std::pow(2.71828, t(0,0));
 
-        //std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
+        std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
 
         weights_[i]  = weights_[i]*w;
 
@@ -358,22 +360,22 @@ void MMPolicyGenerator::updateWeights()
         {
             weights_[i] =  weights_[i]/totalWeight;
 
-            //std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
-        }
-
-        if(weights_[0]==0)
-        {
-            OMPL_INFORM("Problem detected,mode 1 weight should not go to zero");
-            //assert(weights_[0]!=0);
-            std::cin.get();
+            std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
         }
 
     }
 
+    if(weights_[0]/totalWeight < 0.01 || weights_[1]/totalWeight < 0.01 )
+    {
+        OMPL_INFORM("Problem detected,mode 1 weight should not go to zero");
+        //assert(weights_[0]!=0);
+        std::cin.get();
+    }
+
     for(unsigned int i = 0; i < weights_.size(); i++)
     {
-
-        if(weights_[i] < 1e-6 )
+        // if the weight of the mode is less than 1%, delete it
+        if(weights_[i]/totalWeight < 0.01 )
             this->removeBelief(i);
     }
 
@@ -395,7 +397,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
     //std::cin.get();
     //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
 
-    innov  = arma::zeros<arma::colvec>( (landmarkInfoDim)* greaterRows /singleObservationDim ) ;
+    innov  = arma::zeros<arma::colvec>( 2 + (landmarkInfoDim)* greaterRows /singleObservationDim ) ;
 
     for(unsigned int i =0; i< greaterRows/singleObservationDim ; i++)
     {

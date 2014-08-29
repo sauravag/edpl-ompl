@@ -43,7 +43,7 @@ namespace ompl
 {
     namespace magic
     {
-        static const double CAMERA_HALF_FIELD_OF_VIEW = 22.5; // degrees
+        static const double CAMERA_HALF_FIELD_OF_VIEW = 180; // degrees
 
         static const double CAMERA_DETECTION_RANGE = 2.5;// meters
     }
@@ -106,6 +106,7 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
             }
 
             z[singleObservationDim*counter] = landmarks_[i](0) ; // id of the landmark
+            assert(landmarkRange <= ompl::magic::CAMERA_DETECTION_RANGE);
             z[singleObservationDim*counter + 1 ] = landmarkRange + noise[0]; // distance to landmark
             z[singleObservationDim*counter+2] = landmarkBearing + noise[1];
             z[singleObservationDim*counter+3] = landmarks_[i](3);

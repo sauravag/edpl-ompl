@@ -19,7 +19,7 @@
   <CamAruco2DObservationModel
     sigma_range="0.05"
     sigma_angle="0.5"
-    eta_rd="0.10"
+    eta_rd="0.02"
     eta_rphi = "0.01"
     eta_thetad="0.01"
     eta_thetaphi = "0.01"
@@ -47,7 +47,7 @@
     sigmaV="0.012"
     etaV="0.05"
     sigmaOmega="0.001"
-    etaOmega="0.03"
+    etaOmega="0.0"
     P_Wg_filename=""
     orbit_radius=5.0
     wind_noise_pos="0.000001"
