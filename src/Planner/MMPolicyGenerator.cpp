@@ -42,7 +42,8 @@
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
 
-#define WEIGHT_UPDATE_COVARIANCE_MAGNIFIER 10.0
+#define SIGMA_RANGE 1.0 // meters
+#define SIGMA_THETA 0.10 // radians
 namespace ompl
 {
     namespace magic
@@ -306,7 +307,10 @@ bool MMPolicyGenerator::areSimilarWeights()
 
 void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 {
-    arma::colvec sigma = WEIGHT_UPDATE_COVARIANCE_MAGNIFIER*si_->getObservationModel()->sigma_ ;
+    arma::colvec sigma(2);
+
+    sigma(0) = SIGMA_RANGE;
+    sigma(1) = SIGMA_THETA;
 
     arma::colvec variance = arma::pow(sigma,2);
 
@@ -326,7 +330,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
         //std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
         //std::cout<<"t at index #"<<i<<"   = "<<t<<std::endl;
 
-        float w = std::pow(2.71828, t(0,0));
+        float w = std::exp(t(0,0));
 
         std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
 

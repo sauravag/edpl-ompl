@@ -318,7 +318,7 @@ public:
 
         if(maxdistance <= ompl::magic::CONVERGENCE_THRESHOLD_FIRM_MM)
         {
-            return true;
+            return false;
         }
 
         return false;

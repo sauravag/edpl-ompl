@@ -200,15 +200,17 @@ double CamAruco2DObservationModel::getDataAssociationLikelihood(const arma::colv
     // Find the most likely landmark to predict associated with the true observation
     double weight = 0.0;
 
-    arma::colvec noise = this->etaD_*trueObs(1) + this->sigma_;
+    arma::colvec noise = this->sigma_;
 
     arma::mat covariance = arma::diagmat(arma::pow(noise,2));
 
     arma::colvec innov = trueObs-predictedObs;
 
+    FIRMUtils::normalizeAngleToPiRange(innov(1));
+
     arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
 
-    weight = std::pow(2.71828, t(0,0));
+    weight = std::exp(t(0,0));
 
     return weight;
 }
@@ -353,8 +355,7 @@ CamAruco2DObservationModel::getNoiseJacobian(const ompl::base::State *state, con
 
 
 
-arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::base::State *state,
-                                                                        const ObservationType& z)
+arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z)
 {
     using namespace arma;
 
