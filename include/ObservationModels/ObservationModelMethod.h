@@ -80,7 +80,7 @@ class ObservationModelMethod
     /** \brief Find the observation based on the given state and landmark to a correspongind landmark.
         eg. if ground robot sees landmark 1, then what is the predicted observation to this landmark
     */
-    virtual ObservationType getObservationToCorresponsingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark) = 0;
+    virtual ObservationType getObservationToCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark) = 0;
 
     /** \brief Calculate the observation Jacobian i.e. Jx = dh/dx, where h is the observation model and x is the state. */
     virtual ObsToStateJacobianType getObservationJacobian(const ompl::base::State *state, const NoiseType& v, const ObservationType& z) = 0;

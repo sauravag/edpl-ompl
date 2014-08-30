@@ -42,8 +42,8 @@
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
 
-#define SIGMA_RANGE 1.0 // meters
-#define SIGMA_THETA 0.10 // radians
+#define SIGMA_RANGE 1.5 // meters
+#define SIGMA_THETA 0.20 // radians
 namespace ompl
 {
     namespace magic
@@ -393,7 +393,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
     // the beliefs predicted observation
     arma::colvec Zprd =  si_->getObservationModel()->getObservation(currentBeliefStates_[currentBeliefIndx], false);
 
-    int greaterRows = Zg.n_rows >= Zprd.n_rows ? Zg.n_rows : Zprd.n_rows ;
+    //int greaterRows = Zg.n_rows >= Zprd.n_rows ? Zg.n_rows : Zprd.n_rows ;
 
     arma::colvec innov;
 
@@ -403,96 +403,54 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
     //std::cin.get();
     //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
 
-    innov  = arma::zeros<arma::colvec>( 2 + (landmarkInfoDim)* greaterRows /singleObservationDim ) ;
+    innov  = arma::zeros<arma::colvec>( (landmarkInfoDim)* Zg.n_rows /singleObservationDim ) ;
+    /**
+        Logic: First we see if a landmark that is observed by robot is seen by mode:
+        1. If yes, then we compute the innov
+        2. If no, then we predict where the mode "would" see that particular landmark and then calculate the innov.
+    */
 
-
-    // if the number of real landmarks seen is greater than or equal to that predicted by mode
-    if(Zg.n_rows >= Zprd.n_rows)
+    for(int j = 0 ; j < Zg.n_rows/singleObservationDim ; j++)
     {
-
-        for(int j = 0 ; j < Zprd.n_rows/singleObservationDim ; j++)
+        bool matchingIDFound = false;
+        // match ids
+        for(int k = 0 ; k < Zprd.n_rows/singleObservationDim ; k++)
         {
-            // match ids
-            for(int k = 0 ; k < Zg.n_rows/singleObservationDim ; k++)
+            if(Zprd(k*singleObservationDim) == Zg(j*singleObservationDim))
             {
-                if(Zprd(j*singleObservationDim) == Zg(k*singleObservationDim))
-                {
-                    innov( j*(landmarkInfoDim) ) = Zg(k*singleObservationDim + 1) - Zprd(j*singleObservationDim + 1) ;
+                innov( j*(landmarkInfoDim) ) = Zg(j*singleObservationDim + 1) - Zprd(k*singleObservationDim + 1) ;
 
-                    double delta_theta = Zg(k*singleObservationDim + 2) - Zprd(j*singleObservationDim + 2) ;
+                double delta_theta = Zg(j*singleObservationDim + 2) - Zprd(k*singleObservationDim + 2) ;
 
-                    FIRMUtils::normalizeAngleToPiRange(delta_theta);
+                FIRMUtils::normalizeAngleToPiRange(delta_theta);
 
-                    assert(abs(delta_theta) <= 2*boost::math::constants::pi<double>()) ;
+                assert(abs(delta_theta) <= 2*boost::math::constants::pi<double>()) ;
 
-                    innov( j*(landmarkInfoDim) + 1 ) =  delta_theta;
-                }
+                innov( j*(landmarkInfoDim) + 1 ) =  delta_theta;
+
+                matchingIDFound = true;
+
+                break;
             }
         }
-    }
 
-    // if the number of real landmarks seen is less than that predicted by the mode
-    if(Zg.n_rows < Zprd.n_rows)
-    {
-        for(int j = 0 ; j < Zg.n_rows/singleObservationDim ; j++)
+        if(!matchingIDFound)
         {
-            // match ids
-            for(int k = 0 ; k < Zprd.n_rows/singleObservationDim ; k++)
-            {
-                if(Zprd(k*singleObservationDim) == Zg(j*singleObservationDim))
-                {
-                    innov( j*(landmarkInfoDim) ) = Zg(j*singleObservationDim + 1) - Zprd(k*singleObservationDim + 1) ;
+            //For the landmark that is not matched, predict where it would be seen by the mode if it were observed
+            arma::colvec predictedObs = si_->getObservationModel()->getObservationToCorrespondingLandmark(currentBeliefStates_[currentBeliefIndx], Zg.subvec(j*singleObservationDim, j*singleObservationDim + 3)) ;
 
-                    double delta_theta = Zg(j*singleObservationDim + 2) - Zprd(k*singleObservationDim + 2) ;
+            innov( j*(landmarkInfoDim) ) = Zg(j*singleObservationDim + 1) - predictedObs(1) ;
 
-                    FIRMUtils::normalizeAngleToPiRange(delta_theta);
-
-                    assert(abs(delta_theta) <= 2*boost::math::constants::pi<double>()) ;
-
-                    innov( j*(landmarkInfoDim) + 1 ) =  delta_theta;
-                }
-            }
-        }
-    }
-    /*
-    for(unsigned int i =0; i< greaterRows/singleObservationDim ; i++)
-    {
-
-        if(Zg.n_rows >= (i+1)*singleObservationDim && Zprd.n_rows >= (i+1)*singleObservationDim)
-        {
-
-            innov( i*(landmarkInfoDim) ) = Zg(i*singleObservationDim + 1) - Zprd(i*singleObservationDim + 1) ;
-
-            double delta_theta = Zg(i*singleObservationDim + 2) - Zprd(i*singleObservationDim + 2) ;
+            double delta_theta = Zg(j*singleObservationDim + 2) - predictedObs(2) ;
 
             FIRMUtils::normalizeAngleToPiRange(delta_theta);
 
             assert(abs(delta_theta) <= 2*boost::math::constants::pi<double>()) ;
 
-            innov( i*(landmarkInfoDim) + 1 ) =  delta_theta;
-        }
-        else
-        {
-            if(Zg.n_rows >= (i+1)*singleObservationDim)
-            {
-                 innov( i*(landmarkInfoDim) ) = Zg(i*singleObservationDim + 1);
-                 innov( i*(landmarkInfoDim) + 1 ) =  Zg(i*singleObservationDim + 2);
-                 assert(abs(innov( i*(landmarkInfoDim) + 1 ) ) <= 2*boost::math::constants::pi<double>()) ;
-            }
-
-            else
-            {
-                innov( i*(landmarkInfoDim) ) = -Zprd(i*singleObservationDim + 1);
-                innov( i*(landmarkInfoDim) + 1 ) =  -Zprd(i*singleObservationDim + 2);
-            }
-
+            innov( j*(landmarkInfoDim) + 1 ) =  delta_theta;
 
         }
-
-
     }
-    */
-
 
     std::cout<<"Innovation:\n" <<innov;
     //std::cin.get();

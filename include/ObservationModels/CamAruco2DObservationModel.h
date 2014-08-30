@@ -86,7 +86,7 @@ class CamAruco2DObservationModel : public ObservationModelMethod
      /** \brief Find the observation based on the given state and landmark to a correspongind landmark.
         eg. if ground robot sees landmark 1, then what is the predicted observation to this landmark
     */
-    ObservationType getObservationToCorresponsingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark)
+    ObservationType getObservationToCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark)
     {
         arma::colvec candidate;
 
