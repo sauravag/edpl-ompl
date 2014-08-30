@@ -102,7 +102,6 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
               // generate zero noise
               colvec zeronoise =  zeros<colvec>(landmarkInfoDim);
               noise =  zeronoise;
-
             }
 
             z[singleObservationDim*counter] = landmarks_[i](0) ; // id of the landmark
@@ -158,7 +157,7 @@ CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *st
         // The candidate landmark is the closest landmark in the list with the same ID as that of what real robot sees
         colvec candidate;
 
-        int candidateIndx = this->findCorresponsingLandmark(state, Zg.subvec(singleObservationDim*k,singleObservationDim*k+3), candidate);
+        int candidateIndx = this->findCorrespondingLandmark(state, Zg.subvec(singleObservationDim*k,singleObservationDim*k+3), candidate);
 
         z.resize((k+1)*singleObservationDim ,  1);
         z[singleObservationDim*k]     = candidate(0)  ; // id of the landmark
@@ -215,7 +214,7 @@ double CamAruco2DObservationModel::getDataAssociationLikelihood(const arma::colv
 }
 
 
-int CamAruco2DObservationModel::findCorresponsingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark, arma::colvec &candidateObservation)
+int CamAruco2DObservationModel::findCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark, arma::colvec &candidateObservation)
 {
     using namespace arma;
 
@@ -317,7 +316,7 @@ CamAruco2DObservationModel::getObservationJacobian(const ompl::base::State *stat
     {
         colvec candidate;
 
-        int Indx = this->findCorresponsingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
+        int Indx = this->findCorrespondingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
 
         colvec diff =  landmarks_[Indx].subvec(1,2) - xVec.subvec(0,1);
 
@@ -371,7 +370,7 @@ arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::
     {
         colvec candidate;
 
-        int indx = this->findCorresponsingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
+        int indx = this->findCorrespondingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
 
         double range = candidate(1);//norm( landmarks_[indx].subvec(1,2) - xVec.subvec(0,1) , 2);
 

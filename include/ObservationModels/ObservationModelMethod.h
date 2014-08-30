@@ -41,7 +41,7 @@
 
 /**
   @par Short Description
-  Base class for all observation models. An observation model contains a description 
+  Base class for all observation models. An observation model contains a description
   of the sensor and the landmarks. It generates observations and associated observation jacobians/noises.
 
   \brief Base class for observation models.
@@ -59,23 +59,28 @@ class ObservationModelMethod
     /** \brief Constructor. */
     ObservationModelMethod(int nDim=0) : noiseDim_(nDim), zeroNoise_(nDim) {}
 
-    /** \brief z = h(x,v). Get the observation for a given configuration. 
+    /** \brief z = h(x,v). Get the observation for a given configuration.
         \param The state based on which the observation should be generated.
         \param if true, observation corrupted by noise from a given distribution, otherwise noise free observation.
     */
     virtual ObservationType getObservation(const ompl::base::State *state, bool isSimulation) = 0;
 
-    /** \brief Get the predicted observation based on predicted state. 
+    /** \brief Get the predicted observation based on predicted state.
 
-        @para 
+        @para
         Returns the predicted observation based on the previous state estimate for each landmark that is seen by the sensor.
-        For example, if the (real world) sensor detects landmark 'A', this function will estimate the predicted observation of 
+        For example, if the (real world) sensor detects landmark 'A', this function will estimate the predicted observation of
         landmark 'A' based on the predicted state.
 
         \para The predicted State
         \para The true observation.
     */
     virtual ObservationType getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg) = 0;
+
+    /** \brief Find the observation based on the given state and landmark to a correspongind landmark.
+        eg. if ground robot sees landmark 1, then what is the predicted observation to this landmark
+    */
+    virtual ObservationType getObservationToCorresponsingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark) = 0;
 
     /** \brief Calculate the observation Jacobian i.e. Jx = dh/dx, where h is the observation model and x is the state. */
     virtual ObsToStateJacobianType getObservationJacobian(const ompl::base::State *state, const NoiseType& v, const ObservationType& z) = 0;
@@ -97,13 +102,13 @@ class ObservationModelMethod
 
     /** \brief */
     arma::colvec etaPhi_;
-    
+
     /** \brief */
     arma::colvec etaD_;
-    
+
     /** \brief */
     arma::colvec sigma_;
-  
+
   private:
 
     /** \brief Noise vector dimension, it is specific to each observation model subclass. */

@@ -59,8 +59,6 @@ namespace ompl
 
 void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
 {
-    this->updateWeights();
-
     this->printWeights();
 
     // Make sure that each beliefstate has a target state
@@ -259,18 +257,21 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
         ompl::base::State *kfEstimate = si_->allocState();
+        ompl::base::State *kfEstimateUpdated = si_->allocState();
 
         si_->copyState(kfEstimate, currentBeliefStates_[i]);
 
-        kf.Evolve(kfEstimate, control, obs, dummy, dummy, kfEstimate);
+        kf.Evolve(kfEstimate, control, obs, dummy, dummy, kfEstimateUpdated);
 
-        si_->copyState(currentBeliefStates_[i], kfEstimate);
+        si_->copyState(currentBeliefStates_[i], kfEstimateUpdated);
 
         si_->freeState(kfEstimate);
 
+        si_->freeState(kfEstimateUpdated);
+
     }
 
-    this->updateWeights();
+    this->updateWeights(obs);
 
     Visualizer::clearStates();
 
@@ -303,11 +304,8 @@ bool MMPolicyGenerator::areSimilarWeights()
     return false;
 }
 
-void MMPolicyGenerator::updateWeights()
+void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 {
-    // true obs
-    arma::colvec trueObs = si_->getObservation();
-
     arma::colvec sigma = WEIGHT_UPDATE_COVARIANCE_MAGNIFIER*si_->getObservationModel()->sigma_ ;
 
     arma::colvec variance = arma::pow(sigma,2);
@@ -319,9 +317,7 @@ void MMPolicyGenerator::updateWeights()
         std::cout<<"Index #"<<i<<std::endl;
         si_->printState(currentBeliefStates_[i]);
         // compute the innovation
-        arma::colvec beliefObservation =  si_->getObservationModel()->getObservation(currentBeliefStates_[i], false);
-
-        arma::colvec innov = this->computeInnovation(beliefObservation, trueObs);
+        arma::colvec innov = this->computeInnovation(i,trueObservation);
 
         arma::mat covariance = arma::diagmat(arma::repmat(arma::diagmat(variance), innov.n_rows/2, innov.n_rows/2)) ;
 
@@ -381,11 +377,17 @@ void MMPolicyGenerator::updateWeights()
 
 }
 
-arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const arma::colvec Zg)
+arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,const arma::colvec trueObservation)
 {
     const int singleObservationDim = 4;//CamAruco2DObservationModel::singleObservationDim;
 
     const int landmarkInfoDim = 2;//CamAruco2DObservationModel::landmarkInfoDim;
+
+    // the true observation
+    arma::colvec Zg = trueObservation;
+
+    // the beliefs predicted observation
+    arma::colvec Zprd =  si_->getObservationModel()->getObservation(currentBeliefStates_[currentBeliefIndx], false);
 
     int greaterRows = Zg.n_rows >= Zprd.n_rows ? Zg.n_rows : Zprd.n_rows ;
 
@@ -399,6 +401,56 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
     innov  = arma::zeros<arma::colvec>( 2 + (landmarkInfoDim)* greaterRows /singleObservationDim ) ;
 
+
+    // if the number of real landmarks seen is greater than or equal to that predicted by mode
+    if(Zg.n_rows >= Zprd.n_rows)
+    {
+
+        for(int j = 0 ; j < Zprd.n_rows/singleObservationDim ; j++)
+        {
+            // match ids
+            for(int k = 0 ; k < Zg.n_rows/singleObservationDim ; k++)
+            {
+                if(Zprd(j*singleObservationDim) == Zg(k*singleObservationDim))
+                {
+                    innov( j*(landmarkInfoDim) ) = Zg(k*singleObservationDim + 1) - Zprd(j*singleObservationDim + 1) ;
+
+                    double delta_theta = Zg(k*singleObservationDim + 2) - Zprd(j*singleObservationDim + 2) ;
+
+                    FIRMUtils::normalizeAngleToPiRange(delta_theta);
+
+                    assert(abs(delta_theta) <= 2*boost::math::constants::pi<double>()) ;
+
+                    innov( j*(landmarkInfoDim) + 1 ) =  delta_theta;
+                }
+            }
+        }
+    }
+
+    // if the number of real landmarks seen is less than that predicted by the mode
+    if(Zg.n_rows < Zprd.n_rows)
+    {
+        for(int j = 0 ; j < Zg.n_rows/singleObservationDim ; j++)
+        {
+            // match ids
+            for(int k = 0 ; k < Zprd.n_rows/singleObservationDim ; k++)
+            {
+                if(Zprd(k*singleObservationDim) == Zg(j*singleObservationDim))
+                {
+                    innov( j*(landmarkInfoDim) ) = Zg(j*singleObservationDim + 1) - Zprd(k*singleObservationDim + 1) ;
+
+                    double delta_theta = Zg(j*singleObservationDim + 2) - Zprd(k*singleObservationDim + 2) ;
+
+                    FIRMUtils::normalizeAngleToPiRange(delta_theta);
+
+                    assert(abs(delta_theta) <= 2*boost::math::constants::pi<double>()) ;
+
+                    innov( j*(landmarkInfoDim) + 1 ) =  delta_theta;
+                }
+            }
+        }
+    }
+    /*
     for(unsigned int i =0; i< greaterRows/singleObservationDim ; i++)
     {
 
@@ -433,7 +485,10 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
         }
 
+
     }
+    */
+
 
     std::cout<<"Innovation:\n" <<innov;
     //std::cin.get();

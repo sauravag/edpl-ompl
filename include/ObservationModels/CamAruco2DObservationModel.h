@@ -83,6 +83,18 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     ObservationType getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg);
 
+     /** \brief Find the observation based on the given state and landmark to a correspongind landmark.
+        eg. if ground robot sees landmark 1, then what is the predicted observation to this landmark
+    */
+    ObservationType getObservationToCorresponsingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark)
+    {
+        arma::colvec candidate;
+
+        this->findCorrespondingLandmark(state, observedLandmark, candidate);
+
+        return candidate;
+    }
+
     // Jx = dh/dx
     JacobianType getObservationJacobian(const ompl::base::State *state, const ObsNoiseType& v, const ObservationType& z);
     // Jv = dh/dv
@@ -109,7 +121,7 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     double getDataAssociationLikelihood(const arma::colvec trueObs, const arma::colvec predictedObs);
 
     /** \brief Given a landmark that the robot observes (id, range, bearing..) Find the corresponding landmark,returns the position in the landmark list  */
-    int findCorresponsingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark, arma::colvec &candidateObservation);
+    int findCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark, arma::colvec &candidateObservation);
 
     std::vector<arma::colvec> landmarks_;
 

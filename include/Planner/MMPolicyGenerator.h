@@ -166,9 +166,11 @@ class MMPolicyGenerator
         virtual void propagateBeliefs(const ompl::control::Control *control);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
-        virtual void updateWeights();
+        virtual void updateWeights(const arma::colvec trueObservation);
 
-        virtual arma::colvec computeInnovation(const arma::colvec Zprd, const arma::colvec Zg);
+        //virtual arma::colvec computeInnovation(const arma::colvec Zprd, const arma::colvec Zg);
+
+        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation);
 
         void removeBelief(const int Indx);
 
