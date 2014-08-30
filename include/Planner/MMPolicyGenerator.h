@@ -170,7 +170,7 @@ class MMPolicyGenerator
 
         //virtual arma::colvec computeInnovation(const arma::colvec Zprd, const arma::colvec Zg);
 
-        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation);
+        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation, double &weightFactor);
 
         void removeBelief(const int Indx);
 

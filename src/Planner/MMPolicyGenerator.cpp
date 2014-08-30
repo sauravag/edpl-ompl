@@ -321,7 +321,8 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
         std::cout<<"Index #"<<i<<std::endl;
         si_->printState(currentBeliefStates_[i]);
         // compute the innovation
-        arma::colvec innov = this->computeInnovation(i,trueObservation);
+        double weightFactor= 1.0;
+        arma::colvec innov = this->computeInnovation(i,trueObservation,weightFactor);
 
         arma::mat covariance = arma::diagmat(arma::repmat(arma::diagmat(variance), innov.n_rows/2, innov.n_rows/2)) ;
 
@@ -330,7 +331,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
         //std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
         //std::cout<<"t at index #"<<i<<"   = "<<t<<std::endl;
 
-        float w = std::exp(t(0,0));
+        float w = weightFactor*std::exp(t(0,0));
 
         std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
 
@@ -365,12 +366,14 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 
     }
 
+    /*
     if(weights_[0]/totalWeight < 0.01 || weights_[1]/totalWeight < 0.01 )
     {
         OMPL_INFORM("Problem detected,mode 1 weight should not go to zero");
         //assert(weights_[0]!=0);
         std::cin.get();
     }
+    */
 
     for(unsigned int i = 0; i < weights_.size(); i++)
     {
@@ -381,7 +384,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 
 }
 
-arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,const arma::colvec trueObservation)
+arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,const arma::colvec trueObservation, double &weightFactor)
 {
     const int singleObservationDim = 4;//CamAruco2DObservationModel::singleObservationDim;
 
@@ -404,12 +407,13 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
     //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
 
     innov  = arma::zeros<arma::colvec>( (landmarkInfoDim)* Zg.n_rows /singleObservationDim ) ;
+
+    int numIntersection=0;
     /**
         Logic: First we see if a landmark that is observed by robot is seen by mode:
         1. If yes, then we compute the innov
         2. If no, then we predict where the mode "would" see that particular landmark and then calculate the innov.
     */
-
     for(int j = 0 ; j < Zg.n_rows/singleObservationDim ; j++)
     {
         bool matchingIDFound = false;
@@ -429,6 +433,8 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
                 innov( j*(landmarkInfoDim) + 1 ) =  delta_theta;
 
                 matchingIDFound = true;
+
+                numIntersection++;
 
                 break;
             }
@@ -450,6 +456,11 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
             innov( j*(landmarkInfoDim) + 1 ) =  delta_theta;
 
         }
+    }
+
+    if(Zprd.n_rows > Zg.n_rows )
+    {
+        weightFactor = 1 / abs(1 + Zprd.n_rows/singleObservationDim - numIntersection);
     }
 
     std::cout<<"Innovation:\n" <<innov;
