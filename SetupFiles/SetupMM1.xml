@@ -21,9 +21,12 @@
     <landmark id = 7 x = 2    y = 19 theta = -0.5 />
     <landmark id = 7 x = 7.5  y = 19 theta = -0.5 />
     <landmark id = 7 x = 13.0 y = 19 theta = -0.5 />
-    <landmark id = 1000 x = 2.0 y = 19.0 theta = -0.5 />
-    <landmark id = 1001 x = 7.5 y = 19.0 theta = -0.5 />
-    <landmark id = 1002 x = 13.0 y = 19.0 theta = -0.5 />
+    <landmark id = 1000 x = 2.0 y = 16.0 theta = -0.5 />
+    <landmark id = 1001 x = 1.0 y = 16.0 theta = -0.5 />
+    <landmark id = 1002 x = 7.5 y = 16.0 theta = -0.5 />
+    <landmark id = 1003 x = 7.0 y = 16.0 theta = -0.5 />
+    <landmark id = 1004 x = 13.0 y = 16.0 theta = -0.5 />
+    <landmark id = 1005 x = 12.0 y = 16.0 theta = -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
@@ -83,20 +86,32 @@
 </MotionModels>
 <BeliefList>
     <belief x = 2.0  y = 6.0 theta = 1.58 />
-    <belief x = 7.5  y = 6.1 theta = 1.53 />
+    <belief x = 7.5  y = 7.0 theta = 1.53 />
     <belief x = 13.0 y = 5.9 theta = 1.59 />
 </BeliefList>
 <TargetList>
-    <target x = 2.0  y = 19.0  theta = 1.57 /> 
-    <target x = 7.5  y = 19.0  theta = 1.57 /> 
-    <target x = 13.0 y = 19.0  theta = 1.57 /> 
+    <target x = 2.0  y = 18.0  theta = 1.57 /> 
+    <target x = 2.0  y = 16.0  theta = 1.57 /> 
+    <target x = 2.0  y = 14.0  theta = 1.57 /> 
+    <target x = 2.0  y = 12.0  theta = 1.57 /> 
+    <target x = 7.5  y = 18.0  theta = 1.57 /> 
+    <target x = 7.5  y = 16.0  theta = 1.57 /> 
+    <target x = 7.5  y = 14.0  theta = 1.57 /> 
+    <target x = 7.5  y = 12.0  theta = 1.57 /> 
+    <target x = 7.5  y = 10.0  theta = 1.57 /> 
+    <target x = 13.0 y = 18.0  theta = 1.57 /> 
+    <target x = 13.0 y = 16.0  theta = 1.57 /> 
+    <target x = 13.0 y = 14.0  theta = 1.57 /> 
+    <target x = 13.0 y = 12.0  theta = 1.57 /> 
+    <target x = 13.0 y = 10.0  theta = 1.57 /> 
+    <target x = 13.0 y = 8.0  theta = 1.57 /> 
 </TargetList>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/MMEnvExp1.obj"
+        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/MMEnvExp1.obj"
     />
     <Robot
-        robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+        robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
     />
     <StartPose
         x = "1.9"

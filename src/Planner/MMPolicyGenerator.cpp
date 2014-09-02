@@ -318,7 +318,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
-        std::cout<<"Index #"<<i<<std::endl;
+        //std::cout<<"Index #"<<i<<std::endl;
         si_->printState(currentBeliefStates_[i]);
         // compute the innovation
         double weightFactor= 1.0;
@@ -333,7 +333,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 
         float w = weightFactor*std::exp(t(0,0));
 
-        std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
+        //std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
 
         weights_[i]  = weights_[i]*w;
 
@@ -361,7 +361,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
         {
             weights_[i] =  weights_[i]/totalWeight;
 
-            std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
+            //std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
         }
 
     }
@@ -400,8 +400,8 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
 
     arma::colvec innov;
 
-    std::cout<<"Ground Obs:"<<Zg<<std::endl;
-    std::cout<<"Predicted obs :"<<Zprd<<std::endl;
+    //std::cout<<"Ground Obs:"<<Zg<<std::endl;
+    //std::cout<<"Predicted obs :"<<Zprd<<std::endl;
 
     //std::cin.get();
     //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
@@ -463,7 +463,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
         weightFactor = 1 / abs(1 + Zprd.n_rows/singleObservationDim - numIntersection);
     }
 
-    std::cout<<"Innovation:\n" <<innov;
+    //std::cout<<"Innovation:\n" <<innov;
     //std::cin.get();
     return innov;
 }
@@ -541,8 +541,8 @@ void MMPolicyGenerator::evaluateObservationListForVertex(const Vertex v)
 bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
 {
     //std::cout<<"Calculating observation overlap for: "<<std::endl;
-    si_->printState(stateProperty_[a]);
-    si_->printState(stateProperty_[b]);
+    //si_->printState(stateProperty_[a]);
+    //si_->printState(stateProperty_[b]);
 
     // get the list of observations for both vertices
     evaluateObservationListForVertex(a);
