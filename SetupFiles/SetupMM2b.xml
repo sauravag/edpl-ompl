@@ -13,7 +13,7 @@
 <landmark id = 5 x = 12.5 y = 4.0 theta = -0.5   />
 <landmark id = 6 x = 12.5 y = 0.0 theta = -0.5   />
 <landmark id = 101 x = 3.5 y = 19.0 theta = 1.0 />
-<landmark id = 102 x = 12.5 y = 4.0 theta = 0.5 />
+<landmark id = 102 x = 12.5 y = 1.0 theta = 0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel

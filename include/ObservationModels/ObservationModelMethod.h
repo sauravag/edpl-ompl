@@ -38,6 +38,7 @@
 #define OBSERVATION_MODEL_METHOD_
 
 #include "armadillo"
+#include <ompl/control/SpaceInformation.h>
 
 /**
   @par Short Description
@@ -48,74 +49,81 @@
 */
 class ObservationModelMethod
 {
-  public:
+    public:
 
-    typedef arma::colvec ObservationType;
-    typedef arma::colvec NoiseType;
-    typedef arma::mat ObsToStateJacobianType;
-    typedef arma::mat ObsToNoiseJacobianType;
-    typedef boost::shared_ptr<ObservationModelMethod> ObservationModelPointer;
+        typedef arma::colvec ObservationType;
+        typedef arma::colvec NoiseType;
+        typedef arma::mat ObsToStateJacobianType;
+        typedef arma::mat ObsToNoiseJacobianType;
+        typedef boost::shared_ptr<ObservationModelMethod> ObservationModelPointer;
 
-    /** \brief Constructor. */
-    ObservationModelMethod(int nDim=0) : noiseDim_(nDim), zeroNoise_(nDim) {}
+        /** \brief Constructor. */
+        ObservationModelMethod(ompl::control::SpaceInformationPtr si,int nDim=0) : si_(si), noiseDim_(nDim), zeroNoise_(nDim) {}
 
-    /** \brief z = h(x,v). Get the observation for a given configuration.
-        \param The state based on which the observation should be generated.
-        \param if true, observation corrupted by noise from a given distribution, otherwise noise free observation.
-    */
-    virtual ObservationType getObservation(const ompl::base::State *state, bool isSimulation) = 0;
+        /** \brief z = h(x,v). Get the observation for a given configuration.
+            \param The state based on which the observation should be generated.
+            \param if true, observation corrupted by noise from a given distribution, otherwise noise free observation.
+        */
+        virtual ObservationType getObservation(const ompl::base::State *state, bool isSimulation) = 0;
 
-    /** \brief Get the predicted observation based on predicted state.
+        /** \brief Get the predicted observation based on predicted state.
 
-        @para
-        Returns the predicted observation based on the previous state estimate for each landmark that is seen by the sensor.
-        For example, if the (real world) sensor detects landmark 'A', this function will estimate the predicted observation of
-        landmark 'A' based on the predicted state.
+            @para
+            Returns the predicted observation based on the previous state estimate for each landmark that is seen by the sensor.
+            For example, if the (real world) sensor detects landmark 'A', this function will estimate the predicted observation of
+            landmark 'A' based on the predicted state.
 
-        \para The predicted State
-        \para The true observation.
-    */
-    virtual ObservationType getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg) = 0;
+            \para The predicted State
+            \para The true observation.
+        */
+        virtual ObservationType getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg) = 0;
 
-    /** \brief Find the observation based on the given state and landmark to a correspongind landmark.
-        eg. if ground robot sees landmark 1, then what is the predicted observation to this landmark
-    */
-    virtual ObservationType getObservationToCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark) = 0;
+        /** \brief Find the observation based on the given state and landmark to a correspongind landmark.
+            eg. if ground robot sees landmark 1, then what is the predicted observation to this landmark
+        */
+        virtual ObservationType getObservationToCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark) = 0;
 
-    /** \brief Calculate the observation Jacobian i.e. Jx = dh/dx, where h is the observation model and x is the state. */
-    virtual ObsToStateJacobianType getObservationJacobian(const ompl::base::State *state, const NoiseType& v, const ObservationType& z) = 0;
+        /** \brief Calculate the observation Jacobian i.e. Jx = dh/dx, where h is the observation model and x is the state. */
+        virtual ObsToStateJacobianType getObservationJacobian(const ompl::base::State *state, const NoiseType& v, const ObservationType& z) = 0;
 
-    /** \brief Calculates the observation noise jacobian i.e. Jv = dh/dv, where h is the observation model and v is the noise */
-    virtual ObsToNoiseJacobianType getNoiseJacobian(const ompl::base::State *state, const NoiseType& v, const ObservationType& z) = 0;
+        /** \brief Calculates the observation noise jacobian i.e. Jv = dh/dv, where h is the observation model and v is the noise */
+        virtual ObsToNoiseJacobianType getNoiseJacobian(const ompl::base::State *state, const NoiseType& v, const ObservationType& z) = 0;
 
-    /** \brief Computes the innovation between observations that are predicted for the given state and the true observation. */
-    virtual ObservationType computeInnovation(const ompl::base::State *predictedState, const ObservationType& Zg) = 0;
+        /** \brief Computes the innovation between observations that are predicted for the given state and the true observation. */
+        virtual ObservationType computeInnovation(const ompl::base::State *predictedState, const ObservationType& Zg) = 0;
 
-    /** \brief Calculates the observation noise covariance.*/
-    virtual arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z) = 0;
+        /** \brief Calculates the observation noise covariance.*/
+        virtual arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z) = 0;
 
-    /** \brief Checks if a state is observable. */
-    virtual bool isStateObservable(const ompl::base::State *state) = 0;
+        /** \brief Checks if a state is observable. */
+        virtual bool isStateObservable(const ompl::base::State *state) = 0;
 
-    /** \brief Returns the zero observation noise.*/
-    virtual const NoiseType getZeroNoise() {return zeroNoise_; }
+        /** \brief Returns the zero observation noise.*/
+        virtual const NoiseType getZeroNoise() {return zeroNoise_; }
 
-    /** \brief */
-    arma::colvec etaPhi_;
+        /** \brief */
+        arma::colvec etaPhi_;
 
-    /** \brief */
-    arma::colvec etaD_;
+        /** \brief */
+        arma::colvec etaD_;
 
-    /** \brief */
-    arma::colvec sigma_;
+        /** \brief */
+        arma::colvec sigma_;
 
-  private:
+    protected:
 
-    /** \brief Noise vector dimension, it is specific to each observation model subclass. */
-    const int noiseDim_;
+        /** \brief A pointer to the space information. */
+	    ompl::control::SpaceInformationPtr si_;
 
-    /** \brief Stores the value of zero noise. */
-    const NoiseType zeroNoise_;
+    private:
+
+        /** \brief Noise vector dimension, it is specific to each observation model subclass. */
+        const int noiseDim_;
+
+        /** \brief Stores the value of zero noise. */
+        const NoiseType zeroNoise_;
+
+
 };
 
 #endif

@@ -46,6 +46,8 @@ namespace ompl
         static const double CAMERA_HALF_FIELD_OF_VIEW = 180; // degrees
 
         static const double CAMERA_DETECTION_RANGE = 2.5;// meters
+
+        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.30 ; // meters
     }
 }
 
@@ -265,6 +267,41 @@ int CamAruco2DObservationModel::findCorrespondingLandmark(const ompl::base::Stat
 }
 
 
+bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *state, const arma::colvec& landmark )
+{
+    using namespace arma;
+
+    colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
+
+    colvec robot_to_landmark_ray =  landmark.subvec(1,2) - xVec.subvec(0,1);
+
+    double distance = norm(robot_to_landmark_ray,2);
+
+    int steps = std::floor(distance/ompl::magic::ONE_STEP_DISTANCE_FOR_VISIBILITY);
+
+    ompl::base::State *tempState = this->si_->allocState();
+
+    for(int i=1 ; i < steps; i++)
+    {
+        double newX = xVec(0) + i*robot_to_landmark_ray(0)/steps;
+
+        double newY = xVec(1) + i*robot_to_landmark_ray(1)/steps;
+
+        tempState->as<SE2BeliefSpace::StateType>()->setXYYaw(newX, newY,0);
+
+        if(!this->si_->isValid(tempState))
+        {
+            return false;
+        }
+
+    }
+
+    si_->freeState(tempState);
+
+    return true;
+}
+
+
 bool CamAruco2DObservationModel::isLandmarkVisible(const ompl::base::State *state, const arma::colvec& landmark,
                                                               double& range, double& bearing, double& viewingAngle)
 {
@@ -294,8 +331,11 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const ompl::base::State *stat
 
     if( abs(bearing) <= fov && range <= maxRange )
     {
-       assert(abs(viewingAngle) <= boost::math::constants::pi<double>() / 2 );
-      return true;
+        if(hasClearLineOfSight(state, landmark))
+        {
+            assert(abs(viewingAngle) <= boost::math::constants::pi<double>() / 2 );
+            return true;
+        }
     }
 
     return false;

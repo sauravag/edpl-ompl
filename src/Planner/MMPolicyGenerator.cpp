@@ -54,9 +54,102 @@ namespace ompl
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 10.0 ; // range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 30.0 ; // range within which to find neighbors
     }
 }
+
+void MMPolicyGenerator::sampleNewBeliefStates()
+{
+    /**
+    Logic:
+    1. Grid the environment
+    2. At each point in grid, put a robot with periodic orientations (10 degree spacing)
+    */
+    //Make sure the current states and weights are cleared out
+    currentBeliefStates_.clear();
+    weights_.clear();
+
+    //Get the environment boundaries
+    double X_1 = 1.0;
+    double X_2 = 15.0;
+    double Y_1 = 1.0;
+    double Y_2 = 19.0;
+
+    double spacing = 0.60; // diameter of robot
+
+    // grid size
+    int gridSizeX = std::ceil( (X_2-X_1) / spacing);
+    int gridSizeY = std::ceil( (Y_2-Y_1) / spacing);
+
+    double rotationSpacing = 5.0;// degrees
+
+    int numHeadings = std::floor(360/rotationSpacing);
+
+    arma::mat cov = arma::eye(3,3);
+    cov(0,0) = 0.10;
+    cov(1,1) = 0.10;
+    cov(2,2) = 0.35;
+
+    int numSampledStates = 0;
+
+    OMPL_INFORM("MMPolicyGenerator: Sampling start beliefs");
+
+    for(int i = 0; i <= gridSizeX; i++)
+    {
+        for(int j=0; j <= gridSizeY; j++)
+        {
+            double newX = X_1 + i*spacing;
+            double newY = Y_1 + j*spacing;
+
+            for(int k =0; k < numHeadings; k++ )
+            {
+                double newYaw = k*rotationSpacing*3.142/180.0; // degree to radians
+
+                ompl::base::State *newState = si_->allocState();
+
+                newState->as<SE2BeliefSpace::StateType>()->setXYYaw(newX, newY, newYaw);
+                newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
+
+                if(si_->isValid(newState))
+                {
+                    currentBeliefStates_.push_back(si_->cloneState(newState));
+                    numSampledStates++;
+                    //Visualizer::addState(currentBeliefStates_[numSampledStates-1]);
+                }
+                si_->freeState(newState);
+            }
+        }
+    }
+
+    OMPL_INFORM("MMPolicyGenerator: Sampling beliefs Completed");
+
+    assert(currentBeliefStates_.size() == numSampledStates);
+
+    double uniformWeight = 1.0 / numSampledStates; // all beliefs get assigned equal weights
+
+    for(int i=0; i < numSampledStates; i++)
+    {
+        weights_.push_back(uniformWeight); // assign equal weights to all
+    }
+
+    OMPL_INFORM("MMPolicyGenerator: Sample Belief Weights Added");
+
+    arma::colvec obs = si_->getObservation();
+
+    OMPL_INFORM("MMPolicyGenerator: Updating the weights before proceeding");
+
+    for(int i = 0; i < 100; i++)
+    {
+        this->updateWeights(obs);
+    }
+
+    this->printWeights();
+
+    std::cout<<"Press enter"<<std::endl;
+    std::cin.get();
+}
+
+
 
 void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
 {
@@ -130,6 +223,8 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
     int maxGainPolicyIndx=-1;
 
+    OMPL_INFORM("Evaluating the Open Loop policies on all the modes");
+
     for(unsigned int i = 0; i < openLoopPolicies.size(); i++)
     {
         ompl::base::Cost pGain;
@@ -143,7 +238,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             pGain.v += c.v;
 
-            //std::cout<<"Policy Number #"<<i<<" Info Gain value :"<<c.v<<std::endl;
+            std::cout<<"Policy Number #"<<i<<" Mode Number :"<<j<<std::endl;
 
         }
 
@@ -319,7 +414,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
         //std::cout<<"Index #"<<i<<std::endl;
-        si_->printState(currentBeliefStates_[i]);
+        //si_->printState(currentBeliefStates_[i]);
         // compute the innovation
         double weightFactor= 1.0;
         arma::colvec innov = this->computeInnovation(i,trueObservation,weightFactor);
@@ -474,7 +569,7 @@ void MMPolicyGenerator::removeBelief(const int Indx)
 
     weights_.erase(weights_.begin()+Indx);
 
-    targetStates_.erase(targetStates_.begin()+Indx);
+    //targetStates_.erase(targetStates_.begin()+Indx);
 }
 
 void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)

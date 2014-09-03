@@ -186,7 +186,7 @@ public:
             siF_->setStateValidityCheckingResolution(0.005);
 
             // provide the observation model to the space
-            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(pathToSetupFile_.c_str()));
+            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(siF_, pathToSetupFile_.c_str()));
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space
@@ -216,7 +216,9 @@ public:
 
             policyGenerator_ = new MMPolicyGenerator(siF_);
 
-            policyGenerator_->setCurrentBeliefStates(beliefStates_);
+            //policyGenerator_->sampleNewBeliefStates();
+
+            //policyGenerator_->setCurrentBeliefStates(beliefStates_);
 
             policyGenerator_->setBeliefTargetStates(targetStates_);
 
@@ -230,6 +232,7 @@ public:
     bool solve()
     {
         //std::vector<ompl::base::State*> tempbStates;
+        policyGenerator_->sampleNewBeliefStates();
 
         if(!setup_)
         {

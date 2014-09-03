@@ -94,6 +94,9 @@ class MMPolicyGenerator
 
         }
 
+        /** \brief This function samples the beliefs, which form the starting point for the multi-modal scenario*/
+        void sampleNewBeliefStates();
+
         /** \brief Compute distance between two milestones (this is simply distance between the states of the milestones) */
         double distanceFunction(const Vertex a, const Vertex b) const
         {

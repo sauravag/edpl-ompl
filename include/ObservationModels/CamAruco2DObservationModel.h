@@ -71,12 +71,12 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     // get the observation for a given configuration,
     // corrupted by noise from a given distribution
     /** \brief Constructor */
-    CamAruco2DObservationModel(const char *pathToSetupFile) : ObservationModelMethod()
+    CamAruco2DObservationModel(ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) : ObservationModelMethod(si)
     {
 
-      // initialize etaPhi_, etaD_, sigma_;
-      this->loadLandmarks(pathToSetupFile);
-      this->loadParameters(pathToSetupFile);
+        // initialize etaPhi_, etaD_, sigma_;
+        this->loadLandmarks(pathToSetupFile);
+        this->loadParameters(pathToSetupFile);
     }
 
     ObservationType getObservation(const ompl::base::State *state, bool isSimulation);
@@ -104,6 +104,9 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z);
 
+    /** \brief Checks if there is a clear line of sight from the robot to the landmark */
+    bool hasClearLineOfSight(const ompl::base::State *state, const arma::colvec& landmark);
+
     bool isLandmarkVisible(const ompl::base::State *state, const arma::colvec& landmark, double& range, double& bearing, double& viewingAngle);
 
     //void WriteLandmarks();
@@ -127,7 +130,6 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     //Function to load landmarks from XML file into the object
     void loadLandmarks(const char *pathToSetupFile);
-
 
     void loadParameters(const char *pathToSetupFile);
 };
