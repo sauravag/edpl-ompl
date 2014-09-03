@@ -42,7 +42,7 @@
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
 
-#define SIGMA_RANGE 1.5 // meters
+#define SIGMA_RANGE 1.50 // meters
 #define SIGMA_THETA 0.25 // radians
 namespace ompl
 {
@@ -138,15 +138,16 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 
     OMPL_INFORM("MMPolicyGenerator: Updating the weights before proceeding");
 
-    for(int i = 0; i < 10; i++)
+    for(int i = 0; i < 20; i++)
     {
         this->updateWeights(obs);
+        std::cout<<"Progress: "<<100*i/(20-1)<<" %"<<std::endl;
     }
 
     this->printWeights();
 
-    std::cout<<"Press enter"<<std::endl;
-    std::cin.get();
+    //std::cout<<"Press enter"<<std::endl;
+    //std::cin.get();
 }
 
 
@@ -154,9 +155,6 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
 {
     this->printWeights();
-
-    // Make sure that each beliefstate has a target state
-    //assert(currentBeliefStates_.size() == targetStates_.size());
 
     //container to store the sequence of controls for each mode/target pair
     std::vector<std::vector<ompl::control::Control*> > openLoopPolicies;
@@ -166,7 +164,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     {
 
         //Generate a path for the mode/target pair
-        if(si_->isValid(currentBeliefStates_[i]) /*&& si_->distance(currentBeliefStates_[i], targetStates_[i])>0.50*/)
+        if( si_->isValid(currentBeliefStates_[i]) )
         {
 
             ompl::base::PlannerPtr planner(new ompl::geometric::RRT(si_));
@@ -183,7 +181,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
             si_->printState(stateProperty_[targetVertex]);
             std::cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<std::endl;
 
-            pdef->setStartAndGoalStates(currentBeliefStates_[i], stateProperty_[targetVertex]/*targetStates_[i]*/, ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
+            pdef->setStartAndGoalStates(currentBeliefStates_[i], stateProperty_[targetVertex], ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
 
             planner->as<ompl::geometric::RRT>()->setRange(1.0);
 
@@ -461,19 +459,11 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 
     }
 
-    /*
-    if(weights_[0]/totalWeight < 0.01 || weights_[1]/totalWeight < 0.01 )
-    {
-        OMPL_INFORM("Problem detected,mode 1 weight should not go to zero");
-        //assert(weights_[0]!=0);
-        std::cin.get();
-    }
-    */
 
     for(unsigned int i = 0; i < weights_.size(); i++)
     {
         // if the weight of the mode is less than 1%, delete it
-        if(weights_[i]/totalWeight < 0.01 /*|| weights_[i] < 1e-6*/)
+        if(weights_[i]/totalWeight < 0.01 || weights_[i] == 0 )
             this->removeBelief(i);
     }
 
@@ -569,7 +559,8 @@ void MMPolicyGenerator::removeBelief(const int Indx)
 
     weights_.erase(weights_.begin()+Indx);
 
-    //targetStates_.erase(targetStates_.begin()+Indx);
+    //if(targetStates_.size()>0)
+       // targetStates_.erase(targetStates_.begin()+Indx);
 }
 
 void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
