@@ -43,7 +43,7 @@
 #define foreach_reverse BOOST_REVERSE_FOREACH
 
 #define SIGMA_RANGE 1.5 // meters
-#define SIGMA_THETA 0.20 // radians
+#define SIGMA_THETA 0.25 // radians
 namespace ompl
 {
     namespace magic
@@ -70,12 +70,12 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     weights_.clear();
 
     //Get the environment boundaries
-    double X_1 = 1.0;
-    double X_2 = 15.0;
-    double Y_1 = 1.0;
-    double Y_2 = 19.0;
+    double X_1 = 0.5;
+    double X_2 = 22.0;
+    double Y_1 = 0.50;
+    double Y_2 = 22.0;
 
-    double spacing = 0.60; // diameter of robot
+    double spacing = 0.50; // diameter of robot
 
     // grid size
     int gridSizeX = std::ceil( (X_2-X_1) / spacing);
@@ -138,7 +138,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 
     OMPL_INFORM("MMPolicyGenerator: Updating the weights before proceeding");
 
-    for(int i = 0; i < 100; i++)
+    for(int i = 0; i < 10; i++)
     {
         this->updateWeights(obs);
     }
@@ -473,7 +473,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
     for(unsigned int i = 0; i < weights_.size(); i++)
     {
         // if the weight of the mode is less than 1%, delete it
-        if(weights_[i]/totalWeight < 0.01 )
+        if(weights_[i]/totalWeight < 0.01 /*|| weights_[i] < 1e-6*/)
             this->removeBelief(i);
     }
 

@@ -82,7 +82,7 @@ void testMultiModal()
 {
     MultiModalSetup *mySetup(new MultiModalSetup);
 
-    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupMM2b.xml";
+    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupICRA2015Exp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
