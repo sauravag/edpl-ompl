@@ -44,10 +44,10 @@
     dt= 0.1
     /> <!--No Noise--> 
   <UnicycleMotionModel
-    sigmaV="0.012"
-    etaV="0.05"
+    sigmaV="0.001"
+    etaV="0.001"
     sigmaOmega="0.001"
-    etaOmega="0.03"
+    etaOmega="0.001"
     P_Wg_filename=""
     orbit_radius=5.0
     wind_noise_pos="0.000001"
@@ -83,10 +83,10 @@
 </TargetList>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/MMEnvExp2.obj"
+        environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/MMEnvExp2.obj"
     />
     <Robot
-        robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+        robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
     />
     <StartPose
         x = "2.50"

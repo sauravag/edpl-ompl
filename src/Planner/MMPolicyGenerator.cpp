@@ -413,6 +413,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
             innov( i*(landmarkInfoDim) + 1 ) =  delta_theta;
         }
+
         else
         {
             if(Zg.n_rows >= (i+1)*singleObservationDim)
@@ -430,6 +431,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const
 
 
         }
+
 
     }
 

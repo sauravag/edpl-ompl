@@ -43,7 +43,7 @@ namespace ompl
 {
     namespace magic
     {
-        static const double CAMERA_HALF_FIELD_OF_VIEW = 22.5; // degrees
+        static const double CAMERA_HALF_FIELD_OF_VIEW = 180; // degrees
 
         static const double CAMERA_DETECTION_RANGE = 2.5;// meters
     }
