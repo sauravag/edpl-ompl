@@ -145,7 +145,7 @@
 <landmark id = 141 x = 21.50 y = 14.0 theta =  -0.5 />
 <landmark id = 142 x = 21.50 y = 14.5 theta =  -0.5 />
 <landmark id = 143 x = 15.0  y = 21.5 theta =  -0.5 />
-<landmark id = 144 x = 14.5 y =  21.5theta =  -0.5 />
+<landmark id = 144 x = 14.5 y =  21.5 theta =  -0.5 />
 <landmark id = 145 x = 13.5 y = 21.5 theta =  -0.5 />
 </LandmarkList>
 <ObservationModels>
@@ -228,15 +228,18 @@
     />
     <StartPose
         x = "2.0"
-        y = "19.5"
+        y = "20.0"
         theta = "1.57"
     />
     <GoalPose
-        x = "21.0"
-        y = "3.0"
-        theta = "1.57"
+        x = "15.0"
+        y = "1.0"
+        theta = "0"
     />
     <PlanningTime
         maxTime = "900"
+    />
+    <FIRMNodes
+        minNodes = "40"
     />
 </PlanningProblem>
