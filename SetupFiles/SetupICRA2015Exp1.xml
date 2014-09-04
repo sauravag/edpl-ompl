@@ -92,6 +92,61 @@
 <landmark id = 88 x = 9.5  y = 6.5  theta = -0.5 />
 <landmark id = 89 x = 11.0 y = 9.5  theta = -0.5 />
 <landmark id = 90 x = 11.0 y = 12.5  theta = -0.5 />
+<landmark id = 91 x = 15.0 y = 12.5  theta = -0.5 />
+<landmark id = 92 x = 15.5 y = 12.5  theta = -0.5 />
+<landmark id = 93 x = 16.5 y = 12.5  theta = -0.5 />
+<landmark id = 94 x = 16.0 y = 9.5  theta = -0.5 />
+<landmark id = 95 x = 16.5 y = 9.5  theta = -0.5 />
+<landmark id = 96 x = 17.5 y = 9.5  theta = -0.5 />
+<landmark id = 97 x = 18.0 y = 9.5  theta = -0.5 />
+<landmark id = 98 x = 19.0 y = 9.5  theta = -0.5 />
+<landmark id = 99 x = 19.5 y = 9.5  theta = -0.5 />
+<landmark id = 100 x = 20.0 y = 9.5  theta =  -0.5 />
+<landmark id = 101 x = 21.5 y = 9.0  theta =  -0.5 />
+<landmark id = 102 x = 21.5 y = 8.0  theta =  -0.5 />
+<landmark id = 103 x = 21.5 y = 7.5  theta =  -0.5 />
+<landmark id = 104 x = 21.5 y = 7.0  theta =  -0.5 />
+<landmark id = 105 x = 16.0  y = 7.0  theta =  -0.5/>
+<landmark id = 106 x = 16.5  y = 7.0  theta =  -0.5 />
+<landmark id = 107 x = 17.5  y = 7.0  theta =  -0.5 />
+<landmark id = 108 x = 18.0  y = 7.0  theta =  -0.5 />
+<landmark id = 109 x = 18.5  y = 7.0  theta =  -0.5 />
+<landmark id = 110 x = 19.5  y = 7.0  theta =  -0.5 />
+<landmark id = 111 x = 20.0  y = 7.0  theta =  -0.5 />
+<landmark id = 112 x = 12.5  y = 0.5  theta = -0.5  />
+<landmark id = 113 x = 13.0  y = 0.5  theta =  -0.5 />
+<landmark id = 114 x = 14.0  y = 0.5  theta =  -0.5 />
+<landmark id = 115 x = 14.5  y = 0.5  theta =  -0.5 />
+<landmark id = 116 x = 15.0  y = 0.5  theta =  -0.5 />
+<landmark id = 117 x = 15.0 y = 3.5  theta =  -0.5 />
+<landmark id = 118 x = 15.0 y = 4.0  theta =  -0.5 />
+<landmark id = 119 x = 15.0 y = 4.5  theta =  -0.5 />
+<landmark id = 120 x = 15.0 y = 5.0  theta =  -0.5 />
+<landmark id = 121  x = 7.0  y = 9.5 theta =  -0.5 />
+<landmark id = 122 x = 6.5 y = 9.5 theta =  -0.5 />
+<landmark id = 123 x = 5.5 y = 9.5 theta =  -0.5 />
+<landmark id = 124 x = 5.0 y = 9.5 theta =  -0.5 />
+<landmark id = 125 x = 4.5 y = 9.5 theta =  -0.5 />
+<landmark id = 126 x = 3.5 y = 9.5 theta =  -0.5 />
+<landmark id = 127 x = 3.0 y = 9.5 theta =  -0.5 />
+<landmark id = 128 x = 2.0 y = 9.5 theta =  -0.5 />
+<landmark id = 129 x = 1.5 y = 9.5 theta =  -0.5 />
+<landmark id = 130 x = 7.0  y = 0.5 theta =  -0.5 />
+<landmark id = 131 x = 7.0 y = 21.5 theta =  -0.5 />
+<landmark id = 132 x = 7.5 y = 21.5 theta =  -0.5 />
+<landmark id = 133 x = 8.0 y = 21.5 theta =  -0.5 />
+<landmark id = 134 x = 8.5 y = 21.5 theta =  -0.5 />
+<landmark id = 135 x = 2.0 y = 12.5 theta =  -0.5 />
+<landmark id = 136 x = 3.0 y = 12.5 theta =  -0.5 />
+<landmark id = 137 x = 0.5 y = 7.5 theta =  -0.5 />
+<landmark id = 138 x = 0.5 y = 8.0 theta =  -0.5 />
+<landmark id = 139 x = 9.50 y = 11.0 theta =  -0.5 />
+<landmark id = 140 x = 12.5 y = 11.0 theta =  -0.5 />
+<landmark id = 141 x = 21.50 y = 14.0 theta =  -0.5 />
+<landmark id = 142 x = 21.50 y = 14.5 theta =  -0.5 />
+<landmark id = 143 x = 15.0  y = 21.5 theta =  -0.5 />
+<landmark id = 144 x = 14.5 y =  21.5theta =  -0.5 />
+<landmark id = 145 x = 13.5 y = 21.5 theta =  -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
@@ -177,11 +232,11 @@
         theta = "1.57"
     />
     <GoalPose
-        x = "14"
-        y = "8"
+        x = "21.0"
+        y = "3.0"
         theta = "1.57"
     />
     <PlanningTime
-        maxTime = "120"
+        maxTime = "900"
     />
 </PlanningProblem>
