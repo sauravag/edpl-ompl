@@ -172,7 +172,7 @@ public:
             siF_->setStateValidityCheckingResolution(0.005);
 
             // provide the observation model to the space
-            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(pathToSetupFile_.c_str()));
+            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(siF_, pathToSetupFile_.c_str()));
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space

@@ -94,6 +94,9 @@ class MMPolicyGenerator
 
         }
 
+        /** \brief This function samples the beliefs, which form the starting point for the multi-modal scenario*/
+        void sampleNewBeliefStates();
+
         /** \brief Compute distance between two milestones (this is simply distance between the states of the milestones) */
         double distanceFunction(const Vertex a, const Vertex b) const
         {
@@ -166,9 +169,11 @@ class MMPolicyGenerator
         virtual void propagateBeliefs(const ompl::control::Control *control);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
-        virtual void updateWeights();
+        virtual void updateWeights(const arma::colvec trueObservation);
 
-        virtual arma::colvec computeInnovation(const arma::colvec Zprd, const arma::colvec Zg);
+        //virtual arma::colvec computeInnovation(const arma::colvec Zprd, const arma::colvec Zg);
+
+        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation, double &weightFactor);
 
         void removeBelief(const int Indx);
 

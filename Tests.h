@@ -93,9 +93,9 @@ void TestSE2BeliefSpace()
 
 bool isTheStateValid(const ob::State *state)
 {
-    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+    //ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
 
-    return om->isStateObservable(state);
+    return true;//om->isStateObservable(state);
 }
 /*
 void TestBeliefStateSampler()
@@ -135,7 +135,7 @@ void TestBeliefStateSampler()
 }
 */
 
-
+/*
 void TestObservationModel()
 {
     CamAruco2DObservationModel om( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" );
@@ -173,6 +173,7 @@ void TestObservationModel()
 
     cout<<"Observation Model passed tests"<<endl;
 }
+*/
 
 /*
 void TestStatePropagator()
@@ -317,7 +318,7 @@ void TestKalmanFilter()
 
     MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
 
-    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
 
     si->setMotionModel(mm);
     si->setObservationModel(om);
@@ -404,7 +405,7 @@ void TestRHCICreate()
 
     MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml"));
 
-    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel( "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
+    ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(si, "/home/saurav/Research/Development/OMPL/FIRM-OMPL/Setup.xml" ));
 
 
     si->setMotionModel(mm);

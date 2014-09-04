@@ -186,7 +186,7 @@ public:
             siF_->setStateValidityCheckingResolution(0.005);
 
             // provide the observation model to the space
-            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(pathToSetupFile_.c_str()));
+            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(siF_, pathToSetupFile_.c_str()));
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space
@@ -216,7 +216,9 @@ public:
 
             policyGenerator_ = new MMPolicyGenerator(siF_);
 
-            policyGenerator_->setCurrentBeliefStates(beliefStates_);
+            //policyGenerator_->sampleNewBeliefStates();
+
+            //policyGenerator_->setCurrentBeliefStates(beliefStates_);
 
             policyGenerator_->setBeliefTargetStates(targetStates_);
 
@@ -230,6 +232,7 @@ public:
     bool solve()
     {
         //std::vector<ompl::base::State*> tempbStates;
+        policyGenerator_->sampleNewBeliefStates();
 
         if(!setup_)
         {
@@ -477,9 +480,9 @@ protected:
         TiXmlNode* child = 0;
 
         arma::mat cov = arma::eye(3,3);
-        cov(0,0) = 0.1;
-        cov(1,1) = 0.1;
-        cov(2,2) = 0.04;
+        cov(0,0) = 0.03;
+        cov(1,1) = 0.03;
+        cov(2,2) = 0.004;
 
         while( (child = landmarkElement ->IterateChildren(child)))
         {

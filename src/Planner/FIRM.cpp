@@ -760,10 +760,30 @@ void FIRM::executeFeedback(void)
         }
         else
         {
+            // get a copy of the true state
+            ompl::base::State *tempTrueStateCopy = si_->allocState();
+
+            siF_->getTrueState(tempTrueStateCopy);
+
             currentVertex = addStateToGraph(cendState);
+
+            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
+            siF_->setTrueState(tempTrueStateCopy);
+
+            siF_->freeState(tempTrueStateCopy);
+
             solveDynamicProgram(goal);
         }
         si_->copyState(cstartState, cendState);
+
+        if(si_->distance(cstartState,stateProperty_[goal]) < 5.0)
+        {
+            std::cout<<"Before Simulated Kidnapping! (Press Enter) \n";
+            std::cin.get();
+            this->simulateKidnapping();
+            std::cout<<"AFter Simulated Kidnapping! (Press Enter) \n";
+            std::cin.get();
+        }
 
     }
 
@@ -900,4 +920,26 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
     }
 
     return edgeToTake;
+}
+
+void FIRM::simulateKidnapping()
+{
+    //Kidnapped state
+    double X = 2.0;
+    double Y = 19.5;
+    double theta = 1.57;
+
+    ompl::base::State *kidnappedState = si_->allocState();
+
+    //ompl::base::State *currentRobotState = si_->allocState();
+
+    //siF_->getTrueState(currentRobotState);
+
+    //arma::mat currentCovariance = currentRobotState->as<SE2BeliefSpace::StateType>()->getCovariance();
+
+    kidnappedState->as<SE2BeliefSpace::StateType>()->setXYYaw(X,Y,theta);
+    //kidnappedState->as<SE2BeliefSpace::StateType>()->setCovariance(currentCovariance);
+
+    siF_->setTrueState(kidnappedState);
+
 }

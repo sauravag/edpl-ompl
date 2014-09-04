@@ -46,6 +46,8 @@ namespace ompl
         static const double CAMERA_HALF_FIELD_OF_VIEW = 180; // degrees
 
         static const double CAMERA_DETECTION_RANGE = 2.5;// meters
+
+        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.30 ; // meters
     }
 }
 
@@ -86,7 +88,7 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
                 //extract state from Cfg and normalize
                 //generate noise scaling/shifting factor
 
-                colvec noise_std = this->etaD_*landmarkRange + this->etaPhi_*relativeAngle + this->sigma_;
+                colvec noise_std = this->etaD_*landmarkRange + /*this->etaPhi_*relativeAngle +*/ this->sigma_;
 
                 //generate raw noise
                 colvec randNoiseVec = randn<colvec>(2);
@@ -102,10 +104,10 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
               // generate zero noise
               colvec zeronoise =  zeros<colvec>(landmarkInfoDim);
               noise =  zeronoise;
-
             }
 
             z[singleObservationDim*counter] = landmarks_[i](0) ; // id of the landmark
+            assert(landmarkRange <= ompl::magic::CAMERA_DETECTION_RANGE);
             z[singleObservationDim*counter + 1 ] = landmarkRange + noise[0]; // distance to landmark
             z[singleObservationDim*counter+2] = landmarkBearing + noise[1];
             z[singleObservationDim*counter+3] = landmarks_[i](3);
@@ -157,7 +159,7 @@ CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *st
         // The candidate landmark is the closest landmark in the list with the same ID as that of what real robot sees
         colvec candidate;
 
-        int candidateIndx = this->findCorresponsingLandmark(state, Zg.subvec(singleObservationDim*k,singleObservationDim*k+3), candidate);
+        int candidateIndx = this->findCorrespondingLandmark(state, Zg.subvec(singleObservationDim*k,singleObservationDim*k+3), candidate);
 
         z.resize((k+1)*singleObservationDim ,  1);
         z[singleObservationDim*k]     = candidate(0)  ; // id of the landmark
@@ -200,21 +202,23 @@ double CamAruco2DObservationModel::getDataAssociationLikelihood(const arma::colv
     // Find the most likely landmark to predict associated with the true observation
     double weight = 0.0;
 
-    arma::colvec noise = this->etaD_*trueObs(1) + this->sigma_;
+    arma::colvec noise = this->sigma_;
 
     arma::mat covariance = arma::diagmat(arma::pow(noise,2));
 
     arma::colvec innov = trueObs-predictedObs;
 
+    FIRMUtils::normalizeAngleToPiRange(innov(1));
+
     arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
 
-    weight = std::pow(2.71828, t(0,0));
+    weight = std::exp(t(0,0));
 
     return weight;
 }
 
 
-int CamAruco2DObservationModel::findCorresponsingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark, arma::colvec &candidateObservation)
+int CamAruco2DObservationModel::findCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark, arma::colvec &candidateObservation)
 {
     using namespace arma;
 
@@ -263,6 +267,41 @@ int CamAruco2DObservationModel::findCorresponsingLandmark(const ompl::base::Stat
 }
 
 
+bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *state, const arma::colvec& landmark )
+{
+    using namespace arma;
+
+    colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
+
+    colvec robot_to_landmark_ray =  landmark.subvec(1,2) - xVec.subvec(0,1);
+
+    double distance = norm(robot_to_landmark_ray,2);
+
+    int steps = std::floor(distance/ompl::magic::ONE_STEP_DISTANCE_FOR_VISIBILITY);
+
+    ompl::base::State *tempState = this->si_->allocState();
+
+    for(int i=1 ; i < steps; i++)
+    {
+        double newX = xVec(0) + i*robot_to_landmark_ray(0)/steps;
+
+        double newY = xVec(1) + i*robot_to_landmark_ray(1)/steps;
+
+        tempState->as<SE2BeliefSpace::StateType>()->setXYYaw(newX, newY,0);
+
+        if(!this->si_->isValid(tempState))
+        {
+            return false;
+        }
+
+    }
+
+    si_->freeState(tempState);
+
+    return true;
+}
+
+
 bool CamAruco2DObservationModel::isLandmarkVisible(const ompl::base::State *state, const arma::colvec& landmark,
                                                               double& range, double& bearing, double& viewingAngle)
 {
@@ -292,8 +331,11 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const ompl::base::State *stat
 
     if( abs(bearing) <= fov && range <= maxRange )
     {
-       assert(abs(viewingAngle) <= boost::math::constants::pi<double>() / 2 );
-      return true;
+        if(hasClearLineOfSight(state, landmark))
+        {
+            assert(abs(viewingAngle) <= boost::math::constants::pi<double>() / 2 );
+            return true;
+        }
     }
 
     return false;
@@ -316,7 +358,7 @@ CamAruco2DObservationModel::getObservationJacobian(const ompl::base::State *stat
     {
         colvec candidate;
 
-        int Indx = this->findCorresponsingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
+        int Indx = this->findCorrespondingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
 
         colvec diff =  landmarks_[Indx].subvec(1,2) - xVec.subvec(0,1);
 
@@ -353,8 +395,7 @@ CamAruco2DObservationModel::getNoiseJacobian(const ompl::base::State *state, con
 
 
 
-arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::base::State *state,
-                                                                        const ObservationType& z)
+arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z)
 {
     using namespace arma;
 
@@ -370,7 +411,7 @@ arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::
     {
         colvec candidate;
 
-        int indx = this->findCorresponsingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
+        int indx = this->findCorrespondingLandmark(state, z.subvec(i*singleObservationDim,i*singleObservationDim+3), candidate);
 
         double range = candidate(1);//norm( landmarks_[indx].subvec(1,2) - xVec.subvec(0,1) , 2);
 

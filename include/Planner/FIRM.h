@@ -299,6 +299,9 @@ protected:
 
     void sendFeedbackEdgesToViz();
 
+    /** \brief simulates a kidnapping, where the robot is disturbed to a random new location */
+    void simulateKidnapping();
+
     /** \brief Calculates the new cost to go from a node*/
     std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(const Vertex node);
 
