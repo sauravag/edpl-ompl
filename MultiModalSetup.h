@@ -118,7 +118,7 @@ public:
 
     virtual ~MultiModalSetup(void)
     {
-        delete policyGenerator_;
+        //delete policyGenerator_;
     }
 
     const firm::SpaceInformation::SpaceInformationPtr& getSpaceInformation() const
