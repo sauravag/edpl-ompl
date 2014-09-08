@@ -93,7 +93,7 @@ class FIRMWeight {
   protected:
     double  cost_; // the cost of traversing the edge
 
-    size_t controllerID_; // the identifier of the controller associated with the edge
+    int controllerID_; // the identifier of the controller associated with the edge
 
     double successProbability_; //  the transition probability of the edge
 

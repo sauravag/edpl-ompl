@@ -165,10 +165,10 @@
 </MotionModels>
 <PlanningProblem>
 	<Environment
-		environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleFIRMEnv.obj"
+		environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleFIRMEnv.obj"
 	/>
 	<Robot
-		robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+		robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
 	/>
 	<StartPose
 		x = "16"
@@ -176,14 +176,14 @@
 		theta = "0"
 	/>
 	<GoalPose
-		x = "1"
-		y = "4"
+		x = "16"
+		y = "1"
 		theta = "1.57"
 	/>
 	<PlanningTime
-		maxTime = "3000"
+		maxTime = "120"
 	/>
 	<FIRMNodes
-		minNodes = "30"
+		minNodes = "10"
 	/>
 </PlanningProblem>

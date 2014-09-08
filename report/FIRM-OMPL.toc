@@ -20,8 +20,13 @@
 \contentsline {subsection}{\numberline {2.1.8}Find the solution path}{5}{subsection.2.1.8}
 \contentsline {subsubsection}{What was happening in ompl::PRM}{5}{section*.5}
 \contentsline {subsubsection}{What we need to do in FIRM}{5}{section*.6}
-\contentsline {section}{\numberline {2.2}Issues}{5}{section.2.2}
-\contentsline {chapter}{\numberline {3}Project Status}{6}{chapter.3}
-\contentsline {section}{\numberline {3.1}Progress}{6}{section.3.1}
-\contentsline {subsection}{\numberline {3.1.1}Completed Tasks}{6}{subsection.3.1.1}
-\contentsline {subsubsection}{Pending Tasks}{6}{section*.7}
+\contentsline {section}{\numberline {2.2}Rendering the geometry}{5}{section.2.2}
+\contentsline {section}{\numberline {2.3}Issues}{5}{section.2.3}
+\contentsline {section}{\numberline {2.4}Finding the target nodes for the MMPG}{6}{section.2.4}
+\contentsline {section}{\numberline {2.5}How to save/load the graph from an XML}{6}{section.2.5}
+\contentsline {subsection}{\numberline {2.5.1}How to save}{6}{subsection.2.5.1}
+\contentsline {subsection}{\numberline {2.5.2}How to load}{6}{subsection.2.5.2}
+\contentsline {chapter}{\numberline {3}Project Status}{7}{chapter.3}
+\contentsline {section}{\numberline {3.1}Progress}{7}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Completed Tasks}{7}{subsection.3.1.1}
+\contentsline {subsubsection}{Pending Tasks}{7}{section*.7}

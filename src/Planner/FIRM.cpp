@@ -47,8 +47,9 @@
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
-
 #include "../../include/Visualization/Visualizer.h"
+#include "../../include/Utils/FIRMUtils.h"
+
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
 
@@ -235,6 +236,8 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                     {
                         stateStable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
                                 ls.getM() * ls.getR() * trans(ls.getM()), S );
+
+                        workState->as<SE2BeliefSpace::StateType>()->setCovariance(S);
                     }
                     catch(int e)
                     {
@@ -370,6 +373,8 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         if (addedNewSolution())
             psol.optimized_ = true;
         pdef_->addSolutionPath(psol);
+
+        savePlannerData();
     }
 
     return sol ? (addedNewSolution() ? ompl::base::PlannerStatus::EXACT_SOLUTION : ompl::base::PlannerStatus::APPROXIMATE_SOLUTION) : ompl::base::PlannerStatus::TIMEOUT;
@@ -537,10 +542,13 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(ompl::base::State* startNodeStat
 
     double transitionProbability = successCount / numParticles_ ;
 
+    std::cout<<"The transition probability is :"<<transitionProbability<<std::endl;
+
     FIRMWeight weight(edgeCost.v, transitionProbability);
 
     return weight;
 }
+
 
 void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
 {
@@ -989,10 +997,51 @@ bool FIRM::detectKidnapping(ompl::base::State *previousState, ompl::base::State 
     return false;
 }
 
+void FIRM::savePlannerData()
+{
+    //writeFIRMGraphToXML(std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, std::map<std::pair<int,int>,FIRMWeight > edgeWeights)
+
+    std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes;
+
+    foreach(Vertex v, boost::vertices(g_))
+    {
+        arma::colvec xVec = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getArmaData();
+        arma::mat cov = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getCovariance();
+
+        std::pair<int,std::pair<arma::colvec,arma::mat> > nodeToWrite = std::make_pair(v, std::make_pair(xVec, cov)) ;
+
+        nodes.push_back(nodeToWrite);
+
+        std::cout<<"In FIRM graph, writing node: "<<xVec<<" \n"<<cov<<std::endl;
+    }
+
+    std::map<std::pair<int,int>,FIRMWeight > edgeMap;
+
+    foreach(Edge e, boost::edges(g_))
+    {
+        Vertex start = boost::source(e,g_);
+        Vertex goal  = boost::target(e,g_);
+
+        edgeMap[std::make_pair(start,goal)] = boost::get(boost::edge_weight, g_, e);
+    }
 
 
+    FIRMUtils::writeFIRMGraphToXML(nodes, edgeMap);
+
+}
+
+/*
+FIRMWeight loadEdgeControllerWithCost(const Vertex start, const Vertex goal, EdgeControllerType &edgeController)
+{
+
+}
 
 
+void FIRM::loadRoadmapFromFile(const char* pathToGraphXML)
+{
 
+
+}
+*/
 
 

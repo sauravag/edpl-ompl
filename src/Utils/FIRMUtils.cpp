@@ -36,6 +36,8 @@
 #include "../../include/Utils/FIRMUtils.h"
 #include <boost/math/constants/constants.hpp>
 #include <random>
+#include <tinyxml.h>
+
 
 void FIRMUtils::normalizeAngleToPiRange(double &theta)
 {
@@ -71,3 +73,91 @@ int FIRMUtils::generateRandomIntegerInRange(const int floor, const int ceiling)
 
     return distr(eng);
 }
+
+void FIRMUtils::writeFIRMGraphToXML(std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, std::map<std::pair<int,int>,FIRMWeight > edgeWeights)
+{
+    TiXmlDocument doc;
+
+ 	TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
+	doc.LinkEndChild( decl );
+
+	TiXmlElement * Nodes = new TiXmlElement( "Nodes" );
+	doc.LinkEndChild( Nodes );
+
+
+	for(int i = 0; i < nodes.size(); i++)
+	{
+        TiXmlElement * node;
+        node = new TiXmlElement( "node" );
+        Nodes->LinkEndChild( node );
+
+        int nodeID = nodes[i].first; // id of the node in the graph
+
+        arma::colvec xVec = nodes[i].second.first; // x,y,yaw
+
+        arma::mat cov = nodes[i].second.second; // covariance matrix
+
+        node->SetAttribute("id", nodeID);
+        node->SetDoubleAttribute("x", xVec(0));
+        node->SetDoubleAttribute("y", xVec(1));
+        node->SetDoubleAttribute("theta",xVec(2));
+        node->SetDoubleAttribute("c11", cov(0,0));
+        node->SetDoubleAttribute("c12", cov(0,1));
+        node->SetDoubleAttribute("c13", cov(0,2));
+        node->SetDoubleAttribute("c21", cov(1,0));
+        node->SetDoubleAttribute("c22", cov(1,1));
+        node->SetDoubleAttribute("c23", cov(1,2));
+        node->SetDoubleAttribute("c31", cov(2,0));
+        node->SetDoubleAttribute("c32", cov(2,1));
+        node->SetDoubleAttribute("c33", cov(2,2));
+
+        std::cout<<"Writing Node: "<<xVec(0)<<" "<<xVec(1)<<" "<<xVec(2)<<" \n"<<cov<<std::endl;
+
+   }
+
+    TiXmlElement * Edges = new TiXmlElement( "Edges" );
+	doc.LinkEndChild( Edges );
+
+	for( std::map<std::pair<int,int>,FIRMWeight >::iterator e = edgeWeights.begin(); e != edgeWeights.end(); ++e)
+	{
+        TiXmlElement * edge;
+        edge = new TiXmlElement( "edge" );
+        Edges->LinkEndChild( edge );
+
+        edge->SetAttribute("startVertexID", e->first.first);
+        edge->SetAttribute("endVertexID", e->first.second);
+        edge->SetDoubleAttribute("cost", e->second.getCost());
+        edge->SetDoubleAttribute("successProbability", e->second.getSuccessProbability());
+
+        std::cout<<"Writing edge :"<<e->first.first<<" "<<e->first.second<<" "<<e->second.getCost()<<" "<< e->second.getSuccessProbability()<<std::endl;
+
+   }
+
+	doc.SaveFile( "FIRMRoadMap.xml" );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

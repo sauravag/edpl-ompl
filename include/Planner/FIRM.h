@@ -242,6 +242,12 @@ public:
         minFIRMNodes_ = numNodes ;
     }
 
+     /** \brief Loads a saved FIRM roadmap graph from an XML file*/
+    //virtual void loadRoadmapFromFile(const char* pathToGraphXML);
+
+    /** \brief Saves the roadmap to an XML */
+    virtual void savePlannerData();
+
 protected:
 
     /** \brief Free all the memory allocated by the planner */
@@ -250,6 +256,9 @@ protected:
     /** \brief Construct a graph node for a given state (\e state), store it in the nearest neighbors data structure
         and then connect it to the roadmap in accordance to the connection strategy. */
     virtual Vertex addStateToGraph(ompl::base::State *state, bool addReverseEdge = true, bool shouldCreateNodeController=true);
+
+    /** \brief Load a state from XML and add to Graph*/
+    //virtual Vertex loadStateToGraph(ompl::base::State *state);
 
     /** \brief Make two milestones (\e m1 and \e m2) be part of the same connected component. The component with fewer
         elements will get the id of the component with more elements. */
@@ -283,6 +292,9 @@ protected:
     virtual FIRMWeight generateEdgeControllerWithCost(ompl::base::State* startNodeState,
                                                              ompl::base::State* targetNodeState,
                                                              EdgeControllerType &edgeController);
+
+    /** \brief Generates an edge controller and loads the edge properties from XML */
+    //virtual FIRMWeight loadEdgeControllerWithCost(const Vertex start, const Vertex goal, EdgeControllerType &edgeController);
 
     /** \brief Generates the edge controller that drives the robot from start to end of edge */
     virtual void generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, EdgeControllerType &edgeController);
