@@ -303,6 +303,9 @@ protected:
     /** \brief simulates a kidnapping, where the robot is disturbed to a random new location */
     void simulateKidnapping();
 
+    /** \brief Detects whether the robot was kidnapped or not */
+    bool detectKidnapping(ompl::base::State *previousState, ompl::base::State *newState);
+
     /** \brief Calculates the new cost to go from a node*/
     std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(const Vertex node);
 

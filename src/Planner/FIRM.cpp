@@ -87,6 +87,8 @@ namespace ompl
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
 
         static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 4.0;
+
+        static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
     }
 }
 
@@ -756,6 +758,8 @@ void FIRM::executeFeedback(void)
 
     OMPL_INFORM("Running policy execution");
 
+    bool kidnapped_flag = false;
+
     while(currentVertex != goal)
     {
         Edge e = feedback_[currentVertex];
@@ -789,16 +793,22 @@ void FIRM::executeFeedback(void)
         3. Sample modes and run policygen till you converge to one mode
         4. get back to policy execution
         */
+        if(this->detectKidnapping(cstartState, cendState))
+        {
+            std::cout<<"Kidnapped !"<<std::endl;
+            std::cin.get();
+        }
 
         si_->copyState(cstartState, cendState);
 
-        if(si_->distance(cstartState,stateProperty_[goal]) < 5.0)
+        if(si_->distance(cstartState,stateProperty_[goal]) < 5.0 && !kidnapped_flag)
         {
             std::cout<<"Before Simulated Kidnapping! (Press Enter) \n";
             std::cin.get();
             this->simulateKidnapping();
             std::cout<<"AFter Simulated Kidnapping! (Press Enter) \n";
             std::cin.get();
+            kidnapped_flag = true;
         }
 
 
@@ -960,3 +970,29 @@ void FIRM::simulateKidnapping()
     siF_->setTrueState(kidnappedState);
 
 }
+
+bool FIRM::detectKidnapping(ompl::base::State *previousState, ompl::base::State *newState)
+{
+    using namespace arma;
+
+    mat previousCov = previousState->as<SE2BeliefSpace::StateType>()->getCovariance();
+
+    mat newCov = newState->as<SE2BeliefSpace::StateType>()->getCovariance();
+
+    double innovSignal = (trace(newCov) - trace(previousCov)) / trace(previousCov);
+
+    if(innovSignal >= ompl::magic::KIDNAPPING_INNOVATION_CHANGE_THRESHOLD )
+    {
+        return true;
+    }
+
+    return false;
+}
+
+
+
+
+
+
+
+
