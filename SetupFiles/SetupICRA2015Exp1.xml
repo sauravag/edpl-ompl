@@ -221,10 +221,10 @@
 </TargetList>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/ICRA2015Exp1.obj"
+        environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/ICRA2015Exp1.obj"
     />
     <Robot
-        robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+        robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
     />
     <StartPose
         x = "2.0"

@@ -56,6 +56,7 @@
 #include "../Filters/LinearizedKF.h"
 #include "../Path/FeedbackPath.h"
 #include "../ConnectionStrategy/FStrategy.h"
+#include "MMPolicyGenerator.h"
 
 /**
    @anchor FIRM
@@ -386,6 +387,8 @@ protected:
 
     /** \brief The minimum number of nodes that should be sampled. */
     unsigned int minFIRMNodes_;
+
+    MMPolicyGenerator *policyGenerator_;
 
 };
 

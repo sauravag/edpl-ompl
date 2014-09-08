@@ -109,12 +109,17 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
     specs_.optimizingPaths = true;
 
     Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
+
     minFIRMNodes_ = 25;
+
+    policyGenerator_ = new MMPolicyGenerator(si);
+
 }
 
 FIRM::~FIRM(void)
 {
     freeMemory();
+    delete policyGenerator_;
 }
 
 void FIRM::setup(void)
@@ -435,6 +440,9 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
             }
         }
     }
+
+    policyGenerator_->addFIRMNodeToObservationGraph(state);
+
     return m;
 }
 
@@ -774,6 +782,14 @@ void FIRM::executeFeedback(void)
 
             solveDynamicProgram(goal);
         }
+
+        /**
+        1. Check if innovation i.e. change in trace(cov) between start and end state is high
+        2. If the change is high, then switch to lost mode
+        3. Sample modes and run policygen till you converge to one mode
+        4. get back to policy execution
+        */
+
         si_->copyState(cstartState, cendState);
 
         if(si_->distance(cstartState,stateProperty_[goal]) < 5.0)
@@ -784,6 +800,7 @@ void FIRM::executeFeedback(void)
             std::cout<<"AFter Simulated Kidnapping! (Press Enter) \n";
             std::cin.get();
         }
+
 
     }
 
