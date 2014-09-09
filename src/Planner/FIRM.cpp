@@ -542,8 +542,6 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(ompl::base::State* startNodeStat
 
     double transitionProbability = successCount / numParticles_ ;
 
-    std::cout<<"The transition probability is :"<<transitionProbability<<std::endl;
-
     FIRMWeight weight(edgeCost.v, transitionProbability);
 
     return weight;
@@ -727,9 +725,9 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
         double nextNodeCostToGo = costToGo_[targetNode];
 
-        FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, e);
+        const FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, e);
 
-        double transitionProbability  = edgeWeight.getSuccessProbability();
+        const double transitionProbability  = edgeWeight.getSuccessProbability();
 
         double singleCostToGo = ( transitionProbability*nextNodeCostToGo + (1-transitionProbability)*ompl::magic::OBSTACLE_COST_TO_GO) + edgeWeight.getCost();
 
@@ -1012,21 +1010,23 @@ void FIRM::savePlannerData()
 
         nodes.push_back(nodeToWrite);
 
-        std::cout<<"In FIRM graph, writing node: "<<xVec<<" \n"<<cov<<std::endl;
     }
 
-    std::map<std::pair<int,int>,FIRMWeight > edgeMap;
+    std::vector<std::pair<std::pair<int,int>,FIRMWeight> > edgeWeights;
 
     foreach(Edge e, boost::edges(g_))
     {
         Vertex start = boost::source(e,g_);
         Vertex goal  = boost::target(e,g_);
 
-        edgeMap[std::make_pair(start,goal)] = boost::get(boost::edge_weight, g_, e);
+        const FIRMWeight w = boost::get(boost::edge_weight, g_, e);
+
+        edgeWeights.push_back(std::make_pair(std::make_pair(start,goal),w));
+
     }
 
 
-    FIRMUtils::writeFIRMGraphToXML(nodes, edgeMap);
+    FIRMUtils::writeFIRMGraphToXML(nodes, edgeWeights);
 
 }
 

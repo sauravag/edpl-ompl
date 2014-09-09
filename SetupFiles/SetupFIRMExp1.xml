@@ -1,23 +1,23 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
-<landmark id = 75 x = 2.5527 y = 0 theta = 0.5 />
-<landmark id = 135 x = 2.8321 y = 0 theta = 0.5 />
-<landmark id = 136 x = 3.1115 y = 0 theta = 0.5 />
-<landmark id = 2 x = 4.7244 y = 0 theta = 0.5 />
-<landmark id = 137 x = 5.0038 y = 0 theta = 0.5 />
-<landmark id = 138 x = 5.2832 y = 0 theta = 0.5 />
-<landmark id = 3 x = 7.1628 y = 0 theta = 0.5 />
-<landmark id = 4 x = 9.6012 y = 0 theta = 0.5 />
-<landmark id = 92 x = 9.8806 y = 0 theta = 0.5 />
-<landmark id = 93 x = 11.8364 y = 0 theta = 0.5 />
-<landmark id = 94 x = 12.1158 y = 0 theta = 0.5 />
-<landmark id = 95 x = 12.3952 y = 0 theta = 0.5 />
-<landmark id = 96 x = 14.2113 y = 0 theta = 0.5 />
-<landmark id = 6 x = 14.4907 y = 0 theta = 0.5 />
-<landmark id = 97 x = 14.7701 y = 0 theta = 0.5 />
-<landmark id = 98 x = 15.5448 y = 0 theta = 0.5 />
-<landmark id = 211 x = 15.8242 y = 0 theta = 0.5 />
-<landmark id = 99 x = 16.1036 y = 0 theta = 0.5 />
+<landmark id = 75 x = 2.5527 y = 0.2 theta = 0.5 />
+<landmark id = 135 x = 2.8321 y = 0.2 theta = 0.5 />
+<landmark id = 136 x = 3.1115 y = 0.2 theta = 0.5 />
+<landmark id = 2 x = 4.7244 y = 0.2 theta = 0.5 />
+<landmark id = 137 x = 5.0038 y = 0.2 theta = 0.5 />
+<landmark id = 138 x = 5.2832 y = 0.2 theta = 0.5 />
+<landmark id = 3 x = 7.1628 y = 0.2 theta = 0.5 />
+<landmark id = 4 x = 9.6012 y = 0.2 theta = 0.5 />
+<landmark id = 92 x = 9.8806 y = 0.2 theta = 0.5 />
+<landmark id = 93 x = 11.8364 y = 0.2 theta = 0.5 />
+<landmark id = 94 x = 12.1158 y = 0.2 theta = 0.5 />
+<landmark id = 95 x = 12.3952 y = 0.2 theta = 0.5 />
+<landmark id = 96 x = 14.2113 y = 0.2 theta = 0.5 />
+<landmark id = 6 x = 14.4907 y = 0.2 theta = 0.5 />
+<landmark id = 97 x = 14.7701 y = 0.2 theta = 0.5 />
+<landmark id = 98 x = 15.5448 y = 0.2 theta = 0.5 />
+<landmark id = 211 x = 15.8242 y = 0.2 theta = 0.5 />
+<landmark id = 99 x = 16.1036 y = 0.2 theta = 0.5 />
 <landmark id = 83 x = 16.3728 y = 1.3462 theta = 1 />
 <landmark id = 12 x = 15.8244 y = 2.8129 theta = -0.82874 />
 <landmark id = 16 x = 0.0508 y = 8.0569 theta = 0 />
@@ -29,8 +29,8 @@
 <landmark id = 14 x = 0.0508 y = 3.3858 theta = 0 />
 <landmark id = 143 x = 0.41148 y = 2.8651 theta = 0 />
 <landmark id = 140 x = 0.41148 y = 2.4892 theta = 0 />
-<landmark id = 13 x = 0 y = 1.143 theta = 0 />
-<landmark id = 76 x = 0 y = 1.0033 theta = 0 />
+<landmark id = 13 x = 0.25 y = 1.143 theta = 0 />
+<landmark id = 76 x = 0.25 y = 1.0033 theta = 0 />
 <landmark id = 139 x = 2.3114 y = 2.2784 theta = -0.5 />
 <landmark id = 150 x = 2.5908 y = 2.2784 theta = -0.5 />
 <landmark id = 59 x = 3.1394 y = 2.2784 theta = -0.5 />
@@ -184,6 +184,6 @@
 		maxTime = "120"
 	/>
 	<FIRMNodes
-		minNodes = "10"
+		minNodes = "5"
 	/>
 </PlanningProblem>

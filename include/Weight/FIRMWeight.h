@@ -80,13 +80,25 @@ class FIRMWeight {
     //friend istream& operator>> (istream& _is, FIRMWeight& _w);
 
 
-    double getCost(){return cost_;}
+    double getCost() const
+    {
+        return cost_;
+    }
+
     void setCost(double c){ cost_ = c;}
 
-    int getControllerID() { return controllerID_ ;}
+    int getControllerID() const
+    {
+        return controllerID_ ;
+    }
+
     void   setControllerID(int id) { controllerID_ = id ;}
 
-    double getSuccessProbability(){return successProbability_ ;}
+    double getSuccessProbability() const
+    {
+        return successProbability_ ;
+    }
+
     void setSuccessProbability(double p){ successProbability_ = p ;}
 
     // Data

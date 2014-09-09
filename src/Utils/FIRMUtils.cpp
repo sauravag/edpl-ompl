@@ -74,7 +74,7 @@ int FIRMUtils::generateRandomIntegerInRange(const int floor, const int ceiling)
     return distr(eng);
 }
 
-void FIRMUtils::writeFIRMGraphToXML(std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, std::map<std::pair<int,int>,FIRMWeight > edgeWeights)
+void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, const std::vector<std::pair<std::pair<int,int>,FIRMWeight> > edgeWeights)
 {
     TiXmlDocument doc;
 
@@ -118,18 +118,22 @@ void FIRMUtils::writeFIRMGraphToXML(std::vector<std::pair<int,std::pair<arma::co
     TiXmlElement * Edges = new TiXmlElement( "Edges" );
 	doc.LinkEndChild( Edges );
 
-	for( std::map<std::pair<int,int>,FIRMWeight >::iterator e = edgeWeights.begin(); e != edgeWeights.end(); ++e)
+	for(int i = 0; i < edgeWeights.size(); i++)
 	{
         TiXmlElement * edge;
         edge = new TiXmlElement( "edge" );
         Edges->LinkEndChild( edge );
 
-        edge->SetAttribute("startVertexID", e->first.first);
-        edge->SetAttribute("endVertexID", e->first.second);
-        edge->SetDoubleAttribute("cost", e->second.getCost());
-        edge->SetDoubleAttribute("successProbability", e->second.getSuccessProbability());
+        FIRMWeight w = edgeWeights[i].second;
 
-        std::cout<<"Writing edge :"<<e->first.first<<" "<<e->first.second<<" "<<e->second.getCost()<<" "<< e->second.getSuccessProbability()<<std::endl;
+
+        edge->SetAttribute("startVertexID", edgeWeights[i].first.first);
+        edge->SetAttribute("endVertexID", edgeWeights[i].first.second);
+        edge->SetDoubleAttribute("successProb", w.getSuccessProbability());
+        edge->SetDoubleAttribute("cost", w.getCost());
+
+
+        std::cout<<"Writing edge : "<<w.getCost()<<" "<< w.getSuccessProbability()<<std::endl;
 
    }
 
