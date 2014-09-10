@@ -259,8 +259,8 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
 void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
                                             ompl::base::PathPtr &solution)
 {
-    // Don't do anything for first two seconds
-    boost::this_thread::sleep(boost::posix_time::seconds(2));
+    // Don't do anything for first one second
+    boost::this_thread::sleep(boost::posix_time::seconds(1));
 
     while (!ptc && !addedSolution_)
     {
@@ -275,7 +275,10 @@ void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
         addedSolution_ = existsPolicy(startM_, goalM_, solution);
 
         if (!addedSolution_)
-            boost::this_thread::sleep(boost::posix_time::seconds(30));
+        {
+            OMPL_INFORM("FIRM: Checking for Solution.");
+            boost::this_thread::sleep(boost::posix_time::seconds(15));
+        }
     }
 }
 
@@ -390,7 +393,11 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
             psol.optimized_ = true;
         pdef_->addSolutionPath(psol);
 
-        savePlannerData();
+        // If roadmap wasn't loaded from file, then save the newly constructed roadmap
+        if(!loadedRoadmapFromFile_)
+        {
+            this->savePlannerData();
+        }
     }
 
     return sol ? (addedNewSolution() ? ompl::base::PlannerStatus::EXACT_SOLUTION : ompl::base::PlannerStatus::APPROXIMATE_SOLUTION) : ompl::base::PlannerStatus::TIMEOUT;
@@ -415,7 +422,15 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     boost::mutex::scoped_lock _(graphMutex_);
 
-    Vertex m = boost::add_vertex(g_);
+    Vertex m;
+
+    //if state already exists in the graph, just return corresponding vertex
+    if(isDuplicateState(state,m))
+    {
+        return m;
+    }
+
+    m = boost::add_vertex(g_);
 
     addStateToVisualization(state);
 
@@ -437,7 +452,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     foreach (Vertex n, neighbors)
     {
-        if ( m!=n && stateProperty_[m]!=stateProperty_[n])
+        if ( m!=n /*&& stateProperty_[m]!=stateProperty_[n]*/)
         {
             totalConnectionAttemptsProperty_[m]++;
             totalConnectionAttemptsProperty_[n]++;
@@ -476,6 +491,9 @@ bool FIRM::sameComponent(Vertex m1, Vertex m2)
 ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal)
 {
     FeedbackPath *p = new FeedbackPath(siF_);
+
+    std::cout<<"The start vertex is: "<<start<<std::endl;
+    std::cout<<"The goal vertex is: "<<goal<<std::endl;
 
     Vertex currentVertex = start;
 
@@ -524,46 +542,11 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
      // Generate the edge controller for given start and end state
     generateEdgeController(startNodeState,targetNodeState,edgeController);
 
-    if(!loadedRoadmapFromFile_)
+    // If there exists an edge corresponding to this in the loaded file we use that
+    // otherwise evaluate the weight properties
+    if(loadedRoadmapFromFile_)
     {
-
-        double successCount = 0;
-
-        // initialize costs to 0
-        ompl::base::Cost edgeCost(0);
-        ompl::base::Cost nodeStabilizationCost(0);
-
-        for(unsigned int i=0; i< numParticles_;i++)
-        {
-            //cout << "MonteCarlo Simulation particle number "<< i<<endl;
-            siF_->setTrueState(startNodeState);
-            siF_->setBelief(startNodeState);
-
-            ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
-            ompl::base::Cost pcost(0);
-
-            if(edgeController.Execute(startNodeState, endBelief, pcost))
-            {
-               successCount++;
-
-               edgeCost.v = edgeCost.v + pcost.v ;
-
-            }
-
-        }
-
-        if (successCount > 0)  edgeCost.v = edgeCost.v / successCount ;
-        else edgeCost.v = ompl::magic::EXTREMELY_HIGH_EDGE_COST; // extremely high cost if no particle could succeed, we can also simply not add this edge
-
-        double transitionProbability = successCount / numParticles_ ;
-
-        FIRMWeight weight(edgeCost.v, transitionProbability);
-
-        return weight;
-    }
-    else
-    {
-        // find the matching loaded edge and then return its weight
+         // find the matching loaded edge and then return its weight
         for(int i=0; i < loadedEdgeProperties_.size(); i++)
         {
             if(loadedEdgeProperties_[i].first.first == a && loadedEdgeProperties_[i].first.second == b)
@@ -571,7 +554,43 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
                 return loadedEdgeProperties_[i].second;
             }
         }
+
     }
+
+
+    double successCount = 0;
+
+    // initialize costs to 0
+    ompl::base::Cost edgeCost(0);
+    ompl::base::Cost nodeStabilizationCost(0);
+
+    for(unsigned int i=0; i< numParticles_;i++)
+    {
+        //cout << "MonteCarlo Simulation particle number "<< i<<endl;
+        siF_->setTrueState(startNodeState);
+        siF_->setBelief(startNodeState);
+
+        ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
+        ompl::base::Cost pcost(0);
+
+        if(edgeController.Execute(startNodeState, endBelief, pcost))
+        {
+           successCount++;
+
+           edgeCost.v = edgeCost.v + pcost.v ;
+
+        }
+
+    }
+
+    if (successCount > 0)  edgeCost.v = edgeCost.v / successCount ;
+    else edgeCost.v = ompl::magic::EXTREMELY_HIGH_EDGE_COST; // extremely high cost if no particle could succeed, we can also simply not add this edge
+
+    double transitionProbability = successCount / numParticles_ ;
+
+    FIRMWeight weight(edgeCost.v, transitionProbability);
+
+    return weight;
 }
 
 
@@ -662,7 +681,7 @@ arma::colvec MapToColvec(const Map& _m) {
 
 void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 {
-    OMPL_INFORM("Solving DP");
+    OMPL_INFORM("FIRM: Solving DP");
 
     using namespace arma;
 
@@ -726,6 +745,8 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
         costToGo_.swap(newCostToGo);   // Equivalent to costToGo_ = newCostToGo
 
     }
+
+    OMPL_INFORM("FIRM: Solved DP");
 
 }
 
@@ -828,12 +849,12 @@ void FIRM::executeFeedback(void)
         */
         if(this->detectKidnapping(cstartState, cendState))
         {
-            std::cout<<"Kidnapped !"<<std::endl;
-            std::cin.get();
+            //std::cout<<"Kidnapped !"<<std::endl;
+            //std::cin.get();
         }
 
         si_->copyState(cstartState, cendState);
-
+        /*
         if(si_->distance(cstartState,stateProperty_[goal]) < 5.0 && !kidnapped_flag)
         {
             std::cout<<"Before Simulated Kidnapping! (Press Enter) \n";
@@ -844,7 +865,7 @@ void FIRM::executeFeedback(void)
             kidnapped_flag = true;
         }
 
-
+        */
     }
 
 
@@ -991,14 +1012,7 @@ void FIRM::simulateKidnapping()
 
     ompl::base::State *kidnappedState = si_->allocState();
 
-    //ompl::base::State *currentRobotState = si_->allocState();
-
-    //siF_->getTrueState(currentRobotState);
-
-    //arma::mat currentCovariance = currentRobotState->as<SE2BeliefSpace::StateType>()->getCovariance();
-
     kidnappedState->as<SE2BeliefSpace::StateType>()->setXYYaw(X,Y,theta);
-    //kidnappedState->as<SE2BeliefSpace::StateType>()->setCovariance(currentCovariance);
 
     siF_->setTrueState(kidnappedState);
 
@@ -1030,12 +1044,17 @@ void FIRM::savePlannerData()
 
     foreach(Vertex v, boost::vertices(g_))
     {
+        // if the vertex isn't a start or goal then only add it to the saved file
+        //if(!isStartVertex(v) && !isGoalVertex(v))
+        //{
         arma::colvec xVec = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getArmaData();
+
         arma::mat cov = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getCovariance();
 
         std::pair<int,std::pair<arma::colvec,arma::mat> > nodeToWrite = std::make_pair(v, std::make_pair(xVec, cov)) ;
 
         nodes.push_back(nodeToWrite);
+        //}
 
     }
 
@@ -1046,12 +1065,14 @@ void FIRM::savePlannerData()
         Vertex start = boost::source(e,g_);
         Vertex goal  = boost::target(e,g_);
 
+        //if(!isStartVertex(start) && !isGoalVertex(start) && !isStartVertex(goal) && !isGoalVertex(goal))
+        //{
         const FIRMWeight w = boost::get(boost::edge_weight, g_, e);
 
         edgeWeights.push_back(std::make_pair(std::make_pair(start,goal),w));
+        //}
 
     }
-
 
     FIRMUtils::writeFIRMGraphToXML(nodes, edgeWeights);
 
@@ -1062,33 +1083,71 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 {
     std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > FIRMNodeList;
 
-    FIRMUtils::readFIRMGraphFromXML(pathToFile, FIRMNodeList, loadedEdgeProperties_);
-
-    loadedRoadmapFromFile_ = true;
-
-    this->setup();
-
-    for(int i = 0; i < FIRMNodeList.size() ; i++)
+    if(FIRMUtils::readFIRMGraphFromXML(pathToFile, FIRMNodeList, loadedEdgeProperties_))
     {
-        ompl::base::State *newState = siF_->allocState();
 
-        arma::colvec xVec = FIRMNodeList[i].second.first;
-        arma::mat     cov = FIRMNodeList[i].second.second;
+        loadedRoadmapFromFile_ = true;
 
-        newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
-        newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
+        this->setup();
 
-        std::cout<<"Adding state from XML --> \n";
-        siF_->printState(newState);
+        for(int i = 0; i < FIRMNodeList.size() ; i++)
+        {
+            ompl::base::State *newState = siF_->allocState();
 
-        Vertex v = addStateToGraph(siF_->cloneState(newState));
+            arma::colvec xVec = FIRMNodeList[i].second.first;
+            arma::mat     cov = FIRMNodeList[i].second.second;
 
-        siF_->freeState(newState);
+            newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
+            newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
 
-        assert(v==FIRMNodeList[i].first && "IDS DONT MATCH !!");
+            std::cout<<"Adding state from XML --> \n";
+            siF_->printState(newState);
+
+            Vertex v = addStateToGraph(siF_->cloneState(newState));
+
+            siF_->freeState(newState);
+
+            assert(v==FIRMNodeList[i].first && "IDS DONT MATCH !!");
+        }
     }
+}
+
+bool FIRM::isStartVertex(const Vertex v)
+{
+
+    for(int i=0; i <  startM_.size(); i++)
+    {
+        if(v == startM_[i])
+            return true;
+    }
+
+    return false;
 
 }
 
+bool FIRM::isGoalVertex(const Vertex v)
+{
+    for(int i=0; i <  goalM_.size(); i++)
+    {
+        if(v == goalM_[i])
+            return true;
+    }
 
+    return false;
 
+}
+
+bool FIRM::isDuplicateState(const ompl::base::State *state, FIRM::Vertex &duplicateVertex)
+{
+     foreach(Vertex v, boost::vertices(g_))
+    {
+        if(stateProperty_[v] == state)
+        {
+            duplicateVertex = v;
+            return true;
+        }
+
+    }
+
+    return false;
+}

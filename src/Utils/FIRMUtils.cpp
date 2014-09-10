@@ -140,7 +140,7 @@ void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<ar
 	doc.SaveFile( "FIRMRoadMap.xml" );
 }
 
-void FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > &FIRMNodeList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights)
+bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > &FIRMNodeList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights)
 {
     //std::string pathToXML = "/home/sauravagarwal/Research/Development/FIRM-OMPL/FIRMRoadMap.xml";
 
@@ -150,8 +150,8 @@ void FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<s
 
     if ( !loadOkay )
     {
-        printf( "Could not load Graph from XML . Error='%s'. Exiting.\n", doc.ErrorDesc() );
-        exit( 1 );
+        OMPL_INFORM("FIRMUtils: Could not load Graph from XML . Need to construct graph.");
+        return false;
     }
 
     TiXmlNode* NodeList = 0;
@@ -260,6 +260,7 @@ void FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<s
 
     }
 
+    return true;
 }
 
 

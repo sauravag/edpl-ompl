@@ -408,6 +408,18 @@ protected:
     std::vector<std::pair<std::pair<int,int>,FIRMWeight> > loadedEdgeProperties_;
 
 
+private:
+
+    /** \brief Checks if this vertex belongs to the list of start vertices */
+    bool isStartVertex(const Vertex v);
+
+    /** \brief Checks if this vertex belongs to the list of goal vertices */
+    bool isGoalVertex(const Vertex v);
+
+    /** \brief Checks if this state already exists in the graph, return the matching vertex if true.*/
+    bool isDuplicateState(const ompl::base::State *state, Vertex &duplicateVertex);
+
+
 };
 
 
