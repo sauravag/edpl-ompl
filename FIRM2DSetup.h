@@ -214,6 +214,10 @@ public:
             this->setup();
         }
 
+        std::string pathToXML = "/home/sauravagarwal/Research/Development/FIRM-OMPL/FIRMRoadMap.xml";
+
+        planner_->as<FIRM>()->loadRoadMapFromFile(pathToXML);
+
         return planner_->solve(planningTime_);
     }
 

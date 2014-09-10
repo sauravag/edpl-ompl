@@ -117,6 +117,8 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     policyGenerator_ = new MMPolicyGenerator(si);
 
+    loadedRoadmapFromFile_ = false;
+
 }
 
 FIRM::~FIRM(void)
@@ -257,7 +259,9 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
 void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
                                             ompl::base::PathPtr &solution)
 {
-    boost::this_thread::sleep(boost::posix_time::seconds(90));
+    // Don't do anything for first two seconds
+    boost::this_thread::sleep(boost::posix_time::seconds(2));
+
     while (!ptc && !addedSolution_)
     {
         // Check for any new goal states
@@ -354,13 +358,25 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     OMPL_INFORM("%s: Starting with %u states", getName().c_str(), nrStartStates);
 
     addedSolution_ = false;
+
+    if (!isSetup())
+        setup();
+    if (!sampler_)
+        sampler_ = si_->allocValidStateSampler();
+    if (!simpleSampler_)
+        simpleSampler_ = si_->allocStateSampler();
+
     ompl::base::PathPtr sol;
     boost::thread slnThread(boost::bind(&FIRM::checkForSolution, this, ptc, boost::ref(sol)));
 
     ompl::base::PlannerTerminationCondition ptcOrSolutionFound =
         ompl::base::plannerOrTerminationCondition(ptc, ompl::base::PlannerTerminationCondition(boost::bind(&FIRM::addedNewSolution, this)));
 
-    constructRoadmap(ptcOrSolutionFound);
+    // If no roadmap was loaded, then construct one
+    if(!loadedRoadmapFromFile_)
+    {
+        constructRoadmap(ptcOrSolutionFound);
+    }
 
     slnThread.join();
 
@@ -382,12 +398,6 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
 
 void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
 {
-    if (!isSetup())
-        setup();
-    if (!sampler_)
-        sampler_ = si_->allocValidStateSampler();
-    if (!simpleSampler_)
-        simpleSampler_ = si_->allocStateSampler();
 
     std::vector<ompl::base::State*> xstates(ompl::magic::MAX_RANDOM_BOUNCE_STEPS);
     si_->allocStates(xstates);
@@ -490,7 +500,7 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
 
     EdgeControllerType edgeController;
 
-    const FIRMWeight weight = generateEdgeControllerWithCost(stateProperty_[a], stateProperty_[b], edgeController);
+    const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController);
 
     assert(edgeController.getGoal() && "The generated controller has no goal");
 
@@ -506,45 +516,62 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
     Visualizer::addGraphEdge(stateProperty_[a], stateProperty_[b]);
 }
 
-FIRMWeight FIRM::generateEdgeControllerWithCost(ompl::base::State* startNodeState, ompl::base::State* targetNodeState, EdgeControllerType &edgeController)
+FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
 {
+    ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
+    ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
 
-    double successCount = 0;
-
-    // initialize costs to 0
-    ompl::base::Cost edgeCost(0);
-    ompl::base::Cost nodeStabilizationCost(0);
-
-    // Generate the edge controller for given start and end state
+     // Generate the edge controller for given start and end state
     generateEdgeController(startNodeState,targetNodeState,edgeController);
 
-    for(unsigned int i=0; i< numParticles_;i++)
+    if(!loadedRoadmapFromFile_)
     {
-        //cout << "MonteCarlo Simulation particle number "<< i<<endl;
-        siF_->setTrueState(startNodeState);
-        siF_->setBelief(startNodeState);
 
-        ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
-        ompl::base::Cost pcost(0);
+        double successCount = 0;
 
-        if(edgeController.Execute(startNodeState, endBelief, pcost))
+        // initialize costs to 0
+        ompl::base::Cost edgeCost(0);
+        ompl::base::Cost nodeStabilizationCost(0);
+
+        for(unsigned int i=0; i< numParticles_;i++)
         {
-           successCount++;
+            //cout << "MonteCarlo Simulation particle number "<< i<<endl;
+            siF_->setTrueState(startNodeState);
+            siF_->setBelief(startNodeState);
 
-           edgeCost.v = edgeCost.v + pcost.v ;
+            ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
+            ompl::base::Cost pcost(0);
+
+            if(edgeController.Execute(startNodeState, endBelief, pcost))
+            {
+               successCount++;
+
+               edgeCost.v = edgeCost.v + pcost.v ;
+
+            }
 
         }
 
+        if (successCount > 0)  edgeCost.v = edgeCost.v / successCount ;
+        else edgeCost.v = ompl::magic::EXTREMELY_HIGH_EDGE_COST; // extremely high cost if no particle could succeed, we can also simply not add this edge
+
+        double transitionProbability = successCount / numParticles_ ;
+
+        FIRMWeight weight(edgeCost.v, transitionProbability);
+
+        return weight;
     }
-
-    if (successCount > 0)  edgeCost.v = edgeCost.v / successCount ;
-    else edgeCost.v = ompl::magic::EXTREMELY_HIGH_EDGE_COST; // extremely high cost if no particle could succeed, we can also simply not add this edge
-
-    double transitionProbability = successCount / numParticles_ ;
-
-    FIRMWeight weight(edgeCost.v, transitionProbability);
-
-    return weight;
+    else
+    {
+        // find the matching loaded edge and then return its weight
+        for(int i=0; i < loadedEdgeProperties_.size(); i++)
+        {
+            if(loadedEdgeProperties_[i].first.first == a && loadedEdgeProperties_[i].first.second == b)
+            {
+                return loadedEdgeProperties_[i].second;
+            }
+        }
+    }
 }
 
 
@@ -1030,18 +1057,38 @@ void FIRM::savePlannerData()
 
 }
 
-/*
-FIRMWeight loadEdgeControllerWithCost(const Vertex start, const Vertex goal, EdgeControllerType &edgeController)
+
+void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 {
+    std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > FIRMNodeList;
+
+    FIRMUtils::readFIRMGraphFromXML(pathToFile, FIRMNodeList, loadedEdgeProperties_);
+
+    loadedRoadmapFromFile_ = true;
+
+    this->setup();
+
+    for(int i = 0; i < FIRMNodeList.size() ; i++)
+    {
+        ompl::base::State *newState = siF_->allocState();
+
+        arma::colvec xVec = FIRMNodeList[i].second.first;
+        arma::mat     cov = FIRMNodeList[i].second.second;
+
+        newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
+        newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
+
+        std::cout<<"Adding state from XML --> \n";
+        siF_->printState(newState);
+
+        Vertex v = addStateToGraph(siF_->cloneState(newState));
+
+        siF_->freeState(newState);
+
+        assert(v==FIRMNodeList[i].first && "IDS DONT MATCH !!");
+    }
 
 }
 
-
-void FIRM::loadRoadmapFromFile(const char* pathToGraphXML)
-{
-
-
-}
-*/
 
 

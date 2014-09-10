@@ -242,11 +242,11 @@ public:
         minFIRMNodes_ = numNodes ;
     }
 
-     /** \brief Loads a saved FIRM roadmap graph from an XML file*/
-    //virtual void loadRoadmapFromFile(const char* pathToGraphXML);
-
     /** \brief Saves the roadmap to an XML */
     virtual void savePlannerData();
+
+    /** \brief Load the roadmap info from a file */
+    virtual void loadRoadMapFromFile(const std::string pathToFile);
 
 protected:
 
@@ -289,9 +289,7 @@ protected:
     virtual void addEdgeToGraph(const Vertex a, const Vertex b);
 
     /** \brief Generates the cost of the edge */
-    virtual FIRMWeight generateEdgeControllerWithCost(ompl::base::State* startNodeState,
-                                                             ompl::base::State* targetNodeState,
-                                                             EdgeControllerType &edgeController);
+    virtual FIRMWeight generateEdgeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController);
 
     /** \brief Generates an edge controller and loads the edge properties from XML */
     //virtual FIRMWeight loadEdgeControllerWithCost(const Vertex start, const Vertex goal, EdgeControllerType &edgeController);
@@ -404,6 +402,11 @@ protected:
     unsigned int minFIRMNodes_;
 
     MMPolicyGenerator *policyGenerator_;
+
+    bool loadedRoadmapFromFile_;
+
+    std::vector<std::pair<std::pair<int,int>,FIRMWeight> > loadedEdgeProperties_;
+
 
 };
 
