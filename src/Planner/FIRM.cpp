@@ -277,7 +277,7 @@ void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
         if (!addedSolution_)
         {
             OMPL_INFORM("FIRM: Checking for Solution.");
-            boost::this_thread::sleep(boost::posix_time::seconds(15));
+            boost::this_thread::sleep(boost::posix_time::seconds(30));
         }
     }
 }

@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupFIRMExp1.xml";
+    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupICRA2015Exp1-FIRM.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -73,9 +73,11 @@ void plan()
     {
         OMPL_INFORM("Unable to find Solution in given time.");
 
-        exit(1);
     }
 
+    delete mySetup;
+
+    exit(0);
 }
 
 void testMultiModal()
@@ -103,7 +105,9 @@ void testMultiModal()
         OMPL_INFORM("Unable to find Solution in given time.");
     }
 
-    return;
+    delete mySetup;
+
+    exit(0);
 }
 
 int main(int argc, char *argv[])
