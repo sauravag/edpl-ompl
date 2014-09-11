@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupICRA2015Exp1-FIRM.xml";
+    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupICRA2015Exp1-FIRM.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 
     window.resetCamera();
 
-    boost::thread solveThread(plan);
+    boost::thread solveThread(testMultiModal);
 
     app.exec();
 
