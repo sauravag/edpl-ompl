@@ -54,7 +54,12 @@ namespace ompl
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 30.0 ; // range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 8.0 ; // range within which to find neighbors
+
+        static const double CONVERGENCE_THRESHOLD_FIRM_MM = 2.0;
+
+        static const float MIN_ROBOT_CLEARANCE = 0.10;
+
     }
 }
 
@@ -582,6 +587,7 @@ void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
     }
 }
 
+
 void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b)
 {
     //boost::mutex::scoped_lock _(graphMutex_);
@@ -765,4 +771,45 @@ int MMPolicyGenerator::calculateIntersectionWithNeighbor(const Vertex v, std::ve
     }
 
     return w;
+}
+
+bool MMPolicyGenerator::isConverged()
+{
+    double maxdistance = 0;
+
+    for(int i=0; i<currentBeliefStates_.size(); i++)
+    {
+        double d = 0;
+        for(int j=0; j<currentBeliefStates_.size(); j++)
+        {
+            d = si_->distance(currentBeliefStates_[i], currentBeliefStates_[j]);
+        }
+        if(d > maxdistance)
+        {
+            maxdistance = d;
+        }
+    }
+
+    if(maxdistance <= ompl::magic::CONVERGENCE_THRESHOLD_FIRM_MM)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+
+ bool MMPolicyGenerator::areCurrentBeliefsValid()
+{
+    if(currentBeliefStates_.size()==1)
+        return true;
+
+    for(int i =0 ; i< currentBeliefStates_.size(); i++)
+    {
+        if(si_->getStateValidityChecker()->clearance(currentBeliefStates_[i]) < ompl::magic::MIN_ROBOT_CLEARANCE)
+            return false;
+
+    }
+
+    return true;
 }

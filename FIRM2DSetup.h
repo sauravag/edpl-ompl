@@ -214,6 +214,9 @@ public:
             this->setup();
         }
 
+        std::string pathXML = "/home/sauravagarwal/Research/Development/FIRM-OMPL/FIRMRoadMap.xml";
+        planner_->as<FIRM>()->loadRoadMapFromFile(pathXML);
+
         return planner_->solve(planningTime_);
     }
 
@@ -283,6 +286,15 @@ protected:
 
         this->setRobotMesh(robotFilePath);
 
+        /*
+        // Read the roadmap filename
+        child  = node->FirstChild("RoadMap");
+        assert( child );
+        itemElement = child->ToElement();
+        assert( itemElement );
+        itemElement->QueryStringAttribute("roadmapFile", &pathToSetupFile_);
+        */
+
         // Read the start Pose
         child  = node->FirstChild("StartPose");
         assert( child );
@@ -341,9 +353,11 @@ protected:
 
         OMPL_INFORM("Problem configuration is");
 
-        std::cout<<"Path to environment mesh"<<environmentFilePath<<std::endl;
+        std::cout<<"Path to environment mesh: "<<environmentFilePath<<std::endl;
 
-        std::cout<<"Path to robot mesh"<<robotFilePath<<std::endl;
+        std::cout<<"Path to robot mesh: "<<robotFilePath<<std::endl;
+
+        //std::cout<<"Path to roadmap file: "<<pathToRoadMapFile_<<std::endl;
 
         std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
 
@@ -382,5 +396,7 @@ private:
     unsigned int minNodes_;
 
     bool setup_;
+
+    std::string pathToRoadMapFile_;
 };
 #endif

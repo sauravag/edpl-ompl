@@ -73,9 +73,11 @@ void plan()
     {
         OMPL_INFORM("Unable to find Solution in given time.");
 
-        exit(1);
     }
 
+    delete mySetup;
+
+    exit(0);
 }
 
 void testMultiModal()
@@ -103,7 +105,9 @@ void testMultiModal()
         OMPL_INFORM("Unable to find Solution in given time.");
     }
 
-    return;
+    delete mySetup;
+
+    exit(0);
 }
 
 int main(int argc, char *argv[])
@@ -128,5 +132,6 @@ int main(int argc, char *argv[])
     OMPL_INFORM("Task Complete");
 
     return 0;
+
 
 }

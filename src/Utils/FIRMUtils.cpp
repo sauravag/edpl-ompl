@@ -36,6 +36,8 @@
 #include "../../include/Utils/FIRMUtils.h"
 #include <boost/math/constants/constants.hpp>
 #include <random>
+#include <tinyxml.h>
+
 
 void FIRMUtils::normalizeAngleToPiRange(double &theta)
 {
@@ -71,3 +73,216 @@ int FIRMUtils::generateRandomIntegerInRange(const int floor, const int ceiling)
 
     return distr(eng);
 }
+
+void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, const std::vector<std::pair<std::pair<int,int>,FIRMWeight> > edgeWeights)
+{
+    TiXmlDocument doc;
+
+ 	TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
+	doc.LinkEndChild( decl );
+
+	TiXmlElement * Nodes = new TiXmlElement( "Nodes" );
+	doc.LinkEndChild( Nodes );
+
+
+	for(int i = 0; i < nodes.size(); i++)
+	{
+        TiXmlElement * node;
+        node = new TiXmlElement( "node" );
+        Nodes->LinkEndChild( node );
+
+        int nodeID = nodes[i].first; // id of the node in the graph
+
+        arma::colvec xVec = nodes[i].second.first; // x,y,yaw
+
+        arma::mat cov = nodes[i].second.second; // covariance matrix
+
+        node->SetAttribute("id", nodeID);
+        node->SetDoubleAttribute("x", xVec(0));
+        node->SetDoubleAttribute("y", xVec(1));
+        node->SetDoubleAttribute("theta",xVec(2));
+        node->SetDoubleAttribute("c11", cov(0,0));
+        node->SetDoubleAttribute("c12", cov(0,1));
+        node->SetDoubleAttribute("c13", cov(0,2));
+        node->SetDoubleAttribute("c21", cov(1,0));
+        node->SetDoubleAttribute("c22", cov(1,1));
+        node->SetDoubleAttribute("c23", cov(1,2));
+        node->SetDoubleAttribute("c31", cov(2,0));
+        node->SetDoubleAttribute("c32", cov(2,1));
+        node->SetDoubleAttribute("c33", cov(2,2));
+
+        std::cout<<"Writing Node: "<<xVec(0)<<" "<<xVec(1)<<" "<<xVec(2)<<" \n"<<cov<<std::endl;
+
+   }
+
+    TiXmlElement * Edges = new TiXmlElement( "Edges" );
+	doc.LinkEndChild( Edges );
+
+	for(int i = 0; i < edgeWeights.size(); i++)
+	{
+        TiXmlElement * edge;
+        edge = new TiXmlElement( "edge" );
+        Edges->LinkEndChild( edge );
+
+        FIRMWeight w = edgeWeights[i].second;
+
+
+        edge->SetAttribute("startVertexID", edgeWeights[i].first.first);
+        edge->SetAttribute("endVertexID", edgeWeights[i].first.second);
+        edge->SetDoubleAttribute("successProb", w.getSuccessProbability());
+        edge->SetDoubleAttribute("cost", w.getCost());
+
+
+        std::cout<<"Writing edge : "<<w.getCost()<<" "<< w.getSuccessProbability()<<std::endl;
+
+   }
+
+	doc.SaveFile( "FIRMRoadMap.xml" );
+}
+
+bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > &FIRMNodeList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights)
+{
+    //std::string pathToXML = "/home/sauravagarwal/Research/Development/FIRM-OMPL/FIRMRoadMap.xml";
+
+    TiXmlDocument doc(pathToXML);
+
+    bool loadOkay = doc.LoadFile();
+
+    if ( !loadOkay )
+    {
+        OMPL_INFORM("FIRMUtils: Could not load Graph from XML . Need to construct graph.");
+        return false;
+    }
+
+    TiXmlNode* NodeList = 0;
+
+    TiXmlElement* nodeElement = 0;
+
+    TiXmlElement* itemElement = 0;
+
+    NodeList = doc.FirstChild( "Nodes" );
+
+    assert( NodeList );
+
+    nodeElement = NodeList->ToElement(); //convert NodeList to element
+
+    assert( nodeElement  );
+
+    TiXmlNode* child = 0;
+
+    while( (child = nodeElement->IterateChildren(child)))
+    {
+        assert( child );
+
+        itemElement = child->ToElement();
+
+        assert( itemElement );
+
+        double x = 0, y = 0, theta = 0, c11 = 0, c12 = 0, c13 = 0, c21 = 0, c22 = 0, c23 = 0, c31 = 0, c32 = 0, c33 = 0;
+        int id = 0;
+
+        itemElement->QueryIntAttribute("id", &id) ;
+        itemElement->QueryDoubleAttribute("x", &x) ;
+        itemElement->QueryDoubleAttribute("y", &y) ;
+        itemElement->QueryDoubleAttribute("theta", &theta) ;
+        itemElement->QueryDoubleAttribute("c11", &c11) ;
+        itemElement->QueryDoubleAttribute("c12", &c12) ;
+        itemElement->QueryDoubleAttribute("c13", &c13) ;
+        itemElement->QueryDoubleAttribute("c21", &c21) ;
+        itemElement->QueryDoubleAttribute("c22", &c22) ;
+        itemElement->QueryDoubleAttribute("c23", &c23) ;
+        itemElement->QueryDoubleAttribute("c31", &c31) ;
+        itemElement->QueryDoubleAttribute("c32", &c32) ;
+        itemElement->QueryDoubleAttribute("c33", &c33) ;
+
+        arma::colvec xVec(3);
+        arma::mat cov(3,3);
+
+        xVec(0) = x;
+        xVec(1) = y;
+        xVec(2) = theta;
+
+        cov(0,0) = c11;
+        cov(0,1) = c12;
+        cov(0,2) = c13;
+        cov(1,0) = c21;
+        cov(1,1) = c22;
+        cov(1,2) = c23;
+        cov(2,0) = c31;
+        cov(2,1) = c32;
+        cov(2,2) = c33;
+
+        FIRMNodeList.push_back(std::make_pair(id,std::make_pair(xVec,cov)));
+
+        //std::cout<<"Read the node id:"<<id<<" x: "<<x<<" y: "<<y<<" theta: "<<theta<<" \n cov:"<<cov<<std::endl;
+
+    }
+
+
+    //////////////////////
+    TiXmlNode* edgeList = 0;
+
+    TiXmlElement* edgeElement = 0;
+
+    TiXmlElement* itemElement2 = 0;
+
+    edgeList = doc.FirstChild( "Edges" );
+
+    assert( edgeList );
+
+    edgeElement = edgeList->ToElement(); //convert NodeList to element
+
+    assert( edgeElement  );
+
+    TiXmlNode* child2 = 0;
+
+    while( (child2 = edgeElement->IterateChildren(child2)))
+    {
+        assert( child2 );
+
+        itemElement2 = child2->ToElement();
+
+        assert( itemElement2 );
+
+        int startVertexID = 0, endVertexID = 0;
+        double successProb = 0, cost = 0;
+
+        itemElement2->QueryIntAttribute("startVertexID", &startVertexID) ;
+        itemElement2->QueryIntAttribute("endVertexID", &endVertexID) ;
+        itemElement2->QueryDoubleAttribute("successProb", &successProb) ;
+        itemElement2->QueryDoubleAttribute("cost", &cost) ;
+
+        FIRMWeight w(cost, successProb);
+
+        edgeWeights.push_back(std::make_pair(std::make_pair(startVertexID, endVertexID),w));
+
+        //std::cout<<"Read the edge, startvertex: "<<startVertexID<<" endVertex: "<<endVertexID<<" cost: "<<cost<<"  succesProb: "<<successProb<<std::endl;
+
+    }
+
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

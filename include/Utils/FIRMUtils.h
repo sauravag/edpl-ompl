@@ -35,6 +35,9 @@
 #ifndef FIRM_UTILS_H
 #define FIRM_UTILS_H
 
+#include "../Weight/FIRMWeight.h"
+#include "../Spaces/SE2BeliefSpace.h"
+
 /** \brief A class containing utility functions used commonly*/
 class FIRMUtils
 {
@@ -46,7 +49,15 @@ class FIRMUtils
         /** \brief Returns the sign of the value 'd' */
         static int signum(const double d);
 
+        /** \brief Generates a random number within the give range */
         static int generateRandomIntegerInRange(const int floor, const int ceiling);
 
+        /** \brief Save the FIRM graph to an XML file */
+        static void writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, const std::vector<std::pair<std::pair<int,int>,FIRMWeight> > edgeWeights);
+
+        /** \brief Reads the Graph properties from an XML file */
+        static bool readFIRMGraphFromXML(const std::string &pathToXML, std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > &FIRMNodeList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights);
+
 };
+
 #endif
