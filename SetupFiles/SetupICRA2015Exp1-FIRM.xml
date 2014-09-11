@@ -206,10 +206,10 @@
 </MotionModels>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/ICRA2015Exp1.obj"
+        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/ICRA2015Exp1.obj"
     />
     <Robot
-        robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+        robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
     />
      <StartPose
         x = "15.0"
@@ -222,9 +222,9 @@
         theta = "0"
     />
     <PlanningTime
-        maxTime = "1100"
+        maxTime = "2400"
     />
     <FIRMNodes
-        minNodes = "100"
+        minNodes = "125"
     />
 </PlanningProblem>

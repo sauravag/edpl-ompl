@@ -90,6 +90,12 @@ namespace ompl
         static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 4.0;
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
+
+        static const unsigned int MAX_MM_POLICY_LENGTH   = 1000;
+
+        static const float MIN_ROBOT_CLEARANCE = 0.10;
+
+        static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 100;
     }
 }
 
@@ -814,6 +820,8 @@ void FIRM::executeFeedback(void)
 
     bool kidnapped_flag = false;
 
+    int kidnappingCounter  = 0;
+
     while(currentVertex != goal)
     {
         Edge e = feedback_[currentVertex];
@@ -847,25 +855,41 @@ void FIRM::executeFeedback(void)
         3. Sample modes and run policygen till you converge to one mode
         4. get back to policy execution
         */
-        if(this->detectKidnapping(cstartState, cendState))
-        {
-            //std::cout<<"Kidnapped !"<<std::endl;
-            //std::cin.get();
-        }
-
-        si_->copyState(cstartState, cendState);
-        /*
-        if(si_->distance(cstartState,stateProperty_[goal]) < 5.0 && !kidnapped_flag)
+        if(si_->distance(cstartState,stateProperty_[goal]) < 6.0 && !kidnapped_flag && kidnappingCounter < 1)
         {
             std::cout<<"Before Simulated Kidnapping! (Press Enter) \n";
-            std::cin.get();
+            //std::cin.get();
             this->simulateKidnapping();
             std::cout<<"AFter Simulated Kidnapping! (Press Enter) \n";
-            std::cin.get();
+            //std::cin.get();
             kidnapped_flag = true;
+            kidnappingCounter++;
         }
 
-        */
+         if(kidnapped_flag) //if(this->detectKidnapping(cstartState, cendState))
+        {
+            recoverLostRobot(cendState);
+
+             // get a copy of the true state
+            ompl::base::State *tempTrueStateCopy = si_->allocState();
+
+            siF_->getTrueState(tempTrueStateCopy);
+
+            currentVertex = addStateToGraph(cendState);
+
+            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
+            siF_->setTrueState(tempTrueStateCopy);
+
+            siF_->freeState(tempTrueStateCopy);
+
+            solveDynamicProgram(goal);
+
+            kidnapped_flag = false;
+        }
+
+         si_->copyState(cstartState, cendState);
+
+
     }
 
 
@@ -1007,7 +1031,7 @@ void FIRM::simulateKidnapping()
 {
     //Kidnapped state
     double X = 2.0;
-    double Y = 19.5;
+    double Y = 20.0;
     double theta = 1.57;
 
     ompl::base::State *kidnappedState = si_->allocState();
@@ -1020,6 +1044,7 @@ void FIRM::simulateKidnapping()
 
 bool FIRM::detectKidnapping(ompl::base::State *previousState, ompl::base::State *newState)
 {
+
     using namespace arma;
 
     mat previousCov = previousState->as<SE2BeliefSpace::StateType>()->getCovariance();
@@ -1034,6 +1059,7 @@ bool FIRM::detectKidnapping(ompl::base::State *previousState, ompl::base::State 
     }
 
     return false;
+
 }
 
 void FIRM::savePlannerData()
@@ -1150,4 +1176,61 @@ bool FIRM::isDuplicateState(const ompl::base::State *state, FIRM::Vertex &duplic
     }
 
     return false;
+}
+
+void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
+{
+    policyGenerator_->sampleNewBeliefStates();
+
+    ompl::base::State *currentTrueState = siF_->allocState();
+    siF_->getTrueState(currentTrueState);
+
+    int counter = 0;
+
+    while(!policyGenerator_->isConverged())
+    {
+        std::vector<ompl::control::Control*> policy;
+
+        policyGenerator_->generatePolicy(policy);
+
+        int rndnum = FIRMUtils::generateRandomIntegerInRange(0, ompl::magic::MAX_MM_POLICY_LENGTH/*policy.size()-1*/);
+
+        int hzn = rndnum > policy.size()? policy.size() : rndnum;
+
+        for(int i=0; i < hzn ; i++)
+        {
+            siF_->applyControl(policy[i],true);
+
+            //policyGenerator_->getCurrentBeliefStates(tempbStates);
+
+            policyGenerator_->propagateBeliefs(policy[i]);
+
+            siF_->getTrueState(currentTrueState);
+
+            // If the robot's clearance gets below the threshold, break loop & replan
+            if(!policyGenerator_->areCurrentBeliefsValid() || siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE)
+            {
+                if(counter == 0)
+                {
+                    counter++;
+                    break;
+                }
+
+            }
+            if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
+                counter = 0;
+
+            //std::cout<<"Clearance :"<<siF_->getStateValidityChecker()->clearance(currentTrueState)<<std::endl;
+
+            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+        }
+    }
+
+    std::vector<ompl::base::State*> bstates;
+
+    policyGenerator_->getCurrentBeliefStates(bstates);
+
+    // TODO: is the first the recovered state ?
+    siF_->copyState(recoveredState, bstates[0]);
+
 }

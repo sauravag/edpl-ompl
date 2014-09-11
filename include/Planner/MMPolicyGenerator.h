@@ -187,6 +187,13 @@ class MMPolicyGenerator
             OMPL_INFORM("~~End Weights~~ \n");
         }
 
+        /** \brief checks if the beliefs have converged */
+        bool isConverged();
+
+        /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
+        bool areCurrentBeliefsValid();
+
+
     private:
 
          /** \brief Add the a state to the observation graph*/

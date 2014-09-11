@@ -316,6 +316,9 @@ protected:
     /** \brief Detects whether the robot was kidnapped or not */
     bool detectKidnapping(ompl::base::State *previousState, ompl::base::State *newState);
 
+    /** \brief Called when robot is lost, uses multi-modal planner to recover true position of robot */
+    void recoverLostRobot(ompl::base::State *recoveredState);
+
     /** \brief Calculates the new cost to go from a node*/
     std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(const Vertex node);
 

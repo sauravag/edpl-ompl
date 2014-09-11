@@ -214,7 +214,7 @@ public:
             this->setup();
         }
 
-        std::string pathXML = "/home/saurav/Research/Development/FIRM-OMPL/FIRMRoadMap.xml";
+        std::string pathXML = "/home/sauravagarwal/Research/Development/FIRM-OMPL/FIRMRoadMap.xml";
         planner_->as<FIRM>()->loadRoadMapFromFile(pathXML);
 
         return planner_->solve(planningTime_);
@@ -357,7 +357,7 @@ protected:
 
         std::cout<<"Path to robot mesh: "<<robotFilePath<<std::endl;
 
-        std::cout<<"Path to roadmap file: "<<pathToRoadMapFile_<<std::endl;
+        //std::cout<<"Path to roadmap file: "<<pathToRoadMapFile_<<std::endl;
 
         std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
 
