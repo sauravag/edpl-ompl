@@ -32,6 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+/* Author: Saurav Agarwal */
+
 #include "../../include/Planner/MMPolicyGenerator.h"
 #include <boost/thread.hpp>
 #include "../../include/Visualization/Visualizer.h"

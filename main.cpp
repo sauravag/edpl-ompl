@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+/* Author: Saurav Agarwal */
 
 #include "FIRM2DSetup.h"
 #include "MultiModalSetup.h"
@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupICRA2015Exp1-FIRM.xml";
+    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupICRA2015Exp2-FIRM.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 

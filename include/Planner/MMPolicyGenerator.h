@@ -31,6 +31,7 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
+/* Author: Saurav Agarwal */
 
 #ifndef FIRM_OMPL_MM_POLICY_GENERATOR_H
 #define FIRM_OMPL_MM_POLICY_GENERATOR_H
