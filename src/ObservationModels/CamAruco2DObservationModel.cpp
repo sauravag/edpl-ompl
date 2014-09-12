@@ -47,7 +47,7 @@ namespace ompl
 
         static const double CAMERA_DETECTION_RANGE = 2.5;// meters
 
-        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.30 ; // meters
+        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.50 ; // meters
     }
 }
 

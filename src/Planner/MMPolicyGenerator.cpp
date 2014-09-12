@@ -45,7 +45,8 @@
 #define foreach_reverse BOOST_REVERSE_FOREACH
 
 #define SIGMA_RANGE 1.50 // meters
-#define SIGMA_THETA 0.25 // radians
+#define SIGMA_THETA 0.30 // radians
+
 namespace ompl
 {
     namespace magic

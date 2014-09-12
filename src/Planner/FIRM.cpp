@@ -87,7 +87,7 @@ namespace ompl
 
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
 
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 4.0;
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0;
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
@@ -292,6 +292,8 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
 {
     ompl::base::Goal *g = pdef_->getGoal().get();
     ompl::base::Cost sol_cost(0.0);
+
+    OMPL_INFORM("%s: Number of current %u states", getName().c_str(), boost::num_vertices(g_));
 
     if(boost::num_vertices(g_) < minFIRMNodes_) return false;
 
@@ -1032,7 +1034,7 @@ void FIRM::simulateKidnapping()
     //Kidnapped state
     double X = 2.0;
     double Y = 20.0;
-    double theta = 1.57;
+    double theta = 3.14157;
 
     ompl::base::State *kidnappedState = si_->allocState();
 
@@ -1126,7 +1128,7 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
             newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
             newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
 
-            std::cout<<"Adding state from XML --> \n";
+            //std::cout<<"Adding state from XML --> \n";
             siF_->printState(newState);
 
             Vertex v = addStateToGraph(siF_->cloneState(newState));
@@ -1180,6 +1182,9 @@ bool FIRM::isDuplicateState(const ompl::base::State *state, FIRM::Vertex &duplic
 
 void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 {
+    // clear the visualization
+    Visualizer::clearStates();
+
     policyGenerator_->sampleNewBeliefStates();
 
     ompl::base::State *currentTrueState = siF_->allocState();

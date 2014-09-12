@@ -138,8 +138,8 @@
 <landmark id = 134 x = 8.5 y = 21.5 theta =  -0.5 />
 <landmark id = 135 x = 2.0 y = 12.5 theta =  -0.5 />
 <landmark id = 136 x = 3.0 y = 12.5 theta =  -0.5 />
-<landmark id = 137 x = 0.5 y = 7.5 theta =  -0.5 />
-<landmark id = 138 x = 0.5 y = 8.0 theta =  -0.5 />
+<landmark id = 137 x = 0.5 y = 8.5 theta =  -0.5 />
+<landmark id = 138 x = 0.5 y = 9.0 theta =  -0.5 />
 <landmark id = 139 x = 9.50 y = 11.0 theta =  -0.5 />
 <landmark id = 140 x = 12.5 y = 11.0 theta =  -0.5 />
 <landmark id = 141 x = 21.50 y = 14.0 theta =  -0.5 />
@@ -185,9 +185,9 @@
     orbit_radius=5.0
     wind_noise_pos="0.000001"
     wind_noise_ang="0.000001" 
-    min_linear_velocity= 0.2
-    max_linear_velocity= 0.2
-    max_angular_velocity= 0.3
+    min_linear_velocity= 0.5
+    max_linear_velocity= 1.0
+    max_angular_velocity= 0.32
     dt= 0.1
     /> <!--omega is in radians--> 
   <OmnidirectionalMotionModel 
@@ -206,10 +206,10 @@
 </MotionModels>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/ICRA2015Exp2.obj"
+        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/ICRA2015Exp2.obj"
     />
     <Robot
-        robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/iRobot.obj"
+        robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/iRobot.obj"
     />
      <StartPose
         x = "15.0"
@@ -217,14 +217,14 @@
         theta = "1.57"
     />
     <GoalPose
-        x = "15.0"
+        x = "19.0"
         y = "1.0"
         theta = "0"
     />
     <PlanningTime
-        maxTime = "2800"
+        maxTime = "2400"
     />
     <FIRMNodes
-        minNodes = "200"
+        minNodes = "125"
     />
 </PlanningProblem>

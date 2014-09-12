@@ -95,6 +95,7 @@ void Visualizer::drawRobot(const ompl::base::State *state)
 
         glPushMatrix();
             glTranslated(x[0], x[1], 0);
+            glRotated(-90+(180/3.14157)*x[2],0,0,1);
             glCallList(robotIndx_);
         glPopMatrix();
     }
@@ -177,26 +178,34 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         pos *= magnify;
 
         int nPoints = pos.n_rows;
-
-        mat K = trans(chol(covariance.submat(0,0,1,1)));
-        mat shift;
-
-        shift = join_cols((ones(1,nPoints)*x[0]),(ones(1,nPoints)*x[1]));
-
-        mat transformed = K*trans(pos) + shift;
-
-        glPushMatrix();
-
-        glBegin(GL_LINES);
-
-        for(unsigned int i = 0; i < transformed.n_cols; ++i)
+        /*
+        try
         {
-            glVertex2f(transformed(0,i), transformed(1,i));
+            mat K = trans(chol(covariance.submat(0,0,1,1)));
+            mat shift;
+
+            shift = join_cols((ones(1,nPoints)*x[0]),(ones(1,nPoints)*x[1]));
+
+            mat transformed = K*trans(pos) + shift;
+
+            glPushMatrix();
+
+            glBegin(GL_LINES);
+
+            for(unsigned int i = 0; i < transformed.n_cols; ++i)
+            {
+                glVertex2f(transformed(0,i), transformed(1,i));
+            }
+
+            glEnd();
+
+            glPopMatrix();
         }
-
-        glEnd();
-
-        glPopMatrix();
+        catch(int e)
+        {
+            OMPL_INFORM("Visualizer: Covariance cholesky did not converge...proceeding");
+        }
+        */
     }
 
 }

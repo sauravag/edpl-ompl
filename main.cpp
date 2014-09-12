@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupICRA2015Exp2-FIRM.xml";
+    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupICRA2015Exp2-FIRM.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -84,7 +84,7 @@ void testMultiModal()
 {
     MultiModalSetup *mySetup(new MultiModalSetup);
 
-    std::string setupFilePath = "/home/saurav/Research/Development/FIRM-OMPL/SetupFiles/SetupICRA2015Exp1.xml";
+    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupICRA2015Exp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
