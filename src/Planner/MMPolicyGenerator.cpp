@@ -810,37 +810,37 @@ bool MMPolicyGenerator::isConverged()
 
 void MMPolicyGenerator::removeDuplicateModes()
 {
-    std::vector<int> toDelete;
+    std::set<int> toDelete;
 
     for(int i = 0; i < currentBeliefStates_.size(); i++)
     {
         for(int j = 0; j < currentBeliefStates_.size(); j++ )
         {
-            arma::colvec xi = currentBeliefStates_[i]->as<SE2BeliefSpace::StateType>()->getArmaData();
-            arma::colvec xj = currentBeliefStates_[j]->as<SE2BeliefSpace::StateType>()->getArmaData();
-
-            double xd = xi(0) - xj(0);
-            double yd = xi(1) - xj(1);
-            double thetad = xi(2) - xj(2);
-
-            if(std::abs(xd) < 0.0001 && std::abs(yd) < 0.0001 &&  std::abs(thetad) < 0.0001 )
+            if(i!=j)
             {
-                if(weights_[i] >= weights_[j] )
+                arma::colvec xi = currentBeliefStates_[i]->as<SE2BeliefSpace::StateType>()->getArmaData();
+                arma::colvec xj = currentBeliefStates_[j]->as<SE2BeliefSpace::StateType>()->getArmaData();
+
+                double xd = xi(0) - xj(0);
+                double yd = xi(1) - xj(1);
+                double thetad = xi(2) - xj(2);
+
+                if(std::abs(xd) < 0.0001 && std::abs(yd) < 0.0001 &&  std::abs(thetad) < 0.0001 )
                 {
-                    toDelete.push_back(j);
-                }
-                else
-                {
-                    toDelete.push_back(i);
+                    std::cout<<"the diff : "<<xd<<" "<<yd<<" "<<thetad<<std::endl;
+                    std::cout<<"the two same indices are : "<<i<<" "<<j<<std::endl;
+                    if(weights_[i] >= weights_[j] )
+                    {
+                        removeBelief(j);
+                    }
+                    else
+                    {
+                        removeBelief(i);
+                    }
                 }
             }
 
         }
-    }
-
-    for(int i = 0; i < toDelete.size(); i++)
-    {
-        removeBelief(toDelete[i]);
     }
 
 }
