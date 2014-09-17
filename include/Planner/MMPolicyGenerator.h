@@ -38,6 +38,7 @@
 
 
 #include <ompl/geometric/planners/rrt/RRT.h>
+//#include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/pending/disjoint_sets.hpp>
@@ -220,6 +221,9 @@ class MMPolicyGenerator
 
         /** \brief Returns true if all weights are same, false otherwise*/
         bool areSimilarWeights();
+
+        // if 2 modes have the same weight and pose, then they are duplicates
+        void removeDuplicateModes();
 
         /** \brief Container for the current modes/beliefs*/
         std::vector<ompl::base::State*> currentBeliefStates_;

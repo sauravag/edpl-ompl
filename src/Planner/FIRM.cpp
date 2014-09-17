@@ -1031,17 +1031,7 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
 
 void FIRM::simulateKidnapping()
 {
-    //Kidnapped state
-    double X = 2.0;
-    double Y = 20.0;
-    double theta = 3.14157;
-
-    ompl::base::State *kidnappedState = si_->allocState();
-
-    kidnappedState->as<SE2BeliefSpace::StateType>()->setXYYaw(X,Y,theta);
-
-    siF_->setTrueState(kidnappedState);
-
+    siF_->setTrueState(kidnappedState_);
 }
 
 bool FIRM::detectKidnapping(ompl::base::State *previousState, ompl::base::State *newState)
@@ -1198,15 +1188,13 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
         policyGenerator_->generatePolicy(policy);
 
-        int rndnum = FIRMUtils::generateRandomIntegerInRange(0, ompl::magic::MAX_MM_POLICY_LENGTH/*policy.size()-1*/);
+        int rndnum = FIRMUtils::generateRandomIntegerInRange(100, ompl::magic::MAX_MM_POLICY_LENGTH/*policy.size()-1*/);
 
         int hzn = rndnum > policy.size()? policy.size() : rndnum;
 
         for(int i=0; i < hzn ; i++)
         {
             siF_->applyControl(policy[i],true);
-
-            //policyGenerator_->getCurrentBeliefStates(tempbStates);
 
             policyGenerator_->propagateBeliefs(policy[i]);
 
@@ -1224,8 +1212,6 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             }
             if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
                 counter = 0;
-
-            //std::cout<<"Clearance :"<<siF_->getStateValidityChecker()->clearance(currentTrueState)<<std::endl;
 
             boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }

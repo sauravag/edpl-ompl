@@ -53,11 +53,11 @@ namespace ompl
     {
         static const double COLISSION_FAILURE_COST  = 1e6;// cost of colliding
 
-        static const double RRT_PLAN_MAX_TIME = 2.0; // maximum time allowed for RRT to plan
+        static const double RRT_PLAN_MAX_TIME = 5.0; // maximum time allowed for RRT to plan
 
-        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
+        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 2.0; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 8.0 ; // range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 15.0 ; // range within which to find neighbors
 
         static const double CONVERGENCE_THRESHOLD_FIRM_MM = 2.0;
 
@@ -78,9 +78,9 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     weights_.clear();
 
     //Get the environment boundaries
-    double X_1 = 0.5;
+    double X_1 = 0.0;
     double X_2 = 22.0;
-    double Y_1 = 0.50;
+    double Y_1 = 0.0;
     double Y_2 = 22.0;
 
     double spacing = 0.50; // diameter of robot
@@ -89,9 +89,9 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     int gridSizeX = std::ceil( (X_2-X_1) / spacing);
     int gridSizeY = std::ceil( (Y_2-Y_1) / spacing);
 
-    double rotationSpacing = 5.0;// degrees
+    double rotationSpacing = 5.0*boost::math::constants::pi<double>()/180.0;// radians
 
-    int numHeadings = std::floor(360/rotationSpacing);
+    int numHeadings = std::floor(2*boost::math::constants::pi<double>()/rotationSpacing);
 
     arma::mat cov = arma::eye(3,3);
     cov(0,0) = 0.10;
@@ -111,7 +111,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 
             for(int k =0; k < numHeadings; k++ )
             {
-                double newYaw = k*rotationSpacing*3.142/180.0; // degree to radians
+                double newYaw = -boost::math::constants::pi<double>() + k*rotationSpacing;
 
                 ompl::base::State *newState = si_->allocState();
 
@@ -162,6 +162,8 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 
 void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
 {
+    removeDuplicateModes();
+
     this->printWeights();
 
     //container to store the sequence of controls for each mode/target pair
@@ -408,6 +410,7 @@ bool MMPolicyGenerator::areSimilarWeights()
 
 void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 {
+
     arma::colvec sigma(2);
 
     sigma(0) = SIGMA_RANGE;
@@ -489,15 +492,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
     // the beliefs predicted observation
     arma::colvec Zprd =  si_->getObservationModel()->getObservation(currentBeliefStates_[currentBeliefIndx], false);
 
-    //int greaterRows = Zg.n_rows >= Zprd.n_rows ? Zg.n_rows : Zprd.n_rows ;
-
     arma::colvec innov;
-
-    //std::cout<<"Ground Obs:"<<Zg<<std::endl;
-    //std::cout<<"Predicted obs :"<<Zprd<<std::endl;
-
-    //std::cin.get();
-    //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
 
     innov  = arma::zeros<arma::colvec>( (landmarkInfoDim)* Zg.n_rows /singleObservationDim ) ;
 
@@ -556,8 +551,6 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
         weightFactor = 1 / abs(1 + Zprd.n_rows/singleObservationDim - numIntersection);
     }
 
-    //std::cout<<"Innovation:\n" <<innov;
-    //std::cin.get();
     return innov;
 }
 
@@ -567,8 +560,6 @@ void MMPolicyGenerator::removeBelief(const int Indx)
 
     weights_.erase(weights_.begin()+Indx);
 
-    //if(targetStates_.size()>0)
-       // targetStates_.erase(targetStates_.begin()+Indx);
 }
 
 void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
@@ -816,3 +807,42 @@ bool MMPolicyGenerator::isConverged()
 
     return true;
 }
+
+void MMPolicyGenerator::removeDuplicateModes()
+{
+    std::vector<int> toDelete;
+
+    for(int i = 0; i < currentBeliefStates_.size(); i++)
+    {
+        for(int j = 0; j < currentBeliefStates_.size(); j++ )
+        {
+            arma::colvec xi = currentBeliefStates_[i]->as<SE2BeliefSpace::StateType>()->getArmaData();
+            arma::colvec xj = currentBeliefStates_[j]->as<SE2BeliefSpace::StateType>()->getArmaData();
+
+            double xd = xi(0) - xj(0);
+            double yd = xi(1) - xj(1);
+            double thetad = xi(2) - xj(2);
+
+            if(std::abs(xd) < 0.0001 && std::abs(yd) < 0.0001 &&  std::abs(thetad) < 0.0001 )
+            {
+                if(weights_[i] >= weights_[j] )
+                {
+                    toDelete.push_back(j);
+                }
+                else
+                {
+                    toDelete.push_back(i);
+                }
+            }
+
+        }
+    }
+
+    for(int i = 0; i < toDelete.size(); i++)
+    {
+        removeBelief(toDelete[i]);
+    }
+
+}
+
+
