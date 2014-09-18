@@ -158,33 +158,26 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     {
         numModes = currentBeliefStates_.size();
 
-        std::cout<<"\n The number of modes BEFORE update: "<<numModes<<std::endl;
-
         this->updateWeights(obs);
+
+        //this->propagateBeliefs(si_->getMotionModel()->getZeroControl());
 
         updatedNumModes = currentBeliefStates_.size();
 
-        std::cout<<"The number of modes AFTER update: "<<updatedNumModes<<std::endl;
-
 
     }
 
+    // Print the weights of the modes
     this->printWeights();
 
-    Visualizer::clearStates();
-
-    for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
-    {
-        Visualizer::addState(currentBeliefStates_[i]);
-    }
-
+    // show the beliefs
+    this->drawBeliefs();
 }
 
 
 
 void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
 {
-    //removeDuplicateModes();
 
     this->printWeights();
 
@@ -399,13 +392,9 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
 
     this->updateWeights(obs);
 
-    Visualizer::clearStates();
+    this->removeDuplicateModes();
 
-    for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
-    {
-        Visualizer::addState(currentBeliefStates_[i]);
-    }
-
+    this->drawBeliefs();
 
 }
 
@@ -679,31 +668,12 @@ void MMPolicyGenerator::evaluateObservationListForVertex(const Vertex v)
 
 bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
 {
-    //std::cout<<"Calculating observation overlap for: "<<std::endl;
-    //si_->printState(stateProperty_[a]);
-    //si_->printState(stateProperty_[b]);
 
     // get the list of observations for both vertices
     evaluateObservationListForVertex(a);
 
     evaluateObservationListForVertex(b);
 
-    /*
-    std::cout<<"Observations for a"<<std::endl;
-
-    for(int i=0; i < stateObservationProperty_[a].size(); i++)
-    {
-        std::cout<<stateObservationProperty_[a][i]<<std::endl;
-    }
-
-    std::cout<<"Observations for b"<<std::endl;
-    for(int i=0; i < stateObservationProperty_[b].size(); i++)
-    {
-        std::cout<<stateObservationProperty_[b][i]<<std::endl;
-    }
-
-    //std::cin.get();
-    */
 
     bool isOverlapping = false;
 
@@ -770,8 +740,6 @@ MMPolicyGenerator::Vertex MMPolicyGenerator::findTarget(const unsigned int belie
     {
         int w = 0;
 
-        //std::cout<<"My neighbor : "<<i<<std::endl;
-
         // iterate over all other neighborhoods
         for(int j = 0; j < setOfAllNeighbors.size(); j++)
         {
@@ -783,7 +751,6 @@ MMPolicyGenerator::Vertex MMPolicyGenerator::findTarget(const unsigned int belie
             }
         }
 
-        //std::cout<<"ob w :"<<w<<std::endl;
         //TODO: If 2 targets have same weight, then choose the closer one
         if(w < minWeight)
         {
@@ -811,7 +778,6 @@ int MMPolicyGenerator::calculateIntersectionWithNeighbor(const Vertex v, std::ve
                 // then get the edge weight
                 int edgeWeight =  boost::get(boost::edge_weight, g_, e);
 
-                //std::cout<<"Edge weight in og:"<<edgeWeight<<std::endl;
                 w += edgeWeight;
             }
         }
@@ -863,7 +829,7 @@ bool MMPolicyGenerator::isConverged()
 
 void MMPolicyGenerator::removeDuplicateModes()
 {
-    std::set<int> toDelete;
+    std::vector<int> toDelete;
 
     for(int i = 0; i < currentBeliefStates_.size(); i++)
     {
@@ -884,11 +850,11 @@ void MMPolicyGenerator::removeDuplicateModes()
                     std::cout<<"the two same indices are : "<<i<<" "<<j<<std::endl;
                     if(weights_[i] >= weights_[j] )
                     {
-                        //removeBelief(j);
+                        toDelete.push_back(j);
                     }
                     else
                     {
-                        //emoveBelief(i);
+                        toDelete.push_back(i);
                     }
                 }
             }
@@ -896,6 +862,19 @@ void MMPolicyGenerator::removeDuplicateModes()
         }
     }
 
+    this->removeBeliefs(toDelete);
+
 }
 
 
+void MMPolicyGenerator::drawBeliefs()
+{
+
+    Visualizer::clearStates();
+
+    for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
+    {
+        Visualizer::addState(currentBeliefStates_[i]);
+    }
+
+}
