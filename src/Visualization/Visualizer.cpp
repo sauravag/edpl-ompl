@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan */
+/* Authors: Aditya Mahadevan, Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #include "../../include/Visualization/Visualizer.h"
 
@@ -62,7 +62,6 @@ int Visualizer::envIndx_   = -1;
 
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
-
 
     double scale = 0.15;
 

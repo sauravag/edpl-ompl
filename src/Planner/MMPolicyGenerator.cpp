@@ -44,8 +44,6 @@
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
 
-#define SIGMA_RANGE 1.50 // meters
-#define SIGMA_THETA 0.30 // radians
 
 namespace ompl
 {
@@ -62,6 +60,12 @@ namespace ompl
         static const double CONVERGENCE_THRESHOLD_FIRM_MM = 2.0;
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
+
+        static const double SIGMA_RANGE = 1.75; // meters
+
+        static const double SIGMA_THETA = 0.50; // radians
+
+        static const double MODE_DELETION_THRESHOLD = 1e-4; // the percentage of weight a mode should hold, below which it gets deleted
 
     }
 }
@@ -83,7 +87,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     double Y_1 = 0.0;
     double Y_2 = 22.0;
 
-    double spacing = 0.50; // diameter of robot
+    double spacing = 0.50;
 
     // grid size
     int gridSizeX = std::ceil( (X_2-X_1) / spacing);
@@ -146,23 +150,41 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 
     OMPL_INFORM("MMPolicyGenerator: Updating the weights before proceeding");
 
-    for(int i = 0; i < 20; i++)
+    unsigned int numModes = currentBeliefStates_.size();
+    unsigned int updatedNumModes = 0;
+
+    // We will update weights till we converge to most likely modes
+    while( numModes != updatedNumModes )
     {
+        numModes = currentBeliefStates_.size();
+
+        std::cout<<"\n The number of modes BEFORE update: "<<numModes<<std::endl;
+
         this->updateWeights(obs);
-        std::cout<<"Progress: "<<100*i/(20-1)<<" %"<<std::endl;
+
+        updatedNumModes = currentBeliefStates_.size();
+
+        std::cout<<"The number of modes AFTER update: "<<updatedNumModes<<std::endl;
+
+
     }
 
     this->printWeights();
 
-    //std::cout<<"Press enter"<<std::endl;
-    //std::cin.get();
+    Visualizer::clearStates();
+
+    for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
+    {
+        Visualizer::addState(currentBeliefStates_[i]);
+    }
+
 }
 
 
 
 void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
 {
-    removeDuplicateModes();
+    //removeDuplicateModes();
 
     this->printWeights();
 
@@ -413,8 +435,8 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 
     arma::colvec sigma(2);
 
-    sigma(0) = SIGMA_RANGE;
-    sigma(1) = SIGMA_THETA;
+    sigma(0) = ompl::magic::SIGMA_RANGE;
+    sigma(1) = ompl::magic::SIGMA_THETA;
 
     arma::colvec variance = arma::pow(sigma,2);
 
@@ -470,13 +492,18 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 
     }
 
+    std::vector<int> beliefsToRemove;
 
     for(unsigned int i = 0; i < weights_.size(); i++)
     {
         // if the weight of the mode is less than 1%, delete it
-        if(weights_[i]/totalWeight < 0.01 || weights_[i] == 0 )
-            this->removeBelief(i);
+        if(weights_[i]/totalWeight < ompl::magic::MODE_DELETION_THRESHOLD || weights_[i] == 0.0 )
+        {
+            beliefsToRemove.push_back(i);
+        }
     }
+
+    removeBeliefs(beliefsToRemove);
 
 }
 
@@ -554,11 +581,37 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
     return innov;
 }
 
-void MMPolicyGenerator::removeBelief(const int Indx)
+void MMPolicyGenerator::removeBeliefs(const std::vector<int> Indxs)
 {
-    currentBeliefStates_.erase(currentBeliefStates_.begin()+Indx);
+    // Make a local copy
+    std::vector<ompl::base::State*> currentBeliefStatesCopy = currentBeliefStates_;
+    std::vector<float> weightsCopy = weights_;
 
-    weights_.erase(weights_.begin()+Indx);
+    weights_.clear();
+    currentBeliefStates_.clear();
+
+    for(int i = 0 ; i < currentBeliefStatesCopy.size(); i++)
+    {
+        // check if this index is in the list marked to be deleted
+
+        // If not, then we keep it
+        std::vector<int>::const_iterator it = std::find(Indxs.begin(), Indxs.end(), i) ;
+
+        if(it == Indxs.end())
+        {
+            currentBeliefStates_.push_back(currentBeliefStatesCopy[i]);
+            weights_.push_back(weightsCopy[i]);
+        }
+        // if it was marked to be deleted, then we free memory for that state
+        else
+        {
+            si_->freeState(currentBeliefStatesCopy[i]);
+        }
+    }
+
+    //currentBeliefStates_.erase(currentBeliefStates_.begin()+Indx);
+
+    //weights_.erase(weights_.begin()+Indx);
 
 }
 
@@ -831,11 +884,11 @@ void MMPolicyGenerator::removeDuplicateModes()
                     std::cout<<"the two same indices are : "<<i<<" "<<j<<std::endl;
                     if(weights_[i] >= weights_[j] )
                     {
-                        removeBelief(j);
+                        //removeBelief(j);
                     }
                     else
                     {
-                        removeBelief(i);
+                        //emoveBelief(i);
                     }
                 }
             }

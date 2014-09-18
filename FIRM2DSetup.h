@@ -169,8 +169,6 @@ public:
             const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
             siF_->setStateValidityChecker(fclSVC);
 
-            siF_->setStateValidityCheckingResolution(0.005);
-
             // provide the observation model to the space
             ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(siF_, pathToSetupFile_.c_str()));
             siF_->setObservationModel(om);
@@ -183,6 +181,7 @@ public:
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
             siF_->setPropagationStepSize(0.01); // this is the duration that a control is applied
+            siF_->setStateValidityCheckingResolution(0.005);
             siF_->setMinMaxControlDuration(1,100);
 
             if(!start_ || !goal_)

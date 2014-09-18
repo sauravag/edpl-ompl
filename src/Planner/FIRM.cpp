@@ -1056,15 +1056,12 @@ bool FIRM::detectKidnapping(ompl::base::State *previousState, ompl::base::State 
 
 void FIRM::savePlannerData()
 {
-    //writeFIRMGraphToXML(std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, std::map<std::pair<int,int>,FIRMWeight > edgeWeights)
 
     std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes;
 
     foreach(Vertex v, boost::vertices(g_))
     {
-        // if the vertex isn't a start or goal then only add it to the saved file
-        //if(!isStartVertex(v) && !isGoalVertex(v))
-        //{
+
         arma::colvec xVec = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getArmaData();
 
         arma::mat cov = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getCovariance();
@@ -1072,7 +1069,6 @@ void FIRM::savePlannerData()
         std::pair<int,std::pair<arma::colvec,arma::mat> > nodeToWrite = std::make_pair(v, std::make_pair(xVec, cov)) ;
 
         nodes.push_back(nodeToWrite);
-        //}
 
     }
 
@@ -1083,12 +1079,9 @@ void FIRM::savePlannerData()
         Vertex start = boost::source(e,g_);
         Vertex goal  = boost::target(e,g_);
 
-        //if(!isStartVertex(start) && !isGoalVertex(start) && !isStartVertex(goal) && !isGoalVertex(goal))
-        //{
         const FIRMWeight w = boost::get(boost::edge_weight, g_, e);
 
         edgeWeights.push_back(std::make_pair(std::make_pair(start,goal),w));
-        //}
 
     }
 
@@ -1119,7 +1112,7 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
             newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
 
             //std::cout<<"Adding state from XML --> \n";
-            siF_->printState(newState);
+            //siF_->printState(newState);
 
             Vertex v = addStateToGraph(siF_->cloneState(newState));
 

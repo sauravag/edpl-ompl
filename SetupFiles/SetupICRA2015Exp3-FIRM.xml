@@ -198,6 +198,6 @@
         minNodes = "125"
     />
     <KidnappedState
-        x = 15.0 y = 19.0 theta = 1.57 
+        x = 2.0 y = 8.5 theta = 1.57 
     />
 </PlanningProblem>
