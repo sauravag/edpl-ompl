@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/SetupCorridoorWorld2-FIRM.xml";
+    std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -61,6 +61,8 @@ void plan()
     Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
 
     Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
+
+    Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
     if(mySetup->solve())
     {
@@ -107,7 +109,7 @@ void testMultiModal()
 
     delete mySetup;
 
-    //sleep(5);
+    boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
 
     //exit(0);
 }

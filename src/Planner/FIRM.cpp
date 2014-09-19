@@ -756,6 +756,10 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
     OMPL_INFORM("FIRM: Solved DP");
 
+    sendFeedbackEdgesToViz();
+
+    Visualizer::setMode(Visualizer::VZRDrawingMode::FeedbackViewMode);
+
 }
 
 
@@ -801,7 +805,6 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
 void FIRM::executeFeedback(void)
 {
-    sendFeedbackEdgesToViz();
 
     Vertex start = startM_[0];
     Vertex goal  = goalM_[0] ;
@@ -1168,6 +1171,8 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
     // clear the visualization
     Visualizer::clearStates();
 
+    Visualizer::setMode(Visualizer::VZRDrawingMode::NodeViewMode);
+
     policyGenerator_->sampleNewBeliefStates();
 
     ompl::base::State *currentTrueState = siF_->allocState();
@@ -1220,5 +1225,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     // TODO: is the first the recovered state ?
     siF_->copyState(recoveredState, bstates[0]);
+
+    Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
 }
