@@ -57,7 +57,6 @@
 #include "../Path/FeedbackPath.h"
 #include "../ConnectionStrategy/FStrategy.h"
 #include "MMPolicyGenerator.h"
-
 /**
    @anchor FIRM
    @par Short description

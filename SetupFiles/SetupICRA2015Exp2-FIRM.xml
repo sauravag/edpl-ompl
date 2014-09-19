@@ -206,10 +206,10 @@
 </MotionModels>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/ICRA2015Exp2.obj"
+        environmentFile = "./Models/ICRA2015Exp2.obj"
     />
     <Robot
-        robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/iRobot.obj"
+        robotFile = "./Models/iRobot.obj"
     />
      <StartPose
         x = "15.0"
