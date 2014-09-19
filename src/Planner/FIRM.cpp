@@ -1031,17 +1031,7 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
 
 void FIRM::simulateKidnapping()
 {
-    //Kidnapped state
-    double X = 2.0;
-    double Y = 20.0;
-    double theta = 3.14157;
-
-    ompl::base::State *kidnappedState = si_->allocState();
-
-    kidnappedState->as<SE2BeliefSpace::StateType>()->setXYYaw(X,Y,theta);
-
-    siF_->setTrueState(kidnappedState);
-
+    siF_->setTrueState(kidnappedState_);
 }
 
 bool FIRM::detectKidnapping(ompl::base::State *previousState, ompl::base::State *newState)
@@ -1066,15 +1056,12 @@ bool FIRM::detectKidnapping(ompl::base::State *previousState, ompl::base::State 
 
 void FIRM::savePlannerData()
 {
-    //writeFIRMGraphToXML(std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, std::map<std::pair<int,int>,FIRMWeight > edgeWeights)
 
     std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes;
 
     foreach(Vertex v, boost::vertices(g_))
     {
-        // if the vertex isn't a start or goal then only add it to the saved file
-        //if(!isStartVertex(v) && !isGoalVertex(v))
-        //{
+
         arma::colvec xVec = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getArmaData();
 
         arma::mat cov = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getCovariance();
@@ -1082,7 +1069,6 @@ void FIRM::savePlannerData()
         std::pair<int,std::pair<arma::colvec,arma::mat> > nodeToWrite = std::make_pair(v, std::make_pair(xVec, cov)) ;
 
         nodes.push_back(nodeToWrite);
-        //}
 
     }
 
@@ -1093,12 +1079,9 @@ void FIRM::savePlannerData()
         Vertex start = boost::source(e,g_);
         Vertex goal  = boost::target(e,g_);
 
-        //if(!isStartVertex(start) && !isGoalVertex(start) && !isStartVertex(goal) && !isGoalVertex(goal))
-        //{
         const FIRMWeight w = boost::get(boost::edge_weight, g_, e);
 
         edgeWeights.push_back(std::make_pair(std::make_pair(start,goal),w));
-        //}
 
     }
 
@@ -1129,7 +1112,7 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
             newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
 
             //std::cout<<"Adding state from XML --> \n";
-            siF_->printState(newState);
+            //siF_->printState(newState);
 
             Vertex v = addStateToGraph(siF_->cloneState(newState));
 
@@ -1198,15 +1181,13 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
         policyGenerator_->generatePolicy(policy);
 
-        int rndnum = FIRMUtils::generateRandomIntegerInRange(0, ompl::magic::MAX_MM_POLICY_LENGTH/*policy.size()-1*/);
+        int rndnum = FIRMUtils::generateRandomIntegerInRange(100, ompl::magic::MAX_MM_POLICY_LENGTH/*policy.size()-1*/);
 
         int hzn = rndnum > policy.size()? policy.size() : rndnum;
 
         for(int i=0; i < hzn ; i++)
         {
             siF_->applyControl(policy[i],true);
-
-            //policyGenerator_->getCurrentBeliefStates(tempbStates);
 
             policyGenerator_->propagateBeliefs(policy[i]);
 
@@ -1224,8 +1205,6 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             }
             if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
                 counter = 0;
-
-            //std::cout<<"Clearance :"<<siF_->getStateValidityChecker()->clearance(currentTrueState)<<std::endl;
 
             boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }

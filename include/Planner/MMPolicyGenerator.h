@@ -38,6 +38,7 @@
 
 
 #include <ompl/geometric/planners/rrt/RRT.h>
+//#include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/pending/disjoint_sets.hpp>
@@ -176,7 +177,7 @@ class MMPolicyGenerator
 
         virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation, double &weightFactor);
 
-        void removeBelief(const int Indx);
+        void removeBeliefs(const std::vector<int> Indxs);
 
         void printWeights() const
         {
@@ -220,6 +221,12 @@ class MMPolicyGenerator
 
         /** \brief Returns true if all weights are same, false otherwise*/
         bool areSimilarWeights();
+
+        /** \brief if 2 modes have the same weight and pose, then they are duplicates */
+        void removeDuplicateModes();
+
+        /** \brief draw the current beliefs */
+        void drawBeliefs();
 
         /** \brief Container for the current modes/beliefs*/
         std::vector<ompl::base::State*> currentBeliefStates_;

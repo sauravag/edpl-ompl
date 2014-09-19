@@ -248,6 +248,11 @@ public:
     /** \brief Load the roadmap info from a file */
     virtual void loadRoadMapFromFile(const std::string pathToFile);
 
+    void setKidnappedState(ompl::base::State *state)
+    {
+        kidnappedState_ = siF_->cloneState(state);
+    }
+
 protected:
 
     /** \brief Free all the memory allocated by the planner */
@@ -422,6 +427,7 @@ private:
     /** \brief Checks if this state already exists in the graph, return the matching vertex if true.*/
     bool isDuplicateState(const ompl::base::State *state, Vertex &duplicateVertex);
 
+    ompl::base::State *kidnappedState_;
 
 };
 

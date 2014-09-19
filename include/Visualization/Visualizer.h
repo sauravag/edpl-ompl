@@ -182,6 +182,7 @@ class Visualizer
             //ompl::app::RenderGeometry rd(new ompl::app::RenderGeometry(rbg,se));
             renderGeom_ = new ompl::app::RenderGeometry(rbg,se);
         }
+
         /** \brief Draw a single landmark that is passed to this function */
         static void drawLandmark(arma::colvec& landmark);
 
@@ -248,6 +249,7 @@ class Visualizer
 
         /** \brief The gllistindex of the robot rendering */
         static int robotIndx_;
+
 
 };
 #endif // FIRM_OMPL_VISUALIZER_H
