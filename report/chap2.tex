@@ -180,8 +180,20 @@ To the write function we pass two arguments:
 
 1. First argument is a vector of pairs of the node id and the node state. The node state itself is a pair representing the colvec of x,y,z and the covariance matrix.
 
-So we pass the filen
 
+\section{Testing different Scenarios}
+
+\subsection{Current Issues}
+
+\begin{enumerate}
+ \item In some locations, after sampling, the belief doesn't show up in locations where the robot could be. Possible reasons could be:
+      \begin{enumerate}
+       \item The sampling is not dense enough
+       \item The information geometry is not correct, i.e. it isnt exactly the same in each supposedly same location.
+      \end{enumerate}
+
+
+\end{enumerate}
 
 
 

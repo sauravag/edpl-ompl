@@ -169,8 +169,6 @@ public:
             const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
             siF_->setStateValidityChecker(fclSVC);
 
-            siF_->setStateValidityCheckingResolution(0.005);
-
             // provide the observation model to the space
             ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(siF_, pathToSetupFile_.c_str()));
             siF_->setObservationModel(om);
@@ -183,6 +181,7 @@ public:
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
             siF_->setPropagationStepSize(0.01); // this is the duration that a control is applied
+            siF_->setStateValidityCheckingResolution(0.005);
             siF_->setMinMaxControlDuration(1,100);
 
             if(!start_ || !goal_)
@@ -200,6 +199,8 @@ public:
 
             planner_->as<FIRM>()->setMinFIRMNodes(minNodes_);
 
+            planner_->as<FIRM>()->setKidnappedState(kidnappedState_);
+
             planner_->setup();
 
             setup_ = true;
@@ -214,7 +215,8 @@ public:
             this->setup();
         }
 
-        std::string pathXML = "./FIRMRoadMap.xml";
+        std::string pathXML = "FIRMRoadMap.xml";
+
         planner_->as<FIRM>()->loadRoadMapFromFile(pathXML);
 
         return planner_->solve(planningTime_);
@@ -351,6 +353,24 @@ protected:
 
         minNodes_ = nodeNum;
 
+        // Read Kidnapped State
+        // Read the Goal Pose
+        child  = node->FirstChild("KidnappedState");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        double kX = 0 , kY = 0, kTheta = 0;
+
+        itemElement->QueryDoubleAttribute("x", &kX);
+        itemElement->QueryDoubleAttribute("y", &kY);
+        itemElement->QueryDoubleAttribute("theta", &kTheta);
+
+        kidnappedState_ = siF_->allocState();
+
+        kidnappedState_->as<SE2BeliefSpace::StateType>()->setXYYaw(kX, kY, kTheta);
+
         OMPL_INFORM("Problem configuration is");
 
         std::cout<<"Path to environment mesh: "<<environmentFilePath<<std::endl;
@@ -367,6 +387,8 @@ protected:
 
         std::cout<<"Min Nodes: "<<minNodes_<<" seconds"<<std::endl;
 
+        std::cout<<"Kidnapped Pose x:"<<kX<<" y:"<<kY<<" theta:"<<kTheta<<std::endl;
+
     }
 
 private:
@@ -374,6 +396,8 @@ private:
     ompl::base::State *start_;
 
     ompl::base::State *goal_;
+
+    ompl::base::State *kidnappedState_;
 
     firm::SpaceInformation::SpaceInformationPtr siF_;
 

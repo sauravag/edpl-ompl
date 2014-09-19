@@ -47,7 +47,7 @@ namespace ompl
 
         static const double CAMERA_DETECTION_RANGE = 2.5;// meters
 
-        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.30 ; // meters
+        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.50 ; // meters
     }
 }
 
@@ -214,6 +214,8 @@ double CamAruco2DObservationModel::getDataAssociationLikelihood(const arma::colv
 
     weight = std::exp(t(0,0));
 
+    assert(weight >= 0 && "Weight cannot be less than 0!");
+
     return weight;
 }
 
@@ -256,6 +258,8 @@ int CamAruco2DObservationModel::findCorrespondingLandmark(const ompl::base::Stat
         }
 
     }
+
+    assert(candidateIndx >= 0 && "Candidate index cannot be negative");
 
     // The observation is id, range, bearing, orientation of the landmark
     candidateObservation<<landmarkID<<candidatelandmarkRange<<candidatelandmarkBearing<<landmarks_[candidateIndx][3]<<endr;
