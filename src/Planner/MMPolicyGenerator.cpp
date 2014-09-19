@@ -67,6 +67,7 @@ namespace ompl
 
         static const double MODE_DELETION_THRESHOLD = 1e-4; // the percentage of weight a mode should hold, below which it gets deleted
 
+        static const double ZERO_CONTROL_UPDATE_TIME = 2.0 ;
     }
 }
 
@@ -173,16 +174,15 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     // Print the weights of the modes
     this->printWeights();
 
-    numModes = currentBeliefStates_.size();
-    updatedNumModes = 0;
+    double t = 0;
 
-    while( numModes != updatedNumModes )
+    // Run filter for a few seconds to update initial samples, zero control
+    while( t < ompl::magic::ZERO_CONTROL_UPDATE_TIME )
     {
-        numModes = currentBeliefStates_.size();
 
         this->propagateBeliefs(si_->getMotionModel()->getZeroControl());
 
-        updatedNumModes = currentBeliefStates_.size();
+        t += si_->getMotionModel()->getTimestepSize();
 
     }
 

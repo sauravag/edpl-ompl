@@ -67,6 +67,20 @@
 <landmark id = 48 x = 1.0 y = 10.0  theta = -0.5 />
 <landmark id = 49 x = 1.0 y = 11.0  theta = -0.5 />
 <landmark id = 50 x = 1.0 y = 12.0  theta = -0.5 />
+<landmark id = 51 x = 1.0 y = 13.0  theta = -0.5 />
+<landmark id = 52 x = 1.0 y = 14.0  theta = -0.5 />
+<landmark id = 53 x = 1.0 y = 15.0  theta = -0.5 />
+<landmark id = 54 x = 1.0 y = 17.0  theta = -0.5 />
+<landmark id = 55 x = 16.6 y = 19.0  theta = -0.5 />
+<landmark id = 56 x = 17.0 y = 19.0  theta = -0.5 />
+<landmark id = 57 x = 18.0.0 y = 19.0  theta = -0.5 />
+<landmark id = 58 x = 15.0 y = 19.0  theta = -0.5 />
+<landmark id = 59 x = 14.0 y = 19.0  theta = -0.5 />
+<landmark id = 60 x = 3.0 y = 19.0  theta = -0.5 />
+<landmark id = 61 x = 17.0 y = 16.0  theta = -0.5 />
+<landmark id = 62 x = 18.0 y = 16.0  theta = -0.5 />
+<landmark id = 63 x = 15.0 y = 16.0  theta = -0.5 />
+<landmark id = 64 x = 1.0 y = 6.0  theta = -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
@@ -126,28 +140,28 @@
 </MotionModels>
 <PlanningProblem>
     <Environment
-        environmentFile = "./Models/CorridoorWorld1.obj"
+        environmentFile = "./Models/CorridoorWorld2.obj"
     />
     <Robot
         robotFile = "./Models/iRobot.obj"
     />
      <StartPose
-        x = "1.0"
-        y = "3.5"
-        theta = "1.57"
-    />
-    <GoalPose
-        x = "17.0"
-        y = "16.0"
+        x = "10.0"
+        y = "2.0"
         theta = "0"
     />
+    <GoalPose
+        x = "14.0"
+        y = "18.0"
+        theta = "1.57"
+    />
     <PlanningTime
-        maxTime = "200"
+        maxTime = "900"
     />
     <FIRMNodes
-        minNodes = "20"
+        minNodes = "80"
     />
      <KidnappedState
-        x = 1.0 y = 1.0 theta = 1.57 
+        x = 13.0 y = 1.0 theta = 1.57 
     />
 </PlanningProblem>

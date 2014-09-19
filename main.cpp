@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/SetupCorridoorWorld1-FIRM.xml";
+    std::string setupFilePath = "./SetupFiles/SetupCorridoorWorld2-FIRM.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -107,7 +107,9 @@ void testMultiModal()
 
     delete mySetup;
 
-    exit(0);
+    //sleep(5);
+
+    //exit(0);
 }
 
 int main(int argc, char *argv[])

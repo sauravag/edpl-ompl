@@ -1206,8 +1206,12 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
                 counter = 0;
 
+            if(policyGenerator_->isConverged())
+                break;
+
             boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
+
     }
 
     std::vector<ompl::base::State*> bstates;
