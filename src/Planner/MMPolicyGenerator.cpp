@@ -40,6 +40,7 @@
 #include "../../include/Utils/FIRMUtils.h"
 #include <boost/foreach.hpp>
 #include "../../include/ObservationModels/CamAruco2DObservationModel.h"
+#include <numeric>
 
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
@@ -56,8 +57,6 @@ namespace ompl
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 2.0; // maximum distance for RRT to succeed
 
         static const double NEIGHBORHOOD_RANGE = 15.0 ; // range within which to find neighbors
-
-        static const double CONVERGENCE_THRESHOLD_FIRM_MM = 2.0;
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
@@ -200,6 +199,8 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     //container to store the sequence of controls for each mode/target pair
     std::vector<std::vector<ompl::control::Control*> > openLoopPolicies;
 
+    Visualizer::ClearFeedbackEdges();
+
     // Iterate over the mode/target pairs and generate open loop controls
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
@@ -221,6 +222,10 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
             std::cout<<" Target :"<<std::endl;
             si_->printState(stateProperty_[targetVertex]);
             std::cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<std::endl;
+
+            //------ To check if target makes sense
+            Visualizer::addFeedbackEdge(currentBeliefStates_[i],stateProperty_[targetVertex], 1.0);
+            //------
 
             pdef->setStartAndGoalStates(currentBeliefStates_[i], stateProperty_[targetVertex], ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
 
@@ -804,26 +809,12 @@ int MMPolicyGenerator::calculateIntersectionWithNeighbor(const Vertex v, std::ve
 
 bool MMPolicyGenerator::isConverged()
 {
-    double maxdistance = 0;
-
-    for(int i=0; i<currentBeliefStates_.size(); i++)
-    {
-        double d = 0;
-        for(int j=0; j<currentBeliefStates_.size(); j++)
-        {
-            d = si_->distance(currentBeliefStates_[i], currentBeliefStates_[j]);
-        }
-        if(d > maxdistance)
-        {
-            maxdistance = d;
-        }
-    }
-
-    if(maxdistance <= ompl::magic::CONVERGENCE_THRESHOLD_FIRM_MM)
+/*
+    if(currentBeliefStates_.size()==1)
     {
         return true;
     }
-
+*/
     return false;
 }
 
@@ -891,5 +882,18 @@ void MMPolicyGenerator::drawBeliefs()
     {
         Visualizer::addState(currentBeliefStates_[i]);
     }
+
+}
+
+void MMPolicyGenerator::getStateWithMaxWeight(ompl::base::State *state, float &weight)
+{
+
+    std::vector<float>::iterator biggest = std::max_element(weights_.begin(), weights_.end());
+
+    weight = *biggest;
+
+    int index = std::distance(weights_.begin(),biggest);
+
+    si_->copyState(state, currentBeliefStates_[index]);
 
 }

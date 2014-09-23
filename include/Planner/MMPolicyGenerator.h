@@ -195,6 +195,9 @@ class MMPolicyGenerator
         /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
         bool areCurrentBeliefsValid();
 
+        /** \brief get the state with the max weight and its weight */
+        void getStateWithMaxWeight(ompl::base::State *state, float &weight);
+
 
     private:
 
