@@ -65,13 +65,17 @@ int FIRMUtils::signum(const double d)
 
 int FIRMUtils::generateRandomIntegerInRange(const int floor, const int ceiling)
 {
-    std::random_device rd; // obtain a random number from hardware
+    //std::random_device rd; // obtain a random number from hardware
 
-    std::mt19937 eng(rd()); // seed the generator
+    //std::mt19937 eng(rd()); // seed the generator
 
-    std::uniform_int_distribution<> distr(floor, ceiling); // define the range
+    //std::uniform_int_distribution<> distr(floor, ceiling); // define the range
 
-    return distr(eng);
+    //return distr(eng);
+
+    int r = rand()%(ceiling - floor + 1) + floor;
+
+    return r;
 }
 
 void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, const std::vector<std::pair<std::pair<int,int>,FIRMWeight> > edgeWeights)

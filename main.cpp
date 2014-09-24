@@ -86,6 +86,8 @@ void plan()
 
 void testMultiModal()
 {
+    srand(1234567);
+
     MultiModalSetup *mySetup(new MultiModalSetup);
 
     std::string setupFilePath = "./SetupFiles/SetupICRA2015Exp1.xml";

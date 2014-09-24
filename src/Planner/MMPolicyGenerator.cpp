@@ -189,7 +189,6 @@ void MMPolicyGenerator::sampleNewBeliefStates()
         si_->printState(currentBeliefStates_[i]);
     }
 
-    std::cin.get();
 }
 
 

@@ -5,25 +5,33 @@
 <landmark id = 3 x = 2.0  y = 1.0 theta = -0.5 />
 <landmark id = 4 x = 1.5  y = 1.0 theta = -0.5 />
 <landmark id = 5 x = 1.0  y = 1.0 theta = -0.5 />
-<landmark id = 6 x = 2.0  y = 2.0 theta = -0.5 />
+<landmark id = 6 x = 1.5  y = 2.0 theta = -0.5 />
+<landmark id = 7 x = 2.0  y = 2.0 theta = -0.5 />
+<landmark id = 8 x = 2.5  y = 2.0 theta = -0.5 />
 <landmark id = 1 x = 1.0 y = 19.0  theta = -0.5 />
 <landmark id = 2 x = 1.0 y = 19.5 theta = -0.5 />
 <landmark id = 3 x = 1.0 y = 20.0 theta = -0.5 />
 <landmark id = 4 x = 1.0 y = 20.5 theta = -0.5 />
 <landmark id = 5 x = 1.0 y = 21.0 theta = -0.5 />
-<landmark id = 6 x = 2.0  y = 20.0 theta = -0.5 />
+<landmark id = 6 x = 2.0  y = 20.5 theta = -0.5 />
+<landmark id = 7 x = 2.0  y = 20.0 theta = -0.5 />
+<landmark id = 8 x = 2.0  y = 19.5 theta = -0.5 />
 <landmark id = 1 x = 19.0  y = 21.0  theta = -0.5 />
 <landmark id = 2 x = 19.5  y = 21.0 theta = -0.5 />
 <landmark id = 3 x = 20.0  y = 21.0 theta = -0.5 />
 <landmark id = 4 x = 20.5 y = 21.0 theta = -0.5 />
 <landmark id = 5 x = 21.0  y = 21.0 theta = -0.5 />
-<landmark id = 6 x = 20.0  y = 20.0 theta = -0.5 />
+<landmark id = 6 x = 20.5  y = 20.0 theta = -0.5 />
+<landmark id = 7 x = 20.0  y = 20.0 theta = -0.5 />
+<landmark id = 8 x = 19.5  y = 20.0 theta = -0.5 />
 <landmark id = 1 x = 21.0 y = 3.0  theta = -0.5 />
 <landmark id = 2 x = 21.0 y = 2.5 theta = -0.5 />
 <landmark id = 3 x = 21.0 y = 2.0 theta = -0.5 />
 <landmark id = 4 x = 21.0 y = 1.5 theta = -0.5 />
 <landmark id = 5 x = 21.0 y = 1.0 theta = -0.5 />
-<landmark id = 6 x = 20.0  y = 2.0 theta = -0.5 />
+<landmark id = 6 x = 20.0  y = 1.5 theta = -0.5 />
+<landmark id = 7 x = 20.0  y = 2.0 theta = -0.5 />
+<landmark id = 8 x = 20.0  y = 2.5 theta = -0.5 />
 <landmark id = 10 x = 8.0 y = 21.0 theta = -0.5 />
 <landmark id = 11 x = 8.0 y = 20.5 theta = -0.5 />
 <landmark id = 12 x = 8.0 y = 20.0 theta = -0.5 />
@@ -121,6 +129,14 @@
 <landmark id = 56 x = 10.5 y = 9.0 theta = -0.5 />
 <landmark id = 57 x = 9.0 y = 10.5 theta = -0.5 />
 <landmark id = 58 x = 9.0 y = 11.5 theta = -0.5 />
+<landmark id = 100 x = 5.0 y = 21.0 theta = -0.5 />
+<landmark id = 101 x = 6.0 y = 21.0 theta = -0.5 />
+<landmark id = 100 x = 21.0 y = 17.0 theta = -0.5 />
+<landmark id = 101 x = 21.0 y = 16.0 theta = -0.5 />
+<landmark id = 100 x = 17.0 y = 1.0 theta = -0.5 />
+<landmark id = 101 x = 16.0 y = 1.0 theta = -0.5 />
+<landmark id = 100 x = 1.0 y = 5.0 theta = -0.5 />
+<landmark id = 101 x = 1.0 y = 6.0 theta = -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
