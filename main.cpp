@@ -77,6 +77,8 @@ void plan()
 
     }
 
+    boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+
     delete mySetup;
 
     exit(0);

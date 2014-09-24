@@ -87,7 +87,7 @@ class MMPolicyGenerator
         }
 
         /** \brief Destructor */
-        ~MMPolicyGenerator()
+        virtual ~MMPolicyGenerator()
         {
             while(!currentBeliefStates_.empty())
             {
@@ -171,11 +171,9 @@ class MMPolicyGenerator
         virtual void propagateBeliefs(const ompl::control::Control *control);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
-        virtual void updateWeights(const arma::colvec trueObservation);
+        virtual void updateWeights(const arma::colvec trueObservation, bool debug = false);
 
-        //virtual arma::colvec computeInnovation(const arma::colvec Zprd, const arma::colvec Zg);
-
-        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation, double &weightFactor);
+        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation, double &weightFactor, bool debug = false);
 
         void removeBeliefs(const std::vector<int> Indxs);
 
@@ -230,6 +228,12 @@ class MMPolicyGenerator
 
         /** \brief draw the current beliefs */
         void drawBeliefs();
+
+        /** \brief Normalize the weights of modes */
+        void normalizeWeights();
+
+        /** \brief sets a uniform weight for all modes */
+        void assignUniformWeight();
 
         /** \brief Container for the current modes/beliefs*/
         std::vector<ompl::base::State*> currentBeliefStates_;
