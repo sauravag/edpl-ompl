@@ -417,8 +417,16 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
     this->printWeights();
 
     this->updateWeights(obs, false);
+
     OMPL_INFORM("---- AFTER updating weights in propogate: ");
     this->printWeights();
+
+    OMPL_INFORM("---- AFTER updating weights in propogate, STATE WITH HIGHEST WEIGHT: ");
+    ompl::base::State *tstate  = si_->allocState();
+    float tweight = 0;
+    getStateWithMaxWeight(tstate, tweight);
+    si_->printState(tstate);
+
 
     this->removeDuplicateModes();
 
@@ -597,6 +605,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
 
     }
 
+
     // there is a mismatch in what the robot sees and predicted
     if(numIntersection != Zprd.n_rows || numIntersection != Zg.n_rows )
     {
@@ -678,7 +687,7 @@ void MMPolicyGenerator::removeDuplicateModes()
 
     for(int i = 0; i < currentBeliefStates_.size(); i++)
     {
-        for(int j = 0; j < currentBeliefStates_.size(); j++ )
+        for(int j = i+1; j < currentBeliefStates_.size(); j++ )
         {
             if(i!=j)
             {
@@ -689,17 +698,21 @@ void MMPolicyGenerator::removeDuplicateModes()
                 double yd = xi(1) - xj(1);
                 double thetad = xi(2) - xj(2);
 
-                if(std::abs(xd) < 0.0001 && std::abs(yd) < 0.0001 &&  std::abs(thetad) < 0.0001 )
+                if(std::abs(xd) < 0.01 && std::abs(yd) < 0.01 &&  std::abs(thetad) < FIRMUtils::degree2Radian(1.0) )
                 {
 
                     if(weights_[i] >= weights_[j] )
                     {
                         toDelete.push_back(j);
+                        weights_[i] = weights_[i] + weights_[j]; // transfer the weight to the more likely mode
                     }
                     else
                     {
                         toDelete.push_back(i);
+                        weights_[j] = weights_[i] + weights_[j]; // transfer the weight to the more likely mode
+
                     }
+
                 }
             }
 

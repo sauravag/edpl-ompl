@@ -267,26 +267,13 @@ bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<s
     return true;
 }
 
+double FIRMUtils::degree2Radian(double deg)
+{
+    return boost::math::constants::pi<double>()*degree/180.0;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+double FIRMUtils::radian2Degree(double rads)
+{
+    return rads*180.0/boost::math::constants::pi<double>();
+}
 
