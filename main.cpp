@@ -87,6 +87,7 @@ void plan()
 void testMultiModal()
 {
     srand(1234567);
+    arma_rng::set_seed(1234567);
 
     MultiModalSetup *mySetup(new MultiModalSetup);
 
