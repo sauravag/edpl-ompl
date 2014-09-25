@@ -115,8 +115,6 @@ void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<ar
         node->SetDoubleAttribute("c32", cov(2,1));
         node->SetDoubleAttribute("c33", cov(2,2));
 
-        std::cout<<"Writing Node: "<<xVec(0)<<" "<<xVec(1)<<" "<<xVec(2)<<" \n"<<cov<<std::endl;
-
    }
 
     TiXmlElement * Edges = new TiXmlElement( "Edges" );
@@ -136,8 +134,6 @@ void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<ar
         edge->SetDoubleAttribute("successProb", w.getSuccessProbability());
         edge->SetDoubleAttribute("cost", w.getCost());
 
-
-        std::cout<<"Writing edge : "<<w.getCost()<<" "<< w.getSuccessProbability()<<std::endl;
 
    }
 
@@ -218,8 +214,6 @@ bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<s
 
         FIRMNodeList.push_back(std::make_pair(id,std::make_pair(xVec,cov)));
 
-        //std::cout<<"Read the node id:"<<id<<" x: "<<x<<" y: "<<y<<" theta: "<<theta<<" \n cov:"<<cov<<std::endl;
-
     }
 
 
@@ -260,8 +254,6 @@ bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<s
 
         edgeWeights.push_back(std::make_pair(std::make_pair(startVertexID, endVertexID),w));
 
-        //std::cout<<"Read the edge, startvertex: "<<startVertexID<<" endVertex: "<<endVertexID<<" cost: "<<cost<<"  succesProb: "<<successProb<<std::endl;
-
     }
 
     return true;
@@ -269,7 +261,7 @@ bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<s
 
 double FIRMUtils::degree2Radian(double deg)
 {
-    return boost::math::constants::pi<double>()*degree/180.0;
+    return boost::math::constants::pi<double>()*deg/180.0;
 }
 
 double FIRMUtils::radian2Degree(double rads)

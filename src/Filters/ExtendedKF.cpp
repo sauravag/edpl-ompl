@@ -67,10 +67,6 @@ const LinearSystem& ls, ompl::base::State *updatedState)
   {
     si_->copyState(updatedState, belief);
 
-    //arma::mat covTemp = updatedState->as<StateType>()->getCovariance();
-
-    //updatedState->as<StateType>()->setCovariance(covTemp*covGrowthFactor_);
-
     return; // return the prediction if you don't have any innovation
   }
 
