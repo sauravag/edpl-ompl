@@ -87,7 +87,7 @@ class MMPolicyGenerator
         }
 
         /** \brief Destructor */
-        ~MMPolicyGenerator()
+        virtual ~MMPolicyGenerator()
         {
             while(!currentBeliefStates_.empty())
             {
@@ -171,11 +171,9 @@ class MMPolicyGenerator
         virtual void propagateBeliefs(const ompl::control::Control *control);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
-        virtual void updateWeights(const arma::colvec trueObservation);
+        virtual void updateWeights(const arma::colvec trueObservation, bool debug = false);
 
-        //virtual arma::colvec computeInnovation(const arma::colvec Zprd, const arma::colvec Zg);
-
-        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation, double &weightFactor);
+        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation, double &weightFactor, bool debug = false);
 
         void removeBeliefs(const std::vector<int> Indxs);
 
@@ -194,6 +192,9 @@ class MMPolicyGenerator
 
         /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
         bool areCurrentBeliefsValid();
+
+        /** \brief get the state with the max weight and its weight */
+        void getStateWithMaxWeight(ompl::base::State *state, float &weight);
 
 
     private:
@@ -227,6 +228,12 @@ class MMPolicyGenerator
 
         /** \brief draw the current beliefs */
         void drawBeliefs();
+
+        /** \brief Normalize the weights of modes */
+        void normalizeWeights();
+
+        /** \brief sets a uniform weight for all modes */
+        void assignUniformWeight();
 
         /** \brief Container for the current modes/beliefs*/
         std::vector<ompl::base::State*> currentBeliefStates_;
@@ -268,6 +275,9 @@ class MMPolicyGenerator
         mutable boost::mutex                                   graphMutex_;
 
         unsigned int maxEdgeID_;
+
+        /** \brief keep a track of how long a belief has been predicting to observe something that is not seen by the robot*/
+        std::vector<double> timeSinceDivergence_;
 
 };
 #endif

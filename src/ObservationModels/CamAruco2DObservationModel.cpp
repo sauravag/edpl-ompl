@@ -45,7 +45,7 @@ namespace ompl
     {
         static const double CAMERA_HALF_FIELD_OF_VIEW = 180; // degrees
 
-        static const double CAMERA_DETECTION_RANGE = 2.5;// meters
+        static const double CAMERA_DETECTION_RANGE = 3.0;// meters
 
         static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.50 ; // meters
     }
@@ -78,7 +78,7 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
             //cout<<"Trying to resize"<<endl;
             z.resize((counter+1)*singleObservationDim ,  1);
 
-            colvec noise(2);
+            colvec noise = zeros<colvec>(landmarkInfoDim);
 
             if(isSimulation)
             {
@@ -97,13 +97,6 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
                 //normal distribution N(0,1) to N(0,eta*range + sigma)
                 //(shifting was done in GetNoiseCovariance)
                 noise = noise_std%randNoiseVec;
-            }
-            else
-            {
-
-              // generate zero noise
-              colvec zeronoise =  zeros<colvec>(landmarkInfoDim);
-              noise =  zeronoise;
             }
 
             z[singleObservationDim*counter] = landmarks_[i](0) ; // id of the landmark
@@ -273,6 +266,7 @@ int CamAruco2DObservationModel::findCorrespondingLandmark(const ompl::base::Stat
 
 bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *state, const arma::colvec& landmark )
 {
+
     using namespace arma;
 
     colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();

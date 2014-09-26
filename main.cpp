@@ -79,13 +79,13 @@ void plan()
 
     delete mySetup;
 
-    boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
-
-    exit(0);
 }
 
 void testMultiModal()
 {
+    srand(1234567);
+    arma_rng::set_seed(1234567);
+
     MultiModalSetup *mySetup(new MultiModalSetup);
 
     std::string setupFilePath = "./SetupFiles/SetupICRA2015Exp1.xml";

@@ -67,29 +67,6 @@ void firm::SpaceInformation::applyControl(const ompl::control::Control *control,
     Visualizer::updateTrueState(trueState_);
 }
 
-/*
-void firm::SpaceInformation::applyControl(const ompl::control::Control *control)
-{
-    typename MotionModelMethod::NoiseType noise;
-
-    try
-    {
-        noise = motionModel_->generateNoise(trueState_, control);
-    }
-    catch(int e)
-    {
-        noise = motionModel_->getZeroNoise();
-    }
-
-    motionModel_->Evolve(trueState_, control, motionModel_->getZeroNoise(), trueState_);
-
-    Visualizer::updateTrueState(trueState_);
-
-  //OGLDisplay<MPTraits>::UpdateTrueState(m_trueState);
-  //cout<<" The True State is :"<<endl<<m_trueState.GetArmaData()<<endl;
-}
-*/
-
 ObservationModelMethod::ObservationType firm::SpaceInformation::getObservation()
 {
     return observationModel_->getObservation(trueState_, true);

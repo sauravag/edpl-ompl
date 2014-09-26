@@ -65,13 +65,17 @@ int FIRMUtils::signum(const double d)
 
 int FIRMUtils::generateRandomIntegerInRange(const int floor, const int ceiling)
 {
-    std::random_device rd; // obtain a random number from hardware
+    //std::random_device rd; // obtain a random number from hardware
 
-    std::mt19937 eng(rd()); // seed the generator
+    //std::mt19937 eng(rd()); // seed the generator
 
-    std::uniform_int_distribution<> distr(floor, ceiling); // define the range
+    //std::uniform_int_distribution<> distr(floor, ceiling); // define the range
 
-    return distr(eng);
+    //return distr(eng);
+
+    int r = rand()%(ceiling - floor + 1) + floor;
+
+    return r;
 }
 
 void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, const std::vector<std::pair<std::pair<int,int>,FIRMWeight> > edgeWeights)
@@ -111,8 +115,6 @@ void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<ar
         node->SetDoubleAttribute("c32", cov(2,1));
         node->SetDoubleAttribute("c33", cov(2,2));
 
-        std::cout<<"Writing Node: "<<xVec(0)<<" "<<xVec(1)<<" "<<xVec(2)<<" \n"<<cov<<std::endl;
-
    }
 
     TiXmlElement * Edges = new TiXmlElement( "Edges" );
@@ -132,8 +134,6 @@ void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<ar
         edge->SetDoubleAttribute("successProb", w.getSuccessProbability());
         edge->SetDoubleAttribute("cost", w.getCost());
 
-
-        std::cout<<"Writing edge : "<<w.getCost()<<" "<< w.getSuccessProbability()<<std::endl;
 
    }
 
@@ -214,8 +214,6 @@ bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<s
 
         FIRMNodeList.push_back(std::make_pair(id,std::make_pair(xVec,cov)));
 
-        //std::cout<<"Read the node id:"<<id<<" x: "<<x<<" y: "<<y<<" theta: "<<theta<<" \n cov:"<<cov<<std::endl;
-
     }
 
 
@@ -256,33 +254,18 @@ bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<s
 
         edgeWeights.push_back(std::make_pair(std::make_pair(startVertexID, endVertexID),w));
 
-        //std::cout<<"Read the edge, startvertex: "<<startVertexID<<" endVertex: "<<endVertexID<<" cost: "<<cost<<"  succesProb: "<<successProb<<std::endl;
-
     }
 
     return true;
 }
 
+double FIRMUtils::degree2Radian(double deg)
+{
+    return boost::math::constants::pi<double>()*deg/180.0;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+double FIRMUtils::radian2Degree(double rads)
+{
+    return rads*180.0/boost::math::constants::pi<double>();
+}
 

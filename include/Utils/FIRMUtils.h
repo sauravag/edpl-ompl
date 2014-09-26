@@ -58,6 +58,11 @@ class FIRMUtils
         /** \brief Reads the Graph properties from an XML file */
         static bool readFIRMGraphFromXML(const std::string &pathToXML, std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > &FIRMNodeList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights);
 
+        /** \brief Convert degree to radian */
+        static double degree2Radian(double deg);
+
+        /** \brief radians to degree */
+        static double radian2Degree(double rads);
 };
 
 #endif

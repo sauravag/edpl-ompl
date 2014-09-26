@@ -1223,7 +1223,6 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     policyGenerator_->getCurrentBeliefStates(bstates);
 
-    // TODO: is the first the recovered state ?
     siF_->copyState(recoveredState, bstates[0]);
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
