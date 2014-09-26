@@ -121,13 +121,13 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     currentBeliefStates_.push_back(si_->cloneState(newState));
     weights_.push_back(0.0); // push zero weight
 
-     // LT
-    newState->as<SE2BeliefSpace::StateType>()->setXYYaw(1.50, 20.0, 0.0);
+    // RT
+    newState->as<SE2BeliefSpace::StateType>()->setXYYaw(20.0, 20.5,  FIRMUtils::degree2Radian(-90.0));
     currentBeliefStates_.push_back(si_->cloneState(newState));
     weights_.push_back(0.0); // push zero weight
 
-    // RT
-    newState->as<SE2BeliefSpace::StateType>()->setXYYaw(20.0, 20.5,  FIRMUtils::degree2Radian(-90.0));
+     // LT
+    newState->as<SE2BeliefSpace::StateType>()->setXYYaw(1.50, 20.0, 0.0);
     currentBeliefStates_.push_back(si_->cloneState(newState));
     weights_.push_back(0.0); // push zero weight
 
@@ -197,8 +197,8 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 
     this->printWeights();
 
-    std::cout<<"Press enter \n";
-    std::cin.get();
+    //std::cout<<"Press enter \n";
+    //std::cin.get();
 
     // After converging to most likely, assign uniform weights
     assignUniformWeight();
@@ -226,8 +226,8 @@ void MMPolicyGenerator::sampleNewBeliefStates()
         si_->printState(currentBeliefStates_[i]);
     }
 
-    std::cout<<"Press enter \n";
-    std::cin.get();
+    //std::cout<<"Press enter \n";
+    //std::cin.get();
 
 }
 
@@ -436,10 +436,19 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
 
     arma::colvec obs = si_->getObservation();
 
+    std::cout<<"The real robot is at : "<<std::endl;
+    ompl::base::State *tempTS  = si_->allocState();
+    si_->getTrueState(tempTS);
+    si_->printState(tempTS);
+    si_->freeState(tempTS);
+
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
         ompl::base::State *kfEstimate = si_->allocState();
         ompl::base::State *kfEstimateUpdated = si_->allocState();
+
+        std::cout<<"BEFORE Kf Update state at index :"<<i<<std::endl;
+        si_->printState(currentBeliefStates_[i]);
 
         si_->copyState(kfEstimate, currentBeliefStates_[i]);
 
@@ -451,6 +460,9 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
 
         si_->freeState(kfEstimateUpdated);
 
+         std::cout<<"AFTER Kf Update state at index :"<<i<<std::endl;
+        si_->printState(currentBeliefStates_[i]);
+
     }
 
     OMPL_INFORM("---- BEFORE updating weights in propogate: ");
@@ -461,15 +473,15 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
     OMPL_INFORM("---- AFTER updating weights in propogate: ");
     this->printWeights();
 
-    std::cout<<"Press enter ! \n";
-    std::cin.get();
+    //std::cout<<"Press enter ! \n";
+    //std::cin.get();
 
     OMPL_INFORM("---- AFTER updating weights in propogate, STATE WITH HIGHEST WEIGHT: ");
     ompl::base::State *tstate  = si_->allocState();
     float tweight = 0;
     getStateWithMaxWeight(tstate, tweight);
     si_->printState(tstate);
-    if(tweight > 0.26)
+    if(tweight > 1.0 / currentBeliefStates_.size()+0.01)
     {
         OMPL_INFORM("One mode has more than uniform weight");
         std::cin.get();
@@ -507,8 +519,8 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation, bool d
 {
     if(debug)
     {
-        //std::cout<<"DEBUG: The true observation is: \n"<<std::endl;
-        //std::cout<<trueObservation<<std::endl;
+        std::cout<<"DEBUG: The true observation is: \n"<<std::endl;
+        std::cout<<trueObservation<<std::endl;
     }
 
     arma::colvec sigma(2);
@@ -531,8 +543,8 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation, bool d
 
         if(debug)
         {
-            //OMPL_INFORM("DEBUG: the innovation :");
-            //std::cout<<innov<<std::endl;
+            OMPL_INFORM("DEBUG: the innovation :");
+            std::cout<<innov<<std::endl;
         }
 
         float w;
@@ -543,7 +555,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation, bool d
 
             arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
 
-            w = 1/std::sqrt(pow(2*boost::math::constants::pi<double>(),innov.n_rows)*arma::det(covariance)) * std::exp(t(0,0)) * weightFactor;
+            w = std::exp(t(0,0)) * weightFactor; // 1.0/std::sqrt(pow(2*boost::math::constants::pi<double>(),innov.n_rows)*arma::det(covariance))
 
             //innov_comparison.insert_cols(i,innov);
         }
@@ -560,7 +572,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation, bool d
 
     if(debug)
         {
-            OMPL_INFORM("DEBUG: the innovation MATRIX FOR COMPARISON:");
+            //OMPL_INFORM("DEBUG: the innovation MATRIX FOR COMPARISON:");
             //std::cout<<innov_comparison<<std::endl;
         }
 
@@ -628,9 +640,9 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
     if(debug)
     {
         std::cout<<"DEBUG :The mode is at index :"<<currentBeliefIndx<<std::endl;
-        si_->printState(currentBeliefStates_[currentBeliefIndx]);
-        //std::cout<<"DEBUG: The predicted observation is: \n"<<std::endl;
-        //std::cout<<Zprd<<std::endl;
+        //si_->printState(currentBeliefStates_[currentBeliefIndx]);
+        std::cout<<"DEBUG: The predicted observation is: \n"<<std::endl;
+        std::cout<<Zprd<<std::endl;
     }
 
     arma::colvec innov;
@@ -684,7 +696,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
 
         int predictedLandmarksSeen = Zprd.n_rows / singleObservationDim ;
 
-        weightFactor = std::max(1.0 / abs(1 + landmarksActuallySeen - numIntersection) , 1.0 / abs(1 + predictedLandmarksSeen - numIntersection));
+        weightFactor = std::min(1.0 / abs(1 + landmarksActuallySeen - numIntersection) , 1.0 / abs(1 + predictedLandmarksSeen - numIntersection));
     }
 
 

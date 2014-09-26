@@ -365,6 +365,8 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const ompl:
 
     executionCost.v = cost;
 
+    si_->freeState(internalState);
+
     return true ;
 }
 
