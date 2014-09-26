@@ -79,6 +79,8 @@ void plan()
 
     delete mySetup;
 
+    boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+
     exit(0);
 }
 
@@ -109,9 +111,7 @@ void testMultiModal()
 
     delete mySetup;
 
-    boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
-
-    //exit(0);
+    exit(0);
 }
 
 int main(int argc, char *argv[])
