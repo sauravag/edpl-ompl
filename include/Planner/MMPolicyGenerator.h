@@ -276,5 +276,8 @@ class MMPolicyGenerator
 
         unsigned int maxEdgeID_;
 
+        /** \brief keep a track of how long a belief has been predicting to observe something that is not seen by the robot*/
+        std::vector<double> timeSinceDivergence_;
+
 };
 #endif

@@ -141,10 +141,10 @@
   <CamAruco2DObservationModel
     sigma_range="0.05"
     sigma_angle="0.5"
-    eta_rd="0.000002"
-    eta_rphi = "0.00001"
-    eta_thetad="0.00001"
-    eta_thetaphi = "0.00001"
+    eta_rd="0.02"
+    eta_rphi = "0.01"
+    eta_thetad="0.01"
+    eta_thetaphi = "0.01"
     camera_horizontal_fov = "45"
     vcLabel = "cd1"
   >
@@ -217,6 +217,6 @@
         minNodes = "125"
     />
     <KidnappedState
-        x = 1.5.0 y = 20.0 theta = 0 
+        x = 2.0 y = 1.5 theta = -1.57 
     />
 </PlanningProblem>
