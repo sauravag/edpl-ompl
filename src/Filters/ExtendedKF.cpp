@@ -97,7 +97,8 @@ void ExtendedKF::Evolve(const ompl::base::State *belief,
     const ObservationType& obs,
     const LinearSystem& lsPred,
     const LinearSystem& lsUpdate,
-    ompl::base::State *evolvedState)
+    ompl::base::State *evolvedState,
+    bool debug)
 {
 
   // In the EKF we do not use the linear systems passed to the filter, instead we generate the linear systems on the fly
@@ -109,6 +110,12 @@ void ExtendedKF::Evolve(const ompl::base::State *belief,
   ompl::base::State *bPred = si_->allocState();
 
   Predict(belief, control, lsPredicted, bPred);
+
+  if(debug)
+  {
+    si_->copyState(evolvedState, bPred);
+    return;
+  }
 
   if(!obs.n_rows || !obs.n_cols)
   {

@@ -112,7 +112,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 
     OMPL_INFORM("MMPolicyGenerator: Sampling start beliefs");
 
-    /*
+
     // TEST -  PUT FOUR EXACT MODES
     ompl::base::State *newState = si_->allocState();
     newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
@@ -121,27 +121,27 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     newState->as<SE2BeliefSpace::StateType>()->setXYYaw(2.0, 1.5, FIRMUtils::degree2Radian(90.0));
     currentBeliefStates_.push_back(si_->cloneState(newState));
     weights_.push_back(0.0); // push zero weight
-
+    timeSinceDivergence_.push_back(0.0);
     // RT
     newState->as<SE2BeliefSpace::StateType>()->setXYYaw(20.0, 20.5,  FIRMUtils::degree2Radian(-90.0));
     currentBeliefStates_.push_back(si_->cloneState(newState));
     weights_.push_back(0.0); // push zero weight
-
+    timeSinceDivergence_.push_back(0.0);
      // LT
     newState->as<SE2BeliefSpace::StateType>()->setXYYaw(1.50, 20.0, 0.0);
     currentBeliefStates_.push_back(si_->cloneState(newState));
     weights_.push_back(0.0); // push zero weight
-
+    timeSinceDivergence_.push_back(0.0);
 
     // RB
     newState->as<SE2BeliefSpace::StateType>()->setXYYaw(20.5, 2.0,  FIRMUtils::degree2Radian(180.0));
     currentBeliefStates_.push_back(si_->cloneState(newState));
     weights_.push_back(0.0); // push zero weight
-
+    timeSinceDivergence_.push_back(0.0);
     si_->freeState(newState);
     ///---- END TEST
-    */
 
+/*
     for(int i = 0; i <= gridSizeX; i++)
     {
         for(int j=0; j <= gridSizeY; j++)
@@ -168,7 +168,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
             }
         }
     }
-
+*/
     OMPL_INFORM("MMPolicyGenerator: Sampling beliefs Completed");
 
     assignUniformWeight();
@@ -205,7 +205,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     assignUniformWeight();
 
     double t = 0;
-
+/*
     // Run filter for a few seconds to update initial samples, zero control
     while( t < ompl::magic::ZERO_CONTROL_UPDATE_TIME )
     {
@@ -215,7 +215,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
         t += si_->getMotionModel()->getTimestepSize();
 
     }
-
+*/
     // Before beginning the strategy, assign all modes the same weight
     assignUniformWeight();
 
@@ -428,7 +428,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
 }
 
 
-void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
+void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, bool debug)
 {
     // To propagate beliefs we need to apply the control to the true state, get observations and update the beliefs.
     ExtendedKF kf(si_);
@@ -453,7 +453,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
 
         si_->copyState(kfEstimate, currentBeliefStates_[i]);
 
-        kf.Evolve(kfEstimate, control, obs, dummy, dummy, kfEstimateUpdated);
+        kf.Evolve(kfEstimate, control, obs, dummy, dummy, kfEstimateUpdated, debug);
 
         si_->copyState(currentBeliefStates_[i], kfEstimateUpdated);
 
@@ -469,7 +469,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
     OMPL_INFORM("---- BEFORE updating weights in propogate: ");
     this->printWeights();
 
-    this->updateWeights(obs, true);
+    this->updateWeights(obs, debug);
 
     OMPL_INFORM("---- AFTER updating weights in propogate: ");
     this->printWeights();

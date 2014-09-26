@@ -168,7 +168,7 @@ class MMPolicyGenerator
         virtual ompl::base::Cost executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls, const ompl::base::State* state);
 
         /** \brief advances the beliefs/modes by applying the given controls*/
-        virtual void propagateBeliefs(const ompl::control::Control *control);
+        virtual void propagateBeliefs(const ompl::control::Control *control, bool debug = false);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
         virtual void updateWeights(const arma::colvec trueObservation, bool debug = false);
