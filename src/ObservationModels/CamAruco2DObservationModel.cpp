@@ -419,9 +419,7 @@ arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::
 
         if( viewingAngle > boost::math::constants::pi<double>()/2 ) viewingAngle = abs(viewingAngle-boost::math::constants::pi<double>() );
 
-        //noise.subvec(2*i, 2*i+1) = this->etaD_*range + this->etaPhi_*viewingAngle + this->sigma_;
-
-        noise.subvec(2*i, 2*i+1) = this->sigma_;
+        noise.subvec(2*i, 2*i+1) = this->etaD_*range + this->etaPhi_*viewingAngle + this->sigma_;
 
     }
 
