@@ -485,7 +485,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, 
     if(tweight > 1.0 / currentBeliefStates_.size()+0.01)
     {
         OMPL_INFORM("One mode has more than uniform weight");
-        std::cin.get();
+        //std::cin.get();
     }
 
 

@@ -295,9 +295,11 @@ UnicycleMotionModel::getNoiseJacobian(const ompl::base::State *state, const ompl
 
     mat G(3,5);
 
+
     G   <<  cos(theta) << 0 << 1 << 0 << 0 << endr
       <<  sin(theta) << 0 << 0 << 1 << 0 << endr
       <<          0  << 1 << 0 << 0 << 1 << endr;
+
 
     G *= sqrt(this->dt_);
     return G;
