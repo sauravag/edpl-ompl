@@ -137,11 +137,8 @@ bool isUnique(const arma::colvec z)
 typename CamAruco2DObservationModel::ObservationType
 CamAruco2DObservationModel::getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg)
 {
-    //std::cout<<"~~~~~~~~~~~~~~~~~~~~~~~ \n";
 
     using namespace arma;
-
-    //assert(isUnique(Zg));
 
     colvec xVec =  state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
@@ -430,65 +427,12 @@ arma::mat CamAruco2DObservationModel::getObservationNoiseCovariance(const ompl::
     return diagmat(noise);
 
 }
-/**
-typename CamAruco2DObservationModel::ObservationType
-CamAruco2DObservationModel::computeInnovation(const ompl::base::State *predictedState, const ObservationType& Zg)
-{
-  using namespace arma;
 
-  colvec xPrd = predictedState->as<SE2BeliefSpace::StateType>()->getArmaData();
-
-  //return the discrepancy between the expected observation
-  //for a predicted state and the actual observation generated
-
-  ObservationType Zprd = getObservationPrediction(predictedState, Zg);
-
-  if(Zprd.n_rows == 0){
-    ObservationType innov;
-    return innov;
-  }
-
-  ObservationType innov( (landmarkInfoDim)* Zprd.n_rows /singleObservationDim ) ;
-
-  //std::cout<<"Size of ground observation is: "<<Zg.n_rows/singleObservationDim<<std::endl;
-  //std::cout<<"Size of predicted observation is: "<<Zprd.n_rows/singleObservationDim<<endl;
-
-  assert( Zg.n_rows == Zprd.n_rows);
-
-  for(unsigned int i =0; i< Zprd.n_rows/singleObservationDim ; i++)
-  {
-    for(int j=0; j< Zg.n_rows/singleObservationDim; j++)
-    {
-        //cout<<" The current iteration in innovation is: "<<i<<endl;
-        //std::cout<<"ID of ground observation is: "<<Zg(i*singleObservationDim)<<std::endl;
-        //std::cout<<"ID of predicted observation is: "<<Zprd(i*singleObservationDim)<<endl;
-        if(Zprd(i*singleObservationDim) == Zg(j*singleObservationDim))
-
-        innov( i*(landmarkInfoDim) ) = Zprd(i*singleObservationDim + 1) - Zg(j*singleObservationDim + 1) ;
-
-        double delta_theta = Zprd(i*singleObservationDim + 2) - Zg(j*singleObservationDim + 2) ;
-
-        if(delta_theta > boost::math::constants::pi<double>() ) {
-          delta_theta = delta_theta - 2*boost::math::constants::pi<double>() ;
-        }
-
-        if( delta_theta < -boost::math::constants::pi<double>() ){
-          delta_theta =  delta_theta + 2*boost::math::constants::pi<double>() ;
-        }
-
-        innov( i*(landmarkInfoDim) + 1 ) =  delta_theta;
-    }
-  }
-  return innov;
-}
-*/
 
 typename CamAruco2DObservationModel::ObservationType
 CamAruco2DObservationModel::computeInnovation(const ompl::base::State *predictedState, const ObservationType& Zg)
 {
     using namespace arma;
-
-    //assert(isUnique(Zg));
 
     colvec xPrd = predictedState->as<SE2BeliefSpace::StateType>()->getArmaData();
 
@@ -496,8 +440,6 @@ CamAruco2DObservationModel::computeInnovation(const ompl::base::State *predicted
     //for a predicted state and the actual observation generated
 
     ObservationType Zprd = getObservationPrediction(predictedState, Zg);
-
-    //assert(isUnique(Zprd));
 
     if(Zprd.n_rows == 0)
     {
@@ -618,65 +560,71 @@ void CamAruco2DObservationModel::loadLandmarks(const char *pathToSetupFile)
 
   }
 
-    //std::cin.get();
-    std::cout<<"Total number of landmarks loaded successfully :"<<landmarks_.size()<<endl;
+    OMPL_INFORM("CamArucoObservationModel: Total number of landmarks loaded successfully : %u", landmarks_.size() );
+
     Visualizer::addLandmarks(landmarks_);
 }
 
 void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
 {
-  using namespace arma;
-  // Load XML containing landmarks
-  TiXmlDocument doc(pathToSetupFile);
-  bool loadOkay = doc.LoadFile();
+    using namespace arma;
+    // Load XML containing landmarks
+    TiXmlDocument doc(pathToSetupFile);
+    bool loadOkay = doc.LoadFile();
 
-  if ( !loadOkay )
-  {
-    printf( "Could not load setup file . Error='%s'. Exiting.\n", doc.ErrorDesc() );
+    if ( !loadOkay )
+    {
+        printf( "Could not load setup file . Error='%s'. Exiting.\n", doc.ErrorDesc() );
 
-    exit( 1 );
-  }
+        exit( 1 );
+    }
 
-  TiXmlNode* node = 0;
+    TiXmlNode* node = 0;
 
-  TiXmlElement* itemElement = 0;
+    TiXmlElement* itemElement = 0;
 
-  // Get the landmarklist node
-  node = doc.FirstChild( "ObservationModels" );
-  assert( node );
-
-
-  TiXmlNode* child = 0;
-
-  child = node->FirstChild("CamAruco2DObservationModel");
-  //Iterate through all the landmarks and put them into the "landmarks_" list
-  assert( child );
-  itemElement = child->ToElement();
-  assert( itemElement );
+    // Get the landmarklist node
+    node = doc.FirstChild( "ObservationModels" );
+    assert( node );
 
 
-  double sigmaRange=0;
-  double sigmaAngle=0;
-  double etaRD=0;
-  double etaRPhi=0;
-  double etaThetaD=0;
-  double etaThetaPhi=0;
-  itemElement->QueryDoubleAttribute("sigma_range", &sigmaRange) ;
-  std::cout<<"Read sigmaRange :"<<sigmaRange<<endl;
-  itemElement->QueryDoubleAttribute("sigma_angle", &sigmaAngle) ;
-  itemElement->QueryDoubleAttribute("eta_rd", &etaRD) ;
-  itemElement->QueryDoubleAttribute("eta_rphi", &etaRPhi) ;
-  itemElement->QueryDoubleAttribute("eta_thetad", &etaThetaD) ;
-  itemElement->QueryDoubleAttribute("eta_thetaphi", &etaThetaPhi) ;
+    TiXmlNode* child = 0;
 
-  this->sigma_ << sigmaRange << sigmaAngle * boost::math::constants::pi<double>() / 180.0 << endr;
-  this->etaD_  << etaRD << etaThetaD <<endr;
-  this->etaPhi_<< etaRPhi << etaThetaPhi << endr;
+    child = node->FirstChild("CamAruco2DObservationModel");
+    //Iterate through all the landmarks and put them into the "landmarks_" list
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
 
-  std::cout<<"Noise parameters loaded"<<std::endl;
-  std::cout<<"sigma_  : "<<sigma_<<std::endl;
-  std::cout<<"etaD_   :"<<etaD_<<std::endl;
-  std::cout<<"etaPhi_ :"<<etaPhi_<<std::endl;
+
+    double sigmaRange=0;
+    double sigmaAngle=0;
+    double etaRD=0;
+    double etaRPhi=0;
+    double etaThetaD=0;
+    double etaThetaPhi=0;
+    itemElement->QueryDoubleAttribute("sigma_range", &sigmaRange) ;
+    itemElement->QueryDoubleAttribute("sigma_angle", &sigmaAngle) ;
+    itemElement->QueryDoubleAttribute("eta_rd", &etaRD) ;
+    itemElement->QueryDoubleAttribute("eta_rphi", &etaRPhi) ;
+    itemElement->QueryDoubleAttribute("eta_thetad", &etaThetaD) ;
+    itemElement->QueryDoubleAttribute("eta_thetaphi", &etaThetaPhi) ;
+
+    this->sigma_ << sigmaRange << sigmaAngle * boost::math::constants::pi<double>() / 180.0 << endr;
+    this->etaD_  << etaRD << etaThetaD <<endr;
+    this->etaPhi_<< etaRPhi << etaThetaPhi << endr;
+
+
+    OMPL_INFORM("CamArucoObservationModel: sigmaRange = %f", sigmaRange );
+
+    OMPL_INFORM("CamArucoObservationModel: sigma_ = ");
+    std::cout<<sigma_<<std::endl;
+
+    OMPL_INFORM("CamArucoObservationModel: etaD_ = ");
+    std::cout<<etaD_<<std::endl;
+
+    OMPL_INFORM("CamArucoObservationModel: etaPhi = ");
+    std::cout<<etaPhi_<<std::endl;
 
 }
 

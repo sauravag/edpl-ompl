@@ -821,7 +821,7 @@ void FIRM::executeFeedback(void)
 
     ompl::base::State *cendState = si_->allocState();
 
-    OMPL_INFORM("Running policy execution");
+    OMPL_INFORM("FIRM: Running policy execution");
 
     bool kidnapped_flag = false;
 
@@ -919,7 +919,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     ompl::base::State *cendState = si_->allocState();
 
-    OMPL_INFORM("Running policy execution");
+    OMPL_INFORM("FIRM: Running policy execution");
 
     Edge e = feedback_[currentVertex];
 
