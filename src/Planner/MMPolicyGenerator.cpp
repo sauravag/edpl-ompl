@@ -61,13 +61,13 @@ namespace ompl
 
         static const float MIN_ROBOT_CLEARANCE = 0.30;
 
-        static const double SIGMA_RANGE = 1.0; // meters
+        static const double SIGMA_RANGE = 0.5;// meters
 
-        static const double SIGMA_THETA = 1.0; // radians
+        static const double SIGMA_THETA = 0.2; // radians
 
         static const double MODE_DELETION_THRESHOLD = 1e-4; // the percentage of weight a mode should hold, below which it gets deleted
 
-        static const double ZERO_CONTROL_UPDATE_TIME = 3.0 ;
+        static const double ZERO_CONTROL_UPDATE_TIME = 1.0 ;
 
         static const double SAMPLING_ROTATION_SPACING = 5.0; // degrees
 
@@ -222,15 +222,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             ompl::base::ProblemDefinitionPtr pdef(new ompl::base::ProblemDefinition(si_));
 
-            //std::cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<std::endl;
-            //std::cout<<"For belief :"<<std::endl;
-            //si_->printState(currentBeliefStates_[i]);
-
             Vertex targetVertex = findTarget(i);
-
-            //std::cout<<" Target :"<<std::endl;
-            //si_->printState(stateProperty_[targetVertex]);
-            //std::cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<std::endl;
 
             //------ To check if target makes sense
             Visualizer::addFeedbackEdge(currentBeliefStates_[i],stateProperty_[targetVertex], 1.0);
@@ -388,7 +380,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
 }
 
 
-void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, bool debug)
+void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
 {
     // To propagate beliefs we need to apply the control to the true state, get observations and update the beliefs.
     ExtendedKF kf(si_);
@@ -406,7 +398,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, 
 
         si_->copyState(kfEstimate, currentBeliefStates_[i]);
 
-        kf.Evolve(kfEstimate, control, obs, dummy, dummy, kfEstimateUpdated, debug);
+        kf.Evolve(kfEstimate, control, obs, dummy, dummy, kfEstimateUpdated);
 
         si_->copyState(currentBeliefStates_[i], kfEstimateUpdated);
 
@@ -419,7 +411,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, 
     OMPL_INFORM("MMPolicyGenerator: BEFORE updating weights in propogate: ");
     this->printWeights();
 
-    this->updateWeights(obs, debug);
+    this->updateWeights(obs);
 
     OMPL_INFORM("MMPolicyGenerator: AFTER updating weights in propogate: ");
     this->printWeights();
@@ -450,13 +442,8 @@ bool MMPolicyGenerator::areSimilarWeights()
     return false;
 }
 
-void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation, bool debug)
+void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 {
-    if(debug)
-    {
-        std::cout<<"DEBUG: The true observation is: \n"<<std::endl;
-        std::cout<<trueObservation<<std::endl;
-    }
 
     arma::colvec sigma(2);
 
@@ -467,20 +454,12 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation, bool d
 
     float totalWeight = 0.0;
 
-    //arma::mat innov_comparison;
-
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
 
         double weightFactor= 1.0;
 
-        arma::colvec innov = this->computeInnovation(i,trueObservation,weightFactor, debug);
-
-        if(debug)
-        {
-            OMPL_INFORM("DEBUG: the innovation :");
-            std::cout<<innov<<std::endl;
-        }
+        arma::colvec innov = this->computeInnovation(i,trueObservation,weightFactor);
 
         float w;
 
@@ -546,7 +525,115 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation, bool d
 
 }
 
-arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,const arma::colvec trueObservation, double &weightFactor, bool debug)
+/*
+// Alternate implementation of calculating weight update
+float MMPolicyGenerator::computeWeightForMode(const int currentBeliefIndx,const arma::colvec trueObservation)
+{
+    const int singleObservationDim = 4;//CamAruco2DObservationModel::singleObservationDim;
+
+    const int landmarkInfoDim = 2;//CamAruco2DObservationModel::landmarkInfoDim;
+
+    // the true observation
+    arma::colvec Zg = trueObservation;
+
+    int landmarksActuallySeen = Zg.n_rows / singleObservationDim;
+
+    // the belief's predicted observation for what the robot sees
+    arma::colvec Zprd =  si_->getObservationModel()->getObservationPrediction(currentBeliefStates_[currentBeliefIndx], Zg);
+
+    // get observation
+    arma::colvec innov = si_->getObservationModel()->computeInnovation(currentBeliefStates_[currentBeliefIndx], obs);
+
+    float weightUpdate = 1.0;
+
+    // robot and mode see something in common
+    if(innov.n_rows != 0)
+    {
+        // construct a linear system at where the mode is
+        LinearSystem ls(si_,currentBeliefStates_[currentBeliefIndx],si_->getMotionModel()->getZeroControl(), Zprd, si_->getMotionModel(), si_->getObservationModel());
+
+        arma::mat P = currentBeliefStates_[currentBeliefIndx]->as<SE2BeliefSpace::StateType>()->getCovariance();
+
+        mat obsLikelihood = ls.getH() * P * trans(ls.getH()) + ls.getR();
+
+        arma::mat t = -0.5*trans(innov)*obsLikelihood.i()*innov;
+
+        weightUpdate = t(0,0);
+
+    }
+    // if there is no innov it means there is no common observation
+    else
+    {
+        // case 1: robot also doesnt see anything
+        if(Zg.n_rows ==0)
+        {
+            // mode could be seeing something
+            weightUpdate = 1.0;
+        }
+        // robot is seeing something and mode sees nothing in common
+        else
+        {
+            weightUpdate = 0;
+        }
+    }
+
+
+
+     // the beliefs predicted observation for what is should see based on where it is
+    arma::colvec Zmode =  si_->getObservationModel()->getObservation(currentBeliefStates_[currentBeliefIndx], false);
+
+    int numIntersection=0;
+
+    int predictedLandmarksSeen = Zmode.n_rows / singleObservationDim ;
+
+
+    for(int j = 0 ; j < landmarksActuallySeen ; j++)
+    {
+        // match ids
+        for(int k = 0 ; k < predictedLandmarksSeen ; k++)
+        {
+            if(Zprd(k*singleObservationDim) == Zg(j*singleObservationDim))
+            {
+
+                numIntersection++;
+
+                break;
+            }
+        }
+
+    }
+
+    float weightReductionFactor=1.0;
+
+    // there is a mismatch in what the robot sees and predicted
+    if(numIntersection != landmarksActuallySeen || numIntersection != predictedLandmarksSeen )
+    {
+
+        //weightFactor = std::min(1.0 / abs(1 + landmarksActuallySeen - numIntersection) , 1.0 / abs(1 + predictedLandmarksSeen - numIntersection));
+        float heuristicVal = std::max(abs(1 + landmarksActuallySeen - numIntersection) , abs(1 + predictedLandmarksSeen - numIntersection));
+
+        weightReductionFactor = std::exp(-heuristicVal*timeSinceDivergence_[currentBeliefIndx]);
+
+        timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] + std::pow(si_->getMotionModel()->getTimestepSize(),2);
+
+    }
+    else
+    {
+         timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] - 1.0;
+
+         if(timeSinceDivergence_[currentBeliefIndx] < 0)
+         {
+            timeSinceDivergence_[currentBeliefIndx] = 0;
+         }
+    }
+
+    return weightUpdate*weightReductionFactor;
+
+}
+*/
+
+
+arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,const arma::colvec trueObservation, double &weightFactor)
 {
     const int singleObservationDim = 4;//CamAruco2DObservationModel::singleObservationDim;
 
@@ -562,37 +649,15 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
 
     int predictedLandmarksSeen = Zprd.n_rows / singleObservationDim ;
 
-    /**
-    // Getting HPH'+R
-
-    arma::mat cov = currentBeliefStates_[currentBeliefIndx]->as<SE2BeliefSpace::StateType>()->getCovariance();
-
-    LinearSystem ls(si_,currentBeliefStates_[currentBeliefIndx],si_->getMotionModel()->getZeroControl(), Zprd, si_->getMotionModel(), si_->getObservationModel());
-
-    arma::mat likelihoodCovariance = ls.getH() *cov* trans(ls.getH()) + ls.getR();
-
-    std::cout<<"The cov ------->>>>>>>:  \n"<<likelihoodCovariance<<std::endl;
-    */
-
-    if(debug)
-    {
-        std::cout<<"DEBUG :The mode is at index :"<<currentBeliefIndx<<std::endl;
-        //si_->printState(currentBeliefStates_[currentBeliefIndx]);
-        std::cout<<"DEBUG: The predicted observation is: \n"<<std::endl;
-        std::cout<<Zprd<<std::endl;
-    }
-
     arma::colvec innov;
 
     int numIntersection=0;
-    /**
-        Logic: First we see if a landmark that is observed by robot is seen by mode:
-        1. If yes, then we compute the innov
-        2. If no, then we predict where the mode "would" see that particular landmark and then calculate the innov.
-    */
+
+    //First we see if a landmark that is observed by robot is seen by mode:
+    //1. If yes, then we compute the innov
+    //2. If no, then we predict where the mode "would" see that particular landmark and then calculate the innov
     for(int j = 0 ; j < landmarksActuallySeen ; j++)
     {
-        bool matchingIDFound = false;
         // match ids
         for(int k = 0 ; k < predictedLandmarksSeen ; k++)
         {
@@ -611,11 +676,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
 
                 innov_for_landmark(1) =  delta_theta;
 
-                matchingIDFound = true;
-
                 innov.insert_rows(numIntersection*landmarkInfoDim, innov_for_landmark);
-
-                //IC.submat((landmarkInfoDim)*numIntersection, 0, (landmarkInfoDim)*numIntersection+1, 2) = likelihoodCovariance.submat((landmarkInfoDim)*k, 0, (landmarkInfoDim)*k+1, 2);
 
                 numIntersection++;
 
@@ -625,7 +686,6 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
 
     }
 
-
     // there is a mismatch in what the robot sees and predicted
     if(numIntersection != landmarksActuallySeen || numIntersection != predictedLandmarksSeen )
     {
@@ -634,16 +694,6 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
         float heuristicVal = std::max(abs(1 + landmarksActuallySeen - numIntersection) , abs(1 + predictedLandmarksSeen - numIntersection));
 
         weightFactor = std::exp(-heuristicVal*timeSinceDivergence_[currentBeliefIndx]);
-
-        if(debug)
-        {
-
-            std::cout<<"INDEX                  : "<<currentBeliefIndx<<std::endl;
-            std::cout<<"landmarksActuallySeen  : "<<landmarksActuallySeen<<std::endl;
-            std::cout<<"predictedLandmarksSeen : "<<predictedLandmarksSeen<<std::endl;
-            std::cout<<"numIntersection        : "<<numIntersection<<std::endl;
-            std::cout<<"WeightFactor           : "<<weightFactor<<std::endl;
-        }
 
         timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] + std::pow(si_->getMotionModel()->getTimestepSize(),2);
 

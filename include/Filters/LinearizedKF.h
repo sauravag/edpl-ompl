@@ -77,8 +77,7 @@ class LinearizedKF : public KalmanFilterMethod
                 const ObservationType& obs,
                 const LinearSystem& lsPred,
                 const LinearSystem& lsUpdate,
-                ompl::base::State *evolvedState,
-                bool debug = false) ;
+                ompl::base::State *evolvedState) ;
 
     /** \brief  Compute the covariance for a given linear system. A linear system describes a robot's state at a point in
             an open loop trajectory. Helps to understand the expected uncertainty at a point in the trajectory.*/

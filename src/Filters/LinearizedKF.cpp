@@ -93,8 +93,7 @@ void LinearizedKF::Evolve(const ompl::base::State *belief,
     const ObservationType& obs,
     const LinearSystem& lsPred,
     const LinearSystem& lsUpdate,
-    ompl::base::State *evolvedState,
-    bool debug)
+    ompl::base::State *evolvedState)
 {
 
   using namespace arma;

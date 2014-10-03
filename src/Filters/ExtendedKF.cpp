@@ -48,8 +48,11 @@ void ExtendedKF::Predict(const ompl::base::State *belief,
 
   this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predictedState);
 
-  mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
-    ls.getG() * ls.getQ() * trans(ls.getG());
+  mat A = ls.getA();
+  mat G = ls.getG();
+
+  mat covPred = A * belief->as<StateType>()->getCovariance() * trans(A) +
+    G * ls.getQ() * trans(G);
 
   predictedState->as<StateType>()->setCovariance(covPred);
 
@@ -75,8 +78,10 @@ const LinearSystem& ls, ompl::base::State *updatedState)
 
   mat covPred = belief->as<StateType>()->getCovariance();
 
-  mat rightMatrix = ls.getH() * covPred * trans(ls.getH()) + ls.getR();
-  mat leftMatrix = covPred * trans(ls.getH());
+  mat H = ls.getH();
+
+  mat rightMatrix = H * covPred * trans(H) + ls.getR();
+  mat leftMatrix = covPred * trans(H);
   mat KalmanGain = solve(trans(rightMatrix), trans(leftMatrix));
   KalmanGain = KalmanGain.t();
 
@@ -86,7 +91,7 @@ const LinearSystem& ls, ompl::base::State *updatedState)
 
   updatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
 
-  mat covEst = covPred - KalmanGain* ls.getH() * covPred;
+  mat covEst = covPred - KalmanGain* H * covPred;
 
   updatedState->as<StateType>()->setCovariance(covEst);
 
@@ -97,8 +102,7 @@ void ExtendedKF::Evolve(const ompl::base::State *belief,
     const ObservationType& obs,
     const LinearSystem& lsPred,
     const LinearSystem& lsUpdate,
-    ompl::base::State *evolvedState,
-    bool debug)
+    ompl::base::State *evolvedState)
 {
 
   // In the EKF we do not use the linear systems passed to the filter, instead we generate the linear systems on the fly
@@ -110,12 +114,6 @@ void ExtendedKF::Evolve(const ompl::base::State *belief,
   ompl::base::State *bPred = si_->allocState();
 
   Predict(belief, control, lsPredicted, bPred);
-
-  if(debug)
-  {
-    si_->copyState(evolvedState, bPred);
-    return;
-  }
 
   if(!obs.n_rows || !obs.n_cols)
   {

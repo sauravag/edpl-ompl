@@ -168,23 +168,27 @@ class MMPolicyGenerator
         virtual ompl::base::Cost executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls, const ompl::base::State* state);
 
         /** \brief advances the beliefs/modes by applying the given controls*/
-        virtual void propagateBeliefs(const ompl::control::Control *control, bool debug = false);
+        virtual void propagateBeliefs(const ompl::control::Control *control);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
-        virtual void updateWeights(const arma::colvec trueObservation, bool debug = false);
+        virtual void updateWeights(const arma::colvec trueObservation);
 
-        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation, double &weightFactor, bool debug = false);
+        /** \brief Compute the innovation between the robot's and mode's observation*/
+        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation, double &weightFactor);
 
+        /** \brief Remove modes that are no longer considered important*/
         void removeBeliefs(const std::vector<int> Indxs);
 
+        /** \brief Print the mode weights*/
         void printWeights() const
         {
-            OMPL_INFORM("~~Printing Weights~~");
+            OMPL_INFORM("MMPolicyGenerator: Printing Weights");
+
             for(unsigned int i=0; i < weights_.size(); i++)
             {
-                std::cout<<"The Weight of mode #"<<i<<"  ->  "<<weights_[i]<<std::endl;
+                OMPL_INFORM("MMPolicyGenerator: The Weight of mode #%u = %f ",i,weights_[i]);
             }
-            OMPL_INFORM("~~End Weights~~ \n");
+
         }
 
         /** \brief checks if the beliefs have converged */
@@ -198,6 +202,8 @@ class MMPolicyGenerator
 
 
     private:
+
+        //float computeWeightForMode(const int currentBeliefIndx,const arma::colvec trueObservation);
 
          /** \brief Add the a state to the observation graph*/
         void addStateToObservationGraph(ompl::base::State *state);

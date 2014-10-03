@@ -1194,7 +1194,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
         {
             siF_->applyControl(policy[i],true);
 
-            policyGenerator_->propagateBeliefs(policy[i], false);
+            policyGenerator_->propagateBeliefs(policy[i]);
 
             siF_->getTrueState(currentTrueState);
 
