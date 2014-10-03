@@ -75,7 +75,7 @@ class Controller
         virtual bool Execute(const ompl::base::State *startState,
                    ompl::base::State* endState,
                    ompl::base::Cost &executionCost,
-                   bool constructionMode=true);
+                   bool constructionMode=true, bool debug = false);
 
         /** \brief Execute the controller for one step */
          virtual bool executeOneStep(const ompl::base::State *startState,
@@ -229,7 +229,7 @@ template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *startState,
                                                               ompl::base::State* endState,
                                                               ompl::base::Cost &executionCost,
-                                                              bool constructionMode)
+                                                              bool constructionMode, bool debug)
 {
   using namespace std;
 
@@ -309,6 +309,11 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
   si_->freeState(internalState);
   si_->freeState(tempEndState);
+
+  if(debug)
+  {
+    return false;
+  }
 
   return true ;
 }

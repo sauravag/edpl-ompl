@@ -833,7 +833,7 @@ void FIRM::executeFeedback(void)
         controller = edgeControllers_[e];
         ompl::base::Cost cost;
 
-        if(controller.Execute(cstartState, cendState, cost, false))
+        if(controller.Execute(cstartState, cendState, cost, false, true))
         {
             currentVertex = boost::target(e, g_);
         }
@@ -844,14 +844,22 @@ void FIRM::executeFeedback(void)
 
             siF_->getTrueState(tempTrueStateCopy);
 
+            int numVerticesBefore = boost::num_vertices(g_);
+
             currentVertex = addStateToGraph(cendState);
+
+            int numVerticesAfter = boost::num_vertices(g_);
 
             // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
             siF_->freeState(tempTrueStateCopy);
 
-            solveDynamicProgram(goal);
+            if(numVerticesAfter-numVerticesBefore >0)
+            {
+                solveDynamicProgram(goal);
+            }
+
         }
 
         /**
@@ -892,7 +900,7 @@ void FIRM::executeFeedback(void)
             kidnapped_flag = false;
         }
 
-         si_->copyState(cstartState, cendState);
+        si_->copyState(cstartState, cendState);
 
 
     }

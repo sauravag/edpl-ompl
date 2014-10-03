@@ -88,7 +88,7 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
                 //extract state from Cfg and normalize
                 //generate noise scaling/shifting factor
 
-                colvec noise_std = this->etaD_*landmarkRange + /*this->etaPhi_*relativeAngle +*/ this->sigma_;
+                colvec noise_std = this->etaD_*landmarkRange + this->etaPhi_*relativeAngle + this->sigma_;
 
                 //generate raw noise
                 colvec randNoiseVec = randn<colvec>(2);
