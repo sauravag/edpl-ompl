@@ -42,6 +42,20 @@ and install the full omplapp and QT will automatically be installed as part of t
 3. Armadillo C++ Matrix Algebra Library: Recommended to download and build from source
 
 4. tinyxml: Needed for reading landmark/setup parameters
+
+---------------------------------------
+How To Use FIRM
+---------------------------------------
+We have developed FIRM as a planner based on the design philosophy of the planner class in OMPL. On top of the base FIRM planner,
+we have added additional functionaility to the package such as a motion model class, observation model class, filter class etc. 
+that are required within FIRM and not provided explicity in OMPL.
+
+1. Use the provided application as is: Simply compile the code and run it. By changing the names of the setup paramter file (xml files)
+to use in main.cpp, you can control the motion/observation model parameters, environment geometry file, robot geometry file, landmark
+locations etc. 
+
+2. Build you own application by calling FIRM in your scenario.
+
 ---------------------------------------
 License:
 ----------------------------------------
