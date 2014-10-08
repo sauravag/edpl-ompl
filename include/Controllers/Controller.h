@@ -75,7 +75,7 @@ class Controller
         virtual bool Execute(const ompl::base::State *startState,
                    ompl::base::State* endState,
                    ompl::base::Cost &executionCost,
-                   bool constructionMode=true, bool debug = false);
+                   bool constructionMode=true);
 
         /** \brief Execute the controller for one step */
          virtual bool executeOneStep(const ompl::base::State *startState,
@@ -229,7 +229,7 @@ template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *startState,
                                                               ompl::base::State* endState,
                                                               ompl::base::Cost &executionCost,
-                                                              bool constructionMode, bool debug)
+                                                              bool constructionMode)
 {
   using namespace std;
 
@@ -278,12 +278,10 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
-        //deviationCounter++;
-        //if(deviationCounter > 100)
-        //{
-            si_->copyState(endState, internalState);
-            return false;
-        //}
+
+        si_->copyState(endState, internalState);
+        return false;
+
     }
 
     k++;
@@ -309,11 +307,6 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
   si_->freeState(internalState);
   si_->freeState(tempEndState);
-
-  if(debug)
-  {
-    return false;
-  }
 
   return true ;
 }

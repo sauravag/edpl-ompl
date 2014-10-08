@@ -332,7 +332,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
     LinearSystem dummy;
 
     ompl::base::State *tempState = si_->allocState();
-
+ ;
     ompl::base::State *nextState = si_->allocState();
 
     si_->copyState(tempState, state);

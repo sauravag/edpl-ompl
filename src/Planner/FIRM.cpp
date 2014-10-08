@@ -433,10 +433,12 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     Vertex m;
 
     //if state already exists in the graph, just return corresponding vertex
+    /*
     if(isDuplicateState(state,m))
     {
         return m;
     }
+    */
 
     m = boost::add_vertex(g_);
 
@@ -833,7 +835,7 @@ void FIRM::executeFeedback(void)
         controller = edgeControllers_[e];
         ompl::base::Cost cost;
 
-        if(controller.Execute(cstartState, cendState, cost, false, true))
+        if(controller.Execute(cstartState, cendState, cost, false))
         {
             currentVertex = boost::target(e, g_);
         }
@@ -855,10 +857,10 @@ void FIRM::executeFeedback(void)
 
             siF_->freeState(tempTrueStateCopy);
 
-            if(numVerticesAfter-numVerticesBefore >0)
-            {
-                solveDynamicProgram(goal);
-            }
+            assert(numVerticesAfter-numVerticesBefore >0);
+
+            solveDynamicProgram(goal);
+
 
         }
 
@@ -1157,21 +1159,6 @@ bool FIRM::isGoalVertex(const Vertex v)
 
     return false;
 
-}
-
-bool FIRM::isDuplicateState(const ompl::base::State *state, FIRM::Vertex &duplicateVertex)
-{
-     foreach(Vertex v, boost::vertices(g_))
-    {
-        if(stateProperty_[v] == state)
-        {
-            duplicateVertex = v;
-            return true;
-        }
-
-    }
-
-    return false;
 }
 
 void FIRM::recoverLostRobot(ompl::base::State *recoveredState)

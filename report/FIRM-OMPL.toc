@@ -26,7 +26,9 @@
 \contentsline {section}{\numberline {2.5}How to save/load the graph from an XML}{6}{section.2.5}
 \contentsline {subsection}{\numberline {2.5.1}How to save}{6}{subsection.2.5.1}
 \contentsline {subsection}{\numberline {2.5.2}How to load}{6}{subsection.2.5.2}
-\contentsline {chapter}{\numberline {3}Project Status}{7}{chapter.3}
-\contentsline {section}{\numberline {3.1}Progress}{7}{section.3.1}
-\contentsline {subsection}{\numberline {3.1.1}Completed Tasks}{7}{subsection.3.1.1}
-\contentsline {subsubsection}{Pending Tasks}{7}{section*.7}
+\contentsline {section}{\numberline {2.6}Testing different Scenarios}{7}{section.2.6}
+\contentsline {subsection}{\numberline {2.6.1}Current Issues}{7}{subsection.2.6.1}
+\contentsline {chapter}{\numberline {3}Project Status}{8}{chapter.3}
+\contentsline {section}{\numberline {3.1}Progress}{8}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Completed Tasks}{8}{subsection.3.1.1}
+\contentsline {subsubsection}{Pending Tasks}{8}{section*.7}
