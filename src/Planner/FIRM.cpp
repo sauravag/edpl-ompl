@@ -935,7 +935,8 @@ void FIRM::executeFeedbackWithRollout(void)
 
     Vertex tempVertex;
 
-    while(si_->distance(stateProperty_[currentVertex], stateProperty_[goal]) > 0.5)
+    // While the robot state hasn't reached the goal state, keep running
+    while(!stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->isReached(cstartState) /*si_->distance(stateProperty_[currentVertex], stateProperty_[goal]) > 0.5*/)
     {
         //Edge e = feedback_[currentVertex];
         //Vertex targetNode = boost::target(e, g_);
