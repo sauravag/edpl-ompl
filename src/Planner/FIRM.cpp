@@ -64,7 +64,7 @@ namespace ompl
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
 
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 200;
@@ -97,7 +97,7 @@ namespace ompl
 
         static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 100;
 
-        static const int STEPS_TO_ROLLOUT = 100;
+        static const int STEPS_TO_ROLLOUT = 30;
     }
 }
 
@@ -464,7 +464,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     foreach (Vertex n, neighbors)
     {
-        if ( m!=n /*&& stateProperty_[m]!=stateProperty_[n]*/)
+        if ( m!=n )
         {
             totalConnectionAttemptsProperty_[m]++;
             totalConnectionAttemptsProperty_[n]++;
@@ -926,8 +926,6 @@ void FIRM::executeFeedbackWithRollout(void)
 
     Vertex currentVertex =  start;
 
-    EdgeControllerType controller;
-
     ompl::base::State *cstartState = si_->allocState();
     si_->copyState(cstartState, stateProperty_[start]);
 
@@ -948,7 +946,7 @@ void FIRM::executeFeedbackWithRollout(void)
         //Edge e = feedback_[currentVertex];
         //Vertex targetNode = boost::target(e, g_);
 
-        controller = edgeControllers_[e];
+        EdgeControllerType controller = edgeControllers_[e];
 
         ompl::base::Cost cost;
 

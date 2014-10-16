@@ -140,7 +140,7 @@
 <ObservationModels>
   <CamAruco2DObservationModel
     sigma_range="0.05"
-    sigma_angle="0.5"
+    sigma_angle="1.0"
     eta_rd="0.0"
     eta_rphi = "0.0"
     eta_thetad="0.0"
@@ -175,7 +175,7 @@
     wind_noise_pos="0.000001"
     wind_noise_ang="0.000001" 
     min_linear_velocity= 0.5
-    max_linear_velocity= 1.0
+    max_linear_velocity= 0.5
     max_angular_velocity= 0.32
     dt= 0.1
     /> <!--omega is in radians--> 
