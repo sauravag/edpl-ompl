@@ -81,36 +81,6 @@ void plan()
 
 }
 
-void testMultiModal()
-{
-
-    MultiModalSetup *mySetup(new MultiModalSetup);
-
-    std::string setupFilePath = "./SetupFiles/SetupICRA2015Exp1.xml";
-
-    mySetup->setPathToSetupFile(setupFilePath.c_str());
-
-    mySetup->setup();
-
-    Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
-
-    Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
-
-    if(mySetup->solve())
-    {
-
-        OMPL_INFORM("Plan Executed Successfully");
-
-    }
-    else
-    {
-        OMPL_INFORM("Unable to find Solution in given time.");
-    }
-
-    delete mySetup;
-
-    exit(0);
-}
 
 int main(int argc, char *argv[])
 {

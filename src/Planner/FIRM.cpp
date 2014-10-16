@@ -797,7 +797,6 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
         candidateCostToGo[e] =  singleCostToGo ;
 
-        //candidateCostToGo.insert(std::pair<Edge,double>(e,singleCostToGo));
     }
 
     DoubleValueComp dvc;
@@ -866,44 +865,6 @@ void FIRM::executeFeedback(void)
 
         }
 
-        /**
-        1. Check if innovation i.e. change in trace(cov) between start and end state is high
-        2. If the change is high, then switch to lost mode
-        3. Sample modes and run policygen till you converge to one mode
-        4. get back to policy execution
-        */
-        if(si_->distance(cstartState,stateProperty_[goal]) < 6.0 && !kidnapped_flag && kidnappingCounter < 1)
-        {
-            std::cout<<"Before Simulated Kidnapping! (Press Enter) \n";
-            //std::cin.get();
-            this->simulateKidnapping();
-            std::cout<<"AFter Simulated Kidnapping! (Press Enter) \n";
-            //std::cin.get();
-            kidnapped_flag = true;
-            kidnappingCounter++;
-        }
-
-         if(kidnapped_flag) //if(this->detectKidnapping(cstartState, cendState))
-        {
-            recoverLostRobot(cendState);
-
-             // get a copy of the true state
-            ompl::base::State *tempTrueStateCopy = si_->allocState();
-
-            siF_->getTrueState(tempTrueStateCopy);
-
-            currentVertex = addStateToGraph(cendState);
-
-            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
-            siF_->setTrueState(tempTrueStateCopy);
-
-            siF_->freeState(tempTrueStateCopy);
-
-            solveDynamicProgram(goal);
-
-            kidnapped_flag = false;
-        }
-
         si_->copyState(cstartState, cendState);
 
 
@@ -912,6 +873,7 @@ void FIRM::executeFeedback(void)
 
 }
 
+// Experimental
 void FIRM::executeFeedbackWithRollout(void)
 {
     sendFeedbackEdgesToViz();
