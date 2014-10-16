@@ -357,8 +357,6 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const ompl:
       return false;
     }
 
-    step_++;
-
     //Increment cost by:
     //-> 0.01 for time based
     //-> trace(Covariance) for FIRM
@@ -384,9 +382,13 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
     si_->copyState(tempState, startState);
     ompl::base::State *tempEndState = si_->allocState();
 
+    //step_ = 0;
+
     for(int i=0; i < numSteps; i++)
     {
         bool e = executeOneStep(tempState,tempEndState, executionCost, constructionMode);
+
+        step_++;
 
         si_->copyState(tempState, tempEndState);
         si_->copyState(endState, tempEndState);

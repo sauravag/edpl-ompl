@@ -72,18 +72,19 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state) const
     {
         std::cout<<"NORM2 is 0"<<std::endl;
         std::cout<<"The difference vector is: \n"<<stateDiff<<std::endl;
+        std::cout<<"I am at: \n"<<this->getArmaData()<<std::endl;
+        std::cout<<"The checked state is at : \n"<<state->as<SE2BeliefSpace::StateType>()->getArmaData()<<std::endl;
         std::cin.get();
     }
     if(norm2 <= reachDist_)
     {
-        std::cout<<"Is reachable and norm2 is  "<< norm2<<std::endl;
+        //std::cout<<"Is reachable and norm2 is  "<< norm2<<std::endl;
         return true;
     }
-    else
-    {
-        std::cout<<"NOT reachable and norm2 is  "<< norm2<<std::endl;
-        return false;
-    }
+
+    //std::cout<<"NOT reachable and norm2 is  "<< norm2<<std::endl;
+    return false;
+
 }
 
 

@@ -69,7 +69,7 @@ namespace ompl
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 200;
 
-        static const double NUM_MONTE_CARLO_PARTICLES = 5;
+        static const double NUM_MONTE_CARLO_PARTICLES = 2;
 
         static const double EXTREMELY_HIGH_EDGE_COST = 1e6;
 
@@ -96,6 +96,8 @@ namespace ompl
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
         static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 100;
+
+        static const int STEPS_TO_ROLLOUT = 100;
     }
 }
 
@@ -914,8 +916,10 @@ void FIRM::executeFeedbackWithRollout(void)
 {
     sendFeedbackEdgesToViz();
 
-    Vertex start = startM_[0];
-    Vertex goal  = goalM_[0] ;
+    const Vertex start = startM_[0];
+    const Vertex goal  = goalM_[0] ;
+
+    ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
 
     siF_->setTrueState(stateProperty_[start]);
     siF_->setBelief(stateProperty_[start]);
@@ -935,18 +939,16 @@ void FIRM::executeFeedbackWithRollout(void)
 
     Vertex tempVertex;
 
+    OMPL_INFORM("Goal State is: \n");
+    si_->printState(goalState);
+
     // While the robot state hasn't reached the goal state, keep running
-    while(!stateProperty_[goal]->as<SE2BeliefSpace::StateType>()->isReached(cstartState) /*si_->distance(stateProperty_[currentVertex], stateProperty_[goal]) > 0.5*/)
+    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState) /*si_->distance(stateProperty_[currentVertex], stateProperty_[goal]) > 0.5*/)
     {
         //Edge e = feedback_[currentVertex];
         //Vertex targetNode = boost::target(e, g_);
 
         controller = edgeControllers_[e];
-
-        if(tempVertex)
-        {
-            boost::remove_vertex(tempVertex, g_);
-        }
 
         ompl::base::Cost cost;
 
@@ -956,7 +958,7 @@ void FIRM::executeFeedbackWithRollout(void)
             Whichever gives the lowest cost to go, is our new path.
             Do this at each step.
         */
-        controller.executeUpto(100,cstartState,cendState,cost,false);
+        controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT,cstartState,cendState,cost,false);
 
         ompl::base::State *tState = si_->allocState();
 
@@ -964,17 +966,20 @@ void FIRM::executeFeedbackWithRollout(void)
 
         tempVertex = addStateToGraph(cendState, false);
 
-        //solveDynamicProgram(goal);
-
         siF_->setTrueState(tState);
 
         si_->freeState(tState);
 
         e = generateRolloutPolicy(tempVertex);
 
+        boost::remove_vertex(tempVertex, g_);
+
         sendFeedbackEdgesToViz();
 
         si_->copyState(cstartState, cendState);
+
+        OMPL_INFORM("Goal State is: \n");
+        si_->printState(goalState);
 
     }
 
