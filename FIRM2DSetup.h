@@ -224,8 +224,8 @@ public:
 
     void executeSolution()
     {
-        //planner_->as<FIRM>()->executeFeedback();
-        planner_->as<FIRM>()->executeFeedbackWithRollout();
+        planner_->as<FIRM>()->executeFeedback();
+        //planner_->as<FIRM>()->executeFeedbackWithRollout();
 
     }
 

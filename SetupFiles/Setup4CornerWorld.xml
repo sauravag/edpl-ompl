@@ -140,7 +140,7 @@
 <ObservationModels>
   <CamAruco2DObservationModel
     sigma_range="0.05"
-    sigma_angle="0.5"
+    sigma_angle="1"
     eta_rd="0.0"
     eta_rphi = "0.0"
     eta_thetad="0.0"
