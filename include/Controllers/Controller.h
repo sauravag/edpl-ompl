@@ -382,7 +382,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
     si_->copyState(tempState, startState);
     ompl::base::State *tempEndState = si_->allocState();
 
-    //step_ = 0;
+    step_ = 0;
 
     while(step_ < numSteps)
     {
@@ -413,14 +413,6 @@ void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::S
 {
 
   ompl::control::Control* control = separatedController_.generateFeedbackControl(state/*, t*/);
-
-  if(control->as<ompl::control::RealVectorControlSpace::ControlType>()->values[0]==0)
-  {
-    std::cout<<"Purely rotational control, do not increment step_"<<std::endl;
-    step_--;
-    if(step_<0)
-        step_ = 0;
-  }
 
   si_->applyControl(control);
 
