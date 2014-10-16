@@ -69,7 +69,7 @@ namespace ompl
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 200;
 
-        static const double NUM_MONTE_CARLO_PARTICLES = 2;
+        static const double NUM_MONTE_CARLO_PARTICLES = 10;
 
         static const double EXTREMELY_HIGH_EDGE_COST = 1e6;
 
