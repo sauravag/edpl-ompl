@@ -50,6 +50,8 @@ firm::SpaceInformation::SpaceInformationPtr Visualizer::si_;
 
 std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::graphEdges_;
 
+std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::rolloutConnections_;
+
 std::vector<Visualizer::VZRFeedbackEdge> Visualizer::feedbackEdges_;
 
 Visualizer::VZRDrawingMode Visualizer::mode_;
@@ -66,16 +68,17 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
     double scale = 0.15;
 
     glPushMatrix();
+
+    glColor3d(0.0,0.0,1.0);
+
     glTranslated(landmark[1], landmark[2], 0.0);
     glVertex3f(0.8,0.8,0.8);
 
     glBegin(GL_TRIANGLE_FAN);
-        glColor3d(1.0,1.0,1.0);
         glVertex3f(0, scale, 0);
         glVertex3f(0.5*scale, 0, 0);
         glVertex3f(0, -scale, 0);
         glVertex3f(-0.5*scale, 0, 0);
-        glColor3d(1.0,1.0,1.0);
     glEnd();
 
     glPopMatrix();
@@ -84,7 +87,8 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
 
 void Visualizer::drawRobot(const ompl::base::State *state)
 {
-     if(robotIndx_ <=0)
+
+    if(robotIndx_ <=0)
     {
         robotIndx_ = renderGeom_->renderRobot();
     }
@@ -107,11 +111,11 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     switch(stateType)
     {
         case TrueState:
-            glColor3d(1.0,0.0,0.0); // red
+            glColor3d(1.0,0.0,0.0);
             break;
 
         case BeliefState:
-            glColor3d(0,0,1); // grey
+            glColor3d(1,0,0); // red
             break;
 
         case GraphNodeState:
@@ -119,7 +123,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
             break;
 
         default:
-            glColor3d(1.0,1.0,1.0); // white
+            glColor3d(1.0,1.0,1.0); // grey
             break;
     }
 
@@ -218,24 +222,36 @@ void Visualizer::refresh()
 
     drawEnvironment();
 
+    glDisable(GL_LIGHTING);
+
     switch(mode_)
     {
         case NodeViewMode:
+
             drawGraphBeliefNodes();
-            //DrawNodeViewMode();
+
             break;
+
         case FeedbackViewMode:
+
             drawGraphBeliefNodes();
+
             if(feedbackEdges_.size()>0) drawFeedbackEdges();
-            //DrawFeedbackViewMode();
+
             break;
+
         case PRMViewMode:
+
             drawGraphBeliefNodes();
+
             if(graphEdges_.size()>0) drawGraphEdges();
-            //DrawPRMViewMode();
+
             break;
+
         default:
+
             assert(!"There is no default drawing mode for OGLDisplay");
+
             exit(1);
     }
 
@@ -245,9 +261,17 @@ void Visualizer::refresh()
         drawLandmark(landmarks_[i]);
     }
 
-    if(trueState_) drawRobot(trueState_);
+    if(trueState_)
+    {
+        drawRobot(trueState_);
+    }
 
-    if(currentBelief_) drawState(currentBelief_, (VZRStateType)1);
+    if(currentBelief_)
+    {
+        drawState(currentBelief_, (VZRStateType)1);
+    }
+
+    drawRolloutConnections();
 
     glPopMatrix();
 }
@@ -319,15 +343,16 @@ void Visualizer::drawGraphEdges()
     }
 }
 
-/**
-void Visualizer::drawFeedbackEdges()
+
+void Visualizer::drawRolloutConnections()
 {
-    for(int i=0; i<feedbackEdges_.size();i++)
+    glColor3d(1.0,0,0);
+    for(int i=0; i<rolloutConnections_.size();i++)
     {
-        drawEdge(feedbackEdges_[i].source,feedbackEdges_[i].target);
+        drawEdge(rolloutConnections_[i].first,rolloutConnections_[i].second);
     }
 }
-*/
+
 void Visualizer::drawFeedbackEdges()
 {
     using namespace arma;
@@ -341,7 +366,8 @@ void Visualizer::drawFeedbackEdges()
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
         double costFactor = sqrt(i->cost/maxCost);
-        //glColor3d(1.0,1.0,0.0);
+        glColor3d(1.0,1.0,0.0);
+
         glLineWidth(3.0);
             drawEdge(i->source, i->target);
         glLineWidth(1.f);

@@ -67,6 +67,7 @@ namespace firm
             {
                 trueState_ = this->allocState();
                 belief_    = this->allocState();
+                showRobot_ = true;
             }
 
 
@@ -113,6 +114,11 @@ namespace firm
 
             ObservationType getObservation() ;
 
+            void showRobotVisualization(bool flag)
+            {
+                showRobot_ = flag;
+            }
+
 
         protected:
 
@@ -120,6 +126,7 @@ namespace firm
             MotionModelPointer motionModel_; // a model of the robot's motion
             ompl::base::State *trueState_; // The real state of the robot
             ompl::base::State *belief_; // the estimated state of the robot
+            bool showRobot_;
 
 
 

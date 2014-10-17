@@ -40,13 +40,21 @@
 void firm::SpaceInformation::setBelief(const ompl::base::State *state)
 {
     this->copyState(belief_, state);
-    Visualizer::updateCurrentBelief(belief_);
+
+    if(showRobot_)
+    {
+        Visualizer::updateCurrentBelief(belief_);
+    }
 }
 
 void firm::SpaceInformation::setTrueState(const ompl::base::State *state)
 {
     this->copyState(trueState_, state);
-    Visualizer::updateTrueState(trueState_);
+
+    if(showRobot_)
+    {
+        Visualizer::updateTrueState(trueState_);
+    }
 }
 
 void firm::SpaceInformation::applyControl(const ompl::control::Control *control, bool withNoise)
@@ -64,7 +72,12 @@ void firm::SpaceInformation::applyControl(const ompl::control::Control *control,
 
     motionModel_->Evolve(trueState_, control, noise, trueState_);
 
-    Visualizer::updateTrueState(trueState_);
+    if(showRobot_)
+    {
+        Visualizer::updateTrueState(trueState_);
+    }
+
+
 }
 
 ObservationModelMethod::ObservationType firm::SpaceInformation::getObservation()

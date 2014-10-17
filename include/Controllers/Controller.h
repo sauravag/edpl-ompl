@@ -78,7 +78,7 @@ class Controller
                    bool constructionMode=true);
 
         /** \brief Execute the controller for one step */
-         virtual bool executeOneStep(const ompl::base::State *startState,
+         virtual bool executeOneStep(const int k, const ompl::base::State *startState,
                    ompl::base::State* endState,
                    ompl::base::Cost &executionCost,
                    bool constructionMode=true);
@@ -167,7 +167,7 @@ class Controller
         /** \brief  The debug mode, if true, controller is verbose.*/
       	bool debug_;
 
-      	unsigned int step_;
+      	//unsigned int step_;
 
 };
 
@@ -220,7 +220,7 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
 
   debug_ = false;
 
-  step_ = 0;
+  //step_ = 0;
 
 }
 
@@ -313,15 +313,12 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
 
 template <class SeparatedControllerType, class FilterType>
-bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const ompl::base::State *startState,
+bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k, const ompl::base::State *startState,
                                                               ompl::base::State* endState,
                                                               ompl::base::Cost &executionCost,
                                                               bool constructionMode)
 {
     using namespace std;
-
-    unsigned int k = step_;
-
 
     //HOW TO SET INITAL VALUE OF COST
     //cost = 1 ,for time based only if time per execution is "1"
@@ -382,13 +379,17 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
     si_->copyState(tempState, startState);
     ompl::base::State *tempEndState = si_->allocState();
 
-    step_ = 0;
+    //step_ = 0;
 
-    while(step_ < numSteps)
+    int k = 0;
+
+    while(k < numSteps)
     {
-        bool e = executeOneStep(tempState,tempEndState, executionCost, constructionMode);
+        bool e = executeOneStep(k, tempState,tempEndState, executionCost, constructionMode);
 
-        step_++;
+        k++;
+
+        //step_++;
 
         si_->copyState(tempState, tempEndState);
         si_->copyState(endState, tempEndState);
@@ -400,7 +401,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
             return false;
         }
 
-        std::cout<<"The step_ value is: "<<step_<<std::endl;
+        std::cout<<"The step_ value is: "<<k<<std::endl;
     }
 
     si_->freeState(tempEndState);
@@ -414,6 +415,18 @@ void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::S
 
   ompl::control::Control* control = separatedController_.generateFeedbackControl(state/*, t*/);
 
+/*
+  const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
+
+  if(conVals[0]==0)
+  {
+    step_--;
+    if(step_<0)
+    {
+        step_= 0;
+    }
+  }
+*/
   si_->applyControl(control);
 
   ObservationType zCorrected = si_->getObservation();

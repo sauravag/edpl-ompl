@@ -425,6 +425,8 @@ private:
 
     ompl::base::State *kidnappedState_;
 
+    void showRolloutConnections(const Vertex v);
+
 };
 
 

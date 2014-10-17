@@ -52,6 +52,7 @@
 
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
+#define SHOW_MONTE_CARLO False
 
 namespace ompl
 {
@@ -64,7 +65,7 @@ namespace ompl
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;//10
 
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 200;
@@ -461,6 +462,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     // Which milestones will we attempt to connect to?
     const std::vector<Vertex>& neighbors = connectionStrategy_(m);
+    showRolloutConnections(m);
 
     foreach (Vertex n, neighbors)
     {
@@ -576,13 +578,19 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
     ompl::base::Cost edgeCost(0);
     ompl::base::Cost nodeStabilizationCost(0);
 
+    // if want/do not want to show monte carlo sim
+    siF_->showRobotVisualization(SHOW_MONTE_CARLO);
+
     for(unsigned int i=0; i< numParticles_;i++)
     {
-        //cout << "MonteCarlo Simulation particle number "<< i<<endl;
+
+
         siF_->setTrueState(startNodeState);
+
         siF_->setBelief(startNodeState);
 
         ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
+
         ompl::base::Cost pcost(0);
 
         if(edgeController.Execute(startNodeState, endBelief, pcost))
@@ -594,6 +602,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
         }
 
     }
+    siF_->showRobotVisualization(true);
 
     if (successCount > 0)  edgeCost.v = edgeCost.v / successCount ;
     else edgeCost.v = ompl::magic::EXTREMELY_HIGH_EDGE_COST; // extremely high cost if no particle could succeed, we can also simply not add this edge
@@ -941,20 +950,16 @@ void FIRM::executeFeedbackWithRollout(void)
     si_->printState(goalState);
 
     // While the robot state hasn't reached the goal state, keep running
-    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState) /*si_->distance(stateProperty_[currentVertex], stateProperty_[goal]) > 0.5*/)
+    while(/*!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)*/ si_->distance(cstartState, stateProperty_[goal]) > 0.2)
     {
-        //Edge e = feedback_[currentVertex];
-        //Vertex targetNode = boost::target(e, g_);
 
         EdgeControllerType controller = edgeControllers_[e];
 
         ompl::base::Cost cost;
 
         /**
-            Instead of executing the entire controller, we need to
-            execute one step, then calculate the cost to go through the neighboring nodes.
-            Whichever gives the lowest cost to go, is our new path.
-            Do this at each step.
+            Instead of executing the entire controller, we need to execute N steps, then calculate the cost to go through the neighboring nodes.
+            Whichever gives the lowest cost to go, is our new path. Do this at every N steps.
         */
         controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT,cstartState,cendState,cost,false);
 
@@ -976,12 +981,21 @@ void FIRM::executeFeedbackWithRollout(void)
 
         si_->copyState(cstartState, cendState);
 
-        OMPL_INFORM("Goal State is: \n");
-        si_->printState(goalState);
-
     }
 
 
+}
+
+void FIRM::showRolloutConnections(const FIRM::Vertex v)
+{
+    Visualizer::clearRolloutConnections();
+
+    const std::vector<Vertex>& neighbors = connectionStrategy_(v);
+
+    foreach (Vertex n, neighbors)
+    {
+        Visualizer::addRolloutConnection(stateProperty_[v], stateProperty_[n]);
+    }
 }
 
 void FIRM::addStateToVisualization(ompl::base::State *state)
@@ -1000,9 +1014,10 @@ void FIRM::sendFeedbackEdgesToViz()
         sourceVertex = i->first;
         edge = i->second;
         targetVertex = boost::target(edge, g_);
-        //TODO: some random target vertex which is not in graph is being assigned, why?
+
         Visualizer::addFeedbackEdge(stateProperty_[sourceVertex], stateProperty_[targetVertex], 0);
   }
+
 }
 
 
@@ -1010,7 +1025,6 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
 {
     /**
         For the given node, find the out edges and see the total cost of taking that edge
-
         The cost of taking the edge is cost to go from the target of the edge + the cost of the edge itself
     */
     double minCost = 1e10;
@@ -1127,9 +1141,6 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 
             newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
             newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
-
-            //std::cout<<"Adding state from XML --> \n";
-            //siF_->printState(newState);
 
             Vertex v = addStateToGraph(siF_->cloneState(newState));
 

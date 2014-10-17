@@ -190,7 +190,8 @@ void GLWidget::ChangeMode(int mode)
 void GLWidget::initializeGL()
 {
     glClearColor(0.5,0.5,0.5,1.);
-    glEnable(GL_LIGHTING);
+    glDisable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
     glEnable(GL_DEPTH_TEST);
@@ -209,7 +210,7 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glClearColor(0.0, 1.0, 0.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
 
     //projection
     glMatrixMode(GL_PROJECTION);

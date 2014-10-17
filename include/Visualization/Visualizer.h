@@ -130,6 +130,15 @@ class Visualizer
             feedbackEdges_.push_back(edge);
         }
 
+        /** \brief Add a rollout connection to the visualization */
+        static void addRolloutConnection(const ompl::base::State *source, const ompl::base::State *target)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+            edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
+            rolloutConnections_.push_back(edge);
+        }
+
         static void setMode(VZRDrawingMode mode)
         {
             mode_ = mode;
@@ -139,6 +148,12 @@ class Visualizer
         {
             boost::mutex::scoped_lock sl(drawMutex_);
             feedbackEdges_.clear();
+        }
+
+        static void clearRolloutConnections()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            rolloutConnections_.clear();
         }
 
 
@@ -201,7 +216,11 @@ class Visualizer
         /** \brief Draw the edges in the roadmap graph */
         static void drawGraphEdges();
 
+        /** \brief Draw graph feedback edges */
         static void drawFeedbackEdges();
+
+        /** \brief Draw rollout connections */
+        static void drawRolloutConnections();
 
         /** \brief Draw the X&Y bounds*/
         static void drawEnvironment();
@@ -234,6 +253,10 @@ class Visualizer
 
         /** \brief Store the Roadmap graph edges */
         static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > graphEdges_;
+
+
+         /** \brief Store the Rollout connections */
+        static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > rolloutConnections_;
 
         /** \brief Store the feedback edges */
         static std::vector<VZRFeedbackEdge> feedbackEdges_;
