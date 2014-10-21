@@ -124,6 +124,8 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     minFIRMNodes_ = 25;
 
+    currentTimeStep_ = 0;
+
     policyGenerator_ = new MMPolicyGenerator(si);
 
     loadedRoadmapFromFile_ = false;
@@ -593,7 +595,9 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
         ompl::base::Cost pcost(0);
 
-        if(edgeController.Execute(startNodeState, endBelief, pcost))
+        int stepsExecuted = 0;
+
+        if(edgeController.Execute(startNodeState, endBelief, pcost, stepsExecuted))
         {
            successCount++;
 
@@ -842,13 +846,25 @@ void FIRM::executeFeedback(void)
 
     int kidnappingCounter  = 0;
 
+    currentTimeStep_ = 0;
+
     while(currentVertex != goal)
     {
+        costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
+
         Edge e = feedback_[currentVertex];
+
         controller = edgeControllers_[e];
+
         ompl::base::Cost cost;
 
-        if(controller.Execute(cstartState, cendState, cost, false))
+        int stepsExecuted=0;
+
+        bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, false);
+
+        currentTimeStep_ += stepsExecuted;
+
+        if(controllerStatus)
         {
             currentVertex = boost::target(e, g_);
         }
@@ -883,6 +899,7 @@ void FIRM::executeFeedback(void)
         3. Sample modes and run policygen till you converge to one mode
         4. get back to policy execution
         */
+        /*
         if(si_->distance(cstartState,stateProperty_[goal]) < 6.0 && !kidnapped_flag && kidnappingCounter < 1)
         {
             std::cout<<"Before Simulated Kidnapping! (Press Enter) \n";
@@ -914,12 +931,17 @@ void FIRM::executeFeedback(void)
 
             kidnapped_flag = false;
         }
+        */
 
         si_->copyState(cstartState, cendState);
+
+        costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
 
     }
 
+
+    writeCostToGoHistoryToFile("StandardFIRMCostHistory.csv");
 
 }
 
@@ -951,7 +973,12 @@ void FIRM::executeFeedbackWithRollout(void)
     Vertex tempVertex;
 
     OMPL_INFORM("Goal State is: \n");
+
     si_->printState(goalState);
+
+    currentTimeStep_ = 0;
+
+    costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[start]));
 
     // While the robot state hasn't reached the goal state, keep running
     while(/*!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)*/ si_->distance(cstartState, stateProperty_[goal]) > 0.2)
@@ -965,7 +992,11 @@ void FIRM::executeFeedbackWithRollout(void)
             Instead of executing the entire controller, we need to execute N steps, then calculate the cost to go through the neighboring nodes.
             Whichever gives the lowest cost to go, is our new path. Do this at every N steps.
         */
-        controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT,cstartState,cendState,cost,false);
+        int stepsExecuted = 0;
+
+        controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT,cstartState,cendState,cost,stepsExecuted, false);
+
+        currentTimeStep_ += stepsExecuted;
 
         ompl::base::State *tState = si_->allocState();
 
@@ -991,7 +1022,9 @@ void FIRM::executeFeedbackWithRollout(void)
 
     }
 
+    costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
+    writeCostToGoHistoryToFile("RolloutFIRMCostHistory.csv");
 }
 
 void FIRM::showRolloutConnections(const FIRM::Vertex v)
@@ -1083,6 +1116,8 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
         }
 
     }
+
+    costToGoHistory_.push_back(std::make_pair(currentTimeStep_,minCost));
 
     return edgeToTake;
 }

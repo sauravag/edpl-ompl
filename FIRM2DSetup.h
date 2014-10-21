@@ -222,11 +222,16 @@ public:
         return planner_->solve(planningTime_);
     }
 
-    void executeSolution()
+    void executeSolution(int choice=0)
     {
-        //planner_->as<FIRM>()->executeFeedback();
-        planner_->as<FIRM>()->executeFeedbackWithRollout();
-
+        if(choice==1)
+        {
+            planner_->as<FIRM>()->executeFeedbackWithRollout();
+        }
+        else
+        {
+            planner_->as<FIRM>()->executeFeedback();
+        }
     }
 
 

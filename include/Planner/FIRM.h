@@ -417,7 +417,19 @@ protected:
     /** \brief Send the most likely path to visualizer based on start location*/
     void sendMostLikelyPathToViz(const Vertex start, const Vertex goal);
 
+    void writeCostToGoHistoryToFile(std::string fname)
+    {
+        std::ofstream outfile;
 
+        outfile.open(fname);
+
+        for(int i=0; i < costToGoHistory_.size(); i++)
+        {
+            outfile<<costToGoHistory_[i].first<<","<<costToGoHistory_[i].second<<std::endl;
+        }
+
+        outfile.close();
+    }
 
 private:
 
@@ -430,6 +442,10 @@ private:
     ompl::base::State *kidnappedState_;
 
     void showRolloutConnections(const Vertex v);
+
+    std::vector<std::pair<int, float> > costToGoHistory_;
+
+    int currentTimeStep_;
 
 };
 

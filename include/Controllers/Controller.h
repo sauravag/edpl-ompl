@@ -75,6 +75,7 @@ class Controller
         virtual bool Execute(const ompl::base::State *startState,
                    ompl::base::State* endState,
                    ompl::base::Cost &executionCost,
+                   int &stepsTaken,
                    bool constructionMode=true);
 
         /** \brief Execute the controller for one step */
@@ -87,12 +88,14 @@ class Controller
          virtual bool executeUpto(const int numSteps, const ompl::base::State *startState,
                    ompl::base::State* endState,
                    ompl::base::Cost &executionCost,
+                   int &stepsTaken,
                    bool constructionMode=true);
 
         /** \brief Stabilize the system to an existing FIRM node */
         virtual void  Stabilize(const ompl::base::State *startState,
                                               ompl::base::State* endState,
                                               ompl::base::Cost &stabilizationCost,
+                                              int &stepsToStabilize,
                                               bool constructionMode=true);
 
         /** \brief Check whether the controller has satisfied its termination condition for e.g. reached target state*/
@@ -229,6 +232,7 @@ template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *startState,
                                                               ompl::base::State* endState,
                                                               ompl::base::Cost &executionCost,
+                                                              int &stepsTaken,
                                                               bool constructionMode)
 {
   using namespace std;
@@ -280,6 +284,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     {
 
         si_->copyState(endState, internalState);
+
         return false;
 
     }
@@ -301,11 +306,16 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
   //si_->copyState(endState, tempEndState);
 
-  this->Stabilize(tempEndState, endState, stabilizationCost, constructionMode) ;
+  int stepsToStabilize=0;
+
+  this->Stabilize(tempEndState, endState, stabilizationCost, stepsToStabilize, constructionMode) ;
 
   executionCost.v = cost + stabilizationCost.v;
 
+  stepsTaken = k+stepsToStabilize;
+
   si_->freeState(internalState);
+
   si_->freeState(tempEndState);
 
   return true ;
@@ -373,13 +383,14 @@ template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numSteps, const ompl::base::State *startState,
                                                               ompl::base::State* endState,
                                                               ompl::base::Cost &executionCost,
+                                                              int &stepsTaken,
                                                               bool constructionMode)
 {
     ompl::base::State *tempState = si_->allocState();
-    si_->copyState(tempState, startState);
-    ompl::base::State *tempEndState = si_->allocState();
 
-    //step_ = 0;
+    si_->copyState(tempState, startState);
+
+    ompl::base::State *tempEndState = si_->allocState();
 
     int k = 0;
 
@@ -389,23 +400,27 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
 
         k++;
 
-        //step_++;
-
         si_->copyState(tempState, tempEndState);
+
         si_->copyState(endState, tempEndState);
 
         if(!e)
         {
             si_->freeState(tempEndState);
+
             si_->freeState(tempState);
+
             return false;
         }
 
-        std::cout<<"The step_ value is: "<<k<<std::endl;
     }
 
     si_->freeState(tempEndState);
+
     si_->freeState(tempState);
+
+    stepsTaken = k;
+
     return true;
 }
 
@@ -468,6 +483,7 @@ template <class SeparatedControllerType, class FilterType>
 void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base::State *startState,
                                                                               ompl::base::State* endState,
                                                                               ompl::base::Cost &stabilizationCost,
+                                                                              int &stepsToStabilize,
                                                                               bool constructionMode)
 {
 
@@ -506,6 +522,7 @@ void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
    si_->freeState(tempState1);
    si_->freeState(tempState2);
    tries_ = 0;
+   stepsToStabilize = k;
 
 }
 
