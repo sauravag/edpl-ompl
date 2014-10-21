@@ -167,6 +167,8 @@ class Visualizer
             chosenRolloutConnection_ = edge;
         }
 
+        static void drawRobotPath();
+
         static void setMode(VZRDrawingMode mode)
         {
             mode_ = mode;
@@ -305,6 +307,9 @@ class Visualizer
 
         /** \brief Store the feedback edges */
         static std::vector<VZRFeedbackEdge> feedbackEdges_;
+
+        /** \brief stores the sequence of states of the real robot */
+        static std::vector<const ompl::base::State*> robotPath_;
 
         /** \brief Visualizer drawing mode setting */
         static VZRDrawingMode mode_;

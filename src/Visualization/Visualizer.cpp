@@ -58,6 +58,8 @@ std::vector<Visualizer::VZRFeedbackEdge> Visualizer::feedbackEdges_;
 
 boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::chosenRolloutConnection_;
 
+std::vector<const ompl::base::State*> Visualizer::robotPath_;
+
 Visualizer::VZRDrawingMode Visualizer::mode_;
 
 ompl::app::RenderGeometry* Visualizer::renderGeom_;
@@ -269,6 +271,10 @@ void Visualizer::refresh()
                 glLineWidth(1.0);
             }
 
+            robotPath_.push_back(si_->cloneState(trueState_));
+
+            drawRobotPath();
+
             break;
 
         default:
@@ -419,6 +425,19 @@ void Visualizer::drawMostLikelyPath()
     }
 }
 
+void Visualizer::drawRobotPath()
+{
+    glDisable(GL_LIGHTING);
+
+    for(int i=0; i<robotPath_.size()-1;i++)
+    {
+        glColor3d(1.0 , 1.0 , 1.0);
+
+        glLineWidth(4.0);
+            drawEdge(robotPath_[i],robotPath_[i+1]);
+        glLineWidth(1.f);
+    }
+}
 
 
 
