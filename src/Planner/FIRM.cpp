@@ -822,6 +822,8 @@ void FIRM::executeFeedback(void)
     Vertex start = startM_[0];
     Vertex goal  = goalM_[0] ;
 
+    sendMostLikelyPathToViz(start, goal);
+
     siF_->setTrueState(stateProperty_[start]);
     siF_->setBelief(stateProperty_[start]);
 
@@ -923,10 +925,12 @@ void FIRM::executeFeedback(void)
 
 void FIRM::executeFeedbackWithRollout(void)
 {
-    sendFeedbackEdgesToViz();
+    Visualizer::setMode(Visualizer::VZRDrawingMode::RolloutMode);
 
     const Vertex start = startM_[0];
     const Vertex goal  = goalM_[0] ;
+
+    sendMostLikelyPathToViz(start, goal);
 
     ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
 
@@ -975,6 +979,10 @@ void FIRM::executeFeedbackWithRollout(void)
 
         e = generateRolloutPolicy(tempVertex);
 
+        // clear the rollout candidate connection drawings and show the selected edge
+        Visualizer::clearRolloutConnections();
+        Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[boost::target(e,g_)]);
+
         boost::remove_vertex(tempVertex, g_);
 
         sendFeedbackEdgesToViz();
@@ -1020,6 +1028,25 @@ void FIRM::sendFeedbackEdgesToViz()
 
 }
 
+void FIRM::sendMostLikelyPathToViz(const FIRM::Vertex start, const FIRM::Vertex goal)
+{
+    Visualizer::clearMostLikelyPath();
+
+    Vertex v = start;
+
+    while(v != goal)
+    {
+        Vertex targetVertex;
+
+        Edge edge = feedback_[v];
+
+        targetVertex = boost::target(edge, g_);
+
+        Visualizer::addMostLikelyPathEdge(stateProperty_[v], stateProperty_[targetVertex]);
+
+        v = targetVertex;
+    }
+}
 
 FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
 {

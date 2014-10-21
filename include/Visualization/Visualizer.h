@@ -73,7 +73,8 @@ class Visualizer
         {
             NodeViewMode,
             FeedbackViewMode,
-            PRMViewMode
+            PRMViewMode,
+            RolloutMode
         };
 
         struct VZRFeedbackEdge
@@ -109,8 +110,11 @@ class Visualizer
         static void addGraphEdge(const ompl::base::State *source, const ompl::base::State *target)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
+
             std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+
             edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
+
             graphEdges_.push_back(edge);
         }
 
@@ -134,9 +138,33 @@ class Visualizer
         static void addRolloutConnection(const ompl::base::State *source, const ompl::base::State *target)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
+
             std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+
             edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
+
             rolloutConnections_.push_back(edge);
+        }
+
+         /** \brief Add a rollout connection to the visualization */
+        static void addMostLikelyPathEdge(const ompl::base::State *source, const ompl::base::State *target)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+
+            std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+
+            edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
+
+            mostLikelyPath_.push_back(edge);
+        }
+
+        static void setChosenRolloutConnection(const ompl::base::State *source, const ompl::base::State *target)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+
+            boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > edge(std::make_pair(si_->cloneState(source),si_->cloneState(target)));
+
+            chosenRolloutConnection_ = edge;
         }
 
         static void setMode(VZRDrawingMode mode)
@@ -154,6 +182,12 @@ class Visualizer
         {
             boost::mutex::scoped_lock sl(drawMutex_);
             rolloutConnections_.clear();
+        }
+
+         static void clearMostLikelyPath()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            mostLikelyPath_.clear();
         }
 
 
@@ -180,8 +214,11 @@ class Visualizer
         static void updateSpaceInformation(const firm::SpaceInformation::SpaceInformationPtr si)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
+
             si_ = si;
+
             trueState_ = si_->allocState();
+
             currentBelief_ = si->allocState();
         }
 
@@ -222,6 +259,9 @@ class Visualizer
         /** \brief Draw rollout connections */
         static void drawRolloutConnections();
 
+        /** \brief Draw the most likely path under FIRM */
+        static void drawMostLikelyPath();
+
         /** \brief Draw the X&Y bounds*/
         static void drawEnvironment();
 
@@ -254,9 +294,14 @@ class Visualizer
         /** \brief Store the Roadmap graph edges */
         static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > graphEdges_;
 
-
-         /** \brief Store the Rollout connections */
+        /** \brief Store the Rollout connections */
         static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > rolloutConnections_;
+
+        /** \brief Store the Rollout connections */
+        static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > mostLikelyPath_;
+
+        /** \brief The rollout connection that gets chosen as the next target*/
+        static boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> >chosenRolloutConnection_;
 
         /** \brief Store the feedback edges */
         static std::vector<VZRFeedbackEdge> feedbackEdges_;

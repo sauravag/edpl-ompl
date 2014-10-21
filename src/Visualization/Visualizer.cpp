@@ -52,7 +52,11 @@ std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visu
 
 std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::rolloutConnections_;
 
+std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::mostLikelyPath_;
+
 std::vector<Visualizer::VZRFeedbackEdge> Visualizer::feedbackEdges_;
+
+boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::chosenRolloutConnection_;
 
 Visualizer::VZRDrawingMode Visualizer::mode_;
 
@@ -246,6 +250,25 @@ void Visualizer::refresh()
 
             if(graphEdges_.size()>0) drawGraphEdges();
 
+            drawMostLikelyPath();
+
+            break;
+
+        case RolloutMode:
+
+            drawRolloutConnections();
+
+            drawMostLikelyPath();
+
+            // draw the rollout connection with lowest cost
+            if(chosenRolloutConnection_)
+            {
+                glColor3d(0.0 , 1.0 , 0.0);
+                glLineWidth(2.0);
+                drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
+                glLineWidth(1.0);
+            }
+
             break;
 
         default:
@@ -270,8 +293,6 @@ void Visualizer::refresh()
     {
         drawState(currentBelief_, (VZRStateType)1);
     }
-
-    drawRolloutConnections();
 
     glPopMatrix();
 }
@@ -346,9 +367,11 @@ void Visualizer::drawGraphEdges()
 
 void Visualizer::drawRolloutConnections()
 {
-    glColor3d(1.0,0,0);
+    glDisable(GL_LIGHTING);
+
     for(int i=0; i<rolloutConnections_.size();i++)
     {
+        glColor3d(1.0,0.0,0);
         drawEdge(rolloutConnections_[i].first,rolloutConnections_[i].second);
     }
 }
@@ -365,15 +388,36 @@ void Visualizer::drawFeedbackEdges()
 
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
-        double costFactor = sqrt(i->cost/maxCost);
-        glColor3d(1.0,1.0,0.0);
+        std::pair<const ompl::base::State*, const ompl::base::State*> vertexPair = std::make_pair(i->source, i->target);
 
-        glLineWidth(3.0);
-            drawEdge(i->source, i->target);
-        glLineWidth(1.f);
+        std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> >::iterator it = std::find(mostLikelyPath_.begin(), mostLikelyPath_.end(), vertexPair);
+
+        // if this pair does not exist in most likely path, then draw it, other we will only draw it in most likely path
+        if( it == mostLikelyPath_.end())
+        {
+            double costFactor = sqrt(i->cost/maxCost);
+            glColor3d(0.0,1.0,0.0);
+
+            glLineWidth(1.0);
+                drawEdge(i->source, i->target);
+            glLineWidth(1.f);
+        }
     }
 }
 
+void Visualizer::drawMostLikelyPath()
+{
+    glDisable(GL_LIGHTING);
+
+    for(int i=0; i<mostLikelyPath_.size();i++)
+    {
+        glColor3d(1.0 , 1.0 , 0.0);
+
+        glLineWidth(4.0);
+            drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
+        glLineWidth(1.f);
+    }
+}
 
 
 

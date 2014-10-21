@@ -414,6 +414,10 @@ protected:
 
     std::vector<std::pair<std::pair<int,int>,FIRMWeight> > loadedEdgeProperties_;
 
+    /** \brief Send the most likely path to visualizer based on start location*/
+    void sendMostLikelyPathToViz(const Vertex start, const Vertex goal);
+
+
 
 private:
 

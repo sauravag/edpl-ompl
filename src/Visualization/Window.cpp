@@ -55,6 +55,7 @@ MyWindow::MyWindow()
   modeComboBox->addItem("Nodes");
   modeComboBox->addItem("Feedback");
   modeComboBox->addItem("PRM");
+  modeComboBox->addItem("Rollout");
 
   glWidget_ = new GLWidget(this);
 
