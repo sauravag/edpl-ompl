@@ -935,10 +935,9 @@ void FIRM::executeFeedback(void)
 
         si_->copyState(cstartState, cendState);
 
-        costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
-
-
     }
+
+    costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
 
     writeCostToGoHistoryToFile("StandardFIRMCostHistory.csv");
