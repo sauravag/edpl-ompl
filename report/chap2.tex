@@ -147,7 +147,7 @@ landmarks do they see. The weight of the edge is the number of overlapping landm
 Therefore higher weight means that they see more of the same thing.
 
 Then to find the target for a belief, we search for the nodes in its neighborhood(within some radius r,or some fixed
-n number of closes nodes) and repeat this process to find the neighboring nodes NN= {N_1.N_2...} for each belief.
+n number of closes nodes) and repeat this process to find the neighboring nodes $NN= {N_1.N_2...}$ for each belief.
 Then for each neighborhood, find the node in the neighborhood that has the least edgeweight to the other neighborhoods.
 
 
@@ -160,3 +160,71 @@ The functions required would be:
        to sum up the weights of the edges of each node with nodes in all the other nodes in the neighborhoods belonging to set N. Then
        see which node has the lowest sum, that is the least similar in appearance to the nodes in the other neighborhoods.
 \end{enumerate}
+
+\section{How to save/load the graph from an XML}
+
+\subsection{How to save}
+
+\subsection{How to load}
+
+\begin{enumerate}
+ \item We pass the name of the file to load to the planner
+ \item A special function in the planner calls the FIRMUtility function to read that file and store the information.
+ \item FIRMUtility returns a vector of the ompl::base::States* and a vector of FIRMWeights and some mapping of the start and goal vertex for that edge weight
+ \item First the states are all added in a for loop. (But this could screw up some other stuff)
+ \item Or we individually add the state one by one and just like the standard implementation, find its neighbors and when the time comes to add the edge weight, we load it up from the 
+       XML.We match the start id and end id, then return the corresponding weight. It could be a standard map from pair<Vertex,Vertex> to a FIRMWeight object.
+\end{enumerate}
+
+To the write function we pass two arguments:
+
+1. First argument is a vector of pairs of the node id and the node state. The node state itself is a pair representing the colvec of x,y,z and the covariance matrix.
+
+
+\section{Testing different Scenarios}
+
+\subsection{Current Issues}
+
+\begin{enumerate}
+ \item In some locations, after sampling, the belief doesn't show up in locations where the robot could be. Possible reasons could be:
+      \begin{enumerate}
+       \item The sampling is not dense enough
+       \item The information geometry is not correct, i.e. it isnt exactly the same in each supposedly same location.
+      \end{enumerate}
+
+
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

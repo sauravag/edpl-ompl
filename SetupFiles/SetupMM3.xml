@@ -9,10 +9,10 @@
 <landmark id = 3 x = 1 y = 4 theta = 0.5 />
 <landmark id = 3 x = 7 y = 4 theta = 0.5 />
 <landmark id = 3 x = 14 y = 4 theta = 0.5 />
-<landmark id = 1023 x = 1 y = 1 theta = 0.5 />
-<landmark id = 1023 x = 7 y = 1 theta = 0.5 />
-<landmark id = 1023 x = 14 y = 1 theta = 0.5 />
-<landmark id = 1025 x = 1 y = 0 theta = 0.5 />
+<landmark id = 100 x = 1 y = 1 theta = 0.5 />
+<landmark id = 101 x = 7 y = 1 theta = 0.5 />
+<landmark id = 102 x = 14 y = 1 theta = 0.5 />
+<landmark id = 103 x = 1 y = 0 theta = 0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
@@ -76,13 +76,14 @@
     <belief x = 13.0 y = 5.9 theta = 1.59 />
 </BeliefList>
 <TargetList>
-    <target x = 2.0  y = 19.0  theta = 1.57 /> 
-    <target x = 7.5  y = 19.0  theta = 1.57 /> 
-    <target x = 13.0 y = 19.0  theta = 1.57 /> 
+    <target x = 1.0  y = 1.0  theta = 1.57 /> 
+    <target x = 7    y = 1.0  theta = 1.57 /> 
+    <target x = 14.0 y = 1.0  theta = 1.57 /> 
+    <target x = 1.0 y = 0.0  theta = 1.57 /> 
 </TargetList>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/MMEnvExp1.obj"
+        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/MMEnvExp3.obj"
     />
     <Robot
         robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"

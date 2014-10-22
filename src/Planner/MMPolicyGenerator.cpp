@@ -32,15 +32,20 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+/* Author: Saurav Agarwal */
+
 #include "../../include/Planner/MMPolicyGenerator.h"
 #include <boost/thread.hpp>
 #include "../../include/Visualization/Visualizer.h"
 #include "../../include/Utils/FIRMUtils.h"
 #include <boost/foreach.hpp>
 #include "../../include/ObservationModels/CamAruco2DObservationModel.h"
+#include "../../include/LinearSystem/LinearSystem.h"
+#include <numeric>
 
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
+
 
 namespace ompl
 {
@@ -48,47 +53,182 @@ namespace ompl
     {
         static const double COLISSION_FAILURE_COST  = 1e6;// cost of colliding
 
-        static const double RRT_PLAN_MAX_TIME = 2.0; // maximum time allowed for RRT to plan
+        static const double RRT_PLAN_MAX_TIME = 1.0; // maximum time allowed for RRT to plan
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 20.0 ; // range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 15.0 ; // range within which to find neighbors
+
+        static const float MIN_ROBOT_CLEARANCE = 0.30;
+
+        static const double SIGMA_RANGE = 0.5;// meters
+
+        static const double SIGMA_THETA = 0.2; // radians
+
+        static const double MODE_DELETION_THRESHOLD = 1e-4; // the percentage of weight a mode should hold, below which it gets deleted
+
+        static const double ZERO_CONTROL_UPDATE_TIME = 1.0 ;
+
+        static const double SAMPLING_ROTATION_SPACING = 5.0; // degrees
+
+        static const double SAMPLING_GRID_SIZE = 0.50 ; // meters
     }
 }
 
-void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
+void MMPolicyGenerator::sampleNewBeliefStates()
 {
-    this->updateWeights();
+    /**
+    Logic:
+    1. Grid the environment
+    2. At each point in grid, put a robot with periodic orientations (10 degree spacing)
+    */
+    //Make sure the current states and weights are cleared out
+    currentBeliefStates_.clear();
+    weights_.clear();
+
+    ompl::base::StateSpacePtr sp = si_->getStateSpace();
+    ompl::base::RealVectorBounds bounds = sp->as<SE2BeliefSpace>()->getBounds();
+
+    //Get the environment boundaries
+    double X_1 = bounds.low[0];
+    double X_2 = bounds.high[0];
+    double Y_1 = bounds.low[1];
+    double Y_2 = bounds.high[1];
+
+    double spacing = ompl::magic::SAMPLING_GRID_SIZE;
+
+    // grid size
+    int gridSizeX = std::ceil( (X_2-X_1) / spacing);
+    int gridSizeY = std::ceil( (Y_2-Y_1) / spacing);
+
+    double rotationSpacing = FIRMUtils::degree2Radian(ompl::magic::SAMPLING_ROTATION_SPACING);// radians
+
+    int numHeadings = std::floor(2*boost::math::constants::pi<double>()/rotationSpacing);
+
+    arma::mat cov = arma::eye(3,3);
+    cov(0,0) = 0.25;
+    cov(1,1) = 0.25;
+    cov(2,2) = 0.01;
+
+    OMPL_INFORM("MMPolicyGenerator: Sampling start beliefs");
+
+
+    for(int i = 0; i <= gridSizeX; i++)
+    {
+        for(int j=0; j <= gridSizeY; j++)
+        {
+            double newX = X_1 + i*spacing;
+            double newY = Y_1 + j*spacing;
+
+            for(int k =0; k < numHeadings; k++ )
+            {
+                double newYaw = -boost::math::constants::pi<double>() + k*rotationSpacing;
+
+                ompl::base::State *newState = si_->allocState();
+
+                newState->as<SE2BeliefSpace::StateType>()->setXYYaw(newX, newY, newYaw);
+                newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
+
+                if(si_->isValid(newState))
+                {
+                    currentBeliefStates_.push_back(si_->cloneState(newState));
+                    weights_.push_back(0.0); // push zero weight
+                    timeSinceDivergence_.push_back(0.0);
+                }
+                si_->freeState(newState);
+            }
+        }
+    }
+
+    OMPL_INFORM("MMPolicyGenerator: Sampling beliefs Completed");
+
+    assignUniformWeight();
+
+    OMPL_INFORM("MMPolicyGenerator: Sample Belief Weights Added");
+
+    arma::colvec obs = si_->getObservation();
+
+    OMPL_INFORM("MMPolicyGenerator: Updating the weights before proceeding");
+
+    unsigned int numModes = currentBeliefStates_.size();
+    unsigned int updatedNumModes = 0;
+
+    // We will update weights till we converge to most likely modes
+    while( numModes != updatedNumModes )
+    {
+        numModes = currentBeliefStates_.size();
+
+        this->updateWeights(obs);
+
+        updatedNumModes = currentBeliefStates_.size();
+
+    }
+
+    // show the beliefs
+    this->drawBeliefs();
 
     this->printWeights();
 
-    // Make sure that each beliefstate has a target state
-    //assert(currentBeliefStates_.size() == targetStates_.size());
+    // After converging to most likely, assign uniform weights
+    assignUniformWeight();
+
+    double t = 0;
+
+    // Run filter for a few seconds to update initial samples, zero control
+    while( t < ompl::magic::ZERO_CONTROL_UPDATE_TIME )
+    {
+
+        this->propagateBeliefs(si_->getMotionModel()->getZeroControl());
+
+        t += si_->getMotionModel()->getTimestepSize();
+
+    }
+
+    // Before beginning the strategy, assign all modes the same weight
+    assignUniformWeight();
+
+    this->printWeights();
+
+    // Print the states
+    OMPL_INFORM("MMPolicyGenerator: The final sampled beliefs are :");
+    for(int i=0; i< currentBeliefStates_.size(); i++)
+    {
+        si_->printState(currentBeliefStates_[i]);
+    }
+
+}
+
+
+
+void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
+{
+
+    this->printWeights();
 
     //container to store the sequence of controls for each mode/target pair
     std::vector<std::vector<ompl::control::Control*> > openLoopPolicies;
+
+    Visualizer::ClearFeedbackEdges();
 
     // Iterate over the mode/target pairs and generate open loop controls
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
 
         //Generate a path for the mode/target pair
-        if(si_->isValid(currentBeliefStates_[i]) /*&& si_->distance(currentBeliefStates_[i], targetStates_[i])>0.50*/)
+        if( si_->isValid(currentBeliefStates_[i]) )
         {
 
             ompl::base::PlannerPtr planner(new ompl::geometric::RRT(si_));
 
             ompl::base::ProblemDefinitionPtr pdef(new ompl::base::ProblemDefinition(si_));
 
-            std::cout<<"For belief :"<<std::endl;
-            si_->printState(currentBeliefStates_[i]);
-
             Vertex targetVertex = findTarget(i);
 
-            std::cout<<" Target :"<<std::endl;
-            si_->printState(stateProperty_[targetVertex]);
+            //------ To check if target makes sense
+            Visualizer::addFeedbackEdge(currentBeliefStates_[i],stateProperty_[targetVertex], 1.0);
+            //------
 
-            pdef->setStartAndGoalStates(currentBeliefStates_[i], stateProperty_[targetVertex]/*targetStates_[i]*/, ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
+            pdef->setStartAndGoalStates(currentBeliefStates_[i], stateProperty_[targetVertex], ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
 
             planner->as<ompl::geometric::RRT>()->setRange(1.0);
 
@@ -112,9 +252,6 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
                 openLoopPolicies.push_back(olc);
 
-                // If there actually exists a policy, then only add a corresponding weight.
-                //weights.push_back(unNormalizedWeight/totalWeight);
-
             }
 
             planner->clear();
@@ -127,6 +264,8 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     double maxGain = -1e10;
 
     int maxGainPolicyIndx=-1;
+
+    OMPL_INFORM("Evaluating the Open Loop policies on all the modes");
 
     for(unsigned int i = 0; i < openLoopPolicies.size(); i++)
     {
@@ -141,8 +280,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             pGain.v += c.v;
 
-            //std::cout<<"Policy Number #"<<i<<" Info Gain value :"<<c.v<<std::endl;
-
+            OMPL_INFORM("MMPolicyGenerator: Evaluating Policy Number #%u  on Mode Number #%u",i,j);
         }
 
         pGain.v = weights_[i]*pGain.v;
@@ -159,7 +297,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
     if( !areSimilarWeights() && maxGainPolicyIndx >= 0)
     {
-        OMPL_INFORM("A minimum cost policy was found");
+        OMPL_INFORM("MMPolicyGenerator: A minimum cost policy was found");
 
         policy = openLoopPolicies[maxGainPolicyIndx];
 
@@ -169,8 +307,6 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     {
         if(openLoopPolicies.size()>0)
         {
-            OMPL_INFORM("Weights were similar");
-
             int rndp = FIRMUtils::generateRandomIntegerInRange(0, openLoopPolicies.size()-1);
 
             policy = openLoopPolicies[rndp];
@@ -196,7 +332,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
     LinearSystem dummy;
 
     ompl::base::State *tempState = si_->allocState();
-
+ ;
     ompl::base::State *nextState = si_->allocState();
 
     si_->copyState(tempState, state);
@@ -256,26 +392,33 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
         ompl::base::State *kfEstimate = si_->allocState();
+        ompl::base::State *kfEstimateUpdated = si_->allocState();
+
+        //si_->printState(currentBeliefStates_[i]);
 
         si_->copyState(kfEstimate, currentBeliefStates_[i]);
 
-        kf.Evolve(kfEstimate, control, obs, dummy, dummy, kfEstimate);
+        kf.Evolve(kfEstimate, control, obs, dummy, dummy, kfEstimateUpdated);
 
-        si_->copyState(currentBeliefStates_[i], kfEstimate);
+        si_->copyState(currentBeliefStates_[i], kfEstimateUpdated);
 
         si_->freeState(kfEstimate);
 
+        si_->freeState(kfEstimateUpdated);
+
     }
 
-    this->updateWeights();
+    OMPL_INFORM("MMPolicyGenerator: BEFORE updating weights in propogate: ");
+    this->printWeights();
 
-    Visualizer::clearStates();
+    this->updateWeights(obs);
 
-    for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
-    {
-        Visualizer::addState(currentBeliefStates_[i]);
-    }
+    OMPL_INFORM("MMPolicyGenerator: AFTER updating weights in propogate: ");
+    this->printWeights();
 
+    this->removeDuplicateModes();
+
+    this->drawBeliefs();
 
 }
 
@@ -283,11 +426,12 @@ bool MMPolicyGenerator::areSimilarWeights()
 {
 
     arma::colvec w(weights_.size(),1);
+
     for(unsigned int i = 0; i < weights_.size(); i++)
     {
         w[i] = weights_[i];
-        //std::cout<<"Weight is:"<<w[i]<<std::endl;
     }
+
     double sd = arma::stddev(w);
 
     if(sd < 1e-6)
@@ -298,12 +442,13 @@ bool MMPolicyGenerator::areSimilarWeights()
     return false;
 }
 
-void MMPolicyGenerator::updateWeights()
+void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 {
-    // true obs
-    arma::colvec trueObs = si_->getObservation();
 
-    arma::colvec sigma = si_->getObservationModel()->sigma_ ;
+    arma::colvec sigma(2);
+
+    sigma(0) = ompl::magic::SIGMA_RANGE;
+    sigma(1) = ompl::magic::SIGMA_THETA;
 
     arma::colvec variance = arma::pow(sigma,2);
 
@@ -311,26 +456,42 @@ void MMPolicyGenerator::updateWeights()
 
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
-        // compute the innovation
-        arma::colvec beliefObservation =  si_->getObservationModel()->getObservation(currentBeliefStates_[i], false);
-        arma::colvec innov = this->computeInnovation(beliefObservation, trueObs);
 
-        arma::mat covariance = arma::diagmat(arma::repmat(arma::diagmat(variance), innov.n_rows/2, innov.n_rows/2)) ;//innov.n_rows, innov.n_rows);
+        double weightFactor= 1.0;
 
-        arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
+        arma::colvec innov = this->computeInnovation(i,trueObservation,weightFactor);
 
-        //std::cout<<"innov at index #"<<i<<"   = "<<innov<<std::endl;
-        //std::cout<<"t at index #"<<i<<"   = "<<t<<std::endl;
+        float w;
 
-        float w = std::pow(2.71828, t(0,0));//std::exp(t(0,0));
+        // robot and mode see something in common
+        if(innov.n_rows != 0)
+        {
+            arma::mat covariance = arma::diagmat(arma::repmat(arma::diagmat(variance), innov.n_rows/2, innov.n_rows/2)) ;
 
-        //std::cout<<"The weight update multiplier at index #"<<i<<"   = "<<w<<std::endl;
+            arma::mat t = -0.5*trans(innov)*covariance.i()*innov;
+
+            w = std::exp(t(0,0)) * weightFactor;
+
+        }
+        // if there is no innov it means there is no common observation
+        else
+        {
+            // case 1: robot also doesnt see anything
+            if(trueObservation.n_rows ==0)
+            {
+                // mode could be seeing something
+                w = weightFactor;
+            }
+            // robot is seeing something and mode sees nothing in common
+            else
+            {
+                w = 0;
+            }
+        }
 
         weights_[i]  = weights_[i]*w;
 
         totalWeight += weights_[i];
-
-        //std::cout<<"(innov update) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
 
     }
 
@@ -339,92 +500,372 @@ void MMPolicyGenerator::updateWeights()
     {
         for(unsigned int i=0; i< weights_.size(); i++)
         {
-            //std::cout<<"(totalweight=0) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
-
             weights_[i] = 1.0/weights_.size();
         }
         return;
     }
     else
     {
-        // Normalize the weights
-         for(unsigned int i = 0; i < weights_.size(); i++)
-        {
-            weights_[i] =  weights_[i]/totalWeight;
+        normalizeWeights();
 
-            //std::cout<<"(After Norm) Weight at index #"<<i<<"   = "<<weights_[i]<<std::endl;
-        }
-         assert(weights_[0]!=0);
     }
+
+    std::vector<int> beliefsToRemove;
 
     for(unsigned int i = 0; i < weights_.size(); i++)
     {
-
-        if(weights_[i] < 1e-6 )
-            this->removeBelief(i);
+        // if the weight of the mode is less than threshold, delete it
+        if(weights_[i]/totalWeight < ompl::magic::MODE_DELETION_THRESHOLD || weights_[i] == 0.0 )
+        {
+            beliefsToRemove.push_back(i);
+        }
     }
+
+    removeBeliefs(beliefsToRemove);
 
 }
 
-arma::colvec MMPolicyGenerator::computeInnovation(const arma::colvec Zprd, const arma::colvec Zg)
+/*
+// Alternate implementation of calculating weight update
+float MMPolicyGenerator::computeWeightForMode(const int currentBeliefIndx,const arma::colvec trueObservation)
 {
     const int singleObservationDim = 4;//CamAruco2DObservationModel::singleObservationDim;
 
     const int landmarkInfoDim = 2;//CamAruco2DObservationModel::landmarkInfoDim;
 
-    int greaterRows = Zg.n_rows >= Zprd.n_rows ? Zg.n_rows : Zprd.n_rows ;
+    // the true observation
+    arma::colvec Zg = trueObservation;
 
-    arma::colvec innov;
+    int landmarksActuallySeen = Zg.n_rows / singleObservationDim;
 
-    //std::cout<<"Ground Obs:"<<Zg<<std::endl;
-    //std::cout<<"Predicted obs :"<<Zprd<<std::endl;
+    // the belief's predicted observation for what the robot sees
+    arma::colvec Zprd =  si_->getObservationModel()->getObservationPrediction(currentBeliefStates_[currentBeliefIndx], Zg);
 
-    //std::cout<<"Greater Rows :"<<greaterRows<<std::endl;
+    // get observation
+    arma::colvec innov = si_->getObservationModel()->computeInnovation(currentBeliefStates_[currentBeliefIndx], obs);
 
-    innov  = arma::zeros<arma::colvec>( (landmarkInfoDim)* greaterRows /singleObservationDim ) ;
+    float weightUpdate = 1.0;
 
-    for(unsigned int i =0; i< greaterRows/singleObservationDim ; i++)
+    // robot and mode see something in common
+    if(innov.n_rows != 0)
     {
+        // construct a linear system at where the mode is
+        LinearSystem ls(si_,currentBeliefStates_[currentBeliefIndx],si_->getMotionModel()->getZeroControl(), Zprd, si_->getMotionModel(), si_->getObservationModel());
 
-        if(Zg.n_rows >= (i+1)*singleObservationDim && Zprd.n_rows >= (i+1)*singleObservationDim)
+        arma::mat P = currentBeliefStates_[currentBeliefIndx]->as<SE2BeliefSpace::StateType>()->getCovariance();
+
+        mat obsLikelihood = ls.getH() * P * trans(ls.getH()) + ls.getR();
+
+        arma::mat t = -0.5*trans(innov)*obsLikelihood.i()*innov;
+
+        weightUpdate = t(0,0);
+
+    }
+    // if there is no innov it means there is no common observation
+    else
+    {
+        // case 1: robot also doesnt see anything
+        if(Zg.n_rows ==0)
         {
-
-            innov( i*(landmarkInfoDim) ) = Zg(i*singleObservationDim + 1) - Zprd(i*singleObservationDim + 1) ;
-
-            double delta_theta = Zg(i*singleObservationDim + 2) - Zprd(i*singleObservationDim + 2) ;
-
-            FIRMUtils::normalizeAngleToPiRange(delta_theta);
-
-            innov( i*(landmarkInfoDim) + 1 ) =  delta_theta;
+            // mode could be seeing something
+            weightUpdate = 1.0;
         }
+        // robot is seeing something and mode sees nothing in common
         else
         {
-            if(Zg.n_rows >= (i+1)*singleObservationDim)
+            weightUpdate = 0;
+        }
+    }
+
+
+
+     // the beliefs predicted observation for what is should see based on where it is
+    arma::colvec Zmode =  si_->getObservationModel()->getObservation(currentBeliefStates_[currentBeliefIndx], false);
+
+    int numIntersection=0;
+
+    int predictedLandmarksSeen = Zmode.n_rows / singleObservationDim ;
+
+
+    for(int j = 0 ; j < landmarksActuallySeen ; j++)
+    {
+        // match ids
+        for(int k = 0 ; k < predictedLandmarksSeen ; k++)
+        {
+            if(Zprd(k*singleObservationDim) == Zg(j*singleObservationDim))
             {
-                 innov( i*(landmarkInfoDim) ) = Zg(i*singleObservationDim + 1);
-                 innov( i*(landmarkInfoDim) + 1 ) =  Zg(i*singleObservationDim + 2);
+
+                numIntersection++;
+
+                break;
             }
-            /*
-            else
-            {
-                innov( i*(landmarkInfoDim) ) = -Zprd(i*singleObservationDim + 1);
-                innov( i*(landmarkInfoDim) + 1 ) =  -Zprd(i*singleObservationDim + 2);
-            }
-            */
         }
 
     }
 
+    float weightReductionFactor=1.0;
+
+    // there is a mismatch in what the robot sees and predicted
+    if(numIntersection != landmarksActuallySeen || numIntersection != predictedLandmarksSeen )
+    {
+
+        //weightFactor = std::min(1.0 / abs(1 + landmarksActuallySeen - numIntersection) , 1.0 / abs(1 + predictedLandmarksSeen - numIntersection));
+        float heuristicVal = std::max(abs(1 + landmarksActuallySeen - numIntersection) , abs(1 + predictedLandmarksSeen - numIntersection));
+
+        weightReductionFactor = std::exp(-heuristicVal*timeSinceDivergence_[currentBeliefIndx]);
+
+        timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] + std::pow(si_->getMotionModel()->getTimestepSize(),2);
+
+    }
+    else
+    {
+         timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] - 1.0;
+
+         if(timeSinceDivergence_[currentBeliefIndx] < 0)
+         {
+            timeSinceDivergence_[currentBeliefIndx] = 0;
+         }
+    }
+
+    return weightUpdate*weightReductionFactor;
+
+}
+*/
+
+
+arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,const arma::colvec trueObservation, double &weightFactor)
+{
+    const int singleObservationDim = 4;//CamAruco2DObservationModel::singleObservationDim;
+
+    const int landmarkInfoDim = 2;//CamAruco2DObservationModel::landmarkInfoDim;
+
+    // the true observation
+    arma::colvec Zg = trueObservation;
+
+    int landmarksActuallySeen = Zg.n_rows / singleObservationDim;
+
+    // the beliefs predicted observation
+    arma::colvec Zprd =  si_->getObservationModel()->getObservation(currentBeliefStates_[currentBeliefIndx], false);
+
+    int predictedLandmarksSeen = Zprd.n_rows / singleObservationDim ;
+
+    arma::colvec innov;
+
+    int numIntersection=0;
+
+    //First we see if a landmark that is observed by robot is seen by mode:
+    //1. If yes, then we compute the innov
+    //2. If no, then we predict where the mode "would" see that particular landmark and then calculate the innov
+    for(int j = 0 ; j < landmarksActuallySeen ; j++)
+    {
+        // match ids
+        for(int k = 0 ; k < predictedLandmarksSeen ; k++)
+        {
+            if(Zprd(k*singleObservationDim) == Zg(j*singleObservationDim))
+            {
+
+                arma::colvec innov_for_landmark(2);
+
+                innov_for_landmark(0) = Zg(j*singleObservationDim + 1) - Zprd(k*singleObservationDim + 1) ;
+
+                double delta_theta = Zg(j*singleObservationDim + 2) - Zprd(k*singleObservationDim + 2) ;
+
+                FIRMUtils::normalizeAngleToPiRange(delta_theta);
+
+                assert(abs(delta_theta) <= 2*boost::math::constants::pi<double>()) ;
+
+                innov_for_landmark(1) =  delta_theta;
+
+                innov.insert_rows(numIntersection*landmarkInfoDim, innov_for_landmark);
+
+                numIntersection++;
+
+                break;
+            }
+        }
+
+    }
+
+    // there is a mismatch in what the robot sees and predicted
+    if(numIntersection != landmarksActuallySeen || numIntersection != predictedLandmarksSeen )
+    {
+
+        //weightFactor = std::min(1.0 / abs(1 + landmarksActuallySeen - numIntersection) , 1.0 / abs(1 + predictedLandmarksSeen - numIntersection));
+        float heuristicVal = std::max(abs(1 + landmarksActuallySeen - numIntersection) , abs(1 + predictedLandmarksSeen - numIntersection));
+
+        weightFactor = std::exp(-heuristicVal*timeSinceDivergence_[currentBeliefIndx]);
+
+        timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] + std::pow(si_->getMotionModel()->getTimestepSize(),2);
+
+    }
+    else
+    {
+         timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] - 1.0;
+
+         if(timeSinceDivergence_[currentBeliefIndx] < 0)
+         {
+            timeSinceDivergence_[currentBeliefIndx] = 0;
+         }
+    }
+
+
     return innov;
 }
 
-void MMPolicyGenerator::removeBelief(const int Indx)
+void MMPolicyGenerator::removeBeliefs(const std::vector<int> Indxs)
 {
-    currentBeliefStates_.erase(currentBeliefStates_.begin()+Indx);
+    // Make a local copy
+    std::vector<ompl::base::State*> currentBeliefStatesCopy = currentBeliefStates_;
+    std::vector<float> weightsCopy = weights_;
+    std::vector<double>  timeSinceDivergenceCopy = timeSinceDivergence_;
 
-    weights_.erase(weights_.begin()+Indx);
+    weights_.clear();
+    currentBeliefStates_.clear();
+    timeSinceDivergence_.clear();
 
-    targetStates_.erase(targetStates_.begin()+Indx);
+    for(int i = 0 ; i < currentBeliefStatesCopy.size(); i++)
+    {
+        // check if this index is in the list marked to be deleted. If not, then we keep it
+        std::vector<int>::const_iterator it = std::find(Indxs.begin(), Indxs.end(), i) ;
+
+        if(it == Indxs.end())
+        {
+            currentBeliefStates_.push_back(currentBeliefStatesCopy[i]);
+            weights_.push_back(weightsCopy[i]);
+            timeSinceDivergence_.push_back(timeSinceDivergenceCopy[i]);
+        }
+        // if it was marked to be deleted, then we free memory for that state
+        else
+        {
+            si_->freeState(currentBeliefStatesCopy[i]);
+        }
+    }
+
+    normalizeWeights();
+
+}
+
+
+bool MMPolicyGenerator::isConverged()
+{
+
+    if(currentBeliefStates_.size()==1)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+
+ bool MMPolicyGenerator::areCurrentBeliefsValid()
+{
+    if(currentBeliefStates_.size()==1)
+        return true;
+
+    for(int i =0 ; i< currentBeliefStates_.size(); i++)
+    {
+        if(si_->getStateValidityChecker()->clearance(currentBeliefStates_[i]) < ompl::magic::MIN_ROBOT_CLEARANCE)
+            return false;
+
+    }
+
+    return true;
+}
+
+void MMPolicyGenerator::removeDuplicateModes()
+{
+    std::vector<int> toDelete;
+
+    for(int i = 0; i < currentBeliefStates_.size(); i++)
+    {
+        for(int j = i+1; j < currentBeliefStates_.size(); j++ )
+        {
+            if(i!=j)
+            {
+                arma::colvec xi = currentBeliefStates_[i]->as<SE2BeliefSpace::StateType>()->getArmaData();
+                arma::colvec xj = currentBeliefStates_[j]->as<SE2BeliefSpace::StateType>()->getArmaData();
+
+                double xd = xi(0) - xj(0);
+                double yd = xi(1) - xj(1);
+                double thetad = xi(2) - xj(2);
+
+                if(std::abs(xd) < 0.01 && std::abs(yd) < 0.01 &&  std::abs(thetad) < FIRMUtils::degree2Radian(1.0) )
+                {
+
+                    if(weights_[i] >= weights_[j] )
+                    {
+                        toDelete.push_back(j);
+                        weights_[i] = weights_[i] + weights_[j]; // transfer the weight to the more likely mode
+                    }
+                    else
+                    {
+                        toDelete.push_back(i);
+                        weights_[j] = weights_[i] + weights_[j]; // transfer the weight to the more likely mode
+
+                    }
+
+                }
+            }
+
+        }
+    }
+
+    this->removeBeliefs(toDelete);
+
+}
+
+
+void MMPolicyGenerator::drawBeliefs()
+{
+
+    Visualizer::clearStates();
+
+    for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
+    {
+        Visualizer::addState(currentBeliefStates_[i]);
+    }
+
+}
+
+void MMPolicyGenerator::getStateWithMaxWeight(ompl::base::State *state, float &weight)
+{
+
+    std::vector<float>::iterator biggest = std::max_element(weights_.begin(), weights_.end());
+
+    weight = *biggest;
+
+    int index = std::distance(weights_.begin(),biggest);
+
+    si_->copyState(state, currentBeliefStates_[index]);
+
+}
+
+
+void MMPolicyGenerator::normalizeWeights()
+{
+    float totalWeight = std::accumulate(weights_.begin(), weights_.end(), 0.0);
+
+    // Normalize the weights
+     for(unsigned int i = 0; i < weights_.size(); i++)
+    {
+        weights_[i] =  weights_[i]/totalWeight;
+
+    }
+}
+
+void MMPolicyGenerator::assignUniformWeight()
+{
+    int Nm = weights_.size();
+
+    float Wu = 1.0 / Nm;
+
+    for(unsigned int i = 0; i < Nm ; i++)
+    {
+        weights_[i] =  Wu;
+
+    }
+
 }
 
 void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
@@ -446,6 +887,7 @@ void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
     }
 }
 
+
 void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b)
 {
     //boost::mutex::scoped_lock _(graphMutex_);
@@ -455,8 +897,6 @@ void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b
 
     if(getObservationOverlap(a, b, weight))
     {
-        std::cout<<"Observations overlap"<<std::endl;
-        //std::cin.get();
         // Add edge if overlap true, with weight = number of overlaps
         const unsigned int id = maxEdgeID_++;
 
@@ -464,8 +904,6 @@ void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b
 
         // create an edge with the edge weight property
         std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
-
-        //std::cout<<"Added edge to ob graph"<<std::endl;
 
     }
 
@@ -490,30 +928,11 @@ void MMPolicyGenerator::evaluateObservationListForVertex(const Vertex v)
 
 bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
 {
-    std::cout<<"Calculating observation overlap for: "<<std::endl;
-    si_->printState(stateProperty_[a]);
-    si_->printState(stateProperty_[b]);
 
     // get the list of observations for both vertices
     evaluateObservationListForVertex(a);
 
     evaluateObservationListForVertex(b);
-
-
-    std::cout<<"Observations for a"<<std::endl;
-
-    for(int i=0; i < stateObservationProperty_[a].size(); i++)
-    {
-        std::cout<<stateObservationProperty_[a][i]<<std::endl;
-    }
-
-    std::cout<<"Observations for b"<<std::endl;
-    for(int i=0; i < stateObservationProperty_[b].size(); i++)
-    {
-        std::cout<<stateObservationProperty_[b][i]<<std::endl;
-    }
-
-    //std::cin.get();
 
 
     bool isOverlapping = false;
@@ -532,7 +951,6 @@ bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &
 
                 isOverlapping = true;
 
-                //std::cout<<"Observation overlap"<<std::endl;
             }
         }
     }
@@ -581,8 +999,6 @@ MMPolicyGenerator::Vertex MMPolicyGenerator::findTarget(const unsigned int belie
     {
         int w = 0;
 
-        //std::cout<<"My neighbor : "<<i<<std::endl;
-
         // iterate over all other neighborhoods
         for(int j = 0; j < setOfAllNeighbors.size(); j++)
         {
@@ -594,7 +1010,6 @@ MMPolicyGenerator::Vertex MMPolicyGenerator::findTarget(const unsigned int belie
             }
         }
 
-        //std::cout<<"ob w :"<<w<<std::endl;
         //TODO: If 2 targets have same weight, then choose the closer one
         if(w < minWeight)
         {
@@ -622,7 +1037,6 @@ int MMPolicyGenerator::calculateIntersectionWithNeighbor(const Vertex v, std::ve
                 // then get the edge weight
                 int edgeWeight =  boost::get(boost::edge_weight, g_, e);
 
-                //std::cout<<"Edge weight in og:"<<edgeWeight<<std::endl;
                 w += edgeWeight;
             }
         }

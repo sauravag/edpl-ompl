@@ -56,7 +56,7 @@
 #include "../Filters/LinearizedKF.h"
 #include "../Path/FeedbackPath.h"
 #include "../ConnectionStrategy/FStrategy.h"
-
+#include "MMPolicyGenerator.h"
 /**
    @anchor FIRM
    @par Short description
@@ -241,6 +241,17 @@ public:
         minFIRMNodes_ = numNodes ;
     }
 
+    /** \brief Saves the roadmap to an XML */
+    virtual void savePlannerData();
+
+    /** \brief Load the roadmap info from a file */
+    virtual void loadRoadMapFromFile(const std::string pathToFile);
+
+    void setKidnappedState(ompl::base::State *state)
+    {
+        kidnappedState_ = siF_->cloneState(state);
+    }
+
 protected:
 
     /** \brief Free all the memory allocated by the planner */
@@ -249,6 +260,9 @@ protected:
     /** \brief Construct a graph node for a given state (\e state), store it in the nearest neighbors data structure
         and then connect it to the roadmap in accordance to the connection strategy. */
     virtual Vertex addStateToGraph(ompl::base::State *state, bool addReverseEdge = true, bool shouldCreateNodeController=true);
+
+    /** \brief Load a state from XML and add to Graph*/
+    //virtual Vertex loadStateToGraph(ompl::base::State *state);
 
     /** \brief Make two milestones (\e m1 and \e m2) be part of the same connected component. The component with fewer
         elements will get the id of the component with more elements. */
@@ -279,9 +293,10 @@ protected:
     virtual void addEdgeToGraph(const Vertex a, const Vertex b);
 
     /** \brief Generates the cost of the edge */
-    virtual FIRMWeight generateEdgeControllerWithCost(ompl::base::State* startNodeState,
-                                                             ompl::base::State* targetNodeState,
-                                                             EdgeControllerType &edgeController);
+    virtual FIRMWeight generateEdgeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController);
+
+    /** \brief Generates an edge controller and loads the edge properties from XML */
+    //virtual FIRMWeight loadEdgeControllerWithCost(const Vertex start, const Vertex goal, EdgeControllerType &edgeController);
 
     /** \brief Generates the edge controller that drives the robot from start to end of edge */
     virtual void generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, EdgeControllerType &edgeController);
@@ -298,6 +313,15 @@ protected:
     void addStateToVisualization(ompl::base::State *state) ;
 
     void sendFeedbackEdgesToViz();
+
+    /** \brief simulates a kidnapping, where the robot is disturbed to a random new location */
+    void simulateKidnapping();
+
+    /** \brief Detects whether the robot was kidnapped or not */
+    bool detectKidnapping(ompl::base::State *previousState, ompl::base::State *newState);
+
+    /** \brief Called when robot is lost, uses multi-modal planner to recover true position of robot */
+    void recoverLostRobot(ompl::base::State *recoveredState);
 
     /** \brief Calculates the new cost to go from a node*/
     std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(const Vertex node);
@@ -383,6 +407,23 @@ protected:
 
     /** \brief The minimum number of nodes that should be sampled. */
     unsigned int minFIRMNodes_;
+
+    MMPolicyGenerator *policyGenerator_;
+
+    bool loadedRoadmapFromFile_;
+
+    std::vector<std::pair<std::pair<int,int>,FIRMWeight> > loadedEdgeProperties_;
+
+
+private:
+
+    /** \brief Checks if this vertex belongs to the list of start vertices */
+    bool isStartVertex(const Vertex v);
+
+    /** \brief Checks if this vertex belongs to the list of goal vertices */
+    bool isGoalVertex(const Vertex v);
+
+    ompl::base::State *kidnappedState_;
 
 };
 

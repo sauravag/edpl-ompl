@@ -43,7 +43,6 @@ arma::colvec SE2BeliefSpace::StateType::normWeights_ = arma::zeros<arma::colvec>
 
 bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state) const
 {
-    //std::cout<<"Checking reachability"<<std::endl;
     // subtract the two beliefs and get the norm
     arma::colvec stateDiff = this->getArmaData() - state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
@@ -68,16 +67,13 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state) const
 
     double norm2 =  std::max(meanNorm*meanNormWeight_, covDiagNorm*covNormWeight_) ;
 
-    if(norm2 < reachDist_)
+    if(norm2 <= reachDist_)
     {
-        //std::cout<<"Is reachable and norm2 is  "<< norm2<<std::endl;
         return true;
     }
-    else
-    {
-        //std::cout<<"NOT reachable and norm2 is  "<< norm2<<std::endl;
-        return false;
-    }
+
+    return false;
+
 }
 
 
@@ -163,36 +159,3 @@ void SE2BeliefSpace::printBeliefState(const State *state)
     std::cout<<"------End BeliefState-------"<<std::endl;
 }
 
-/*
-void SE2BeliefSpace::registerProjections(void)
-{
-    class SE2DefaultProjection : public ProjectionEvaluator
-    {
-    public:
-
-        SE2DefaultProjection(const StateSpace *space) : ProjectionEvaluator(space)
-        {
-        }
-
-        virtual unsigned int getDimension(void) const
-        {
-            return 2;
-        }
-
-        virtual void defaultCellSizes(void)
-        {
-            cellSizes_.resize(2);
-            const RealVectorBounds &b = space_->as<SE2StateSpace>()->getBounds();
-            cellSizes_[0] = (b.high[0] - b.low[0]) / magic::PROJECTION_DIMENSION_SPLITS;
-            cellSizes_[1] = (b.high[1] - b.low[1]) / magic::PROJECTION_DIMENSION_SPLITS;
-        }
-
-        virtual void project(const State *state, EuclideanProjection &projection) const
-        {
-            memcpy(&projection(0), state->as<SE2StateSpace::StateType>()->as<RealVectorStateSpace::StateType>(0)->values, 2 * sizeof(double));
-        }
-    };
-
-    registerDefaultProjection(ProjectionEvaluatorPtr(dynamic_cast<ProjectionEvaluator*>(new SE2DefaultProjection(this))));
-}
-*/

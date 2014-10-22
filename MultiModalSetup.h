@@ -53,7 +53,6 @@ namespace ompl
 
         static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 100;
 
-        static const double CONVERGENCE_THRESHOLD_FIRM_MM = 2.0;
     }
 }
 
@@ -186,7 +185,7 @@ public:
             siF_->setStateValidityCheckingResolution(0.005);
 
             // provide the observation model to the space
-            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(pathToSetupFile_.c_str()));
+            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(siF_, pathToSetupFile_.c_str()));
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space
@@ -216,7 +215,9 @@ public:
 
             policyGenerator_ = new MMPolicyGenerator(siF_);
 
-            policyGenerator_->setCurrentBeliefStates(beliefStates_);
+            //policyGenerator_->sampleNewBeliefStates();
+
+            //policyGenerator_->setCurrentBeliefStates(beliefStates_);
 
             policyGenerator_->setBeliefTargetStates(targetStates_);
 
@@ -230,6 +231,7 @@ public:
     bool solve()
     {
         //std::vector<ompl::base::State*> tempbStates;
+        policyGenerator_->sampleNewBeliefStates();
 
         if(!setup_)
         {
@@ -243,7 +245,7 @@ public:
         bstates = beliefStates_;
 
         int counter = 0;
-         while(!isConverged(bstates))
+         while(!policyGenerator_->isConverged())
         {
             std::vector<ompl::control::Control*> policy;
 
@@ -266,7 +268,7 @@ public:
                 policyGenerator_->getCurrentBeliefStates(bstates);
 
                 // If the robot's clearance gets below the threshold, break loop & replan
-                if(!areValid(bstates) || siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE)
+                if(!policyGenerator_->areCurrentBeliefsValid() || siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE)
                 {
                     if(counter == 0)
                     {
@@ -299,46 +301,7 @@ public:
         return boost::bind(&MultiModalSetup::getGeometricComponentStateInternal, this, _1, _2);
     }
 
-    bool isConverged(std::vector<ompl::base::State*> states)
-    {
-        double maxdistance = 0;
 
-        for(int i=0; i<states.size(); i++)
-        {
-            double d = 0;
-            for(int j=0; j<states.size(); j++)
-            {
-                d = siF_->distance(states[i], states[j]);
-            }
-            if(d > maxdistance)
-            {
-                maxdistance = d;
-            }
-        }
-
-        if(maxdistance <= ompl::magic::CONVERGENCE_THRESHOLD_FIRM_MM)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
-    bool areValid(const std::vector<ompl::base::State*> states)
-    {
-        if(states.size()==1)
-            return true;
-
-        for(int i =0 ; i< states.size(); i++)
-        {
-            if(siF_->getStateValidityChecker()->clearance(states[i]) < ompl::magic::MIN_ROBOT_CLEARANCE)
-                return false;
-
-        }
-
-        return true;
-    }
 protected:
 
     const ompl::base::State* getGeometricComponentStateInternal(const ompl::base::State *state, unsigned int /*index*/) const
@@ -477,9 +440,9 @@ protected:
         TiXmlNode* child = 0;
 
         arma::mat cov = arma::eye(3,3);
-        cov(0,0) = 0.2;
-        cov(1,1) = 0.2;
-        cov(2,2) = 0.04;
+        cov(0,0) = 0.03;
+        cov(1,1) = 0.03;
+        cov(2,2) = 0.004;
 
         while( (child = landmarkElement ->IterateChildren(child)))
         {

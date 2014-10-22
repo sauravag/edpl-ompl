@@ -1,0 +1,222 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<LandmarkList>
+<landmark id = 1 x = 3.0  y = 1.0  theta = -0.5 />
+<landmark id = 2 x = 2.5  y = 1.0 theta = -0.5 />
+<landmark id = 3 x = 2.0  y = 1.0 theta = -0.5 />
+<landmark id = 4 x = 1.5  y = 1.0 theta = -0.5 />
+<landmark id = 5 x = 1.0  y = 1.0 theta = -0.5 />
+<landmark id = 6 x = 1.5  y = 2.0 theta = -0.5 />
+<landmark id = 7 x = 2.0  y = 2.0 theta = -0.5 />
+<landmark id = 8 x = 2.5  y = 2.0 theta = -0.5 />
+<landmark id = 1 x = 1.0 y = 19.0  theta = -0.5 />
+<landmark id = 2 x = 1.0 y = 19.5 theta = -0.5 />
+<landmark id = 3 x = 1.0 y = 20.0 theta = -0.5 />
+<landmark id = 4 x = 1.0 y = 20.5 theta = -0.5 />
+<landmark id = 5 x = 1.0 y = 21.0 theta = -0.5 />
+<landmark id = 6 x = 2.0  y = 20.5 theta = -0.5 />
+<landmark id = 7 x = 2.0  y = 20.0 theta = -0.5 />
+<landmark id = 8 x = 2.0  y = 19.5 theta = -0.5 />
+<landmark id = 1 x = 19.0  y = 21.0  theta = -0.5 />
+<landmark id = 2 x = 19.5  y = 21.0 theta = -0.5 />
+<landmark id = 3 x = 20.0  y = 21.0 theta = -0.5 />
+<landmark id = 4 x = 20.5 y = 21.0 theta = -0.5 />
+<landmark id = 5 x = 21.0  y = 21.0 theta = -0.5 />
+<landmark id = 6 x = 20.5  y = 20.0 theta = -0.5 />
+<landmark id = 7 x = 20.0  y = 20.0 theta = -0.5 />
+<landmark id = 8 x = 19.5  y = 20.0 theta = -0.5 />
+<landmark id = 1 x = 21.0 y = 3.0  theta = -0.5 />
+<landmark id = 2 x = 21.0 y = 2.5 theta = -0.5 />
+<landmark id = 3 x = 21.0 y = 2.0 theta = -0.5 />
+<landmark id = 4 x = 21.0 y = 1.5 theta = -0.5 />
+<landmark id = 5 x = 21.0 y = 1.0 theta = -0.5 />
+<landmark id = 6 x = 20.0  y = 1.5 theta = -0.5 />
+<landmark id = 7 x = 20.0  y = 2.0 theta = -0.5 />
+<landmark id = 8 x = 20.0  y = 2.5 theta = -0.5 />
+<landmark id = 10 x = 8.0 y = 21.0 theta = -0.5 />
+<landmark id = 11 x = 8.0 y = 20.5 theta = -0.5 />
+<landmark id = 12 x = 8.0 y = 20.0 theta = -0.5 />
+<landmark id = 13 x = 8.0 y = 19.5 theta = -0.5 />
+<landmark id = 14 x = 8.0 y = 19.0 theta = -0.5 />
+<landmark id = 15 x = 8.0 y = 18.5 theta = -0.5 />
+<landmark id = 16 x = 8.0 y = 18.0 theta = -0.5 />
+<landmark id = 17 x = 8.0 y = 17.5 theta = -0.5 />
+<landmark id = 18 x = 8.0 y = 17.0 theta = -0.5 />
+<landmark id = 19 x = 8.0 y = 16.5 theta = -0.5 />
+<landmark id = 20 x = 8.0 y = 16.0 theta = -0.5 />
+<landmark id = 10 x = 21.0 y = 14.0 theta = -0.5 />
+<landmark id = 11 x = 20.5 y = 14.0 theta = -0.5 />
+<landmark id = 12 x = 20.0 y = 14.0 theta = -0.5 />
+<landmark id = 13 x = 19.5 y = 14.0 theta = -0.5 />
+<landmark id = 14 x = 19.0 y = 14.0 theta = -0.5 />
+<landmark id = 15 x = 18.5 y = 14.0 theta = -0.5 />
+<landmark id = 16 x = 18.0 y = 14.0 theta = -0.5 />
+<landmark id = 17 x = 17.5 y = 14.0 theta = -0.5 />
+<landmark id = 18 x = 17.0 y = 14.0 theta = -0.5 />
+<landmark id = 19 x = 16.5 y = 14.0 theta = -0.5 />
+<landmark id = 20 x = 16.0 y = 14.0 theta = -0.5 />
+<landmark id = 10 x = 14.0 y = 1.0 theta = -0.5 />
+<landmark id = 11 x = 14.0 y = 1.5 theta = -0.5 />
+<landmark id = 12 x = 14.0 y = 2.0 theta = -0.5 />
+<landmark id = 13 x = 14.0 y = 2.5 theta = -0.5 />
+<landmark id = 14 x = 14.0 y = 3.0 theta = -0.5 />
+<landmark id = 15 x = 14.0 y = 3.5 theta = -0.5 />
+<landmark id = 16 x = 14.0 y = 4.0 theta = -0.5 />
+<landmark id = 17 x = 14.0 y = 4.5 theta = -0.5 />
+<landmark id = 18 x = 14.0 y = 5.0 theta = -0.5 />
+<landmark id = 19 x = 14.0 y = 5.5 theta = -0.5 />
+<landmark id = 20 x = 14.0 y = 6.0 theta = -0.5 />
+<landmark id = 10 x = 1.0 y = 8.0 theta = -0.5 />
+<landmark id = 11 x = 1.5 y = 8.0 theta = -0.5 />
+<landmark id = 12 x = 2.0 y = 8.0 theta = -0.5 />
+<landmark id = 13 x = 2.5 y = 8.0 theta = -0.5 />
+<landmark id = 14 x = 3.0 y = 8.0 theta = -0.5 />
+<landmark id = 15 x = 3.5 y = 8.0 theta = -0.5 />
+<landmark id = 16 x = 4.0 y = 8.0 theta = -0.5 />
+<landmark id = 17 x = 4.5 y = 8.0 theta = -0.5 />
+<landmark id = 18 x = 5.0 y = 8.0 theta = -0.5 />
+<landmark id = 19 x = 5.5 y = 8.0 theta = -0.5 />
+<landmark id = 20 x = 6.0 y = 8.0 theta = -0.5 />
+<landmark id = 21 x = 1.0 y = 14.0 theta = -0.5 />
+<landmark id = 22 x = 1.5 y = 14.0 theta = -0.5 />
+<landmark id = 23 x = 2.0 y = 14.0 theta = -0.5 />
+<landmark id = 24 x = 2.5 y = 14.0 theta = -0.5 />
+<landmark id = 25 x = 3.0 y = 14.0 theta = -0.5 />
+<landmark id = 26 x = 3.5 y = 14.0 theta = -0.5 />
+<landmark id = 27 x = 4.0 y = 14.0 theta = -0.5 />
+<landmark id = 28 x = 4.5 y = 14.0 theta = -0.5 />
+<landmark id = 29 x = 5.0 y = 14.0 theta = -0.5 />
+<landmark id = 30 x = 5.5 y = 14.0 theta = -0.5 />
+<landmark id = 31 x = 6.0 y = 14.0 theta = -0.5 />
+<landmark id = 21 x = 14.0 y = 21.0 theta = -0.5 />
+<landmark id = 22 x = 14.0 y = 20.5 theta = -0.5 />
+<landmark id = 23 x = 14.0 y = 20.0 theta = -0.5 />
+<landmark id = 24 x = 14.0 y = 19.5 theta = -0.5 />
+<landmark id = 25 x = 14.0 y = 19.0 theta = -0.5 />
+<landmark id = 26 x = 14.0 y = 18.5 theta = -0.5 />
+<landmark id = 27 x = 14.0 y = 18.0 theta = -0.5 />
+<landmark id = 28 x = 14.0 y = 17.5 theta = -0.5 />
+<landmark id = 29 x = 14.0 y = 17.0 theta = -0.5 />
+<landmark id = 30 x = 14.0 y = 16.5 theta = -0.5 />
+<landmark id = 31 x = 14.0 y = 16.0 theta = -0.5 />
+<landmark id = 21 x = 21.0 y = 8.0 theta = -0.5 />
+<landmark id = 22 x = 20.5 y = 8.0 theta = -0.5 />
+<landmark id = 23 x = 20.0 y = 8.0 theta = -0.5 />
+<landmark id = 24 x = 19.5 y = 8.0 theta = -0.5 />
+<landmark id = 25 x = 19.0 y = 8.0 theta = -0.5 />
+<landmark id = 26 x = 18.5 y = 8.0 theta = -0.5 />
+<landmark id = 27 x = 18.0 y = 8.0 theta = -0.5 />
+<landmark id = 28 x = 17.5 y = 8.0 theta = -0.5 />
+<landmark id = 29 x = 17.0 y = 8.0 theta = -0.5 />
+<landmark id = 30 x = 16.5 y = 8.0 theta = -0.5 />
+<landmark id = 31 x = 16.0 y = 8.0 theta = -0.5 />
+<landmark id = 21 x = 8.0 y = 1.0 theta = -0.5 />
+<landmark id = 22 x = 8.0 y = 1.5 theta = -0.5 />
+<landmark id = 23 x = 8.0 y = 2.0 theta = -0.5 />
+<landmark id = 24 x = 8.0 y = 2.5 theta = -0.5 />
+<landmark id = 25 x = 8.0 y = 3.0 theta = -0.5 />
+<landmark id = 26 x = 8.0 y = 3.5 theta = -0.5 />
+<landmark id = 27 x = 8.0 y = 4.0 theta = -0.5 />
+<landmark id = 28 x = 8.0 y = 4.5 theta = -0.5 />
+<landmark id = 29 x = 8.0 y = 5.0 theta = -0.5 />
+<landmark id = 30 x = 8.0 y = 5.5 theta = -0.5 />
+<landmark id = 31 x = 8.0 y = 6.0 theta = -0.5 />
+<landmark id = 50 x = 10.5 y = 13.0 theta = -0.5 />
+<landmark id = 51 x = 11.5 y = 13.0 theta = -0.5 />
+<landmark id = 52 x = 13.0 y = 11.5 theta = -0.5 />
+<landmark id = 53 x = 13.0 y = 10.5 theta = -0.5 />
+<landmark id = 54 x = 10.5 y = 9.0 theta = -0.5 />
+<landmark id = 55 x = 11.5 y = 9.0 theta = -0.5 />
+<landmark id = 56 x = 9.0 y = 10.5 theta = -0.5 />
+<landmark id = 57 x = 9.0 y = 11.5 theta = -0.5 />
+<landmark id = 100 x = 5.0 y = 21.0 theta = -0.5 />
+<landmark id = 101 x = 6.0 y = 21.0 theta = -0.5 />
+<landmark id = 100 x = 21.0 y = 17.0 theta = -0.5 />
+<landmark id = 101 x = 21.0 y = 16.0 theta = -0.5 />
+<landmark id = 100 x = 17.0 y = 1.0 theta = -0.5 />
+<landmark id = 101 x = 16.0 y = 1.0 theta = -0.5 />
+<landmark id = 100 x = 1.0 y = 5.0 theta = -0.5 />
+<landmark id = 101 x = 1.0 y = 6.0 theta = -0.5 />
+</LandmarkList>
+<ObservationModels>
+  <CamAruco2DObservationModel
+    sigma_range="0.05"
+    sigma_angle="1"
+    eta_rd="0.0"
+    eta_rphi = "0.0"
+    eta_thetad="0.0"
+    eta_thetaphi = "0.0"
+    camera_horizontal_fov = "45"
+    vcLabel = "cd1"
+  >
+  </CamAruco2DObservationModel>
+</ObservationModels>
+<MotionModels>
+  <!--UnicycleMotionModel
+    sigmaV="0.001"
+    etaV="0.001"
+    sigmaOmega="0.0001"
+    etaOmega="0.001"
+    P_Wg_filename=""
+    orbit_radius=5.0
+    wind_noise_pos="0.000001"
+    wind_noise_ang="0.000001" 
+    min_linear_velocity= 0.2
+    max_linear_velocity= 0.2
+    max_angular_velocity= 0.3
+    dt= 0.1
+    /> <!--No Noise--> 
+  <UnicycleMotionModel
+    sigmaV="0.012"
+    etaV="0.05"
+    sigmaOmega="0.001"
+    etaOmega="0.03"
+    P_Wg_filename=""
+    orbit_radius=5.0
+    wind_noise_pos="0.000001"
+    wind_noise_ang="0.000001" 
+    min_linear_velocity= 0.5
+    max_linear_velocity= 1.0
+    max_angular_velocity= 0.32
+    dt= 0.1
+    /> <!--omega is in radians--> 
+  <OmnidirectionalMotionModel 
+    max_connect_radius="30.0"
+    robot_link_length="0.2"
+    sigma="0.00"
+    eta="0.000"
+    wind_noise_pos="0.05"
+    wind_noise_ang="0.00" 
+    P_Wg_filename=""
+    dt=0.10 
+    V=5.0 
+    omega="1.5708"/> <!--omega is in radians, wind_noise_ang is in degrees -->
+    <!--wind_noise_pos="1.000"
+    wind_noise_ang="7.0"-->
+</MotionModels>
+<PlanningProblem>
+    <Environment
+        environmentFile = "./Models/ICRA2015Exp2.obj"
+    />
+    <Robot
+        robotFile = "./Models/iRobot.obj"
+    />
+     <StartPose
+        x = "15.0"
+        y = "19.5"
+        theta = "1.57"
+    />
+    <GoalPose
+        x = "19.0"
+        y = "1.5"
+        theta = "0"
+    />
+    <PlanningTime
+        maxTime = "2400"
+    />
+    <FIRMNodes
+        minNodes = "125"
+    />
+    <KidnappedState
+        x = 1.5 y = 19.5 theta = 1.57 
+    />
+</PlanningProblem>

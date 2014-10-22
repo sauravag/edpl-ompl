@@ -37,7 +37,7 @@
 #include "../../include/Filters/ExtendedKF.h"
 #include "boost/date_time/local_time/local_time.hpp"
 
-const int ExtendedKF::covGrowthFactor_=1.1;
+const int ExtendedKF::covGrowthFactor_=1.01;
 
 void ExtendedKF::Predict(const ompl::base::State *belief,
   const ompl::control::Control* control,
@@ -48,8 +48,11 @@ void ExtendedKF::Predict(const ompl::base::State *belief,
 
   this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predictedState);
 
-  mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
-    ls.getG() * ls.getQ() * trans(ls.getG());
+  mat A = ls.getA();
+  mat G = ls.getG();
+
+  mat covPred = A * belief->as<StateType>()->getCovariance() * trans(A) +
+    G * ls.getQ() * trans(G);
 
   predictedState->as<StateType>()->setCovariance(covPred);
 
@@ -67,10 +70,6 @@ const LinearSystem& ls, ompl::base::State *updatedState)
   {
     si_->copyState(updatedState, belief);
 
-    arma::mat covTemp = updatedState->as<StateType>()->getCovariance();
-
-    updatedState->as<StateType>()->setCovariance(covTemp*covGrowthFactor_);
-
     return; // return the prediction if you don't have any innovation
   }
 
@@ -79,8 +78,10 @@ const LinearSystem& ls, ompl::base::State *updatedState)
 
   mat covPred = belief->as<StateType>()->getCovariance();
 
-  mat rightMatrix = ls.getH() * covPred * trans(ls.getH()) + ls.getR();
-  mat leftMatrix = covPred * trans(ls.getH());
+  mat H = ls.getH();
+
+  mat rightMatrix = H * covPred * trans(H) + ls.getR();
+  mat leftMatrix = covPred * trans(H);
   mat KalmanGain = solve(trans(rightMatrix), trans(leftMatrix));
   KalmanGain = KalmanGain.t();
 
@@ -90,7 +91,7 @@ const LinearSystem& ls, ompl::base::State *updatedState)
 
   updatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
 
-  mat covEst = covPred - KalmanGain* ls.getH() * covPred;
+  mat covEst = covPred - KalmanGain* H * covPred;
 
   updatedState->as<StateType>()->setCovariance(covEst);
 

@@ -31,12 +31,14 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
+/* Author: Saurav Agarwal */
 
 #ifndef FIRM_OMPL_MM_POLICY_GENERATOR_H
 #define FIRM_OMPL_MM_POLICY_GENERATOR_H
 
 
 #include <ompl/geometric/planners/rrt/RRT.h>
+//#include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/pending/disjoint_sets.hpp>
@@ -85,7 +87,7 @@ class MMPolicyGenerator
         }
 
         /** \brief Destructor */
-        ~MMPolicyGenerator()
+        virtual ~MMPolicyGenerator()
         {
             while(!currentBeliefStates_.empty())
             {
@@ -93,6 +95,9 @@ class MMPolicyGenerator
             }
 
         }
+
+        /** \brief This function samples the beliefs, which form the starting point for the multi-modal scenario*/
+        void sampleNewBeliefStates();
 
         /** \brief Compute distance between two milestones (this is simply distance between the states of the milestones) */
         double distanceFunction(const Vertex a, const Vertex b) const
@@ -166,23 +171,39 @@ class MMPolicyGenerator
         virtual void propagateBeliefs(const ompl::control::Control *control);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
-        virtual void updateWeights();
+        virtual void updateWeights(const arma::colvec trueObservation);
 
-        virtual arma::colvec computeInnovation(const arma::colvec Zprd, const arma::colvec Zg);
+        /** \brief Compute the innovation between the robot's and mode's observation*/
+        virtual arma::colvec computeInnovation(const int currentBeliefIndx, const arma::colvec trueObservation, double &weightFactor);
 
-        void removeBelief(const int Indx);
+        /** \brief Remove modes that are no longer considered important*/
+        void removeBeliefs(const std::vector<int> Indxs);
 
+        /** \brief Print the mode weights*/
         void printWeights() const
         {
-            OMPL_INFORM("~~Printing Weights~~");
+            OMPL_INFORM("MMPolicyGenerator: Printing Weights");
+
             for(unsigned int i=0; i < weights_.size(); i++)
             {
-                std::cout<<"The Weight of mode #"<<i<<"  ->  "<<weights_[i]<<std::endl;
+                OMPL_INFORM("MMPolicyGenerator: The Weight of mode #%u = %f ",i,weights_[i]);
             }
-            OMPL_INFORM("~~End Weights~~ \n");
+
         }
 
+        /** \brief checks if the beliefs have converged */
+        bool isConverged();
+
+        /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
+        bool areCurrentBeliefsValid();
+
+        /** \brief get the state with the max weight and its weight */
+        void getStateWithMaxWeight(ompl::base::State *state, float &weight);
+
+
     private:
+
+        //float computeWeightForMode(const int currentBeliefIndx,const arma::colvec trueObservation);
 
          /** \brief Add the a state to the observation graph*/
         void addStateToObservationGraph(ompl::base::State *state);
@@ -207,6 +228,18 @@ class MMPolicyGenerator
 
         /** \brief Returns true if all weights are same, false otherwise*/
         bool areSimilarWeights();
+
+        /** \brief if 2 modes have the same weight and pose, then they are duplicates */
+        void removeDuplicateModes();
+
+        /** \brief draw the current beliefs */
+        void drawBeliefs();
+
+        /** \brief Normalize the weights of modes */
+        void normalizeWeights();
+
+        /** \brief sets a uniform weight for all modes */
+        void assignUniformWeight();
 
         /** \brief Container for the current modes/beliefs*/
         std::vector<ompl::base::State*> currentBeliefStates_;
@@ -248,6 +281,9 @@ class MMPolicyGenerator
         mutable boost::mutex                                   graphMutex_;
 
         unsigned int maxEdgeID_;
+
+        /** \brief keep a track of how long a belief has been predicting to observe something that is not seen by the robot*/
+        std::vector<double> timeSinceDivergence_;
 
 };
 #endif

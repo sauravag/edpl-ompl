@@ -1,28 +1,28 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
-<landmark id = 1 x = 2.5 y = 1.0  theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 1.0  theta = 0.0 />
-<landmark id = 1 x = 2.5 y = 4.0 theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 4.0 theta = 0.0 />
-<landmark id = 1 x = 2.5 y = 8.0 theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 8.0 theta = 0.0 />
-<landmark id = 1 x = 2.5 y = 12.0 theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 12.0 theta = 0.0 />
-<landmark id = 1 x = 2.5 y = 16.0 theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 16.0 theta = 0.0 />
-<landmark id = 1 x = 2.5 y = 20.0 theta = 0.0 />
-<landmark id = 1 x = 12.5 y = 20.0 theta = 0.0 />
-<landmark id = 100 x = 7.5 y = 19.0 theta = 0.0 />
-<landmark id = 101 x = 11.5 y = 16.0 theta = 0.0 />
+<landmark id = 1 x = 2.5 y = 0.0  theta = -0.5 />
+<landmark id = 2 x = 2.5 y = 4.0 theta = -0.5 />
+<landmark id = 3 x = 2.5 y = 8.0 theta = -0.5 />
+<landmark id = 4 x = 2.5 y = 12.0 theta = -0.5 />
+<landmark id = 5 x = 2.5 y = 16.0 theta = -0.5 />
+<landmark id = 6 x = 2.5 y = 20.0 theta = -0.5 />
+<landmark id = 1 x = 12.5 y = 20.0  theta = -0.5 />
+<landmark id = 2 x = 12.5 y = 16.0 theta = -0.5  />
+<landmark id = 3 x = 12.5 y = 12.0 theta = -0.5  />
+<landmark id = 4 x = 12.5 y = 8.0 theta = -0.5   />
+<landmark id = 5 x = 12.5 y = 4.0 theta = -0.5   />
+<landmark id = 6 x = 12.5 y = 0.0 theta = -0.5   />
+<landmark id = 101 x = 3.5 y = 19.0 theta = 1.0 />
+<landmark id = 102 x = 12.5 y = 1.0 theta = 0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
     sigma_range="0.05"
-    sigma_angle="2.00"
-    eta_rd="0.100"
+    sigma_angle="0.5"
+    eta_rd="0.02"
     eta_rphi = "0.01"
     eta_thetad="0.01"
-    eta_thetaphi = "0.05"
+    eta_thetaphi = "0.01"
     camera_horizontal_fov = "45"
     vcLabel = "cd1"
   >
@@ -44,10 +44,10 @@
     dt= 0.1
     /> <!--No Noise--> 
   <UnicycleMotionModel
-    sigmaV="0.0022"
-    etaV="0.05"
+    sigmaV="0.001"
+    etaV="0.001"
     sigmaOmega="0.001"
-    etaOmega="0.04"
+    etaOmega="0.0"
     P_Wg_filename=""
     orbit_radius=5.0
     wind_noise_pos="0.000001"
@@ -72,27 +72,25 @@
     wind_noise_ang="7.0"-->
 </MotionModels>
 <BeliefList>
-    <belief x = 2.5  y = 10.0 theta = 1.57 />
-    <belief x = 12.5  y = 10.0 theta = 1.57 />
+    <belief x = 2.5  y = 11.0 theta = 1.57 />
+    <belief x = 12.5  y = 9.0 theta = -1.57 />
 </BeliefList>
 <TargetList>
-    <target x = 2.5 y = 0.5  theta = 1.57 />
-    <target x = 12.5 y = 0.5  theta = 1.57 />
-    <target x = 2.5 y = 7.0  theta = 1.57 />
-    <target x = 2.5  y = 19.0 theta = 1.57 />
-    <target x = 7.0  y = 19.0  theta = 0.0  /> 
-    <target x = 12.5  y = 19.0  theta = 1.57 />
+    <target x = 2.5 y = 19.0  theta = 0 />
+    <target x = 12.5 y = 2.0  theta = -1.57 />
+    <target x = 2.5  y = 15.0 theta = 1.57 />
+    <target x = 12.5 y = 9.0  theta = -1.57 />
 </TargetList>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/MMEnvExp2.obj"
+        environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/MMEnvExp2.obj"
     />
     <Robot
-        robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+        robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
     />
     <StartPose
         x = "2.50"
-        y = "10.0"
+        y = "11.0"
         theta = "1.57"
     />
     <GoalPose

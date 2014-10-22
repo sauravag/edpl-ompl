@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+/* Author: Saurav Agarwal */
 
 #include "FIRM2DSetup.h"
 #include "MultiModalSetup.h"
@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupFIRMExp2.xml";
+    std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -61,6 +61,8 @@ void plan()
     Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
 
     Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
+
+    Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
     if(mySetup->solve())
     {
@@ -73,41 +75,18 @@ void plan()
     {
         OMPL_INFORM("Unable to find Solution in given time.");
 
-        exit(1);
     }
+
+    delete mySetup;
 
 }
 
-void testMultiModal()
-{
-    MultiModalSetup *mySetup(new MultiModalSetup);
-
-    std::string setupFilePath = "/home/sauravagarwal/Research/Development/FIRM-OMPL/SetupFiles/SetupMM2b.xml";
-
-    mySetup->setPathToSetupFile(setupFilePath.c_str());
-
-    mySetup->setup();
-
-    Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
-
-    Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
-
-    if(mySetup->solve())
-    {
-
-        OMPL_INFORM("Plan Executed Successfully");
-
-    }
-    else
-    {
-        OMPL_INFORM("Unable to find Solution in given time.");
-    }
-
-    return;
-}
 
 int main(int argc, char *argv[])
 {
+    srand(1234567);
+
+    arma_rng::set_seed(1234567);
 
     QApplication app(argc, argv);
 
@@ -119,7 +98,7 @@ int main(int argc, char *argv[])
 
     window.resetCamera();
 
-    boost::thread solveThread(testMultiModal);
+    boost::thread solveThread(plan);
 
     app.exec();
 
@@ -128,5 +107,6 @@ int main(int argc, char *argv[])
     OMPL_INFORM("Task Complete");
 
     return 0;
+
 
 }

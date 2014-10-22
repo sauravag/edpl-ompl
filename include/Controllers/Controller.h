@@ -235,7 +235,6 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
   unsigned int k = 0;
 
-
   //HOW TO SET INITAL VALUE OF COST
   //cost = 1 ,for time based only if time per execution is "1"
   //cost = 0.01 , for covariance based
@@ -250,6 +249,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
   ompl::base::State *tempEndState = si_->allocState();
 
   si_->copyState(tempEndState, startState);
+
+  int deviationCounter = 0;
 
   while(!this->isTerminated(tempEndState, k))
   {
@@ -277,8 +278,10 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
-         si_->copyState(endState, internalState);
-         return false;
+
+        si_->copyState(endState, internalState);
+        return false;
+
     }
 
     k++;
@@ -354,8 +357,6 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const ompl:
       return false;
     }
 
-    step_++;
-
     //Increment cost by:
     //-> 0.01 for time based
     //-> trace(Covariance) for FIRM
@@ -364,6 +365,8 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const ompl:
     if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 
     executionCost.v = cost;
+
+    si_->freeState(internalState);
 
     return true ;
 }
@@ -379,9 +382,13 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
     si_->copyState(tempState, startState);
     ompl::base::State *tempEndState = si_->allocState();
 
+    //step_ = 0;
+
     for(int i=0; i < numSteps; i++)
     {
         bool e = executeOneStep(tempState,tempEndState, executionCost, constructionMode);
+
+        step_++;
 
         si_->copyState(tempState, tempEndState);
         si_->copyState(endState, tempEndState);

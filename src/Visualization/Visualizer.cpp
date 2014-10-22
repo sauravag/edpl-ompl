@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan */
+/* Authors: Aditya Mahadevan, Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
 #include "../../include/Visualization/Visualizer.h"
 
@@ -62,7 +62,6 @@ int Visualizer::envIndx_   = -1;
 
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
-
 
     double scale = 0.15;
 
@@ -95,6 +94,7 @@ void Visualizer::drawRobot(const ompl::base::State *state)
 
         glPushMatrix();
             glTranslated(x[0], x[1], 0);
+            glRotated(-90+(180/3.14157)*x[2],0,0,1);
             glCallList(robotIndx_);
         glPopMatrix();
     }
@@ -164,7 +164,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     if(trace(covariance) != 0)
     {
         double chi2 = 9.21034;
-        double magnify = 4.0; // scaled up for viewing
+        double magnify = 1.0; // scaled up for viewing
         mat pos;
         for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())
         {
@@ -177,26 +177,34 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         pos *= magnify;
 
         int nPoints = pos.n_rows;
-
-        mat K = trans(chol(covariance.submat(0,0,1,1)));
-        mat shift;
-
-        shift = join_cols((ones(1,nPoints)*x[0]),(ones(1,nPoints)*x[1]));
-
-        mat transformed = K*trans(pos) + shift;
-
-        glPushMatrix();
-
-        glBegin(GL_LINES);
-
-        for(unsigned int i = 0; i < transformed.n_cols; ++i)
+        /*
+        try
         {
-            glVertex2f(transformed(0,i), transformed(1,i));
+            mat K = trans(chol(covariance.submat(0,0,1,1)));
+            mat shift;
+
+            shift = join_cols((ones(1,nPoints)*x[0]),(ones(1,nPoints)*x[1]));
+
+            mat transformed = K*trans(pos) + shift;
+
+            glPushMatrix();
+
+            glBegin(GL_LINES);
+
+            for(unsigned int i = 0; i < transformed.n_cols; ++i)
+            {
+                glVertex2f(transformed(0,i), transformed(1,i));
+            }
+
+            glEnd();
+
+            glPopMatrix();
         }
-
-        glEnd();
-
-        glPopMatrix();
+        catch(int e)
+        {
+            OMPL_INFORM("Visualizer: Covariance cholesky did not converge...proceeding");
+        }
+        */
     }
 
 }

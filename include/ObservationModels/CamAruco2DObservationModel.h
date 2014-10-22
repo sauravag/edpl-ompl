@@ -71,17 +71,29 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     // get the observation for a given configuration,
     // corrupted by noise from a given distribution
     /** \brief Constructor */
-    CamAruco2DObservationModel(const char *pathToSetupFile) : ObservationModelMethod()
+    CamAruco2DObservationModel(ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) : ObservationModelMethod(si)
     {
 
-      // initialize etaPhi_, etaD_, sigma_;
-      this->loadLandmarks(pathToSetupFile);
-      this->loadParameters(pathToSetupFile);
+        // initialize etaPhi_, etaD_, sigma_;
+        this->loadLandmarks(pathToSetupFile);
+        this->loadParameters(pathToSetupFile);
     }
 
     ObservationType getObservation(const ompl::base::State *state, bool isSimulation);
 
     ObservationType getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg);
+
+     /** \brief Find the observation based on the given state and landmark to a correspongind landmark.
+        eg. if ground robot sees landmark 1, then what is the predicted observation to this landmark
+    */
+    ObservationType getObservationToCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark)
+    {
+        arma::colvec candidate;
+
+        this->findCorrespondingLandmark(state, observedLandmark, candidate);
+
+        return candidate;
+    }
 
     // Jx = dh/dx
     JacobianType getObservationJacobian(const ompl::base::State *state, const ObsNoiseType& v, const ObservationType& z);
@@ -92,7 +104,10 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z);
 
-    bool isLandmarkVisible(const arma::colvec xVec, const arma::colvec& landmark, double& range, double& bearing, double& viewingAngle);
+    /** \brief Checks if there is a clear line of sight from the robot to the landmark */
+    bool hasClearLineOfSight(const ompl::base::State *state, const arma::colvec& landmark);
+
+    bool isLandmarkVisible(const ompl::base::State *state, const arma::colvec& landmark, double& range, double& bearing, double& viewingAngle);
 
     //void WriteLandmarks();
 
@@ -102,11 +117,19 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     ObservationType removeSpuriousObservations(const ObservationType& Zg);
 
+    /** \brief Estimates the range and bearing from given state to landmark */
+    void calculateRangeBearingToLandmark(const ompl::base::State *state, const arma::colvec& landmark, double& range, double& bearing);
+
+    /** \brief Calculates the likelihood of an observation prediction */
+    double getDataAssociationLikelihood(const arma::colvec trueObs, const arma::colvec predictedObs);
+
+    /** \brief Given a landmark that the robot observes (id, range, bearing..) Find the corresponding landmark,returns the position in the landmark list  */
+    int findCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark, arma::colvec &candidateObservation);
+
     std::vector<arma::colvec> landmarks_;
 
     //Function to load landmarks from XML file into the object
     void loadLandmarks(const char *pathToSetupFile);
-
 
     void loadParameters(const char *pathToSetupFile);
 };

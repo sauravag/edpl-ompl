@@ -295,9 +295,11 @@ UnicycleMotionModel::getNoiseJacobian(const ompl::base::State *state, const ompl
 
     mat G(3,5);
 
+
     G   <<  cos(theta) << 0 << 1 << 0 << 0 << endr
       <<  sin(theta) << 0 << 0 << 1 << 0 << endr
       <<          0  << 1 << 0 << 0 << 1 << endr;
+
 
     G *= sqrt(this->dt_);
     return G;
@@ -400,16 +402,22 @@ void UnicycleMotionModel::loadParameters(const char *pathToSetupFile)
     maxAngularVelocity_ = maxAngularVelocity;
     dt_                 = dt;
 
+    OMPL_INFORM("UnicycleMotionModel: sigma_ = ");
+    std::cout<<sigma_<<std::endl;
 
-    std::cout<<"Motion Model parameters loaded"<<std::endl;
-    std::cout<<"sigma_  : "<<sigma_<<std::endl;
-    std::cout<<"eta_   :"<<eta_<<std::endl;
-    std::cout<<"P_Wg_ :"<<P_Wg_<<std::endl;
-    std::cout<<"minLinearVelocity_ :"<<minLinearVelocity_<<std::endl;
-    std::cout<<"maxLinearVelocity_ :"<<maxLinearVelocity_<<std::endl;
-    std::cout<<"maxAngularVelocity_ :"<<maxAngularVelocity_<<std::endl;
-    std::cout<<"dt_ :"<<dt_<<std::endl;
-    std::cout<<"Motion Model parameters finished"<<std::endl;
+    OMPL_INFORM("UnicycleMotionModel: eta_ = ");
+    std::cout<<eta_<<std::endl;
+
+    OMPL_INFORM("UnicycleMotionModel: P_Wg_ = ");
+    std::cout<<P_Wg_<<std::endl;
+
+    OMPL_INFORM("UnicycleMotionModel: min Linear Velocity (m/s)    = %f", minLinearVelocity_ );
+
+    OMPL_INFORM("UnicycleMotionModel: max Linear Velocity (m/s)    = %f", maxLinearVelocity_);
+
+    OMPL_INFORM("UnicycleMotionModel: max Angular Velocity (rad/s) = %f",maxAngularVelocity_);
+
+    OMPL_INFORM("UnicycleMotionModel: Timestep (seconds) = %f", dt_);
 
 }
 

@@ -120,7 +120,10 @@ class MotionModelMethod
 		virtual ompl::control::Control* getZeroControl() { return zeroControl_; }
 
 		/** \brief Get the zero noise. */
-		virtual const NoiseType& getZeroNoise()  { return zeroNoise_; }
+		virtual const NoiseType& getZeroNoise()
+		{
+            return zeroNoise_;
+        }
 
         /** \brief Get the control dimension. */
         virtual const size_t controlDim()           { return controlDim_; }
