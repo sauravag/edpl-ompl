@@ -820,6 +820,33 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
 }
 
+double FIRM::evaluateSuccessProbability(const FIRM::Vertex start, const FIRM::Vertex goal)
+{
+    double successProb = 1.0;
+
+    Vertex v = start;
+
+    while(v != goal)
+    {
+        Vertex targetVertex;
+
+        Edge edge = feedback_[v];
+
+        const FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, edge);
+
+        const double transitionProbability  = edgeWeight.getSuccessProbability();
+
+        successProb = successProb * transitionProbability;
+
+        targetVertex = boost::target(edge, g_);
+
+        v = targetVertex;
+    }
+
+    return successProb;
+}
+
+
 void FIRM::executeFeedback(void)
 {
 
@@ -852,13 +879,15 @@ void FIRM::executeFeedback(void)
     {
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
 
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(currentVertex, goal) ) );
+
         Edge e = feedback_[currentVertex];
 
         controller = edgeControllers_[e];
 
         ompl::base::Cost cost;
 
-        int stepsExecuted=0;
+        int stepsExecuted = 0;
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, false);
 
@@ -937,10 +966,18 @@ void FIRM::executeFeedback(void)
 
     }
 
+    for(int i=0; i < successProbabilityHistory_.size(); i++)
+    {
+        std::cout<<"SuccessProb: "<< successProbabilityHistory_[i].second<<std::endl;
+    }
+
+    std::cin.get();
+
     costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
+    writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
 
-    writeCostToGoHistoryToFile("StandardFIRMCostHistory.csv");
+    writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory", "successProbability");
 
 }
 
@@ -979,8 +1016,11 @@ void FIRM::executeFeedbackWithRollout(void)
 
     costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[start]));
 
+    successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(currentVertex, goal) ) );
+
+
     // While the robot state hasn't reached the goal state, keep running
-    while(/*!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)*/ si_->distance(cstartState, stateProperty_[goal]) > 0.2)
+    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
 
         EdgeControllerType controller = edgeControllers_[e];
@@ -993,7 +1033,7 @@ void FIRM::executeFeedbackWithRollout(void)
         */
         int stepsExecuted = 0;
 
-        controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT,cstartState,cendState,cost,stepsExecuted, false);
+        controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT, cstartState, cendState, cost, stepsExecuted, false);
 
         currentTimeStep_ += stepsExecuted;
 
@@ -1009,8 +1049,11 @@ void FIRM::executeFeedbackWithRollout(void)
 
         e = generateRolloutPolicy(tempVertex);
 
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(currentVertex, goal) ) );
+
         // clear the rollout candidate connection drawings and show the selected edge
         Visualizer::clearRolloutConnections();
+
         Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[boost::target(e,g_)]);
 
         boost::remove_vertex(tempVertex, g_);
@@ -1023,7 +1066,10 @@ void FIRM::executeFeedbackWithRollout(void)
 
     costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
-    writeCostToGoHistoryToFile("RolloutFIRMCostHistory.csv");
+    writeTimeSeriesDataToFile("RolloutFIRMCostHistory.csv", "costToGo");
+
+    writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory", "successProbability");
+
 }
 
 void FIRM::showRolloutConnections(const FIRM::Vertex v)
