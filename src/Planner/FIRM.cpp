@@ -853,6 +853,8 @@ void FIRM::executeFeedback(void)
     Vertex start = startM_[0];
     Vertex goal  = goalM_[0] ;
 
+    ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
+
     sendMostLikelyPathToViz(start, goal);
 
     siF_->setTrueState(stateProperty_[start]);
@@ -875,7 +877,7 @@ void FIRM::executeFeedback(void)
 
     currentTimeStep_ = 0;
 
-    while(currentVertex != goal)
+    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)/*currentVertex != goal*/)
     {
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
 
@@ -966,13 +968,6 @@ void FIRM::executeFeedback(void)
 
     }
 
-    for(int i=0; i < successProbabilityHistory_.size(); i++)
-    {
-        std::cout<<"SuccessProb: "<< successProbabilityHistory_[i].second<<std::endl;
-    }
-
-    std::cin.get();
-
     costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
     writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
@@ -1033,7 +1028,15 @@ void FIRM::executeFeedbackWithRollout(void)
         */
         int stepsExecuted = 0;
 
-        controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT, cstartState, cendState, cost, stepsExecuted, false);
+        // This If/Else condition is a hack, so that we avoid rollout in intial turn
+        if(currentTimeStep_ == 0)
+        {
+            controller.executeUpto(75, cstartState, cendState, cost, stepsExecuted, false);
+        }
+        else
+        {
+            controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT, cstartState, cendState, cost, stepsExecuted, false);
+        }
 
         currentTimeStep_ += stepsExecuted;
 

@@ -168,7 +168,7 @@
   <UnicycleMotionModel
     sigmaV="0.012"
     etaV="0.05"
-    sigmaOmega="0.001"
+    sigmaOmega="0.01"
     etaOmega="0.03"
     P_Wg_filename=""
     orbit_radius=5.0
