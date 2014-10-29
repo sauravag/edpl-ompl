@@ -66,7 +66,7 @@ void plan()
 
     if(mySetup->solve())
     {
-        mySetup->executeSolution(1);
+        mySetup->executeSolution(2); //0: FIRM, 1 : rollout , 2: kidnapping-multi-modal
 
         OMPL_INFORM("Plan Executed Successfully");
 

@@ -228,6 +228,10 @@ public:
         {
             planner_->as<FIRM>()->executeFeedbackWithRollout();
         }
+        if(choice==2)
+        {
+            planner_->as<FIRM>()->executeFeedbackWithKidnapping();
+        }
         else
         {
             planner_->as<FIRM>()->executeFeedback();

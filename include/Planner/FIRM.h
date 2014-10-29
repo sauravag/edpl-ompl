@@ -232,6 +232,9 @@ public:
      /** \brief Executes the generated policy on the system */
     void executeFeedback(void);
 
+    /** \brief Executes the generated policy on the system with kidnapping in the middle of a run */
+    void executeFeedbackWithKidnapping(void);
+
     /** \brief Executes the rollout policy algorithm (See ICRA '14 paper) */
     void executeFeedbackWithRollout(void);
 

@@ -871,6 +871,91 @@ void FIRM::executeFeedback(void)
 
     OMPL_INFORM("FIRM: Running policy execution");
 
+    currentTimeStep_ = 0;
+
+    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
+    {
+        costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
+
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(currentVertex, goal) ) );
+
+        Edge e = feedback_[currentVertex];
+
+        controller = edgeControllers_[e];
+
+        ompl::base::Cost cost;
+
+        int stepsExecuted = 0;
+
+        bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, false);
+
+        currentTimeStep_ += stepsExecuted;
+
+        if(controllerStatus)
+        {
+            currentVertex = boost::target(e, g_);
+        }
+        else
+        {
+            // get a copy of the true state
+            ompl::base::State *tempTrueStateCopy = si_->allocState();
+
+            siF_->getTrueState(tempTrueStateCopy);
+
+            int numVerticesBefore = boost::num_vertices(g_);
+
+            currentVertex = addStateToGraph(cendState);
+
+            int numVerticesAfter = boost::num_vertices(g_);
+
+            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
+            siF_->setTrueState(tempTrueStateCopy);
+
+            siF_->freeState(tempTrueStateCopy);
+
+            assert(numVerticesAfter-numVerticesBefore >0);
+
+            solveDynamicProgram(goal);
+
+
+        }
+
+        si_->copyState(cstartState, cendState);
+
+    }
+
+    costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
+
+    writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
+
+    writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory", "successProbability");
+
+}
+
+void FIRM::executeFeedbackWithKidnapping(void)
+{
+
+    Vertex start = startM_[0];
+    Vertex goal  = goalM_[0] ;
+
+    ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
+
+    sendMostLikelyPathToViz(start, goal);
+
+    siF_->setTrueState(stateProperty_[start]);
+    siF_->setBelief(stateProperty_[start]);
+
+    Vertex currentVertex =  start;
+
+    EdgeControllerType controller;
+
+    ompl::base::State *cstartState = si_->allocState();
+    si_->copyState(cstartState, stateProperty_[start]);
+
+    ompl::base::State *cendState = si_->allocState();
+
+    OMPL_INFORM("FIRM: Running policy execution");
+
     bool kidnapped_flag = false;
 
     int kidnappingCounter  = 0;
@@ -930,7 +1015,7 @@ void FIRM::executeFeedback(void)
         3. Sample modes and run policygen till you converge to one mode
         4. get back to policy execution
         */
-        /*
+
         if(si_->distance(cstartState,stateProperty_[goal]) < 6.0 && !kidnapped_flag && kidnappingCounter < 1)
         {
             std::cout<<"Before Simulated Kidnapping! (Press Enter) \n";
@@ -962,7 +1047,7 @@ void FIRM::executeFeedback(void)
 
             kidnapped_flag = false;
         }
-        */
+
 
         si_->copyState(cstartState, cendState);
 
@@ -970,9 +1055,9 @@ void FIRM::executeFeedback(void)
 
     costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
-    writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
+    //writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
 
-    writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory", "successProbability");
+    //writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory", "successProbability");
 
 }
 
