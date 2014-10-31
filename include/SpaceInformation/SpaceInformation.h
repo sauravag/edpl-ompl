@@ -68,6 +68,7 @@ namespace firm
                 trueState_ = this->allocState();
                 belief_    = this->allocState();
                 showRobot_ = true;
+                logVelocity_ = false;
             }
 
 
@@ -110,23 +111,47 @@ namespace firm
                 return this->isValid(trueState_);
             }
 
-            void applyControl(const ompl::control::Control *control, bool withNoise = true);
+            virtual void applyControl(const ompl::control::Control *control, bool withNoise = true);
 
-            ObservationType getObservation() ;
+            virtual ObservationType getObservation() ;
 
             void showRobotVisualization(bool flag)
             {
                 showRobot_ = flag;
             }
 
+            void getVelocityLog(std::vector<std::pair<double,double> > &vLog)
+            {
+                vLog = velocityLog_;
+            }
+
+            void doVelocityLogging(bool logFlag)
+            {
+                logVelocity_ = logFlag;
+            }
 
         protected:
 
-            ObservationModelPointer observationModel_; // a model of the robot's sensor
-            MotionModelPointer motionModel_; // a model of the robot's motion
-            ompl::base::State *trueState_; // The real state of the robot
-            ompl::base::State *belief_; // the estimated state of the robot
+            /** \brief Model of the robot's sensor */
+            ObservationModelPointer observationModel_;
+
+            /** \brief Model of the robot's motion */
+            MotionModelPointer motionModel_;
+
+            /** \brief The real state of the robot */
+            ompl::base::State *trueState_;
+
+            /** \brief The estimated state of the robot */
+            ompl::base::State *belief_;
+
+            /** \brief Boolean that control robot visualization */
             bool showRobot_;
+
+            /** \brief To log/not log velocity*/
+            bool logVelocity_;
+
+            /** \brief Storage for velocity log */
+            std::vector<std::pair<double,double> > velocityLog_;
 
 
 

@@ -77,6 +77,12 @@ void firm::SpaceInformation::applyControl(const ompl::control::Control *control,
         Visualizer::updateTrueState(trueState_);
     }
 
+    if(logVelocity_)
+    {
+        const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
+
+        velocityLog_.push_back(std::make_pair(conVals[0], conVals[1]));
+    }
 
 }
 

@@ -191,11 +191,10 @@ void GLWidget::initializeGL()
 {
     glClearColor(0.5,0.5,0.5,1.);
     glDisable(GL_LIGHTING);
-    //glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
-    glEnable(GL_DEPTH_TEST);
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    glDisable(GL_DEPTH_TEST);
+    //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
@@ -208,13 +207,14 @@ void GLWidget::initializeGL()
 //Update function for GL Scene
 void GLWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT /*| GL_DEPTH_BUFFER_BIT*/);
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
 
     //projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    //glOrtho (0, 640, 480, 0, 0, 1);
     gluPerspective(m_camZoom, (GLfloat) width()/(GLfloat) height(), 1.0, 100.0);
     //model
     glMatrixMode(GL_MODELVIEW);
