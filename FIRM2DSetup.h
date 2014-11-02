@@ -224,18 +224,24 @@ public:
 
     void executeSolution(int choice=0)
     {
-        if(choice==1)
+        switch(choice)
         {
-            planner_->as<FIRM>()->executeFeedbackWithRollout();
+            case 1:
+
+                planner_->as<FIRM>()->executeFeedbackWithRollout();
+                break;
+
+            case 2:
+
+                planner_->as<FIRM>()->executeFeedbackWithKidnapping();
+                break;
+
+            default:
+
+                planner_->as<FIRM>()->executeFeedback();
+                break;
         }
-        if(choice==2)
-        {
-            planner_->as<FIRM>()->executeFeedbackWithKidnapping();
-        }
-        else
-        {
-            planner_->as<FIRM>()->executeFeedback();
-        }
+
     }
 
 

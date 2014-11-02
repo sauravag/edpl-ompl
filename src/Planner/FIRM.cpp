@@ -65,7 +65,7 @@ namespace ompl
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;//10
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
 
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 200;
@@ -88,7 +88,7 @@ namespace ompl
 
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
 
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0;
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // meters
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
@@ -120,7 +120,7 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
     specs_.approximateSolutions = true;
     specs_.optimizingPaths = true;
 
-    Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
+    //Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
 
     minFIRMNodes_ = 25;
 
@@ -150,7 +150,7 @@ void FIRM::setup(void)
     {
         //connectionStrategy_ = ompl::geometric::KStarStrategy<Vertex>(boost::bind(&FIRM::milestoneCount, this), nn_, si_->getStateDimension());
         connectionStrategy_ = FStrategy<Vertex>(ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
-        //connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
+        //connectionStrategy_ = ompl::geometric::KBoundedStrategy<Vertex>(ompl::magic::DEFAULT_NEAREST_NEIGHBORS, ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
     }
 
     int np = ompl::magic::NUM_MONTE_CARLO_PARTICLES;
@@ -1098,12 +1098,19 @@ void FIRM::executeFeedbackWithRollout(void)
 
     successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(currentVertex, goal) ) );
 
+    double averageTimeForRolloutComputation = 0;
+
+    int numberOfRollouts = 0;
+
+    Edge previousEdge = e ;
 
     // While the robot state hasn't reached the goal state, keep running
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
 
         EdgeControllerType controller = edgeControllers_[e];
+
+        assert(controller.getGoal());
 
         ompl::base::Cost cost;
 
@@ -1125,6 +1132,9 @@ void FIRM::executeFeedbackWithRollout(void)
 
         currentTimeStep_ += stepsExecuted;
 
+        // start profiling time to compute rollout
+        auto start_time = std::chrono::high_resolution_clock::now();
+
         ompl::base::State *tState = si_->allocState();
 
         siF_->getTrueState(tState);
@@ -1135,7 +1145,18 @@ void FIRM::executeFeedbackWithRollout(void)
 
         si_->freeState(tState);
 
+        previousEdge = e;
+
         e = generateRolloutPolicy(tempVertex);
+
+        // end profiling time to compute rollout
+        auto end_time = std::chrono::high_resolution_clock::now();
+
+        numberOfRollouts++;
+
+        averageTimeForRolloutComputation += std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+        std::cout << "Time to execute rollout : "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << " milli seconds."<<std::endl;
 
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(currentVertex, goal) ) );
 
@@ -1151,6 +1172,16 @@ void FIRM::executeFeedbackWithRollout(void)
         si_->copyState(cstartState, cendState);
 
     }
+
+    averageTimeForRolloutComputation = averageTimeForRolloutComputation / (1000*numberOfRollouts);
+
+    std::ofstream outfile;
+
+    outfile.open("RolloutComputationTime.txt",  std::ios::app );
+
+    outfile<<"Nearest Neighbor Radius: "<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<", Monte Carlo Particles: "<<ompl::magic::NUM_MONTE_CARLO_PARTICLES<<", Avg Time (seconds): "<<averageTimeForRolloutComputation<<std::endl;
+
+    outfile.close();
 
     costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
