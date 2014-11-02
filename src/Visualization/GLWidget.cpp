@@ -190,11 +190,10 @@ void GLWidget::ChangeMode(int mode)
 void GLWidget::initializeGL()
 {
     glClearColor(0.5,0.5,0.5,1.);
-    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
-    glDisable(GL_DEPTH_TEST);
-    //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
@@ -214,8 +213,8 @@ void GLWidget::paintGL()
     //projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glOrtho (0, 640, 480, 0, 0, 1);
     gluPerspective(m_camZoom, (GLfloat) width()/(GLfloat) height(), 1.0, 100.0);
+
     //model
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
