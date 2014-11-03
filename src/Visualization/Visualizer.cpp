@@ -68,6 +68,8 @@ int Visualizer::robotIndx_ = -1;
 
 int Visualizer::envIndx_   = -1;
 
+bool Visualizer::saveVideo_ = false;
+
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
 

@@ -150,7 +150,7 @@ namespace firm
             /** \brief To log/not log velocity*/
             bool logVelocity_;
 
-            /** \brief Storage for velocity log */
+            /** \brief Storage for velocity log v, w*/
             std::vector<std::pair<double,double> > velocityLog_;
 
 

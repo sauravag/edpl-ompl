@@ -260,12 +260,12 @@ void GLWidget::paintGL()
         glPopMatrix();
     }
 
-    /**
+
     if(Display::saveVideo())
     {
         saveFrame();
     }
-    */
+
 
     glPopMatrix();
 

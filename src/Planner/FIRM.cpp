@@ -88,7 +88,7 @@ namespace ompl
 
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
 
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 2.5; // meters
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // meters
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
@@ -437,14 +437,6 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     Vertex m;
 
-    //if state already exists in the graph, just return corresponding vertex
-    /*
-    if(isDuplicateState(state,m))
-    {
-        return m;
-    }
-    */
-
     m = boost::add_vertex(g_);
 
     addStateToVisualization(state);
@@ -464,7 +456,6 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     // Which milestones will we attempt to connect to?
     const std::vector<Vertex>& neighbors = connectionStrategy_(m);
-    showRolloutConnections(m);
 
     foreach (Vertex n, neighbors)
     {
@@ -1102,7 +1093,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     int numberOfRollouts = 0;
 
-    Edge previousEdge = e ;
+    Visualizer::doSaveVideo(true);
 
     // While the robot state hasn't reached the goal state, keep running
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
@@ -1113,6 +1104,8 @@ void FIRM::executeFeedbackWithRollout(void)
         assert(controller.getGoal());
 
         ompl::base::Cost cost;
+
+        siF_->doVelocityLogging(true);
 
         /**
             Instead of executing the entire controller, we need to execute N steps, then calculate the cost to go through the neighboring nodes.
@@ -1132,6 +1125,10 @@ void FIRM::executeFeedbackWithRollout(void)
 
         currentTimeStep_ += stepsExecuted;
 
+        siF_->doVelocityLogging(false);
+
+        Visualizer::doSaveVideo(false);
+
         // start profiling time to compute rollout
         auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -1145,12 +1142,14 @@ void FIRM::executeFeedbackWithRollout(void)
 
         si_->freeState(tState);
 
-        previousEdge = e;
-
         e = generateRolloutPolicy(tempVertex);
 
         // end profiling time to compute rollout
         auto end_time = std::chrono::high_resolution_clock::now();
+
+        Visualizer::doSaveVideo(true);
+
+        showRolloutConnections(tempVertex);
 
         numberOfRollouts++;
 
@@ -1189,6 +1188,15 @@ void FIRM::executeFeedbackWithRollout(void)
 
     writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory", "successProbability");
 
+    std::vector<std::pair<double, double> > velLog;
+
+    siF_->getVelocityLog(velLog);
+
+    for(int i=0; i < velLog.size(); i++)
+    {
+        std::cout<<"Velocity: "<<velLog[i].first <<" "<<velLog[i].second <<std::endl;
+    }
+
 }
 
 void FIRM::showRolloutConnections(const FIRM::Vertex v)
@@ -1201,6 +1209,8 @@ void FIRM::showRolloutConnections(const FIRM::Vertex v)
     {
         Visualizer::addRolloutConnection(stateProperty_[v], stateProperty_[n]);
     }
+
+    boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 }
 
 void FIRM::addStateToVisualization(ompl::base::State *state)

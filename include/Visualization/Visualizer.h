@@ -272,6 +272,16 @@ class Visualizer
         /** \brief Refresh the drawing and show latest scenario*/
         static void refresh();
 
+        static bool saveVideo()
+        {
+            return saveVideo_;
+        }
+
+        static bool doSaveVideo(bool flag)
+        {
+            saveVideo_ = flag;
+        }
+
 
     private:
 
@@ -322,6 +332,8 @@ class Visualizer
 
         /** \brief The gllistindex of the robot rendering */
         static int robotIndx_;
+
+        static bool saveVideo_;
 
 
 };
