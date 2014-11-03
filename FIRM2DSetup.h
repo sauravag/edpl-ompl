@@ -68,9 +68,9 @@ public:
 
         // set the state component norm weights
         arma::colvec normWeights(3);
-        normWeights(0) = 2.0/3.0;
-        normWeights(1) = 2.0/3.0;
-        normWeights(2) = 1.0/3.0;
+        normWeights(0) = 4.0/std::sqrt(33);
+        normWeights(1) = 4.0/std::sqrt(33);
+        normWeights(2) = 1.0/std::sqrt(33);
         StateType::normWeights_ = normWeights;
 
         // The bounds should be inferred from the geometry files,

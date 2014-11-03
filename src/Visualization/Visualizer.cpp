@@ -228,9 +228,21 @@ void Visualizer::refresh()
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
 
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    //glDepthMask(GL_TRUE);
+
     drawEnvironment();
 
+    if(trueState_)
+    {
+        drawRobot(trueState_);
+    }
+
     glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    //glDepthMask(GL_FALSE);
 
     switch(mode_)
     {
@@ -290,11 +302,6 @@ void Visualizer::refresh()
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
     {
         drawLandmark(landmarks_[i]);
-    }
-
-    if(trueState_)
-    {
-        drawRobot(trueState_);
     }
 
     if(currentBelief_)

@@ -1153,7 +1153,9 @@ void FIRM::executeFeedbackWithRollout(void)
 
         numberOfRollouts++;
 
-        averageTimeForRolloutComputation += std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+        int numNN = connectionStrategy_(tempVertex).size();
+
+        averageTimeForRolloutComputation += (std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count()) / numNN;
 
         std::cout << "Time to execute rollout : "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << " milli seconds."<<std::endl;
 
@@ -1178,7 +1180,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     outfile.open("RolloutComputationTime.txt",  std::ios::app );
 
-    outfile<<"Nearest Neighbor Radius: "<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<", Monte Carlo Particles: "<<ompl::magic::NUM_MONTE_CARLO_PARTICLES<<", Avg Time (seconds): "<<averageTimeForRolloutComputation<<std::endl;
+    outfile<<"Nearest Neighbor Radius: "<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<", Monte Carlo Particles: "<<ompl::magic::NUM_MONTE_CARLO_PARTICLES<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;
 
     outfile.close();
 

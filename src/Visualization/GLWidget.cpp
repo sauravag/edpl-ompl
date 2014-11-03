@@ -91,12 +91,12 @@ QSize GLWidget::sizeHint() const
 
 void GLWidget::resetCam()
 {
-    m_camPos[0] = 10.0;
-    m_camPos[1] = 10.0;
+    m_camPos[0] = 11.0;
+    m_camPos[1] = 11.0;
 
-    m_camPos[2] = 30.0;
-    m_camAt[0] = 0.0; m_camAt[1] = 0.0; m_camAt[2] = -1.0;
-    m_camZoom = 45; m_long = -boost::math::constants::pi<double>()/2.0; m_lat = 0.0;
+    m_camPos[2] = 50.0;
+    m_camAt[0] = 0.0; m_camAt[1] = 0.0; m_camAt[2] = -1.5;
+    m_camZoom = 50; m_long = -boost::math::constants::pi<double>()/2.0; m_lat = 0.0;
     updateGL();
 }
 
@@ -190,9 +190,10 @@ void GLWidget::ChangeMode(int mode)
 void GLWidget::initializeGL()
 {
     glClearColor(0.5,0.5,0.5,1.);
-    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
+    glEnable(GL_DEPTH_TEST);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
@@ -206,14 +207,15 @@ void GLWidget::initializeGL()
 //Update function for GL Scene
 void GLWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT /*| GL_DEPTH_BUFFER_BIT*/);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
 
     //projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(m_camZoom, (GLfloat) width()/(GLfloat) height(), 1.0, 100.0);
+    gluPerspective(m_camZoom, (GLfloat) width()/(GLfloat) height(), 1.0, 1000.0);
+    //glOrtho(0.0f, (GLfloat) width(), 0.0f, (GLfloat) height(), 20.0f, 80.0f);
 
     //model
     glMatrixMode(GL_MODELVIEW);
@@ -273,10 +275,10 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int width, int height)
 {
-    glViewport (0, 0, (GLsizei) width, (GLsizei) height);
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    gluPerspective(m_camZoom, (GLfloat) width/(GLfloat) height, 1.0, 100.0);
+    gluPerspective(m_camZoom, (GLfloat) width/(GLfloat) height, 1.0, 1000.0);
+    glViewport (0, 0, (GLsizei) width, (GLsizei) height);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
