@@ -173,10 +173,10 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         */
     glPopMatrix();
 
-    if(trace(covariance) != 0)
+    if(trace(covariance) != 0 && stateType == VZRStateType::BeliefState)
     {
         double chi2 = 9.21034;
-        double magnify = 1.0; // scaled up for viewing
+        double magnify = 40.0; // scaled up for viewing
         mat pos;
         for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())
         {
@@ -189,7 +189,9 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         pos *= magnify;
 
         int nPoints = pos.n_rows;
-        /*
+
+        glColor3d(1.0,0.0,0.0); // grey
+
         try
         {
             mat K = trans(chol(covariance.submat(0,0,1,1)));
@@ -216,7 +218,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         {
             OMPL_INFORM("Visualizer: Covariance cholesky did not converge...proceeding");
         }
-        */
+
     }
 
 }
@@ -231,18 +233,6 @@ void Visualizer::refresh()
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
     //glDepthMask(GL_TRUE);
-
-    drawEnvironment();
-
-    if(trueState_)
-    {
-        drawRobot(trueState_);
-    }
-
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    //glDepthMask(GL_FALSE);
 
     switch(mode_)
     {
@@ -298,7 +288,19 @@ void Visualizer::refresh()
             exit(1);
     }
 
+    drawEnvironment();
+
+    if(trueState_)
+    {
+        drawRobot(trueState_);
+    }
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    //glDepthMask(GL_FALSE);
     //draw landmarks
+
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
     {
         drawLandmark(landmarks_[i]);

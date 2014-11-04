@@ -94,7 +94,7 @@ void GLWidget::resetCam()
     m_camPos[0] = 11.0;
     m_camPos[1] = 11.0;
 
-    m_camPos[2] = 50.0;
+    m_camPos[2] = -1.0;
     m_camAt[0] = 0.0; m_camAt[1] = 0.0; m_camAt[2] = -1.5;
     m_camZoom = 50; m_long = -boost::math::constants::pi<double>()/2.0; m_lat = 0.0;
     updateGL();
@@ -215,7 +215,7 @@ void GLWidget::paintGL()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(m_camZoom, (GLfloat) width()/(GLfloat) height(), 1.0, 1000.0);
-    //glOrtho(0.0f, (GLfloat) width(), 0.0f, (GLfloat) height(), 20.0f, 80.0f);
+    glOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 3.0f);
 
     //model
     glMatrixMode(GL_MODELVIEW);
@@ -282,6 +282,7 @@ void GLWidget::resizeGL(int width, int height)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    std::cout<<m_camZoom<<std::endl;
     if(m_view)
     {
         vector<double> pos(2);
