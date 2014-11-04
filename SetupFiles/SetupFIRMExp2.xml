@@ -137,8 +137,8 @@
 	<UnicycleMotionModel
 		sigmaV="0.0022"
 		etaV="0.05"
-    sigmaOmega="0.001"
-    etaOmega="0.04"
+        sigmaOmega="0.001"
+        etaOmega="0.04"
 		P_Wg_filename=""
 		orbit_radius=5.0
 		wind_noise_pos="0.000001"
@@ -165,16 +165,14 @@
 </MotionModels>
 <PlanningProblem>
 	<Environment
-		environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/FIRMEnvExp2.obj"
+		environmentFile = "./Models/FIRMEnvExp2.obj"
 	/>		
-	<!--"/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/FIRMEnvExp2.obj"-->
 	<Robot
-		robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+		robotFile = "./Models/iRobot.obj"
 	/>
-	<!--/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"-->
 	<StartPose
 		x = "1.0"
-		y = "0.50"
+		y = "1"
 		theta = "0"
 	/>
 	<GoalPose
@@ -183,9 +181,12 @@
 		theta = "1.57"
 	/>
 	<PlanningTime
-		maxTime = "900"
+		maxTime = "3600"
 	/>
 	<FIRMNodes
 		minNodes = "125"
 	/>
+	<KidnappedState
+        x = 1.5 y = 19.5 theta = 1.57 
+    />
 </PlanningProblem>
