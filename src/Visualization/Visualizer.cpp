@@ -77,7 +77,7 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
 
     glPushMatrix();
 
-    glColor3d(0.0,0.0,1.0);
+    glColor3d(0.0,0.0,0.0);
 
     glTranslated(landmark[1], landmark[2], 0.0);
     glVertex3f(0.8,0.8,0.8);
@@ -127,7 +127,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
             break;
 
         case GraphNodeState:
-            glColor3d(1.0,1.0,1.0); // white
+            glColor3d(0.0,1.0,0.0); // green
             break;
 
         default:
@@ -227,12 +227,10 @@ void Visualizer::refresh()
 {
     boost::mutex::scoped_lock sl(drawMutex_);
 
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
 
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
-    //glDepthMask(GL_TRUE);
 
     switch(mode_)
     {
@@ -270,8 +268,8 @@ void Visualizer::refresh()
             if(chosenRolloutConnection_)
             {
                 glColor3d(0.0 , 1.0 , 0.0);
-                glLineWidth(2.0);
-                drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
+                glLineWidth(3.0);
+                    drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
                 glLineWidth(1.0);
             }
 
@@ -297,10 +295,8 @@ void Visualizer::refresh()
 
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    //glDepthMask(GL_FALSE);
-    //draw landmarks
 
+    //draw landmarks
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
     {
         drawLandmark(landmarks_[i]);
@@ -389,7 +385,10 @@ void Visualizer::drawRolloutConnections()
     for(int i=0; i<rolloutConnections_.size();i++)
     {
         glColor3d(1.0,0.0,0);
+        glLineWidth(3.0);
         drawEdge(rolloutConnections_[i].first,rolloutConnections_[i].second);
+        glLineWidth(1.0);
+
     }
 }
 
@@ -442,7 +441,7 @@ void Visualizer::drawRobotPath()
 
     for(int i=0; i<robotPath_.size()-1;i++)
     {
-        glColor3d(1.0 , 1.0 , 1.0);
+        glColor3d(0.0 , 1.0 , 1.0);
 
         glLineWidth(4.0);
             drawEdge(robotPath_[i],robotPath_[i+1]);
