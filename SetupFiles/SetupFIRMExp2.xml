@@ -143,9 +143,9 @@
 		orbit_radius=5.0
 		wind_noise_pos="0.000001"
 		wind_noise_ang="0.000001" 
-		min_linear_velocity= 0.2
-		max_linear_velocity= 0.2
-		max_angular_velocity= 0.3
+		min_linear_velocity= 1.0
+		max_linear_velocity= 1.0
+		max_angular_velocity= 0.60
 		dt= 0.1
 	  /> <!--omega is in radians--> 
 	<OmnidirectionalMotionModel 
@@ -176,8 +176,8 @@
 		theta = "0"
 	/>
 	<GoalPose
-		x = "12.50"
-		y = "18.0"
+		x = "19.0"
+		y = "13.0"
 		theta = "1.57"
 	/>
 	<PlanningTime
