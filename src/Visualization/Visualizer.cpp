@@ -127,7 +127,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
             break;
 
         case GraphNodeState:
-            glColor3d(0.0,1.0,0.0); // green
+            glColor3d(0.0,0.0,1.0); // blue
             break;
 
         default:
@@ -143,11 +143,11 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
         //draw a black disk
         GLUquadric *disk = gluNewQuadric();
-        gluDisk(disk, 0, 0.15, 15, 1);
+        gluDisk(disk, 0, 0.12, 12, 1);
         gluDeleteQuadric(disk);
         glBegin(GL_LINES);
         glVertex3f(0, 0, 0);
-        glVertex3f(1.0*cos(x[2]), 1.0*sin(x[2]), 0);
+        glVertex3f(0.5*cos(x[2]), 0.5*sin(x[2]), 0);
         glEnd();
 
         double fovRadius = 2.5; //meters
