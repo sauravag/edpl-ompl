@@ -77,7 +77,7 @@ namespace ompl
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 1e2;
 
         /** Discounting factor for the Dynamic Programming solution, helps converge faster */
-        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 0.99;
+        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
 
         static const int DP_MAX_ITERATIONS = 10000;
 
@@ -85,7 +85,7 @@ namespace ompl
 
         static const double INIT_COST_TO_GO = 2.0;
 
-        static const double OBSTACLE_COST_TO_GO = 500;
+        static const double OBSTACLE_COST_TO_GO = 100;
 
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
 
@@ -977,6 +977,12 @@ void FIRM::executeFeedback(void)
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, false);
 
+        if(!si_->isValid(cendState))
+        {
+            OMPL_INFORM("Robot Collided :(");
+            return;
+        }
+
         currentTimeStep_ += stepsExecuted;
 
         if(controllerStatus)
@@ -1065,6 +1071,12 @@ void FIRM::executeFeedbackWithKidnapping(void)
         int stepsExecuted = 0;
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, false);
+
+        if(!si_->isValid(cendState))
+        {
+            OMPL_INFORM("Robot Collided :(");
+            return;
+        }
 
         currentTimeStep_ += stepsExecuted;
 
@@ -1218,6 +1230,12 @@ void FIRM::executeFeedbackWithRollout(void)
         else
         {
             controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT, cstartState, cendState, cost, stepsExecuted, false);
+        }
+
+        if(!si_->isValid(cendState))
+        {
+            OMPL_INFORM("Robot Collided :(");
+            return;
         }
 
         currentTimeStep_ += stepsExecuted;

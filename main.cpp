@@ -78,7 +78,7 @@ void plan()
         {
             mySetup->executeSolution(mode);
 
-            OMPL_INFORM("Plan Executed Successfully");
+            OMPL_INFORM("Plan Executed.");
 
             keepTrying = 0;
 
@@ -96,6 +96,7 @@ void plan()
 
 }
 
+/*
 void testMultiModal()
 {
 
@@ -126,6 +127,7 @@ void testMultiModal()
 
     exit(0);
 }
+*/
 
 int main(int argc, char *argv[])
 {
