@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
+    std::string setupFilePath = "./SetupFiles/SetupFIRMExp2.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -114,9 +114,9 @@ void testMultiModal()
 
 int main(int argc, char *argv[])
 {
-    srand(1234567);
+    srand(123456);
 
-    arma_rng::set_seed(1234567);
+    arma_rng::set_seed(123456);
 
     QApplication app(argc, argv);
 
