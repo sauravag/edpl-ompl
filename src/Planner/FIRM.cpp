@@ -68,15 +68,16 @@ namespace ompl
         static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
 
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
-        static const double ROADMAP_BUILD_TIME = 200;
+        static const double ROADMAP_BUILD_TIME = 60;
 
-        static const double NUM_MONTE_CARLO_PARTICLES = 10;
+        static const double NUM_MONTE_CARLO_PARTICLES = 15;
 
         static const double EXTREMELY_HIGH_EDGE_COST = 1e6;
 
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 1e2;
 
-        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1;
+        /** Discounting factor for the Dynamic Programming solution, helps converge faster */
+        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 0.99;
 
         static const int DP_MAX_ITERATIONS = 10000;
 
@@ -200,6 +201,89 @@ void FIRM::freeMemory(void)
     g_.clear();
 }
 
+void FIRM::expandRoadmap(double expandTime)
+{
+    expandRoadmap(ompl::base::timedPlannerTerminationCondition(expandTime));
+}
+
+void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
+{
+    if (!simpleSampler_)
+        simpleSampler_ = si_->allocStateSampler();
+
+    std::vector<ompl::base::State*> states(ompl::magic::MAX_RANDOM_BOUNCE_STEPS);
+    si_->allocStates(states);
+    expandRoadmap(ptc, states);
+    si_->freeStates(states);
+}
+
+void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
+                                         std::vector<ompl::base::State*> &workStates)
+{
+    // construct a probability distribution over the vertices in the roadmap as indicated in
+    // "Probabilistic Roadmaps for Path Planning in High-Dimensional Configuration Spaces"
+    // Lydia E. Kavraki, Petr Svestka, Jean-Claude Latombe, and Mark H. Overmars
+
+    ompl::PDF<Vertex> pdf;
+    foreach (Vertex v, boost::vertices(g_))
+    {
+        const unsigned int t = totalConnectionAttemptsProperty_[v];
+        pdf.add(v, (double)(t - successfulConnectionAttemptsProperty_[v]) / (double)t);
+    }
+
+    if (pdf.empty())
+        return;
+
+    while (ptc == false)
+    {
+        Vertex v = pdf.sample(rng_.uniform01());
+        unsigned int s = si_->randomBounceMotion(simpleSampler_, stateProperty_[v], workStates.size(), workStates, false);
+        if (s > 0)
+        {
+            s--;
+            Vertex last = addStateToGraph(si_->cloneState(workStates[s]));
+
+            /*
+            graphMutex_.lock();
+            for (unsigned int i = 0 ; i < s ; ++i)
+            {
+                // add the vertex along the bouncing motion
+                Vertex m = boost::add_vertex(g_);
+                stateProperty_[m] = si_->cloneState(workStates[i]);
+                totalConnectionAttemptsProperty_[m] = 1;
+                successfulConnectionAttemptsProperty_[m] = 0;
+                disjointSets_.make_set(m);
+
+                // add the edge to the parent vertex
+                const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
+                const unsigned int id = maxEdgeID_++;
+                const Graph::edge_property_type properties(weight, id);
+                boost::add_edge(v, m, properties, g_);
+                uniteComponents(v, m);
+
+                // add the vertex to the nearest neighbors data structure
+                nn_->add(m);
+                v = m;
+            }
+
+            // if there are intermediary states or the milestone has not been connected to the initially sampled vertex,
+            // we add an edge
+            if (s > 0 || !sameComponent(v, last))
+            {
+                // add the edge to the parent vertex
+                const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
+                const unsigned int id = maxEdgeID_++;
+                const Graph::edge_property_type properties(weight, id);
+                boost::add_edge(v, last, properties, g_);
+                uniteComponents(v, last);
+            }
+            graphMutex_.unlock();
+            */
+        }
+    }
+}
+
+
 void FIRM::growRoadmap(double growTime)
 {
     growRoadmap(ompl::base::timedPlannerTerminationCondition(growTime));
@@ -283,11 +367,13 @@ void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
                 goalM_.push_back(addStateToGraph(si_->cloneState(st)));
         }
         */
+        OMPL_INFORM("FIRM: Checking for Solution.");
+
         addedSolution_ = existsPolicy(startM_, goalM_, solution);
 
         if (!addedSolution_)
         {
-            OMPL_INFORM("FIRM: Checking for Solution.");
+            OMPL_INFORM("FIRM: No Solution Yet.");
             boost::this_thread::sleep(boost::posix_time::seconds(30));
         }
     }
@@ -298,7 +384,7 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
     ompl::base::Goal *g = pdef_->getGoal().get();
     ompl::base::Cost sol_cost(0.0);
 
-    OMPL_INFORM("%s: Number of current %u states", getName().c_str(), boost::num_vertices(g_));
+    OMPL_INFORM("%s: Number of current states = %u", getName().c_str(), boost::num_vertices(g_));
 
     if(boost::num_vertices(g_) < minFIRMNodes_) return false;
 
@@ -394,6 +480,12 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         constructRoadmap(ptcOrSolutionFound);
     }
 
+    // If roadmap wasn't loaded from file, then save the newly constructed roadmap
+    if(!loadedRoadmapFromFile_)
+    {
+        this->savePlannerData();
+    }
+
     slnThread.join();
 
     OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_) - nrStartStates);
@@ -405,12 +497,6 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         if (addedNewSolution())
             psol.optimized_ = true;
         pdef_->addSolutionPath(psol);
-
-        // If roadmap wasn't loaded from file, then save the newly constructed roadmap
-        if(!loadedRoadmapFromFile_)
-        {
-            this->savePlannerData();
-        }
     }
 
     return sol ? (addedNewSolution() ? ompl::base::PlannerStatus::EXACT_SOLUTION : ompl::base::PlannerStatus::APPROXIMATE_SOLUTION) : ompl::base::PlannerStatus::TIMEOUT;
@@ -421,10 +507,21 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
 
     std::vector<ompl::base::State*> xstates(ompl::magic::MAX_RANDOM_BOUNCE_STEPS);
     si_->allocStates(xstates);
+    bool grow = true;
 
     while (ptc() == false)
     {
-        growRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(ompl::magic::ROADMAP_BUILD_TIME)), xstates[0]);
+        // In FIRM, we maintain a 2:1 ratio for growth to expansion
+        if(grow)
+        {
+            growRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(2*ompl::magic::ROADMAP_BUILD_TIME)), xstates[0]);
+        }
+        else
+        {
+            expandRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(ompl::magic::ROADMAP_BUILD_TIME)), xstates);
+        }
+
+        grow = !grow;
     }
 
     si_->freeStates(xstates);
@@ -919,7 +1016,7 @@ void FIRM::executeFeedback(void)
 
     writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
 
-    writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory", "successProbability");
+    writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory.csv", "successProbability");
 
 }
 
@@ -1188,7 +1285,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     writeTimeSeriesDataToFile("RolloutFIRMCostHistory.csv", "costToGo");
 
-    writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory", "successProbability");
+    writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory.csv", "successProbability");
 
     std::vector<std::pair<double, double> > velLog;
 

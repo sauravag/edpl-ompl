@@ -185,7 +185,17 @@ public:
         method will also improve the roadmap, as needed.*/
     virtual void growRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
 
-    /** \brief  */
+     /** \brief Attempt to connect disjoint components in the roadmap
+                using random bouncing motions (the PRM expansion step) for the
+                given time (seconds). */
+    virtual void expandRoadmap(double expandTime);
+
+    /** \brief Attempt to connect disjoint components in the roadmap
+        using random bouncing motions (the PRM expansion step) until the
+        given condition evaluates true. */
+    virtual void expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
+
+    /** \brief  The key function that solves the planning problem.*/
     virtual ompl::base::PlannerStatus solve(const ompl::base::PlannerTerminationCondition &ptc);
 
     /** \brief  */
@@ -278,6 +288,11 @@ protected:
     /** \brief Randomly sample the state space, add and connect nodes
          in the roadmap. Stop this process when the termination condition*/
     virtual void growRoadmap(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::State *workState);
+
+     /** \brief Attempt to connect disjoint components in the
+                roadmap using random bounding motions (the PRM
+                expansion step) */
+    virtual void expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc, std::vector<ompl::base::State*> &workStates);
 
     /** \brief Thread that checks for solution */
     void checkForSolution(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::PathPtr &solution);

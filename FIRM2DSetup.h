@@ -180,7 +180,7 @@ public:
             ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
-            siF_->setPropagationStepSize(0.01); // this is the duration that a control is applied
+            siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
             siF_->setStateValidityCheckingResolution(0.005);
             siF_->setMinMaxControlDuration(1,100);
 

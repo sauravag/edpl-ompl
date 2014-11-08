@@ -430,18 +430,6 @@ void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::S
 
   ompl::control::Control* control = separatedController_.generateFeedbackControl(state/*, t*/);
 
-/*
-  const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
-
-  if(conVals[0]==0)
-  {
-    step_--;
-    if(step_<0)
-    {
-        step_= 0;
-    }
-  }
-*/
   si_->applyControl(control);
 
   ObservationType zCorrected = si_->getObservation();
