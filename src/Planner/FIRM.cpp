@@ -931,8 +931,6 @@ double FIRM::evaluateSuccessProbability(const FIRM::Vertex start, const FIRM::Ve
 
         const double transitionProbability  = edgeWeight.getSuccessProbability();
 
-        OMPL_INFORM("The success probability of edge: %f",transitionProbability);
-
         successProb = successProb * transitionProbability;
 
         targetVertex = boost::target(edge, g_);
