@@ -238,12 +238,18 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
     {
         Vertex v = pdf.sample(rng_.uniform01());
         unsigned int s = si_->randomBounceMotion(simpleSampler_, stateProperty_[v], workStates.size(), workStates, false);
+
+        for(int i=0;i<workStates.size(); i++)
+        {
+            addStateToGraph(si_->cloneState(workStates[i]));
+        }
+        /*
         if (s > 0)
         {
             s--;
             Vertex last = addStateToGraph(si_->cloneState(workStates[s]));
 
-            /*
+
             graphMutex_.lock();
             for (unsigned int i = 0 ; i < s ; ++i)
             {
@@ -278,8 +284,9 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 uniteComponents(v, last);
             }
             graphMutex_.unlock();
-            */
+
         }
+        */
     }
 }
 
@@ -923,6 +930,8 @@ double FIRM::evaluateSuccessProbability(const FIRM::Vertex start, const FIRM::Ve
         const FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, edge);
 
         const double transitionProbability  = edgeWeight.getSuccessProbability();
+
+        OMPL_INFORM("The success probability of edge: %f",transitionProbability);
 
         successProb = successProb * transitionProbability;
 
