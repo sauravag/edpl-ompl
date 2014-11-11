@@ -915,16 +915,16 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
 }
 
-double FIRM::evaluateSuccessProbability(const FIRM::Vertex start, const FIRM::Vertex goal)
+double FIRM::evaluateSuccessProbability(const Edge currentEdge, const FIRM::Vertex start, const FIRM::Vertex goal)
 {
-    double successProb = 1.0;
+    const FIRMWeight currentEdgeWeight = boost::get(boost::edge_weight, g_, currentEdge);
 
-    Vertex v = start;
+    double successProb = currentEdgeWeight.getSuccessProbability();
+
+    Vertex v = boost::target(currentEdge, g_);
 
     while(v != goal)
     {
-        Vertex targetVertex;
-
         Edge edge = feedback_[v];
 
         const FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, edge);
@@ -933,9 +933,8 @@ double FIRM::evaluateSuccessProbability(const FIRM::Vertex start, const FIRM::Ve
 
         successProb = successProb * transitionProbability;
 
-        targetVertex = boost::target(edge, g_);
+        v = boost::target(edge, g_);
 
-        v = targetVertex;
     }
 
     return successProb;
@@ -972,9 +971,9 @@ void FIRM::executeFeedback(void)
     {
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
 
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(currentVertex, goal) ) );
-
         Edge e = feedback_[currentVertex];
+
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(e, currentVertex, goal) ) );
 
         controller = edgeControllers_[e];
 
@@ -984,10 +983,15 @@ void FIRM::executeFeedback(void)
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, false);
 
-        if(!si_->isValid(cendState))
+         // get a copy of the true state
+        ompl::base::State *tempTrueStateCopy = si_->allocState();
+
+        siF_->getTrueState(tempTrueStateCopy);
+
+        if(!si_->isValid(tempTrueStateCopy))
         {
-            OMPL_INFORM("Robot Collided :(");
-            return;
+           OMPL_INFORM("Robot Collided :(");
+           return;
         }
 
         currentTimeStep_ += stepsExecuted;
@@ -998,28 +1002,17 @@ void FIRM::executeFeedback(void)
         }
         else
         {
-            // get a copy of the true state
-            ompl::base::State *tempTrueStateCopy = si_->allocState();
-
-            siF_->getTrueState(tempTrueStateCopy);
-
-            int numVerticesBefore = boost::num_vertices(g_);
 
             currentVertex = addStateToGraph(cendState);
-
-            int numVerticesAfter = boost::num_vertices(g_);
 
             // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
-            siF_->freeState(tempTrueStateCopy);
-
-            assert(numVerticesAfter-numVerticesBefore >0);
-
             solveDynamicProgram(goal);
 
-
         }
+
+        si_->freeState(tempTrueStateCopy);
 
         si_->copyState(cstartState, cendState);
 
@@ -1067,9 +1060,9 @@ void FIRM::executeFeedbackWithKidnapping(void)
     {
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
 
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(currentVertex, goal) ) );
-
         Edge e = feedback_[currentVertex];
+
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(e, currentVertex, goal) ) );
 
         controller = edgeControllers_[e];
 
@@ -1079,7 +1072,12 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, false);
 
-        if(!si_->isValid(cendState))
+         // get a copy of the true state
+        ompl::base::State *tempTrueStateCopy = si_->allocState();
+
+        siF_->getTrueState(tempTrueStateCopy);
+
+        if(!si_->isValid(tempTrueStateCopy))
         {
             OMPL_INFORM("Robot Collided :(");
             return;
@@ -1093,10 +1091,6 @@ void FIRM::executeFeedbackWithKidnapping(void)
         }
         else
         {
-            // get a copy of the true state
-            ompl::base::State *tempTrueStateCopy = si_->allocState();
-
-            siF_->getTrueState(tempTrueStateCopy);
 
             int numVerticesBefore = boost::num_vertices(g_);
 
@@ -1107,14 +1101,13 @@ void FIRM::executeFeedbackWithKidnapping(void)
             // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
-            siF_->freeState(tempTrueStateCopy);
-
             assert(numVerticesAfter-numVerticesBefore >0);
 
             solveDynamicProgram(goal);
 
-
         }
+
+        si_->freeState(tempTrueStateCopy);
 
         /**
         1. Check if innovation i.e. change in trace(cov) between start and end state is high
@@ -1203,17 +1196,19 @@ void FIRM::executeFeedbackWithRollout(void)
 
     costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[start]));
 
-    successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(currentVertex, goal) ) );
-
     double averageTimeForRolloutComputation = 0;
 
     int numberOfRollouts = 0;
 
     Visualizer::doSaveVideo(true);
 
+    connectionStrategy_ = FStrategy<Vertex>(1.1*ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
+
     // While the robot state hasn't reached the goal state, keep running
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
+
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(e, tempVertex, goal) ) );
 
         EdgeControllerType controller = edgeControllers_[e];
 
@@ -1229,17 +1224,13 @@ void FIRM::executeFeedbackWithRollout(void)
         */
         int stepsExecuted = 0;
 
-        // This If/Else condition is a hack, so that we avoid rollout in intial turn
-        if(currentTimeStep_ == 0)
-        {
-            controller.executeUpto(75, cstartState, cendState, cost, stepsExecuted, false);
-        }
-        else
-        {
-            controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT, cstartState, cendState, cost, stepsExecuted, false);
-        }
+        controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT, cstartState, cendState, cost, stepsExecuted, false);
 
-        if(!si_->isValid(cendState))
+        ompl::base::State *tState = si_->allocState();
+
+        siF_->getTrueState(tState);
+
+        if(!si_->isValid(tState))
         {
             OMPL_INFORM("Robot Collided :(");
             return;
@@ -1247,50 +1238,53 @@ void FIRM::executeFeedbackWithRollout(void)
 
         currentTimeStep_ += stepsExecuted;
 
-        siF_->doVelocityLogging(false);
+        // If the robot has already reached a FIRM node then take feedback edge
+        // else do rollout
+        if(stateProperty_[boost::target(e,g_)]->as<SE2BeliefSpace::StateType>()->isReached(cendState))
+        {
+            tempVertex = boost::target(e,g_);
+            e = feedback_[tempVertex];
+        }
+        else
+        {
+            siF_->doVelocityLogging(false);
 
-        Visualizer::doSaveVideo(false);
+            Visualizer::doSaveVideo(false);
 
-        // start profiling time to compute rollout
-        auto start_time = std::chrono::high_resolution_clock::now();
+            // start profiling time to compute rollout
+            auto start_time = std::chrono::high_resolution_clock::now();
 
-        ompl::base::State *tState = si_->allocState();
+            tempVertex = addStateToGraph(cendState, false);
 
-        siF_->getTrueState(tState);
+            siF_->setTrueState(tState);
 
-        tempVertex = addStateToGraph(cendState, false);
+            e = generateRolloutPolicy(tempVertex);
 
-        siF_->setTrueState(tState);
+            // end profiling time to compute rollout
+            auto end_time = std::chrono::high_resolution_clock::now();
+
+            Visualizer::doSaveVideo(true);
+
+            numberOfRollouts++;
+
+            int numNN = connectionStrategy_(tempVertex).size();
+
+            averageTimeForRolloutComputation += (std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count()) / numNN;
+
+            std::cout << "Time to execute rollout : "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << " milli seconds."<<std::endl;
+
+            showRolloutConnections(tempVertex);
+
+            // clear the rollout candidate connection drawings and show the selected edge
+            Visualizer::clearRolloutConnections();
+
+            Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[boost::target(e,g_)]);
+
+            boost::remove_vertex(tempVertex, g_);
+
+        }
 
         si_->freeState(tState);
-
-        e = generateRolloutPolicy(tempVertex);
-
-        // end profiling time to compute rollout
-        auto end_time = std::chrono::high_resolution_clock::now();
-
-        Visualizer::doSaveVideo(true);
-
-        showRolloutConnections(tempVertex);
-
-        numberOfRollouts++;
-
-        int numNN = connectionStrategy_(tempVertex).size();
-
-        averageTimeForRolloutComputation += (std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count()) / numNN;
-
-        std::cout << "Time to execute rollout : "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << " milli seconds."<<std::endl;
-
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(currentVertex, goal) ) );
-
-        // clear the rollout candidate connection drawings and show the selected edge
-        Visualizer::clearRolloutConnections();
-
-        Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[boost::target(e,g_)]);
-
-        boost::remove_vertex(tempVertex, g_);
-
-        sendFeedbackEdgesToViz();
 
         si_->copyState(cstartState, cendState);
 
@@ -1387,6 +1381,7 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
     */
     double minCost = 1e10;
     Edge edgeToTake;
+
     // Iterate over the out edges
     foreach(Edge e, boost::out_edges(currentVertex, g_))
     {

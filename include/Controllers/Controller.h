@@ -369,7 +369,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     //-> trace(Covariance) for FIRM
     cost += arma::trace(endState->as<StateType>()->getCovariance());
 
-    if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+    if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
     executionCost.v = cost;
 

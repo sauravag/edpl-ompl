@@ -143,6 +143,10 @@
 <landmark id = 141 x = 9.0 y = 17.3 theta = 0.0 />
 <landmark id = 142 x = 7.0 y = 17.0 theta = 0.0 />
 <landmark id = 143 x = 7.0 y = 17.2 theta = 0.0 />
+<landmark id = 144 x = 15.0 y = 17.5 theta = 0.0 />
+<landmark id = 145 x = 15.2 y = 17.5 theta = 0.0 />
+<landmark id = 146 x = 15.0 y = 18.5 theta = 0.0 />
+<landmark id = 147 x = 15.0 y = 18.7 theta = 0.0 />
 </LandmarkList>
 <ObservationModels>
 	<CamAruco2DObservationModel

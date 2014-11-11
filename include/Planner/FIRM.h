@@ -471,8 +471,8 @@ private:
     /** \brief Add rollout connections to visualization */
     void showRolloutConnections(const Vertex v);
 
-    /** \brief calculate the current success probability from start to goal vertex*/
-    double evaluateSuccessProbability(const Vertex start, const Vertex goal);
+    /** \brief calculate the current success probability by multiplying the success probability of current edge and all future edges to goal vertex*/
+    double evaluateSuccessProbability(const Edge currentEdge, const Vertex start, const Vertex goal);
 
     ompl::base::State *kidnappedState_;
 
