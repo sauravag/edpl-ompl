@@ -77,10 +77,10 @@ namespace ompl
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
 
         /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
-        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
+        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 0.99;
 
         /** \brief Maximum allowed number of iterations to solve DP */
-        static const int DP_MAX_ITERATIONS = 10000;
+        static const int DP_MAX_ITERATIONS = 5000;
 
         /** \brief Weighting factor for filtering cost */
         static const double INFORMATION_COST_WEIGHT = 0.97;
@@ -393,7 +393,7 @@ void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
         if (!addedSolution_)
         {
             OMPL_INFORM("FIRM: No Solution Yet.");
-            boost::this_thread::sleep(boost::posix_time::seconds(30));
+            boost::this_thread::sleep(boost::posix_time::seconds(60));
         }
     }
 }
