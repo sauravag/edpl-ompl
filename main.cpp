@@ -72,6 +72,8 @@ void plan()
 
     int keepTrying = 1;
 
+    mySetup->loadGraphFromFile();
+
     while(keepTrying)
     {
         if(mySetup->solve())

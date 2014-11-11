@@ -64,7 +64,7 @@ public:
         // setting the mean and norm weights (used in reachability check)
         StateType::covNormWeight_  =  1.0;
         StateType::meanNormWeight_ =  2.0;
-        StateType::reachDist_ =  0.15;
+        StateType::reachDist_ =  0.20;
 
         // set the state component norm weights
         arma::colvec normWeights(3);
@@ -208,16 +208,23 @@ public:
 
     }
 
-    ompl::base::PlannerStatus solve()
+    void loadGraphFromFile(std::string pathToRoadMapFile = "FIRMRoadMap.xml")
     {
         if(!setup_)
         {
             this->setup();
         }
 
-        std::string pathXML = "FIRMRoadMap.xml";
+        planner_->as<FIRM>()->loadRoadMapFromFile(pathToRoadMapFile);
 
-        planner_->as<FIRM>()->loadRoadMapFromFile(pathXML);
+    }
+
+    ompl::base::PlannerStatus solve()
+    {
+        if(!setup_)
+        {
+            this->setup();
+        }
 
         return planner_->solve(planningTime_);
     }
@@ -394,8 +401,6 @@ protected:
 
         std::cout<<"Path to robot mesh: "<<robotFilePath<<std::endl;
 
-        //std::cout<<"Path to roadmap file: "<<pathToRoadMapFile_<<std::endl;
-
         std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
 
         std::cout<<"Goal Pose X: "<<goalX<<" Y: "<<goalY<<" Theta: "<<goalTheta<<std::endl;
@@ -437,7 +442,5 @@ private:
     unsigned int minNodes_;
 
     bool setup_;
-
-    std::string pathToRoadMapFile_;
 };
 #endif

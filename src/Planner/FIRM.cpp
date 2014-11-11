@@ -67,28 +67,40 @@ namespace ompl
             default in the construction of the PRM roadmap */
         static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
 
-        /** \brief The time in seconds for a single roadmap building operation (dt)*/
+        /** \brief The time in seconds for a single roadmap building operation */
         static const double ROADMAP_BUILD_TIME = 60;
 
+        /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
         static const double NUM_MONTE_CARLO_PARTICLES = 15;
 
-        static const double EXTREMELY_HIGH_EDGE_COST = 1e6;
+        /** \brief For a node that is not observable, use a high covariance */
+        static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
 
-        static const double NON_OBSERVABLE_NODE_COVARIANCE = 1e2;
-
-        /** Discounting factor for the Dynamic Programming solution, helps converge faster */
+        /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
         static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
 
+        /** \brief Maximum allowed number of iterations to solve DP */
         static const int DP_MAX_ITERATIONS = 10000;
 
+        /** \brief Weighting factor for filtering cost */
+        static const double INFORMATION_COST_WEIGHT = 0.97;
+
+        /** \brief Weighting factor for edge execution time cost */
+        static const double TIME_TO_STOP_COST_WEIGHT = 0.03;
+
+        /** \brief The cost to go from goal. */
         static const double GOAL_COST_TO_GO = 0.0;
 
+        /** \brief The initial cost to go from a non-goal node*/
         static const double INIT_COST_TO_GO = 2.0;
 
-        static const double OBSTACLE_COST_TO_GO = 100;
+        /** \brief The cost to traverse an obstacle*/
+        static const double OBSTACLE_COST_TO_GO = 200;
 
+        /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
 
+        /** \brief Default neighborhood radius */
         static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // meters
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
@@ -665,9 +677,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
                 return loadedEdgeProperties_[i].second;
             }
         }
-
     }
-
 
     double successCount = 0;
 
@@ -688,23 +698,24 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
         ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
 
-        ompl::base::Cost pcost(0);
+        ompl::base::Cost filteringCost(0);
 
         int stepsExecuted = 0;
 
-        if(edgeController.Execute(startNodeState, endBelief, pcost, stepsExecuted))
+        int stepsToStop = 0;
+
+        if(edgeController.Execute(startNodeState, endBelief, filteringCost, stepsExecuted, stepsToStop))
         {
-           successCount++;
+            successCount++;
 
-           edgeCost.v = edgeCost.v + pcost.v ;
-
+            // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
+            edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
         }
-
     }
+
     siF_->showRobotVisualization(true);
 
-    if (successCount > 0)  edgeCost.v = edgeCost.v / successCount ;
-    else edgeCost.v = ompl::magic::EXTREMELY_HIGH_EDGE_COST; // extremely high cost if no particle could succeed, we can also simply not add this edge
+    edgeCost.v = edgeCost.v / successCount ;
 
     double transitionProbability = successCount / numParticles_ ;
 
@@ -967,6 +978,9 @@ void FIRM::executeFeedback(void)
 
     currentTimeStep_ = 0;
 
+    Visualizer::doSaveVideo(true);
+
+
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
@@ -981,7 +995,9 @@ void FIRM::executeFeedback(void)
 
         int stepsExecuted = 0;
 
-        bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, false);
+        int stepsToStop = 0;
+
+        bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
          // get a copy of the true state
         ompl::base::State *tempTrueStateCopy = si_->allocState();
@@ -1002,6 +1018,7 @@ void FIRM::executeFeedback(void)
         }
         else
         {
+            Visualizer::doSaveVideo(false);
 
             currentVertex = addStateToGraph(cendState);
 
@@ -1009,6 +1026,9 @@ void FIRM::executeFeedback(void)
             siF_->setTrueState(tempTrueStateCopy);
 
             solveDynamicProgram(goal);
+
+            Visualizer::doSaveVideo(true);
+
 
         }
 
@@ -1070,7 +1090,9 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         int stepsExecuted = 0;
 
-        bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, false);
+        int stepsToStop = 0;
+
+        bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
          // get a copy of the true state
         ompl::base::State *tempTrueStateCopy = si_->allocState();
