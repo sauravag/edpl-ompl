@@ -72,10 +72,10 @@ void firm::SpaceInformation::applyControl(const ompl::control::Control *control,
 
     motionModel_->Evolve(trueState_, control, noise, trueState_);
 
-    //if(showRobot_)
-    //{
+    if(showRobot_)
+    {
         Visualizer::updateTrueState(trueState_);
-    //}
+    }
 
     if(logVelocity_)
     {

@@ -496,10 +496,10 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     }
 
     // If roadmap wasn't loaded from file, then save the newly constructed roadmap
-    if(!loadedRoadmapFromFile_)
-    {
+    //if(!loadedRoadmapFromFile_)
+    //{
         this->savePlannerData();
-    }
+    //}
 
     slnThread.join();
 
@@ -983,7 +983,6 @@ void FIRM::executeFeedback(void)
 
     Visualizer::doSaveVideo(true);
 
-
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
@@ -1023,6 +1022,11 @@ void FIRM::executeFeedback(void)
         {
             Visualizer::doSaveVideo(false);
 
+            //
+            OMPL_INFORM("Controller stopped due to deviation, need to add new state at: ");
+            siF_->printState(cendState);
+            //
+
             currentVertex = addStateToGraph(cendState);
 
             // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
@@ -1032,12 +1036,12 @@ void FIRM::executeFeedback(void)
 
             Visualizer::doSaveVideo(true);
 
-
         }
 
         si_->freeState(tempTrueStateCopy);
 
         si_->copyState(cstartState, cendState);
+
 
     }
 

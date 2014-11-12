@@ -257,6 +257,10 @@ public:
         return boost::bind(&FIRM2DSetup::getGeometricComponentStateInternal, this, _1, _2);
     }
 
+    void saveRoadmap()
+    {
+        planner_->as<FIRM>()->savePlannerData();
+    }
 protected:
 
     const ompl::base::State* getGeometricComponentStateInternal(const ompl::base::State *state, unsigned int /*index*/) const
