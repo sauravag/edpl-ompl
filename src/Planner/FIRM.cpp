@@ -589,12 +589,17 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
                     if(addReverseEdge)
                     {
                         reverseEdgeAdded = addEdgeToGraph(n, m);
-                        successfulConnectionAttemptsProperty_[n]++;
+                        if(reverseEdgeAdded)
+                        {
+                            successfulConnectionAttemptsProperty_[n]++;
+                            uniteComponents(m, n);
+                        }
+                        else
+                        {
+                            boost::remove_edge(m,n,g_); // if you cannot add bidirectional edge, then keep no edge between the two nodes
+                        }
                     }
 
-                    // only unite the components if edges could be added in both directions
-                    if(forwardEdgeAdded && reverseEdgeAdded)
-                        uniteComponents(m, n);
                 }
             }
         }
@@ -624,6 +629,8 @@ ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Verte
 
     Vertex currentVertex = start;
 
+    int counter  = 0;
+
     while(currentVertex!=goal)
     {
         Edge edge = feedback_[currentVertex]; // get the edge
@@ -635,6 +642,8 @@ ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Verte
             p->append(stateProperty_[target]); // because from the goal node you don't need to take a controller
         }
         currentVertex =  target;
+
+        counter++; // the maximum number of nodes that robot can pass through is the total number of nodes
     }
 
     return ompl::base::PathPtr(p);
@@ -825,19 +834,15 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
     */
     foreach (Vertex v, boost::vertices(g_))
     {
-        if(boost::out_degree(v,g_) > 0 )
+        if(v == goalVertex)
         {
-
-            if(v == goalVertex)
-            {
-                costToGo_[v] = ompl::magic::GOAL_COST_TO_GO;
-                newCostToGo[v] = ompl::magic::GOAL_COST_TO_GO;
-            }
-            else
-            {
-                costToGo_[v] = ompl::magic::INIT_COST_TO_GO;
-                newCostToGo[v] = ompl::magic::INIT_COST_TO_GO;
-            }
+            costToGo_[v] = ompl::magic::GOAL_COST_TO_GO;
+            newCostToGo[v] = ompl::magic::GOAL_COST_TO_GO;
+        }
+        else
+        {
+            costToGo_[v] = ompl::magic::INIT_COST_TO_GO;
+            newCostToGo[v] = ompl::magic::INIT_COST_TO_GO;
         }
     }
 
@@ -852,10 +857,10 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
         foreach(Vertex v, boost::vertices(g_))
         {
+
             //value for goal node stays the same or if has no out edges then ignore it
-            if( v == goalVertex || boost::out_degree(v,g_) < 1 )
+            if( v == goalVertex || boost::out_degree(v,g_) == 0 )
             {
-                newCostToGo[v] = costToGo_[v];
                 continue;
             }
 
@@ -865,6 +870,9 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
             feedback_[v] = candidate.first;
 
             newCostToGo[v] = candidate.second * discountFactor;
+
+            //assert(costToGo_.size()==newCostToGo.size());
+
         }
 
         convergenceCondition = (norm(MapToColvec(costToGo_)-MapToColvec(newCostToGo), "inf") <= ompl::magic::DP_CONVERGENCE_THRESHOLD);
@@ -1567,10 +1575,10 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 
             edgeControllers_[newEdge.first] = edgeController;
 
-            //if(unite)
+            if(unite)
                 uniteComponents(a, b);
 
-            //unite = !unite;
+            unite = !unite;
 
             Visualizer::addGraphEdge(stateProperty_[a], stateProperty_[b]);
 
