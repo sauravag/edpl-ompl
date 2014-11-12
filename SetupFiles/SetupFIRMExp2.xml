@@ -147,6 +147,19 @@
 <landmark id = 145 x = 15.2 y = 17.5 theta = 0.0 />
 <landmark id = 146 x = 15.0 y = 18.5 theta = 0.0 />
 <landmark id = 147 x = 15.0 y = 18.7 theta = 0.0 />
+<landmark id = 148 x = 19.9 y = 8.0 theta = 0.0 />
+<landmark id = 149 x = 19.9 y = 8.3 theta = 0.0 />
+<landmark id = 150 x = 19.9 y = 8.6 theta = 0.0 />
+<landmark id = 151 x = 19.9 y = 10.0 theta = 0.0 />
+<landmark id = 152 x = 19.9 y = 10.3 theta = 0.0 />
+<landmark id = 153 x = 19.9 y = 10.6 theta = 0.0 />
+<landmark id = 154 x = 12.0 y = 19.5 theta = 0.0 />
+<landmark id = 155 x = 12.3 y = 19.5 theta = 0.0 />
+<landmark id = 156 x = 12.6 y = 19.5 theta = 0.0 />
+<landmark id = 157 x = 10.5 y = 4.50 theta = 0.0 />
+<landmark id = 158 x = 10.8 y = 4.50 theta = 0.0 />
+<landmark id = 159 x = 11.0 y = 2.0 theta = 0.0 />
+<landmark id = 160 x = 11.0 y = 2.2 theta = 0.0 />
 </LandmarkList>
 <ObservationModels>
 	<CamAruco2DObservationModel
@@ -178,15 +191,15 @@
 	  /> <!--No Noise--> 
 	<UnicycleMotionModel
 		sigmaV="0.012"
-		etaV="0.03"
+		etaV="0.05"
         sigmaOmega="0.001"
         etaOmega="0.03"
 		P_Wg_filename=""
 		orbit_radius=5.0
 		wind_noise_pos="0.000001"
 		wind_noise_ang="0.000001" 
-		min_linear_velocity= 1.0
-		max_linear_velocity= 1.0
+		min_linear_velocity= 0.75
+		max_linear_velocity= 0.75
 		max_angular_velocity= 0.60
 		dt= 0.1
 	  /> <!--omega is in radians--> 
@@ -213,17 +226,17 @@
 		robotFile = "./Models/iRobot.obj"
 	/>
 	<StartPose
-		x = "15.0"
-		y = "18.10"
+		x = "12.8"
+		y = "18.5"
 		theta = "0"
 	/>
 	<GoalPose
-		x = "14.5"
+		x = "12.50"
 		y = "1.35"
-		theta = "1.57"
+		theta = "0"
 	/>
 	<PlanningTime
-		maxTime = "1200"
+		maxTime = "900"
 	/>
 	<FIRMNodes
 		minNodes = "100"

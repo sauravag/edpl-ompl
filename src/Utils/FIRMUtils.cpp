@@ -140,7 +140,7 @@ void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<ar
 	doc.SaveFile( "FIRMRoadMap.xml" );
 }
 
-bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > &FIRMNodeList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights)
+bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<std::pair<int, arma::colvec> > &FIRMNodePosList, std::vector<std::pair<int, arma::mat> > &FIRMNodeCovarianceList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights)
 {
     //std::string pathToXML = "/home/sauravagarwal/Research/Development/FIRM-OMPL/FIRMRoadMap.xml";
 
@@ -212,7 +212,8 @@ bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<s
         cov(2,1) = c32;
         cov(2,2) = c33;
 
-        FIRMNodeList.push_back(std::make_pair(id,std::make_pair(xVec,cov)));
+        FIRMNodePosList.push_back(std::make_pair(id,xVec));
+        FIRMNodeCovarianceList.push_back(std::make_pair(id,cov));
 
     }
 

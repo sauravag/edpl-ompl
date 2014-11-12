@@ -68,14 +68,6 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state) const
 
     double norm2 =  std::max(meanNorm*meanNormWeight_, covDiagNorm*covNormWeight_) ;
 
-    if(norm2 == 0)
-    {
-        std::cout<<"NORM2 is 0"<<std::endl;
-        std::cout<<"The difference vector is: \n"<<stateDiff<<std::endl;
-        std::cout<<"I am at: \n"<<this->getArmaData()<<std::endl;
-        std::cout<<"The checked state is at : \n"<<state->as<SE2BeliefSpace::StateType>()->getArmaData()<<std::endl;
-        //std::cin.get();
-    }
     if(norm2 <= reachDist_)
     {
         //std::cout<<"Is reachable and norm2 is  "<< norm2<<std::endl;

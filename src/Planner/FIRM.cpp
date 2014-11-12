@@ -77,16 +77,16 @@ namespace ompl
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
 
         /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
-        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
+        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 0.99;
 
         /** \brief Maximum allowed number of iterations to solve DP */
         static const int DP_MAX_ITERATIONS = 10000;
 
         /** \brief Weighting factor for filtering cost */
-        static const double INFORMATION_COST_WEIGHT = 0.97;
+        static const double INFORMATION_COST_WEIGHT = 0.9999 ;
 
         /** \brief Weighting factor for edge execution time cost */
-        static const double TIME_TO_STOP_COST_WEIGHT = 0.03;
+        static const double TIME_TO_STOP_COST_WEIGHT = 0.0001;
 
         /** \brief The cost to go from goal. */
         static const double GOAL_COST_TO_GO = 0.0;
@@ -95,7 +95,7 @@ namespace ompl
         static const double INIT_COST_TO_GO = 2.0;
 
         /** \brief The cost to traverse an obstacle*/
-        static const double OBSTACLE_COST_TO_GO = 200;
+        static const double OBSTACLE_COST_TO_GO = 500;
 
         /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
@@ -132,8 +132,6 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
     specs_.recognizedGoal = ompl::base::GOAL_SAMPLEABLE_REGION;
     specs_.approximateSolutions = true;
     specs_.optimizingPaths = true;
-
-    //Planner::declareParam<unsigned int>("max_nearest_neighbors", this, &FIRM::setMaxNearestNeighbors, std::string("8:1000"));
 
     minFIRMNodes_ = 25;
 
@@ -240,7 +238,7 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
     foreach (Vertex v, boost::vertices(g_))
     {
         const unsigned int t = totalConnectionAttemptsProperty_[v];
-        pdf.add(v, (double)(t - successfulConnectionAttemptsProperty_[v]) / (double)t);
+        pdf.add(v, (double)(t - successfulConnectionAttemptsProperty_[v]) /(double)t);
     }
 
     if (pdf.empty())
@@ -249,18 +247,14 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
     while (ptc == false)
     {
         Vertex v = pdf.sample(rng_.uniform01());
+
         unsigned int s = si_->randomBounceMotion(simpleSampler_, stateProperty_[v], workStates.size(), workStates, false);
 
-        for(int i=0;i<workStates.size(); i++)
-        {
-            addStateToGraph(si_->cloneState(workStates[i]));
-        }
-        /*
         if (s > 0)
         {
             s--;
-            Vertex last = addStateToGraph(si_->cloneState(workStates[s]));
 
+            Vertex last = addStateToGraph(si_->cloneState(workStates[s]));
 
             graphMutex_.lock();
             for (unsigned int i = 0 ; i < s ; ++i)
@@ -273,32 +267,34 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 disjointSets_.make_set(m);
 
                 // add the edge to the parent vertex
-                const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
-                const unsigned int id = maxEdgeID_++;
-                const Graph::edge_property_type properties(weight, id);
-                boost::add_edge(v, m, properties, g_);
-                uniteComponents(v, m);
+                if(addEdgeToGraph(v,m) && addEdgeToGraph(m,v))
+                {
+                    uniteComponents(v, m);
+                }
 
                 // add the vertex to the nearest neighbors data structure
                 nn_->add(m);
-                v = m;
+
+                v  =  m;
+
+                addStateToVisualization(stateProperty_[m]);
+
             }
 
             // if there are intermediary states or the milestone has not been connected to the initially sampled vertex,
             // we add an edge
             if (s > 0 || !sameComponent(v, last))
             {
-                // add the edge to the parent vertex
-                const ompl::base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
-                const unsigned int id = maxEdgeID_++;
-                const Graph::edge_property_type properties(weight, id);
-                boost::add_edge(v, last, properties, g_);
-                uniteComponents(v, last);
+                if(addEdgeToGraph(v,last) && addEdgeToGraph(last,v))
+                {
+                    uniteComponents(v, last);
+                }
             }
+
             graphMutex_.unlock();
 
         }
-        */
+
     }
 }
 
@@ -579,19 +575,27 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
         {
             totalConnectionAttemptsProperty_[m]++;
             totalConnectionAttemptsProperty_[n]++;
+
             if (si_->checkMotion(stateProperty_[m], stateProperty_[n]))
             {
-                successfulConnectionAttemptsProperty_[m]++;
-                successfulConnectionAttemptsProperty_[n]++;
-
-                addEdgeToGraph(m, n);
-
-                if(addReverseEdge)
+                // if edge is successfully added to graph
+                bool forwardEdgeAdded = addEdgeToGraph(m, n);
+                if(forwardEdgeAdded)
                 {
-                    addEdgeToGraph(n, m);
-                }
+                    successfulConnectionAttemptsProperty_[m]++;
 
-                uniteComponents(m, n);
+                    bool reverseEdgeAdded = false;
+
+                    if(addReverseEdge)
+                    {
+                        reverseEdgeAdded = addEdgeToGraph(n, m);
+                        successfulConnectionAttemptsProperty_[n]++;
+                    }
+
+                    // only unite the components if edges could be added in both directions
+                    if(forwardEdgeAdded && reverseEdgeAdded)
+                        uniteComponents(m, n);
+                }
             }
         }
     }
@@ -636,12 +640,15 @@ ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Verte
     return ompl::base::PathPtr(p);
 }
 
-void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
+bool FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
 {
 
     EdgeControllerType edgeController;
 
     const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController);
+
+    if(weight.getSuccessProbability() == 0)
+        return false; // this edge should not be added as it has no chance of success
 
     assert(edgeController.getGoal() && "The generated controller has no goal");
 
@@ -655,6 +662,8 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
     edgeControllers_[newEdge.first] = edgeController;
 
     Visualizer::addGraphEdge(stateProperty_[a], stateProperty_[b]);
+
+    return true;
 }
 
 FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
@@ -667,7 +676,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
     // If there exists an edge corresponding to this in the loaded file we use that
     // otherwise evaluate the weight properties
-    if(loadedRoadmapFromFile_)
+    /*if(loadedRoadmapFromFile_)
     {
          // find the matching loaded edge and then return its weight
         for(int i=0; i < loadedEdgeProperties_.size(); i++)
@@ -677,7 +686,10 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
                 return loadedEdgeProperties_[i].second;
             }
         }
+
+        std::cout<<"Could not load "
     }
+    */
 
     double successCount = 0;
 
@@ -916,7 +928,6 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
         candidateCostToGo[e] =  singleCostToGo ;
 
-        //candidateCostToGo.insert(std::pair<Edge,double>(e,singleCostToGo));
     }
 
     DoubleValueComp dvc;
@@ -1224,7 +1235,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     Visualizer::doSaveVideo(true);
 
-    connectionStrategy_ = FStrategy<Vertex>(1.1*ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
+    connectionStrategy_ = FStrategy<Vertex>(1.2*ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
 
     // While the robot state hasn't reached the goal state, keep running
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
@@ -1500,31 +1511,82 @@ void FIRM::savePlannerData()
 
 void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 {
-    std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > FIRMNodeList;
+    std::vector<std::pair<int, arma::colvec> > FIRMNodePosList;
+    std::vector<std::pair<int, arma::mat> > FIRMNodeCovarianceList;
 
-    if(FIRMUtils::readFIRMGraphFromXML(pathToFile, FIRMNodeList, loadedEdgeProperties_))
+    boost::mutex::scoped_lock _(graphMutex_);
+
+    if(FIRMUtils::readFIRMGraphFromXML(pathToFile,  FIRMNodePosList, FIRMNodeCovarianceList , loadedEdgeProperties_))
     {
 
         loadedRoadmapFromFile_ = true;
 
         this->setup();
 
-        for(int i = 0; i < FIRMNodeList.size() ; i++)
+        for(int i = 0; i < FIRMNodePosList.size() ; i++)
         {
             ompl::base::State *newState = siF_->allocState();
 
-            arma::colvec xVec = FIRMNodeList[i].second.first;
-            arma::mat     cov = FIRMNodeList[i].second.second;
+            arma::colvec xVec = FIRMNodePosList[i].second;
+            arma::mat     cov = FIRMNodeCovarianceList[i].second;
 
             newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
             newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
 
-            Vertex v = addStateToGraph(siF_->cloneState(newState));
+            //Vertex v = addStateToGraph(siF_->cloneState(newState));
 
-            siF_->freeState(newState);
+            Vertex m;
 
-            assert(v==FIRMNodeList[i].first && "IDS DONT MATCH !!");
+            m = boost::add_vertex(g_);
+
+            addStateToVisualization(newState);
+
+            stateProperty_[m] = newState;
+
+            NodeControllerType nodeController;
+
+            generateNodeController(newState, nodeController); // Generate the node controller
+
+            nodeControllers_[m] = nodeController; // Add it to the list
+
+            // Initialize to its own (dis)connected component.
+            disjointSets_.make_set(m);
+
+            nn_->add(m);
+
+            assert(m==FIRMNodePosList[i].first && "IDS DONT MATCH !!");
         }
+
+        for(int i=0; i<loadedEdgeProperties_.size(); i++)
+        {
+            EdgeControllerType edgeController;
+
+            Vertex a = loadedEdgeProperties_[i].first.first;
+            Vertex b = loadedEdgeProperties_[i].first.second;
+
+            ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
+            ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+
+            // Generate the edge controller for given start and end state
+            generateEdgeController(startNodeState,targetNodeState,edgeController);
+
+            const FIRMWeight weight = loadedEdgeProperties_[i].second;
+
+            const unsigned int id = maxEdgeID_++;
+
+            const Graph::edge_property_type properties(weight, id);
+
+            // create an edge with the edge weight property
+            std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
+
+            edgeControllers_[newEdge.first] = edgeController;
+
+            uniteComponents(a, b);
+
+            Visualizer::addGraphEdge(stateProperty_[a], stateProperty_[b]);
+
+        }
+
     }
 }
 

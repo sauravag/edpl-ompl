@@ -68,7 +68,7 @@ void plan()
 
     OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
 
-    cin>>mode;
+    //cin>>mode;
 
     int keepTrying = 1;
 
@@ -133,9 +133,9 @@ void testMultiModal()
 
 int main(int argc, char *argv[])
 {
-    srand(123456);
+    srand(1234569);
 
-    arma_rng::set_seed(123456);
+    arma_rng::set_seed(1234569);
 
     QApplication app(argc, argv);
 
