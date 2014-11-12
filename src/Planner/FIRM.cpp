@@ -497,9 +497,9 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
 
     // If roadmap wasn't loaded from file, then save the newly constructed roadmap
     //if(!loadedRoadmapFromFile_)
-    //{
+    {
         this->savePlannerData();
-    //}
+    }
 
     slnThread.join();
 

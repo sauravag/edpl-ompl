@@ -68,7 +68,7 @@ void plan()
 
     OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
 
-    //cin>>mode;
+    cin>>mode;
 
     int keepTrying = 1;
 
