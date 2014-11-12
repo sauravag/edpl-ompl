@@ -77,7 +77,7 @@ namespace ompl
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
 
         /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
-        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 0.99;
+        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
 
         /** \brief Maximum allowed number of iterations to solve DP */
         static const int DP_MAX_ITERATIONS = 10000;
@@ -389,7 +389,7 @@ void FIRM::checkForSolution(const ompl::base::PlannerTerminationCondition &ptc,
         if (!addedSolution_)
         {
             OMPL_INFORM("FIRM: No Solution Yet.");
-            boost::this_thread::sleep(boost::posix_time::seconds(60));
+            boost::this_thread::sleep(boost::posix_time::seconds(30));
         }
     }
 }
@@ -674,23 +674,6 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
      // Generate the edge controller for given start and end state
     generateEdgeController(startNodeState,targetNodeState,edgeController);
 
-    // If there exists an edge corresponding to this in the loaded file we use that
-    // otherwise evaluate the weight properties
-    /*if(loadedRoadmapFromFile_)
-    {
-         // find the matching loaded edge and then return its weight
-        for(int i=0; i < loadedEdgeProperties_.size(); i++)
-        {
-            if(loadedEdgeProperties_[i].first.first == a && loadedEdgeProperties_[i].first.second == b)
-            {
-                return loadedEdgeProperties_[i].second;
-            }
-        }
-
-        std::cout<<"Could not load "
-    }
-    */
-
     double successCount = 0;
 
     // initialize costs to 0
@@ -872,6 +855,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
             //value for goal node stays the same or if has no out edges then ignore it
             if( v == goalVertex || boost::out_degree(v,g_) < 1 )
             {
+                newCostToGo[v] = costToGo_[v];
                 continue;
             }
 
@@ -1557,6 +1541,8 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
             assert(m==FIRMNodePosList[i].first && "IDS DONT MATCH !!");
         }
 
+        bool unite = true;
+
         for(int i=0; i<loadedEdgeProperties_.size(); i++)
         {
             EdgeControllerType edgeController;
@@ -1581,7 +1567,10 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 
             edgeControllers_[newEdge.first] = edgeController;
 
-            uniteComponents(a, b);
+            //if(unite)
+                uniteComponents(a, b);
+
+            //unite = !unite;
 
             Visualizer::addGraphEdge(stateProperty_[a], stateProperty_[b]);
 
