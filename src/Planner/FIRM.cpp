@@ -71,7 +71,7 @@ namespace ompl
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-        static const double NUM_MONTE_CARLO_PARTICLES = 15;
+        static const double NUM_MONTE_CARLO_PARTICLES = 20;
 
         /** \brief For a node that is not observable, use a high covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
@@ -80,7 +80,7 @@ namespace ompl
         static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
 
         /** \brief Maximum allowed number of iterations to solve DP */
-        static const int DP_MAX_ITERATIONS = 10000;
+        static const int DP_MAX_ITERATIONS = 20000;
 
         /** \brief Weighting factor for filtering cost */
         static const double INFORMATION_COST_WEIGHT = 0.9999 ;
@@ -95,7 +95,7 @@ namespace ompl
         static const double INIT_COST_TO_GO = 2.0;
 
         /** \brief The cost to traverse an obstacle*/
-        static const double OBSTACLE_COST_TO_GO = 500;
+        static const double OBSTACLE_COST_TO_GO = 200;
 
         /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
@@ -496,7 +496,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     }
 
     // If roadmap wasn't loaded from file, then save the newly constructed roadmap
-    //if(!loadedRoadmapFromFile_)
+    if(!loadedRoadmapFromFile_)
     {
         this->savePlannerData();
     }
@@ -593,6 +593,8 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
                         {
                             successfulConnectionAttemptsProperty_[n]++;
                             uniteComponents(m, n);
+                            Visualizer::addGraphEdge(stateProperty_[m], stateProperty_[n]);
+                            Visualizer::addGraphEdge(stateProperty_[n], stateProperty_[m]);
                         }
                         else
                         {
@@ -622,6 +624,8 @@ bool FIRM::sameComponent(Vertex m1, Vertex m2)
 
 ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal)
 {
+    sendFeedbackEdgesToViz();
+
     FeedbackPath *p = new FeedbackPath(siF_);
 
     std::cout<<"The start vertex is: "<<start<<std::endl;
@@ -634,16 +638,26 @@ ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Verte
     while(currentVertex!=goal)
     {
         Edge edge = feedback_[currentVertex]; // get the edge
+
         Vertex target = boost::target(edge, g_); // get the target of this edge
+
+        if(target > boost::num_vertices(g_))
+            OMPL_ERROR("Error in constructing feedback path. Tried to access vertex ID not in graph.");
+
         p->append(stateProperty_[currentVertex],edgeControllers_[edge]); // push the state and controller to take
+
         if(target == goal)
         {
-
             p->append(stateProperty_[target]); // because from the goal node you don't need to take a controller
         }
+
         currentVertex =  target;
 
         counter++; // the maximum number of nodes that robot can pass through is the total number of nodes
+
+        if(counter > boost::num_vertices(g_))
+            OMPL_ERROR("There is no feedback to guide robot to goal. Maybe DP did not converge.");
+
     }
 
     return ompl::base::PathPtr(p);
@@ -669,8 +683,6 @@ bool FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
     std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
 
     edgeControllers_[newEdge.first] = edgeController;
-
-    Visualizer::addGraphEdge(stateProperty_[a], stateProperty_[b]);
 
     return true;
 }
@@ -944,6 +956,8 @@ double FIRM::evaluateSuccessProbability(const Edge currentEdge, const FIRM::Vert
         const FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, edge);
 
         const double transitionProbability  = edgeWeight.getSuccessProbability();
+
+        OMPL_INFORM("The success probability of edge is %f", transitionProbability);
 
         successProb = successProb * transitionProbability;
 
