@@ -105,7 +105,7 @@ void Visualizer::drawRobot(const ompl::base::State *state)
         arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
         glPushMatrix();
-            glTranslated(x[0], x[1], 0);
+            glTranslated(x[0], x[1], 0.0);
             glRotated(-90+(180/3.14157)*x[2],0,0,1);
             glCallList(robotIndx_);
         glPopMatrix();
@@ -234,6 +234,10 @@ void Visualizer::refresh()
     glClear(GL_DEPTH_BUFFER_BIT);
     //glDepthMask(GL_TRUE);
 
+    drawRobotPath();
+
+    drawEnvironment();
+
     switch(mode_)
     {
         case NodeViewMode:
@@ -277,8 +281,6 @@ void Visualizer::refresh()
 
             robotPath_.push_back(si_->cloneState(trueState_));
 
-            drawRobotPath();
-
             break;
 
         default:
@@ -288,8 +290,6 @@ void Visualizer::refresh()
             exit(1);
     }
 
-    drawEnvironment();
-
     if(trueState_)
     {
         drawRobot(trueState_);
@@ -297,7 +297,7 @@ void Visualizer::refresh()
 
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
-    glClear(GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_DEPTH_BUFFER_BIT);
     //glDepthMask(GL_FALSE);
     //draw landmarks
 
@@ -438,15 +438,18 @@ void Visualizer::drawMostLikelyPath()
 
 void Visualizer::drawRobotPath()
 {
-    glDisable(GL_LIGHTING);
-
-    for(int i=0; i<robotPath_.size()-1;i++)
+    if(robotPath_.size()>=2)
     {
-        glColor3d(1.0 , 1.0 , 1.0);
+        glDisable(GL_LIGHTING);
 
-        glLineWidth(4.0);
-            drawEdge(robotPath_[i],robotPath_[i+1]);
-        glLineWidth(1.f);
+        for(int i=0; i<robotPath_.size()-1;i++)
+        {
+            glColor3d(1.0 , 1.0 , 1.0);
+
+            glLineWidth(4.0);
+                drawEdge(robotPath_[i],robotPath_[i+1]);
+            glLineWidth(1.f);
+        }
     }
 }
 

@@ -282,7 +282,6 @@ void GLWidget::resizeGL(int width, int height)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    std::cout<<m_camZoom<<std::endl;
     if(m_view)
     {
         vector<double> pos(2);
