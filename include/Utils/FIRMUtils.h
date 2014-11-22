@@ -56,7 +56,7 @@ class FIRMUtils
         static void writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > nodes, const std::vector<std::pair<std::pair<int,int>,FIRMWeight> > edgeWeights);
 
         /** \brief Reads the Graph properties from an XML file */
-        static bool readFIRMGraphFromXML(const std::string &pathToXML, std::vector<std::pair<int,std::pair<arma::colvec,arma::mat> > > &FIRMNodeList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights);
+        static bool readFIRMGraphFromXML(const std::string &pathToXML,std::vector<std::pair<int, arma::colvec> > &FIRMNodePosList, std::vector<std::pair<int, arma::mat> > &FIRMNodeCovarianceList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights);
 
         /** \brief Convert degree to radian */
         static double degree2Radian(double deg);

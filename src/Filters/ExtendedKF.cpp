@@ -105,24 +105,31 @@ void ExtendedKF::Evolve(const ompl::base::State *belief,
     ompl::base::State *evolvedState)
 {
 
-  // In the EKF we do not use the linear systems passed to the filter, instead we generate the linear systems on the fly
+    // In the EKF we do not use the linear systems passed to the filter, instead we generate the linear systems on the fly
 
-  using namespace arma;
+    using namespace arma;
 
-  LinearSystem lsPredicted(si_, belief, control, this->motionModel_, this->observationModel_) ;
+    LinearSystem lsPredicted(si_, belief, control, this->motionModel_, this->observationModel_) ;
 
-  ompl::base::State *bPred = si_->allocState();
+    ompl::base::State *bPred = si_->allocState();
 
-  Predict(belief, control, lsPredicted, bPred);
+    Predict(belief, control, lsPredicted, bPred);
 
-  if(!obs.n_rows || !obs.n_cols)
-  {
-    si_->copyState(evolvedState, bPred);
-    return;
-  }
+    if(!obs.n_rows || !obs.n_cols)
+    {
+        si_->copyState(evolvedState, bPred);
+        return;
+    }
 
-  LinearSystem lsUpdated(si_, bPred, control, obs, this->motionModel_, this->observationModel_) ;
+    LinearSystem lsUpdated(si_, bPred, control, obs, this->motionModel_, this->observationModel_) ;
 
-  Update(bPred, obs, lsUpdated, evolvedState);
+    ompl::base::State *bUpdated = si_->allocState();
+
+    Update(bPred, obs, lsUpdated, bUpdated);
+
+    si_->copyState(evolvedState, bUpdated);
+
+    si_->freeState(bPred);
+    si_->freeState(bUpdated);
 
 }

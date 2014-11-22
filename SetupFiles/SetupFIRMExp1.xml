@@ -165,10 +165,10 @@
 </MotionModels>
 <PlanningProblem>
 	<Environment
-		environmentFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleFIRMEnv.obj"
+		environmentFile = "./Models/simpleFIRMEnv.obj"
 	/>
 	<Robot
-		robotFile = "/home/saurav/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+		robotFile = "./Models/iRobot.obj"
 	/>
 	<StartPose
 		x = "15.5"

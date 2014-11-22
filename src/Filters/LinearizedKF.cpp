@@ -107,6 +107,8 @@ void LinearizedKF::Evolve(const ompl::base::State *belief,
   }
 
   Update(bPred, obs, lsUpdate, evolvedState);
+
+  si_->freeState(bPred);
 }
 
 

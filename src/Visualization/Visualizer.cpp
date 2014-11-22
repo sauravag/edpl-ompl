@@ -77,7 +77,7 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
 
     glPushMatrix();
 
-    glColor3d(0.0,0.0,1.0);
+    glColor3d(0.0,0.0,0.0);
 
     glTranslated(landmark[1], landmark[2], 0.0);
     glVertex3f(0.8,0.8,0.8);
@@ -127,7 +127,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
             break;
 
         case GraphNodeState:
-            glColor3d(1.0,1.0,1.0); // white
+            glColor3d(0.0,0.0,1.0); // blue
             break;
 
         default:
@@ -143,11 +143,11 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
         //draw a black disk
         GLUquadric *disk = gluNewQuadric();
-        gluDisk(disk, 0, 0.15, 15, 1);
+        gluDisk(disk, 0, 0.12, 12, 1);
         gluDeleteQuadric(disk);
         glBegin(GL_LINES);
         glVertex3f(0, 0, 0);
-        glVertex3f(1.0*cos(x[2]), 1.0*sin(x[2]), 0);
+        glVertex3f(0.5*cos(x[2]), 0.5*sin(x[2]), 0);
         glEnd();
 
         double fovRadius = 2.5; //meters
@@ -176,7 +176,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     if(trace(covariance) != 0 && stateType == VZRStateType::BeliefState)
     {
         double chi2 = 9.21034;
-        double magnify = 40.0; // scaled up for viewing
+        double magnify = 20.0; // scaled up for viewing
         mat pos;
         for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())
         {
@@ -227,12 +227,10 @@ void Visualizer::refresh()
 {
     boost::mutex::scoped_lock sl(drawMutex_);
 
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
 
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
-    //glDepthMask(GL_TRUE);
 
     drawRobotPath();
 
@@ -274,8 +272,8 @@ void Visualizer::refresh()
             if(chosenRolloutConnection_)
             {
                 glColor3d(0.0 , 1.0 , 0.0);
-                glLineWidth(2.0);
-                drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
+                glLineWidth(3.0);
+                    drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
                 glLineWidth(1.0);
             }
 
@@ -297,10 +295,14 @@ void Visualizer::refresh()
 
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
+<<<<<<< HEAD
     //glClear(GL_DEPTH_BUFFER_BIT);
     //glDepthMask(GL_FALSE);
     //draw landmarks
+=======
+>>>>>>> 9662d69d7246d026907f5a2d5d2ab3294244f90f
 
+    //draw landmarks
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
     {
         drawLandmark(landmarks_[i]);
@@ -389,7 +391,10 @@ void Visualizer::drawRolloutConnections()
     for(int i=0; i<rolloutConnections_.size();i++)
     {
         glColor3d(1.0,0.0,0);
+        glLineWidth(3.0);
         drawEdge(rolloutConnections_[i].first,rolloutConnections_[i].second);
+        glLineWidth(1.0);
+
     }
 }
 
@@ -440,7 +445,11 @@ void Visualizer::drawRobotPath()
 {
     if(robotPath_.size()>=2)
     {
+<<<<<<< HEAD
         glDisable(GL_LIGHTING);
+=======
+        glColor3d(0.0 , 1.0 , 1.0);
+>>>>>>> 9662d69d7246d026907f5a2d5d2ab3294244f90f
 
         for(int i=0; i<robotPath_.size()-1;i++)
         {
