@@ -161,7 +161,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         fovRight << fovRadius*cos(x[2] - fovAngle) 	<< endr
                  << fovRadius*sin(x[2] - fovAngle) 	<< endr
                  <<	0								<< endr;
-        glColor3d(0.5,0.5,0.5);
+        //glColor3d(0.5,0.5,0.5);
 
         //Remove comment to show field of view of robot
         /*
@@ -190,7 +190,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
         int nPoints = pos.n_rows;
 
-        glColor3d(1.0,0.0,0.0); // grey
+        //glColor3d(1.0,0.0,0.0); // grey
 
         try
         {
@@ -295,12 +295,9 @@ void Visualizer::refresh()
 
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
-<<<<<<< HEAD
     //glClear(GL_DEPTH_BUFFER_BIT);
     //glDepthMask(GL_FALSE);
     //draw landmarks
-=======
->>>>>>> 9662d69d7246d026907f5a2d5d2ab3294244f90f
 
     //draw landmarks
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
@@ -408,6 +405,7 @@ void Visualizer::drawFeedbackEdges()
         maxCost = std::max(maxCost, i->cost);
     }
 
+    glLineWidth(2.0);
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
         std::pair<const ompl::base::State*, const ompl::base::State*> vertexPair = std::make_pair(i->source, i->target);
@@ -420,36 +418,35 @@ void Visualizer::drawFeedbackEdges()
             double costFactor = sqrt(i->cost/maxCost);
             glColor3d(0.0,1.0,0.0);
 
-            glLineWidth(1.0);
+
                 drawEdge(i->source, i->target);
-            glLineWidth(1.f);
+
         }
     }
+    glLineWidth(1.0);
 }
 
 void Visualizer::drawMostLikelyPath()
 {
     glDisable(GL_LIGHTING);
 
+    glLineWidth(4.0);
     for(int i=0; i<mostLikelyPath_.size();i++)
     {
         glColor3d(1.0 , 1.0 , 0.0);
 
-        glLineWidth(4.0);
+
             drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
-        glLineWidth(1.f);
     }
+    glLineWidth(1.f);
 }
 
 void Visualizer::drawRobotPath()
 {
     if(robotPath_.size()>=2)
     {
-<<<<<<< HEAD
         glDisable(GL_LIGHTING);
-=======
         glColor3d(0.0 , 1.0 , 1.0);
->>>>>>> 9662d69d7246d026907f5a2d5d2ab3294244f90f
 
         for(int i=0; i<robotPath_.size()-1;i++)
         {

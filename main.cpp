@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/SetupFIRMExp2.xml";
+    std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -64,7 +64,7 @@ void plan()
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    int mode = 0;
+    int mode = 2;
 
     OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
 

@@ -71,7 +71,7 @@ namespace ompl
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-        static const double NUM_MONTE_CARLO_PARTICLES = 20;
+        static const double NUM_MONTE_CARLO_PARTICLES = 10;
 
         /** \brief For a node that is not observable, use a high covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
@@ -1563,6 +1563,8 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
             disjointSets_.make_set(m);
 
             nn_->add(m);
+
+            policyGenerator_->addFIRMNodeToObservationGraph(newState);
 
             assert(m==FIRMNodePosList[i].first && "IDS DONT MATCH !!");
         }
