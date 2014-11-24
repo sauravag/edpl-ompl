@@ -40,6 +40,8 @@ boost::mutex Visualizer::drawMutex_;
 
 std::list<ompl::base::State*> Visualizer::states_;
 
+std::list<ompl::base::State*> Visualizer::beliefModes_;
+
 ompl::base::State* Visualizer::trueState_;
 
 ompl::base::State* Visualizer::currentBelief_;
@@ -119,7 +121,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     switch(stateType)
     {
         case TrueState:
-            glColor3d(1.0,0.0,0.0);
+            glColor3d(1,0,0);
             break;
 
         case BeliefState:
@@ -127,11 +129,11 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
             break;
 
         case GraphNodeState:
-            glColor3d(0.0,0.0,1.0); // blue
+            glColor3d(0,0,1); // blue
             break;
 
         default:
-            glColor3d(1.0,1.0,1.0); // grey
+            glColor3d(1,1,1); // grey
             break;
     }
 
@@ -281,6 +283,15 @@ void Visualizer::refresh()
 
             break;
 
+        case MultiModalMode:
+
+            drawGraphBeliefNodes();
+
+            drawBeliefModes();
+
+            break;
+
+
         default:
 
             assert(!"There is no default drawing mode for OGLDisplay");
@@ -305,7 +316,7 @@ void Visualizer::refresh()
         drawLandmark(landmarks_[i]);
     }
 
-    if(currentBelief_)
+    if(currentBelief_ && mode_ !=MultiModalMode)
     {
         drawState(currentBelief_, (VZRStateType)1);
     }
@@ -363,11 +374,21 @@ void Visualizer::drawObstacle()
     glEnd();
 
 }
+
 void Visualizer::drawGraphBeliefNodes()
 {
     for(typename std::list<ompl::base::State*>::iterator s=states_.begin(), e=states_.end(); s!=e; ++s)
     {
           drawState(*s, (VZRStateType)2);
+    }
+
+}
+
+void Visualizer::drawBeliefModes()
+{
+    for(typename std::list<ompl::base::State*>::iterator s=beliefModes_.begin(), e=beliefModes_.end(); s!=e; ++s)
+    {
+          drawState(*s, (VZRStateType)1);
     }
 
 }

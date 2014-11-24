@@ -136,6 +136,15 @@
 <landmark id = 101 x = 16.0 y = 1.0 theta = -0.5 />
 <landmark id = 100 x = 1.0 y = 5.0 theta = -0.5 />
 <landmark id = 101 x = 1.0 y = 6.0 theta = -0.5 />
+<landmark id = 102 x = 1.3 y = 8.7 theta = -0.5 />
+<landmark id = 103 x = 1.7 y = 8.7 theta = -0.5 />
+<landmark id = 104 x = 2.3 y = 8.7 theta = -0.5 />
+<landmark id = 105 x = 15.0 y = 14.0 theta = -0.5 />
+<landmark id = 106 x = 16.0 y = 14.0 theta = -0.5 />
+<landmark id = 107 x = 16.5 y = 15.0 theta = -0.5 />
+<landmark id = 108 x = 16.5 y = 14.5 theta = -0.5 />
+<landmark id = 109 x = 15.5 y = 15.8 theta = -0.5 />
+<landmark id = 101 x = 15.2 y = 15.8 theta = -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
@@ -195,23 +204,23 @@
 </MotionModels>
 <PlanningProblem>
     <Environment
-        environmentFile = "./Models/ICRA2015Exp2.obj"
+        environmentFile = "./Models/4CornerWorld.obj"
     />
     <Robot
         robotFile = "./Models/iRobot.obj"
     />
      <StartPose
-        x = "15.0"
-        y = "19.5"
+        x = "20"
+        y = "3.0"
         theta = "1.57"
     />
     <GoalPose
-        x = "19.0"
-        y = "1.5"
+        x = "1.0"
+        y = "3.0"
         theta = "0"
     />
     <PlanningTime
-        maxTime = "3600"
+        maxTime = "600"
     />
     <FIRMNodes
         minNodes = "125"

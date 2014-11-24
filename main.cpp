@@ -133,9 +133,9 @@ void testMultiModal()
 
 int main(int argc, char *argv[])
 {
-    srand(1234569);
+    srand(2345);
 
-    arma_rng::set_seed(1234569);
+    arma_rng::set_seed(2345);
 
     QApplication app(argc, argv);
 

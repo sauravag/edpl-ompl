@@ -1634,10 +1634,8 @@ bool FIRM::isGoalVertex(const Vertex v)
 
 void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 {
-    // clear the visualization
-    Visualizer::clearStates();
 
-    Visualizer::setMode(Visualizer::VZRDrawingMode::NodeViewMode);
+    Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
 
     policyGenerator_->sampleNewBeliefStates();
 
@@ -1665,7 +1663,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             siF_->getTrueState(currentTrueState);
 
             // If the robot's clearance gets below the threshold, break loop & replan
-            if(!policyGenerator_->areCurrentBeliefsValid() || siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE)
+            if(!policyGenerator_->areCurrentBeliefsValid() /*|| siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE*/)
             {
                 if(counter == 0)
                 {
@@ -1674,6 +1672,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
                 }
 
             }
+
             if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
                 counter = 0;
 

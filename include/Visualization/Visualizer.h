@@ -74,7 +74,8 @@ class Visualizer
             NodeViewMode,
             FeedbackViewMode,
             PRMViewMode,
-            RolloutMode
+            RolloutMode,
+            MultiModalMode
         };
 
         struct VZRFeedbackEdge
@@ -99,11 +100,27 @@ class Visualizer
             states_.push_back(si_->cloneState(state));
         }
 
+
         /** \brief Clear the state container */
         static void clearStates()
         {
             boost::mutex::scoped_lock sl(drawMutex_);
             states_.clear();
+        }
+
+        /** \brief Add state to belief mode list */
+        static void addBeliefMode(ompl::base::State *state)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            assert(state);
+            beliefModes_.push_back(si_->cloneState(state));
+        }
+
+        /** \brief Clear belief Modes */
+        static void clearBeliefModes()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            beliefModes_.clear();
         }
 
         /** \brief Add a Roadmap Graph edge to the visualization */
@@ -252,6 +269,9 @@ class Visualizer
         /** \brief Draw the stored graph nodes */
         static void drawGraphBeliefNodes();
 
+        /** \brief Draw belief modes. */
+        static void drawBeliefModes();
+
         /** \brief Draw the edges in the roadmap graph */
         static void drawGraphEdges();
 
@@ -296,6 +316,9 @@ class Visualizer
 
         /** \brief Store the robots belief state */
         static ompl::base::State* currentBelief_;
+
+        /** \brief Store the belief modes for multi-modal operation */
+        static std::list<ompl::base::State*> beliefModes_;
 
         /** \brief Store the landmarks */
         static std::vector<arma::colvec> landmarks_;

@@ -819,11 +819,11 @@ void MMPolicyGenerator::removeDuplicateModes()
 void MMPolicyGenerator::drawBeliefs()
 {
 
-    Visualizer::clearStates();
+    Visualizer::clearBeliefModes();
 
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
-        Visualizer::addState(currentBeliefStates_[i]);
+        Visualizer::addBeliefMode(currentBeliefStates_[i]);
     }
 
 }
@@ -870,7 +870,6 @@ void MMPolicyGenerator::assignUniformWeight()
 
 void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
 {
-    //boost::mutex::scoped_lock _(graphMutex_);
 
     // Add state to graph
     Vertex m = boost::add_vertex(g_);
@@ -890,7 +889,6 @@ void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
 
 void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b)
 {
-    //boost::mutex::scoped_lock _(graphMutex_);
 
     // See if there is an overlap in observation between the two vertices
     unsigned int weight = 0;
