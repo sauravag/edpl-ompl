@@ -203,12 +203,23 @@ class Visualizer
             rolloutConnections_.clear();
         }
 
-         static void clearMostLikelyPath()
+        static void clearMostLikelyPath()
         {
             boost::mutex::scoped_lock sl(drawMutex_);
             mostLikelyPath_.clear();
         }
 
+        static void addOpenLoopRRTPath(const ompl::geometric::PathGeometric path)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            openLoopRRTPaths_.push_back(path);
+        }
+
+        static void clearOpenLoopRRTPaths()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            openLoopRRTPaths_.clear();
+        }
 
         /** \brief update the robot's true state for drawing */
         static void updateTrueState(const ompl::base::State *state)
@@ -289,6 +300,11 @@ class Visualizer
 
         static void drawObstacle();
 
+        /** \brief Draw geometric path.*/
+        static void drawGeometricPath(const ompl::geometric::PathGeometric path);
+
+        static void drawOpenLoopRRTPaths();
+
         /** \brief Refresh the drawing and show latest scenario*/
         static void refresh();
 
@@ -343,6 +359,9 @@ class Visualizer
 
         /** \brief stores the sequence of states of the real robot */
         static std::vector<const ompl::base::State*> robotPath_;
+
+        /** \brief Container for RRT paths generated as candidates during Multi-Modal operation */
+        static std::vector<ompl::geometric::PathGeometric> openLoopRRTPaths_;
 
         /** \brief Visualizer drawing mode setting */
         static VZRDrawingMode mode_;

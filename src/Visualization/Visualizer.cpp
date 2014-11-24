@@ -62,6 +62,8 @@ boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > 
 
 std::vector<const ompl::base::State*> Visualizer::robotPath_;
 
+std::vector<ompl::geometric::PathGeometric> Visualizer::openLoopRRTPaths_;
+
 Visualizer::VZRDrawingMode Visualizer::mode_;
 
 ompl::app::RenderGeometry* Visualizer::renderGeom_;
@@ -289,6 +291,8 @@ void Visualizer::refresh()
 
             drawBeliefModes();
 
+            drawOpenLoopRRTPaths();
+
             break;
 
 
@@ -480,5 +484,22 @@ void Visualizer::drawRobotPath()
     }
 }
 
+void Visualizer::drawGeometricPath(ompl::geometric::PathGeometric path)
+{
+    for(int i=0;i<path.getStateCount()-1;i++)
+    {
+        glColor3d(0 , 1 , 0);
+        glLineWidth(2.0);
+        drawEdge(path.getState(i),path.getState(i+1)) ;
+        glLineWidth(1.0);
+    }
+}
 
+void Visualizer::drawOpenLoopRRTPaths()
+{
+    for(int i=0;i<openLoopRRTPaths_.size();i++)
+    {
+        drawGeometricPath(openLoopRRTPaths_[i]);
+    }
+}
 

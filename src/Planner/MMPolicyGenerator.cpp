@@ -208,8 +208,6 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     //container to store the sequence of controls for each mode/target pair
     std::vector<std::vector<ompl::control::Control*> > openLoopPolicies;
 
-    Visualizer::ClearFeedbackEdges();
-
     // Iterate over the mode/target pairs and generate open loop controls
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
@@ -236,15 +234,15 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             planner->setup();
 
-
             ompl::base::PlannerStatus solved = planner->solve(ompl::magic::RRT_PLAN_MAX_TIME);
-
 
             if(solved)
             {
                 const ompl::base::PathPtr &path = pdef->getSolutionPath();
 
                 ompl::geometric::PathGeometric gpath = static_cast<ompl::geometric::PathGeometric&>(*path);
+
+                Visualizer::addOpenLoopRRTPath(gpath);
 
                 std::vector<ompl::control::Control*> olc;
 
@@ -318,6 +316,8 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
         }
 
     }
+
+    Visualizer::clearOpenLoopRRTPaths();
 
 }
 
