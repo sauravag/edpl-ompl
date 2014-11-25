@@ -71,11 +71,7 @@ namespace ompl
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-<<<<<<< HEAD
-        static const double NUM_MONTE_CARLO_PARTICLES = 50;
-=======
         static const double NUM_MONTE_CARLO_PARTICLES = 10;
->>>>>>> 9caec044df7023ec50952dd60e6f4be360bf7779
 
         /** \brief For a node that is not observable, use a high covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
@@ -84,7 +80,7 @@ namespace ompl
         static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
 
         /** \brief Maximum allowed number of iterations to solve DP */
-        static const int DP_MAX_ITERATIONS = 10000;
+        static const int DP_MAX_ITERATIONS = 20000;
 
         /** \brief Weighting factor for filtering cost */
         static const double INFORMATION_COST_WEIGHT = 0.9999 ;
@@ -500,7 +496,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     }
 
     // If roadmap wasn't loaded from file, then save the newly constructed roadmap
-    //if(!loadedRoadmapFromFile_)
+    if(!loadedRoadmapFromFile_)
     {
         this->savePlannerData();
     }
@@ -961,8 +957,7 @@ double FIRM::evaluateSuccessProbability(const Edge currentEdge, const FIRM::Vert
 
         const double transitionProbability  = edgeWeight.getSuccessProbability();
 
-        OMPL_INFORM("The success probability of edge is: ");
-        std::cout<<transitionProbability<<std::endl;
+        OMPL_INFORM("The success probability of edge is %f", transitionProbability);
 
         successProb = successProb * transitionProbability;
 
@@ -1529,7 +1524,7 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
     std::vector<std::pair<int, arma::colvec> > FIRMNodePosList;
     std::vector<std::pair<int, arma::mat> > FIRMNodeCovarianceList;
 
-    //boost::mutex::scoped_lock _(graphMutex_);
+    boost::mutex::scoped_lock _(graphMutex_);
 
     if(FIRMUtils::readFIRMGraphFromXML(pathToFile,  FIRMNodePosList, FIRMNodeCovarianceList , loadedEdgeProperties_))
     {
@@ -1548,10 +1543,8 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
             newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
             newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
 
-            Vertex v = addStateToGraph(siF_->cloneState(newState));
+            //Vertex v = addStateToGraph(siF_->cloneState(newState));
 
-            siF_->freeState(newState);
-            /*
             Vertex m;
 
             m = boost::add_vertex(g_);
@@ -1574,9 +1567,8 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
             policyGenerator_->addFIRMNodeToObservationGraph(newState);
 
             assert(m==FIRMNodePosList[i].first && "IDS DONT MATCH !!");
-            */
         }
-        /*
+
         bool unite = true;
 
         for(int i=0; i<loadedEdgeProperties_.size(); i++)
@@ -1611,7 +1603,6 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
             Visualizer::addGraphEdge(stateProperty_[a], stateProperty_[b]);
 
         }
-        */
 
     }
 }
