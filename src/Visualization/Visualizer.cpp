@@ -40,6 +40,8 @@ boost::mutex Visualizer::drawMutex_;
 
 std::list<ompl::base::State*> Visualizer::states_;
 
+std::list<ompl::base::State*> Visualizer::beliefModes_;
+
 ompl::base::State* Visualizer::trueState_;
 
 ompl::base::State* Visualizer::currentBelief_;
@@ -59,6 +61,8 @@ std::vector<Visualizer::VZRFeedbackEdge> Visualizer::feedbackEdges_;
 boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::chosenRolloutConnection_;
 
 std::vector<const ompl::base::State*> Visualizer::robotPath_;
+
+std::vector<ompl::geometric::PathGeometric> Visualizer::openLoopRRTPaths_;
 
 Visualizer::VZRDrawingMode Visualizer::mode_;
 
@@ -105,7 +109,7 @@ void Visualizer::drawRobot(const ompl::base::State *state)
         arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
         glPushMatrix();
-            glTranslated(x[0], x[1], 0);
+            glTranslated(x[0], x[1], 0.0);
             glRotated(-90+(180/3.14157)*x[2],0,0,1);
             glCallList(robotIndx_);
         glPopMatrix();
@@ -119,7 +123,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     switch(stateType)
     {
         case TrueState:
-            glColor3d(1.0,0.0,0.0);
+            glColor3d(1,0,0);
             break;
 
         case BeliefState:
@@ -127,11 +131,11 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
             break;
 
         case GraphNodeState:
-            glColor3d(0.0,0.0,1.0); // blue
+            glColor3d(0,0,1); // blue
             break;
 
         default:
-            glColor3d(1.0,1.0,1.0); // grey
+            glColor3d(1,1,1); // grey
             break;
     }
 
@@ -161,7 +165,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         fovRight << fovRadius*cos(x[2] - fovAngle) 	<< endr
                  << fovRadius*sin(x[2] - fovAngle) 	<< endr
                  <<	0								<< endr;
-        glColor3d(0.5,0.5,0.5);
+        //glColor3d(0.5,0.5,0.5);
 
         //Remove comment to show field of view of robot
         /*
@@ -190,7 +194,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
         int nPoints = pos.n_rows;
 
-        glColor3d(1.0,0.0,0.0); // grey
+        //glColor3d(1.0,0.0,0.0); // grey
 
         try
         {
@@ -231,6 +235,10 @@ void Visualizer::refresh()
 
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
+
+    drawRobotPath();
+
+    drawEnvironment();
 
     switch(mode_)
     {
@@ -275,9 +283,18 @@ void Visualizer::refresh()
 
             robotPath_.push_back(si_->cloneState(trueState_));
 
-            drawRobotPath();
+            break;
+
+        case MultiModalMode:
+
+            drawGraphBeliefNodes();
+
+            drawBeliefModes();
+
+            drawOpenLoopRRTPaths();
 
             break;
+
 
         default:
 
@@ -286,8 +303,6 @@ void Visualizer::refresh()
             exit(1);
     }
 
-    drawEnvironment();
-
     if(trueState_)
     {
         drawRobot(trueState_);
@@ -295,6 +310,9 @@ void Visualizer::refresh()
 
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
+    //glClear(GL_DEPTH_BUFFER_BIT);
+    //glDepthMask(GL_FALSE);
+    //draw landmarks
 
     //draw landmarks
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
@@ -302,7 +320,7 @@ void Visualizer::refresh()
         drawLandmark(landmarks_[i]);
     }
 
-    if(currentBelief_)
+    if(currentBelief_ && mode_ !=MultiModalMode)
     {
         drawState(currentBelief_, (VZRStateType)1);
     }
@@ -360,11 +378,21 @@ void Visualizer::drawObstacle()
     glEnd();
 
 }
+
 void Visualizer::drawGraphBeliefNodes()
 {
     for(typename std::list<ompl::base::State*>::iterator s=states_.begin(), e=states_.end(); s!=e; ++s)
     {
           drawState(*s, (VZRStateType)2);
+    }
+
+}
+
+void Visualizer::drawBeliefModes()
+{
+    for(typename std::list<ompl::base::State*>::iterator s=beliefModes_.begin(), e=beliefModes_.end(); s!=e; ++s)
+    {
+          drawState(*s, (VZRStateType)1);
     }
 
 }
@@ -402,6 +430,7 @@ void Visualizer::drawFeedbackEdges()
         maxCost = std::max(maxCost, i->cost);
     }
 
+    glLineWidth(2.0);
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
         std::pair<const ompl::base::State*, const ompl::base::State*> vertexPair = std::make_pair(i->source, i->target);
@@ -414,40 +443,63 @@ void Visualizer::drawFeedbackEdges()
             double costFactor = sqrt(i->cost/maxCost);
             glColor3d(0.0,1.0,0.0);
 
-            glLineWidth(1.0);
+
                 drawEdge(i->source, i->target);
-            glLineWidth(1.f);
+
         }
     }
+    glLineWidth(1.0);
 }
 
 void Visualizer::drawMostLikelyPath()
 {
     glDisable(GL_LIGHTING);
 
+    glLineWidth(4.0);
     for(int i=0; i<mostLikelyPath_.size();i++)
     {
         glColor3d(1.0 , 1.0 , 0.0);
 
-        glLineWidth(4.0);
+
             drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
-        glLineWidth(1.f);
     }
+    glLineWidth(1.f);
 }
 
 void Visualizer::drawRobotPath()
 {
-    glDisable(GL_LIGHTING);
-
-    for(int i=0; i<robotPath_.size()-1;i++)
+    if(robotPath_.size()>=2)
     {
+        glDisable(GL_LIGHTING);
         glColor3d(0.0 , 1.0 , 1.0);
 
-        glLineWidth(4.0);
-            drawEdge(robotPath_[i],robotPath_[i+1]);
-        glLineWidth(1.f);
+        for(int i=0; i<robotPath_.size()-1;i++)
+        {
+            glColor3d(1.0 , 1.0 , 1.0);
+
+            glLineWidth(4.0);
+                drawEdge(robotPath_[i],robotPath_[i+1]);
+            glLineWidth(1.f);
+        }
     }
 }
 
+void Visualizer::drawGeometricPath(ompl::geometric::PathGeometric path)
+{
+    for(int i=0;i<path.getStateCount()-1;i++)
+    {
+        glColor3d(0 , 1 , 0);
+        glLineWidth(2.0);
+        drawEdge(path.getState(i),path.getState(i+1)) ;
+        glLineWidth(1.0);
+    }
+}
 
+void Visualizer::drawOpenLoopRRTPaths()
+{
+    for(int i=0;i<openLoopRRTPaths_.size();i++)
+    {
+        drawGeometricPath(openLoopRRTPaths_[i]);
+    }
+}
 

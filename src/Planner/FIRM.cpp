@@ -71,7 +71,11 @@ namespace ompl
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
+<<<<<<< HEAD
         static const double NUM_MONTE_CARLO_PARTICLES = 50;
+=======
+        static const double NUM_MONTE_CARLO_PARTICLES = 10;
+>>>>>>> 9caec044df7023ec50952dd60e6f4be360bf7779
 
         /** \brief For a node that is not observable, use a high covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
@@ -1567,6 +1571,8 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 
             nn_->add(m);
 
+            policyGenerator_->addFIRMNodeToObservationGraph(newState);
+
             assert(m==FIRMNodePosList[i].first && "IDS DONT MATCH !!");
             */
         }
@@ -1637,10 +1643,8 @@ bool FIRM::isGoalVertex(const Vertex v)
 
 void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 {
-    // clear the visualization
-    Visualizer::clearStates();
 
-    Visualizer::setMode(Visualizer::VZRDrawingMode::NodeViewMode);
+    Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
 
     policyGenerator_->sampleNewBeliefStates();
 
@@ -1668,7 +1672,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             siF_->getTrueState(currentTrueState);
 
             // If the robot's clearance gets below the threshold, break loop & replan
-            if(!policyGenerator_->areCurrentBeliefsValid() || siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE)
+            if(!policyGenerator_->areCurrentBeliefsValid() /*|| siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE*/)
             {
                 if(counter == 0)
                 {
@@ -1677,6 +1681,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
                 }
 
             }
+
             if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
                 counter = 0;
 
