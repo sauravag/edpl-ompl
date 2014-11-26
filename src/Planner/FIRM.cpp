@@ -1158,7 +1158,6 @@ void FIRM::executeFeedbackWithKidnapping(void)
         3. Sample modes and run policygen till you converge to one mode
         4. get back to policy execution
         */
-
         if(si_->distance(cstartState,stateProperty_[goal]) < 6.0 && !kidnapped_flag && kidnappingCounter < 1)
         {
             std::cout<<"Before Simulated Kidnapping! (Press Enter) \n";
@@ -1170,9 +1169,11 @@ void FIRM::executeFeedbackWithKidnapping(void)
             kidnappingCounter++;
         }
 
-         if(kidnapped_flag) //if(this->detectKidnapping(cstartState, cendState))
+        if(kidnapped_flag) //if(this->detectKidnapping(cstartState, cendState))
         {
             recoverLostRobot(cendState);
+
+            siF_->setBelief(cendState);
 
              // get a copy of the true state
             ompl::base::State *tempTrueStateCopy = si_->allocState();
@@ -1190,7 +1191,6 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
             kidnapped_flag = false;
         }
-
 
         si_->copyState(cstartState, cendState);
 

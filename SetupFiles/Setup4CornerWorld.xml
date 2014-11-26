@@ -65,12 +65,6 @@
 <landmark id = 18 x = 14.0 y = 5.0 theta = -0.5 />
 <landmark id = 19 x = 14.0 y = 5.5 theta = -0.5 />
 <landmark id = 20 x = 14.0 y = 6.0 theta = -0.5 />
-<landmark id = 10 x = 1.0 y = 8.0 theta = -0.5 />
-<landmark id = 11 x = 1.5 y = 8.0 theta = -0.5 />
-<landmark id = 12 x = 2.0 y = 8.0 theta = -0.5 />
-<landmark id = 13 x = 2.5 y = 8.0 theta = -0.5 />
-<landmark id = 14 x = 3.0 y = 8.0 theta = -0.5 />
-<landmark id = 15 x = 3.5 y = 8.0 theta = -0.5 />
 <landmark id = 16 x = 4.0 y = 8.0 theta = -0.5 />
 <landmark id = 17 x = 4.5 y = 8.0 theta = -0.5 />
 <landmark id = 18 x = 5.0 y = 8.0 theta = -0.5 />
@@ -148,13 +142,14 @@
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
+    camera_range = "3.0"
+    camera_half_fov = "180"    
     sigma_range="0.05"
     sigma_angle="1.0"
     eta_rd="0.0"
     eta_rphi = "0.0"
     eta_thetad="0.0"
     eta_thetaphi = "0.0"
-    camera_horizontal_fov = "45"
     vcLabel = "cd1"
   >
   </CamAruco2DObservationModel>
@@ -215,9 +210,9 @@
         theta = "1.57"
     />
     <GoalPose
-        x = "1.0"
-        y = "3.0"
-        theta = "0"
+        x = "1.5"
+        y = "8.2"
+        theta = "1.57"
     />
     <PlanningTime
         maxTime = "600"

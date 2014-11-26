@@ -240,12 +240,6 @@ void Visualizer::refresh()
 
     drawEnvironment();
 
-    if(trueState_)
-    {
-        drawRobot(trueState_);
-    }
-
-
     switch(mode_)
     {
         case NodeViewMode:
@@ -297,9 +291,9 @@ void Visualizer::refresh()
 
             drawGraphBeliefNodes();
 
-            drawBeliefModes();
-
             drawOpenLoopRRTPaths();
+
+            drawBeliefModes();
 
             break;
 
@@ -316,6 +310,11 @@ void Visualizer::refresh()
     //glClear(GL_DEPTH_BUFFER_BIT);
     //glDepthMask(GL_FALSE);
     //draw landmarks
+
+    if(trueState_)
+    {
+        drawRobot(trueState_);
+    }
 
     //draw landmarks
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
@@ -488,8 +487,8 @@ void Visualizer::drawGeometricPath(ompl::geometric::PathGeometric path)
 {
     for(int i=0;i<path.getStateCount()-1;i++)
     {
+        glColor3d(0 , 1.0, 0);
         glLineWidth(2.0);
-        glColor3d(1 , 0, 0);
         drawEdge(path.getState(i),path.getState(i+1)) ;
         glLineWidth(1.0);
     }

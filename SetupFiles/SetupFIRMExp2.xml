@@ -167,6 +167,8 @@
 </LandmarkList>
 <ObservationModels>
 	<CamAruco2DObservationModel
+	    camera_range = "3.0"
+    	camera_half_fov = "180"  
 		sigma_range="0.04"
 		sigma_angle="1.00"
 		eta_rd="0.100"
