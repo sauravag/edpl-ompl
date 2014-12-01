@@ -240,6 +240,14 @@ void Visualizer::refresh()
 
     drawEnvironment();
 
+    if(trueState_)
+    {
+        drawRobot(trueState_);
+    }
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+
     switch(mode_)
     {
         case NodeViewMode:
@@ -305,16 +313,10 @@ void Visualizer::refresh()
             exit(1);
     }
 
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
+    //glDisable(GL_LIGHTING);
+    //glDisable(GL_DEPTH_TEST);
     //glClear(GL_DEPTH_BUFFER_BIT);
     //glDepthMask(GL_FALSE);
-    //draw landmarks
-
-    if(trueState_)
-    {
-        drawRobot(trueState_);
-    }
 
     //draw landmarks
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
@@ -403,6 +405,7 @@ void Visualizer::drawGraphEdges()
 {
     for(unsigned int i=0; i<graphEdges_.size();i++)
     {
+        glColor3d(0.5,0.5,0.5);
         drawEdge(graphEdges_[i].first,graphEdges_[i].second);
     }
 }

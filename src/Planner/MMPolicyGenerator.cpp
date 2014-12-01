@@ -1008,11 +1008,19 @@ MMPolicyGenerator::Vertex MMPolicyGenerator::findTarget(const unsigned int belie
             }
         }
 
-        //TODO: If 2 targets have same weight, then choose the closer one
         if(w < minWeight)
         {
             minWeight = w;
             targetNodeIndx = i;
+        }
+
+        //If 2 targets have same weight, then choose the closer one
+        if(w==minWeight && targetNodeIndx >= 0)
+        {
+            if(si_->distance(currentBeliefStates_[beliefStateIndx],stateProperty_[i]) <= si_->distance(currentBeliefStates_[beliefStateIndx], stateProperty_[targetNodeIndx]))
+            {
+                targetNodeIndx = i;
+            }
         }
 
     }
