@@ -1663,7 +1663,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             siF_->getTrueState(currentTrueState);
 
             // If the robot's clearance gets below the threshold, break loop & replan
-            if(!policyGenerator_->areCurrentBeliefsValid() /*|| siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE*/)
+            if(!policyGenerator_->doCurrentBeliefsSatisfyClearance() /*|| siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE*/)
             {
                 if(counter == 0)
                 {

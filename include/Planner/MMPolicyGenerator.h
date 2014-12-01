@@ -168,7 +168,7 @@ class MMPolicyGenerator
         virtual ompl::base::Cost executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls, const ompl::base::State* state);
 
         /** \brief advances the beliefs/modes by applying the given controls*/
-        virtual void propagateBeliefs(const ompl::control::Control *control);
+        virtual void propagateBeliefs(const ompl::control::Control *control, bool isSimulation = false);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
         virtual void updateWeights(const arma::colvec trueObservation);
@@ -194,8 +194,11 @@ class MMPolicyGenerator
         /** \brief checks if the beliefs have converged */
         bool isConverged();
 
-        /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
+        /** \brief Returns true if all beliefs are valid i.e. collision free */
         bool areCurrentBeliefsValid();
+
+        /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
+        bool doCurrentBeliefsSatisfyClearance();
 
         /** \brief get the state with the max weight and its weight */
         void getStateWithMaxWeight(ompl::base::State *state, float &weight);

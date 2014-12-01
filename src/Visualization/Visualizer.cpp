@@ -313,11 +313,6 @@ void Visualizer::refresh()
             exit(1);
     }
 
-    //glDisable(GL_LIGHTING);
-    //glDisable(GL_DEPTH_TEST);
-    //glClear(GL_DEPTH_BUFFER_BIT);
-    //glDepthMask(GL_FALSE);
-
     //draw landmarks
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
     {
