@@ -1189,6 +1189,8 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
             solveDynamicProgram(goal);
 
+            sendMostLikelyPathToViz(currentVertex, goal);
+
             kidnapped_flag = false;
         }
 

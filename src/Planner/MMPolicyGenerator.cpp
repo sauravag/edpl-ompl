@@ -370,7 +370,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
 
     int changeInNumberOfModes = abs(currentBeliefStates_.size() - currentBeliefStatesCopy.size());
 
-    olpInfGain.v += changeInNumberOfModes*(I2-I1);
+    olpInfGain.v += changeInNumberOfModes;//*(I2-I1);
 
     // reset old weight values
     weights_ = weightsCopy;
