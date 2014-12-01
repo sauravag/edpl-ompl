@@ -206,7 +206,7 @@
     />
      <StartPose
         x = "20"
-        y = "3.0"
+        y = "2.9"
         theta = "1.57"
     />
     <GoalPose

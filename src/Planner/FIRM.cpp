@@ -1158,7 +1158,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
         3. Sample modes and run policygen till you converge to one mode
         4. get back to policy execution
         */
-        if(si_->distance(cstartState,stateProperty_[goal]) < 6.0 && !kidnapped_flag && kidnappingCounter < 1)
+        if(si_->distance(cendState,stateProperty_[goal]) < si_->distance(cendState,stateProperty_[start]) && !kidnapped_flag && kidnappingCounter < 1)
         {
             std::cout<<"Before Simulated Kidnapping! (Press Enter) \n";
             //std::cin.get();

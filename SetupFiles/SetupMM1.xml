@@ -30,6 +30,8 @@
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
+    camera_range = "3.0"
+    camera_half_fov = "180"    
     sigma_range="0.05"
     sigma_angle="2.00"
     eta_rd="0.100"
@@ -84,34 +86,12 @@
     <!--wind_noise_pos="1.000"
     wind_noise_ang="7.0"-->
 </MotionModels>
-<BeliefList>
-    <belief x = 2.0  y = 6.0 theta = 1.58 />
-    <belief x = 7.5  y = 7.0 theta = 1.53 />
-    <belief x = 13.0 y = 5.9 theta = 1.59 />
-</BeliefList>
-<TargetList>
-    <target x = 2.0  y = 18.0  theta = 1.57 /> 
-    <target x = 2.0  y = 16.0  theta = 1.57 /> 
-    <target x = 2.0  y = 14.0  theta = 1.57 /> 
-    <target x = 2.0  y = 12.0  theta = 1.57 /> 
-    <target x = 7.5  y = 18.0  theta = 1.57 /> 
-    <target x = 7.5  y = 16.0  theta = 1.57 /> 
-    <target x = 7.5  y = 14.0  theta = 1.57 /> 
-    <target x = 7.5  y = 12.0  theta = 1.57 /> 
-    <target x = 7.5  y = 10.0  theta = 1.57 /> 
-    <target x = 13.0 y = 18.0  theta = 1.57 /> 
-    <target x = 13.0 y = 16.0  theta = 1.57 /> 
-    <target x = 13.0 y = 14.0  theta = 1.57 /> 
-    <target x = 13.0 y = 12.0  theta = 1.57 /> 
-    <target x = 13.0 y = 10.0  theta = 1.57 /> 
-    <target x = 13.0 y = 8.0  theta = 1.57 /> 
-</TargetList>
 <PlanningProblem>
     <Environment
-        environmentFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/MMEnvExp1.obj"
+        environmentFile = "./Models/MMEnvExp1.obj"
     />
     <Robot
-        robotFile = "/home/sauravagarwal/Research/Development/FIRM-OMPL/Models/simpleICreate2.obj"
+        robotFile = "./Models/simpleICreate2.obj"
     />
     <StartPose
         x = "1.9"
@@ -125,5 +105,11 @@
     />
     <PlanningTime
         maxTime = "120"
+    />
+    <FIRMNodes
+        minNodes = "125"
+    />
+    <KidnappedState
+        x = 1.9 y = 6 theta = 1.57 
     />
 </PlanningProblem>
