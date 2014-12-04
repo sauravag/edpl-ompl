@@ -167,6 +167,8 @@
 </LandmarkList>
 <ObservationModels>
 	<CamAruco2DObservationModel
+	    camera_range = "3.0"
+    	camera_half_fov = "180"  
 		sigma_range="0.04"
 		sigma_angle="1.00"
 		eta_rd="0.100"
@@ -194,9 +196,9 @@
 		dt= 0.1
 	  /> <!--No Noise--> 
 	<UnicycleMotionModel
-		sigmaV="0.012"
+		sigmaV="0.015"
 		etaV="0.05"
-        sigmaOmega="0.001"
+        sigmaOmega="0.005"
         etaOmega="0.03"
 		P_Wg_filename=""
 		orbit_radius=5.0

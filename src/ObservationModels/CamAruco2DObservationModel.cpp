@@ -43,11 +43,7 @@ namespace ompl
 {
     namespace magic
     {
-        static const double CAMERA_HALF_FIELD_OF_VIEW = 180; // degrees
-
-        static const double CAMERA_DETECTION_RANGE = 3.0;// meters
-
-        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.50 ; // meters
+        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.5 ; // meters
     }
 }
 
@@ -100,7 +96,7 @@ CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::getObser
             }
 
             z[singleObservationDim*counter] = landmarks_[i](0) ; // id of the landmark
-            assert(landmarkRange <= ompl::magic::CAMERA_DETECTION_RANGE);
+            assert(landmarkRange <= cameraRange_);
             z[singleObservationDim*counter + 1 ] = landmarkRange + noise[0]; // distance to landmark
             z[singleObservationDim*counter+2] = landmarkBearing + noise[1];
             z[singleObservationDim*counter+3] = landmarks_[i](3);
@@ -304,9 +300,9 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const ompl::base::State *stat
 
     colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
-    double fov = ompl::magic::CAMERA_HALF_FIELD_OF_VIEW*boost::math::constants::pi<double>()/180; // radians
+    double fov = cameraHalfFov_*boost::math::constants::pi<double>()/180; // radians
 
-    double maxRange = ompl::magic::CAMERA_DETECTION_RANGE; // meters // NOTE: if you change this value, you must make a corresponding change in the "draw" function of the Cfg.cpp file.
+    double maxRange = cameraRange_; // meters // NOTE: if you change this value, you must make a corresponding change in the "draw" function of the Cfg.cpp file.
 
     this->calculateRangeBearingToLandmark(state, landmark, range , bearing);
 
@@ -596,13 +592,17 @@ void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
     itemElement = child->ToElement();
     assert( itemElement );
 
-
+    double cameraRange = 0;
+    double cameraHalfFov = 0;
     double sigmaRange=0;
     double sigmaAngle=0;
     double etaRD=0;
     double etaRPhi=0;
     double etaThetaD=0;
     double etaThetaPhi=0;
+
+    itemElement->QueryDoubleAttribute("camera_range", &cameraRange) ;
+    itemElement->QueryDoubleAttribute("camera_half_fov", &cameraHalfFov) ;
     itemElement->QueryDoubleAttribute("sigma_range", &sigmaRange) ;
     itemElement->QueryDoubleAttribute("sigma_angle", &sigmaAngle) ;
     itemElement->QueryDoubleAttribute("eta_rd", &etaRD) ;
@@ -614,6 +614,8 @@ void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
     this->etaD_  << etaRD << etaThetaD <<endr;
     this->etaPhi_<< etaRPhi << etaThetaPhi << endr;
 
+    cameraRange_ = cameraRange;
+    cameraHalfFov_ = cameraHalfFov;
 
     OMPL_INFORM("CamArucoObservationModel: sigmaRange = %f", sigmaRange );
 

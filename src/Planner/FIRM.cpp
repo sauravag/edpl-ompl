@@ -1158,8 +1158,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
         3. Sample modes and run policygen till you converge to one mode
         4. get back to policy execution
         */
-
-        if(si_->distance(cstartState,stateProperty_[goal]) < 6.0 && !kidnapped_flag && kidnappingCounter < 1)
+        if(si_->distance(cendState,stateProperty_[goal]) < si_->distance(cendState,stateProperty_[start]) && !kidnapped_flag && kidnappingCounter < 1)
         {
             std::cout<<"Before Simulated Kidnapping! (Press Enter) \n";
             //std::cin.get();
@@ -1170,9 +1169,11 @@ void FIRM::executeFeedbackWithKidnapping(void)
             kidnappingCounter++;
         }
 
-         if(kidnapped_flag) //if(this->detectKidnapping(cstartState, cendState))
+        if(kidnapped_flag) //if(this->detectKidnapping(cstartState, cendState))
         {
             recoverLostRobot(cendState);
+
+            siF_->setBelief(cendState);
 
              // get a copy of the true state
             ompl::base::State *tempTrueStateCopy = si_->allocState();
@@ -1188,9 +1189,10 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
             solveDynamicProgram(goal);
 
+            sendMostLikelyPathToViz(currentVertex, goal);
+
             kidnapped_flag = false;
         }
-
 
         si_->copyState(cstartState, cendState);
 
@@ -1662,8 +1664,8 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
             siF_->getTrueState(currentTrueState);
 
-            // If the robot's clearance gets below the threshold, break loop & replan
-            if(!policyGenerator_->areCurrentBeliefsValid() || siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE)
+            // If the belief's clearance gets below the threshold, break loop & replan
+            if(!policyGenerator_->doCurrentBeliefsSatisfyClearance() /*|| siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE*/)
             {
                 if(counter == 0)
                 {

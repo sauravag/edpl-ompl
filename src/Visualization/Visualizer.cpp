@@ -240,6 +240,14 @@ void Visualizer::refresh()
 
     drawEnvironment();
 
+    if(trueState_)
+    {
+        drawRobot(trueState_);
+    }
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+
     switch(mode_)
     {
         case NodeViewMode:
@@ -251,6 +259,8 @@ void Visualizer::refresh()
         case FeedbackViewMode:
 
             drawGraphBeliefNodes();
+
+            drawMostLikelyPath();
 
             if(feedbackEdges_.size()>0) drawFeedbackEdges();
 
@@ -289,9 +299,9 @@ void Visualizer::refresh()
 
             drawGraphBeliefNodes();
 
-            drawBeliefModes();
-
             drawOpenLoopRRTPaths();
+
+            drawBeliefModes();
 
             break;
 
@@ -302,17 +312,6 @@ void Visualizer::refresh()
 
             exit(1);
     }
-
-    if(trueState_)
-    {
-        drawRobot(trueState_);
-    }
-
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
-    //glClear(GL_DEPTH_BUFFER_BIT);
-    //glDepthMask(GL_FALSE);
-    //draw landmarks
 
     //draw landmarks
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
@@ -401,6 +400,7 @@ void Visualizer::drawGraphEdges()
 {
     for(unsigned int i=0; i<graphEdges_.size();i++)
     {
+        glColor3d(0.5,0.5,0.5);
         drawEdge(graphEdges_[i].first,graphEdges_[i].second);
     }
 }
@@ -443,8 +443,7 @@ void Visualizer::drawFeedbackEdges()
             double costFactor = sqrt(i->cost/maxCost);
             glColor3d(0.0,1.0,0.0);
 
-
-                drawEdge(i->source, i->target);
+            drawEdge(i->source, i->target);
 
         }
     }
@@ -459,9 +458,7 @@ void Visualizer::drawMostLikelyPath()
     for(int i=0; i<mostLikelyPath_.size();i++)
     {
         glColor3d(1.0 , 1.0 , 0.0);
-
-
-            drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
+        drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
     }
     glLineWidth(1.f);
 }
@@ -488,7 +485,7 @@ void Visualizer::drawGeometricPath(ompl::geometric::PathGeometric path)
 {
     for(int i=0;i<path.getStateCount()-1;i++)
     {
-        glColor3d(0 , 1 , 0);
+        glColor3d(0 , 1.0, 0);
         glLineWidth(2.0);
         drawEdge(path.getState(i),path.getState(i+1)) ;
         glLineWidth(1.0);
