@@ -260,7 +260,7 @@ void Visualizer::refresh()
 
             drawGraphBeliefNodes();
 
-            drawMostLikelyPath();
+            //drawMostLikelyPath();
 
             if(feedbackEdges_.size()>0) drawFeedbackEdges();
 

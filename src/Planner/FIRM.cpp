@@ -1654,7 +1654,9 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
         int rndnum = FIRMUtils::generateRandomIntegerInRange(100, ompl::magic::MAX_MM_POLICY_LENGTH/*policy.size()-1*/);
 
-        int hzn = rndnum > policy.size()? policy.size() : rndnum;
+        //int hzn = rndnum > policy.size()? policy.size() : rndnum;
+        int hzn = ompl::magic::MAX_MM_POLICY_LENGTH > policy.size()? policy.size() : rndnum;
+
 
         for(int i=0; i < hzn ; i++)
         {
