@@ -297,6 +297,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
     Visualizer::clearOpenLoopRRTPaths();
 
+    //TODO: If all policies have same expected gain, then pick one randomly
     if( maxGainPolicyIndx >= 0)
     {
         OMPL_INFORM("MMPolicyGenerator: A minimum cost policy was found");
