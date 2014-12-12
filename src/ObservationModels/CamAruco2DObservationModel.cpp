@@ -259,7 +259,7 @@ int CamAruco2DObservationModel::findCorrespondingLandmark(const ompl::base::Stat
 
 bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *state, const arma::colvec& landmark )
 {
-/*
+
     using namespace arma;
 
     colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
@@ -288,7 +288,7 @@ bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *st
     }
 
     si_->freeState(tempState);
-*/
+
     return true;
 }
 

@@ -106,6 +106,9 @@ void Visualizer::drawRobot(const ompl::base::State *state)
     }
     else
     {
+
+        drawState(state,(VZRStateType)0);
+        /*
         arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
         glPushMatrix();
@@ -113,6 +116,8 @@ void Visualizer::drawRobot(const ompl::base::State *state)
             glRotated(-90+(180/3.14157)*x[2],0,0,1);
             glCallList(robotIndx_);
         glPopMatrix();
+        */
+
     }
 }
 
@@ -123,7 +128,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     switch(stateType)
     {
         case TrueState:
-            glColor3d(1,0,0);
+            glColor3d(0,0,1); // blue
             break;
 
         case BeliefState:
@@ -131,7 +136,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
             break;
 
         case GraphNodeState:
-            glColor3d(0,0,1); // blue
+            glColor3d(0,1,1); // cyan
             break;
 
         default:
@@ -142,16 +147,37 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
     mat covariance = state->as<SE2BeliefSpace::StateType>()->getCovariance();
 
+    double outerDiskRadius = 0.12;
+    double z = 0;
+
+
+    if(stateType == VZRStateType::TrueState)
+    {
+        outerDiskRadius = 0.5;
+        z = -0.1;
+    }
+    if(stateType == VZRStateType::GraphNodeState)
+    {
+        z = -0.5;
+    }
+
     glPushMatrix();
-        glTranslated(x[0], x[1], 0);
+        glTranslated(x[0], x[1], z);
 
         //draw a black disk
         GLUquadric *disk = gluNewQuadric();
-        gluDisk(disk, 0, 0.12, 12, 1);
+        gluDisk(disk, 0, outerDiskRadius, 100, 1);
         gluDeleteQuadric(disk);
         glBegin(GL_LINES);
         glVertex3f(0, 0, 0);
-        glVertex3f(0.5*cos(x[2]), 0.5*sin(x[2]), 0);
+        if(stateType == VZRStateType::TrueState)
+        {
+            glVertex3f(1.0*cos(x[2]), 1.0*sin(x[2]), 0);
+        }
+        else
+        {
+            glVertex3f(0.5*cos(x[2]), 0.5*sin(x[2]), 0);
+        }
         glEnd();
 
         double fovRadius = 2.5; //meters
@@ -165,16 +191,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         fovRight << fovRadius*cos(x[2] - fovAngle) 	<< endr
                  << fovRadius*sin(x[2] - fovAngle) 	<< endr
                  <<	0								<< endr;
-        //glColor3d(0.5,0.5,0.5);
 
-        //Remove comment to show field of view of robot
-        /*
-        glBegin(GL_LINE_LOOP);
-            glVertex3f(0,0,0);
-            glVertex3f(fovRight[0], fovRight[1], 0);
-            glVertex3f(fovLeft[0], fovLeft[1], 0);
-        glEnd();
-        */
     glPopMatrix();
 
     if(trace(covariance) != 0 && stateType == VZRStateType::BeliefState)
@@ -193,8 +210,6 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         pos *= magnify;
 
         int nPoints = pos.n_rows;
-
-        //glColor3d(1.0,0.0,0.0); // grey
 
         try
         {
@@ -240,11 +255,6 @@ void Visualizer::refresh()
 
     drawEnvironment();
 
-    if(trueState_)
-    {
-        drawRobot(trueState_);
-    }
-
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
 
@@ -259,8 +269,6 @@ void Visualizer::refresh()
         case FeedbackViewMode:
 
             drawGraphBeliefNodes();
-
-            //drawMostLikelyPath();
 
             if(feedbackEdges_.size()>0) drawFeedbackEdges();
 
@@ -297,9 +305,11 @@ void Visualizer::refresh()
 
         case MultiModalMode:
 
+            drawOpenLoopRRTPaths();
+
             drawGraphBeliefNodes();
 
-            drawOpenLoopRRTPaths();
+            drawRobot(trueState_);
 
             drawBeliefModes();
 
@@ -317,6 +327,11 @@ void Visualizer::refresh()
     for(size_t i = 0 ; i < landmarks_.size(); ++i)
     {
         drawLandmark(landmarks_[i]);
+    }
+
+    if(trueState_ && mode_ !=MultiModalMode)
+    {
+        drawRobot(trueState_);
     }
 
     if(currentBelief_ && mode_ !=MultiModalMode)
