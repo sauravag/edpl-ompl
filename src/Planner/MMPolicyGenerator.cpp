@@ -57,7 +57,7 @@ namespace ompl
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 7.0 ; // range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 12.0 ; // range within which to find neighbors
 
         static const float MIN_ROBOT_CLEARANCE = 0.30;
 
@@ -219,7 +219,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
         if( si_->isValid(currentBeliefStates_[i]) )
         {
 
-            ompl::base::PlannerPtr planner(new ompl::geometric::RRT(si_));
+            ompl::base::PlannerPtr planner(new ompl::geometric::RRTstar(si_));
 
             ompl::base::ProblemDefinitionPtr pdef(new ompl::base::ProblemDefinition(si_));
 
@@ -285,6 +285,8 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
         pGain.v = weights_[i]*pGain.v;
 
+        OMPL_INFORM("MMPolicyGenerator: Weighted Information Gain for Policy #%u = %f",i,pGain.v);
+
         policyInfGains.push_back(pGain);
 
         if(pGain.v >= maxGain)
@@ -294,6 +296,10 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
             maxGainPolicyIndx = i;
         }
     }
+
+    OMPL_INFORM("MMPolicyGenerator: Max gain policy index = %u", maxGainPolicyIndx);
+
+    //std::cin.get();
 
     Visualizer::clearOpenLoopRRTPaths();
 
@@ -354,9 +360,12 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
 
         propagateBeliefs(controls[i], true);
 
-        if(!areCurrentBeliefsValid())
+        if(!si_->checkTrueStateValidity()/*!areCurrentBeliefsValid()*/)
         {
             olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1);
+            OMPL_INFORM("MMPolicyGenerator: Collided in sim");
+            //std::cin.get();
+            break;
         }
 
     }
@@ -369,9 +378,11 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
          I2 +=   weights_[i]/arma::trace(currentBeliefStates_[i]->as<SE2BeliefSpace::StateType>()->getCovariance());
     }
 
-    int changeInNumberOfModes = abs(currentBeliefStates_.size() - currentBeliefStatesCopy.size());
+    double changeInNumberOfModes = (double)(currentBeliefStatesCopy.size() - currentBeliefStates_.size());
 
-    olpInfGain.v += changeInNumberOfModes;//*(I2-I1);
+    OMPL_INFORM("The discrete change in number of modes: %f",  changeInNumberOfModes);
+
+    olpInfGain.v +=  changeInNumberOfModes;
 
     // reset old weight values
     weights_ = weightsCopy;
@@ -711,19 +722,19 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
         //weightFactor = std::min(1.0 / abs(1 + landmarksActuallySeen - numIntersection) , 1.0 / abs(1 + predictedLandmarksSeen - numIntersection));
         float heuristicVal = std::max(abs(1 + landmarksActuallySeen - numIntersection) , abs(1 + predictedLandmarksSeen - numIntersection));
 
-        weightFactor = std::exp(-heuristicVal*timeSinceDivergence_[currentBeliefIndx]);
+        weightFactor = std::exp(-heuristicVal*timeSinceDivergence_[currentBeliefIndx]*1e-4);
 
-        timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] + std::pow(si_->getMotionModel()->getTimestepSize(),2);
+        timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] + std::pow(si_->getMotionModel()->getTimestepSize(),1);
 
     }
     else
     {
-         timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] - 1.0;
+         //timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] - 1.0;
 
-         if(timeSinceDivergence_[currentBeliefIndx] < 0)
-         {
+         //if(timeSinceDivergence_[currentBeliefIndx] < 0)
+         //{
             timeSinceDivergence_[currentBeliefIndx] = 0;
-         }
+         //}
     }
 
 

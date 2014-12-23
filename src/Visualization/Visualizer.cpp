@@ -197,7 +197,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     if(trace(covariance) != 0 && stateType == VZRStateType::BeliefState)
     {
         double chi2 = 9.21034;
-        double magnify = 20.0; // scaled up for viewing
+        double magnify = 5.0; // scaled up for viewing
         mat pos;
         for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())
         {

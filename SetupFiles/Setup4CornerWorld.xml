@@ -130,11 +130,10 @@
 <landmark id = 109 x = 15.5 y = 15.8 theta = -0.5 />
 <landmark id = 110 x = 15.2 y = 15.8 theta = -0.5 />
 <landmark id = 111 x = 14.8 y = 15.4 theta = -0.5 />
-<landmark id = 111 x = 14.8 y = 14.4 theta = -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
-    camera_range = "3.0"
+    camera_range = "2.0"
     camera_half_fov = "180"    
     sigma_range="0.05"
     sigma_angle="1.0"

@@ -176,6 +176,11 @@ void CamAruco2DObservationModel::calculateRangeBearingToLandmark(const ompl::bas
 
     double delta_theta = robot_landmark_ray - xVec[2];
 
+    if(distance < 0.1)
+    {
+        OMPL_INFORM("Aruco: Range: %f  bearing: %f", distance, delta_theta);
+    }
+
     FIRMUtils::normalizeAngleToPiRange(delta_theta);
 
     range = distance;
@@ -317,7 +322,8 @@ bool CamAruco2DObservationModel::isLandmarkVisible(const ompl::base::State *stat
     // if range less than 1 cm, limit it to 1 cm as smallest value
     if(range < 1e-2)
     {
-        range = 1e-2;
+        //range = 1e-2;
+        return false; // if too close or on top of landmark, dont see it
     }
 
     if( abs(bearing) <= fov && range <= maxRange )

@@ -1097,6 +1097,8 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     currentTimeStep_ = 0;
 
+    Visualizer::doSaveVideo(true);
+
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)/*currentVertex != goal*/)
     {
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
@@ -1135,18 +1137,16 @@ void FIRM::executeFeedbackWithKidnapping(void)
         else
         {
 
-            int numVerticesBefore = boost::num_vertices(g_);
+            Visualizer::doSaveVideo(false);
 
             currentVertex = addStateToGraph(cendState);
-
-            int numVerticesAfter = boost::num_vertices(g_);
 
             // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
-            assert(numVerticesAfter-numVerticesBefore >0);
-
             solveDynamicProgram(goal);
+
+            Visualizer::doSaveVideo(true);
 
         }
 
@@ -1636,6 +1636,7 @@ bool FIRM::isGoalVertex(const Vertex v)
 
 void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 {
+    Visualizer::doSaveVideo(false);
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
 
@@ -1645,6 +1646,8 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
     siF_->getTrueState(currentTrueState);
 
     int counter = 0;
+
+    Visualizer::doSaveVideo(true);
 
     while(!policyGenerator_->isConverged())
     {

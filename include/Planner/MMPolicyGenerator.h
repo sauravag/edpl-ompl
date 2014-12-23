@@ -38,7 +38,7 @@
 
 
 #include <ompl/geometric/planners/rrt/RRT.h>
-//#include <ompl/geometric/planners/rrt/RRTstar.h>
+#include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/pending/disjoint_sets.hpp>
