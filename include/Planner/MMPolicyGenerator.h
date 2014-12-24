@@ -203,6 +203,11 @@ class MMPolicyGenerator
         /** \brief get the state with the max weight and its weight */
         void getStateWithMaxWeight(ompl::base::State *state, float &weight);
 
+        std::vector<float> getWeights()
+        {
+            return weights_;
+        }
+
 
     private:
 

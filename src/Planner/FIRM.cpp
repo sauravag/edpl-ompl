@@ -1649,6 +1649,10 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     Visualizer::doSaveVideo(true);
 
+    int timeSinceKidnap = 0;
+
+    weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
+
     while(!policyGenerator_->isConverged())
     {
         std::vector<ompl::control::Control*> policy;
@@ -1687,6 +1691,12 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
                 break;
 
             boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+
+            timeSinceKidnap++;
+
+            weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
+
+
         }
 
     }
@@ -1698,5 +1708,8 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
     siF_->copyState(recoveredState, bstates[0]);
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
+
+    writeTimeSeriesDataToFile("MultiModalWeightsHistory.csv", "multiModalWeights");
+
 
 }

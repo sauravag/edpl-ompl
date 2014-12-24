@@ -456,6 +456,19 @@ protected:
                 outfile<<successProbabilityHistory_[i].first<<","<<successProbabilityHistory_[i].second<<std::endl;
             }
         }
+        if(dataName.compare("multiModalWeights")==0)
+        {
+            for(int i=0; i < successProbabilityHistory_.size(); i++)
+            {
+                outfile<<weightsHistory_[i].first<<",";
+
+                for(int j=0; j< weightsHistory_[i].second.size(); j++)
+                {
+                    outfile<<weightsHistory_[i].second[j]<<",";
+                }
+                outfile<<std::endl;
+            }
+        }
 
         outfile.close();
     }
@@ -479,6 +492,9 @@ private:
     std::vector<std::pair<int, float> > costToGoHistory_;
 
     std::vector<std::pair<int, double> > successProbabilityHistory_;
+
+    std::vector<std::pair<int, std::vector<float> > > weightsHistory_;
+
 
     int currentTimeStep_;
 
