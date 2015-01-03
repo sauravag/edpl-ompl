@@ -176,10 +176,10 @@ void CamAruco2DObservationModel::calculateRangeBearingToLandmark(const ompl::bas
 
     double delta_theta = robot_landmark_ray - xVec[2];
 
-    if(distance < 0.1)
-    {
-        OMPL_INFORM("Aruco: Range: %f  bearing: %f", distance, delta_theta);
-    }
+    //if(distance < 0.1)
+    //{
+    //    OMPL_INFORM("Aruco: Range: %f  bearing: %f", distance, delta_theta);
+    //}
 
     FIRMUtils::normalizeAngleToPiRange(delta_theta);
 

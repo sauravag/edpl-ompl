@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<LandmarkList>
+<landmark id = 1 x = 7.0   y = 0.5  theta = -0.5 />
+<landmark id = 2 x = 7.5   y = 0.5  theta = -0.5 />
+<landmark id = 3 x = 8.0   y = 0.5  theta = -0.5 />
+<landmark id = 1 x = 15.0  y = 0.5  theta = -0.5 />
+<landmark id = 2 x = 15.5  y = 0.5  theta = -0.5 />
+<landmark id = 3 x = 16.0  y = 0.5  theta = -0.5 />
+<landmark id = 1 x = 23.0  y = 0.5  theta = -0.5 />
+<landmark id = 2 x = 23.5  y = 0.5  theta = -0.5 />
+<landmark id = 3 x = 24.0  y = 0.5  theta = -0.5 />
+<landmark id = 1 x = 23.0  y = 37.5  theta = -0.5 />
+<landmark id = 2 x = 22.5  y = 37.5  theta = -0.5 />
+<landmark id = 3 x = 22.0  y = 37.5  theta = -0.5 />
+<landmark id = 1 x = 15.0  y = 37.5  theta = -0.5 />
+<landmark id = 2 x = 14.5  y = 37.5  theta = -0.5 />
+<landmark id = 3 x = 14.0  y = 37.5  theta = -0.5 />
+<landmark id = 1 x = 7.0  y = 37.5  theta = -0.5 />
+<landmark id = 2 x = 6.5  y = 37.5  theta = -0.5 />
+<landmark id = 3 x = 6.0  y = 37.5  theta = -0.5 />
+<landmark id = 10 x = 7.5  y = 1.5  theta = -0.5 />
+<landmark id = 11 x = 7.5  y = 2.5  theta = -0.5 />
+<landmark id = 12 x = 7.5  y = 3.5  theta = -0.5 />
+<landmark id = 13 x = 7.5  y = 4.5  theta = -0.5 />
+<landmark id = 14 x = 7.5  y = 5.5  theta = -0.5 />
+<landmark id = 15 x = 7.5  y = 6.5  theta = -0.5 />
+<landmark id = 16 x = 7.5  y = 7.5  theta = -0.5 />
+<landmark id = 10 x = 15.5  y = 1.5  theta = -0.5 />
+<landmark id = 11 x = 15.5  y = 2.5  theta = -0.5 />
+<landmark id = 12 x = 15.5  y = 3.5  theta = -0.5 />
+<landmark id = 13 x = 15.5  y = 4.5  theta = -0.5 />
+<landmark id = 14 x = 15.5  y = 5.5  theta = -0.5 />
+<landmark id = 15 x = 15.5  y = 6.5  theta = -0.5 />
+<landmark id = 16 x = 15.5  y = 7.5  theta = -0.5 />
+<landmark id = 10 x = 23.5  y = 1.5  theta = -0.5 />
+<landmark id = 11 x = 23.5  y = 2.5  theta = -0.5 />
+<landmark id = 12 x = 23.5  y = 3.5  theta = -0.5 />
+<landmark id = 13 x = 23.5  y = 4.5  theta = -0.5 />
+<landmark id = 14 x = 23.5  y = 5.5  theta = -0.5 />
+<landmark id = 15 x = 23.5  y = 6.5  theta = -0.5 />
+<landmark id = 16 x = 23.5  y = 7.5  theta = -0.5 />
+<landmark id = 10 x = 22.5  y = 36.5  theta = -0.5 />
+<landmark id = 11 x = 22.5  y = 35.5  theta = -0.5 />
+<landmark id = 12 x = 22.5  y = 34.5  theta = -0.5 />
+<landmark id = 13 x = 22.5  y = 33.5  theta = -0.5 />
+<landmark id = 14 x = 22.5  y = 32.5  theta = -0.5 />
+<landmark id = 15 x = 22.5  y = 31.5  theta = -0.5 />
+<landmark id = 16 x = 22.5  y = 30.5  theta = -0.5 />
+<landmark id = 10 x = 14.5  y = 36.5  theta = -0.5 />
+<landmark id = 11 x = 14.5  y = 35.5  theta = -0.5 />
+<landmark id = 12 x = 14.5  y = 34.5  theta = -0.5 />
+<landmark id = 13 x = 14.5  y = 33.5  theta = -0.5 />
+<landmark id = 14 x = 14.5  y = 32.5  theta = -0.5 />
+<landmark id = 15 x = 14.5  y = 31.5  theta = -0.5 />
+<landmark id = 16 x = 14.5  y = 30.5  theta = -0.5 />
+<landmark id = 10 x = 6.5  y = 36.5  theta = -0.5 />
+<landmark id = 11 x = 6.5  y = 35.5  theta = -0.5 />
+<landmark id = 12 x = 6.5  y = 34.5  theta = -0.5 />
+<landmark id = 13 x = 6.5  y = 33.5  theta = -0.5 />
+<landmark id = 14 x = 6.5  y = 32.5  theta = -0.5 />
+<landmark id = 15 x = 6.5  y = 31.5  theta = -0.5 />
+<landmark id = 16 x = 6.5  y = 30.5  theta = -0.5 />
+<landmark id = 31 x = 27.5  y = 8.5  theta = -0.5 />
+<landmark id = 32 x = 27.5  y = 9  theta = -0.5 />
+<landmark id = 33 x = 27.5  y = 9.5  theta = -0.5 />
+<landmark id = 31 x = 2.5  y = 29.5  theta = -0.5 />
+<landmark id = 32 x = 2.5  y = 29.0  theta = -0.5 />
+<landmark id = 33 x = 2.5  y = 28.5  theta = -0.5 />
+<landmark id = 41 x = 0.5  y = 8.5  theta = -0.5 />
+<landmark id = 42 x = 0.5  y = 9.0  theta = -0.5 />
+<landmark id = 43 x = 0.5  y = 9.5  theta = -0.5 />
+<landmark id = 41 x = 29.5  y = 29.5 theta = -0.5 />
+<landmark id = 42 x = 29.5  y = 29.0 theta = -0.5 />
+<landmark id = 43 x = 29.5  y = 28.5 theta = -0.5 />
+<landmark id = 51 x = 0.5  y = 18.5  theta = -0.5 />
+<landmark id = 52 x = 0.5  y = 19.0  theta = -0.5 />
+<landmark id = 53 x = 0.5  y = 19.5  theta = -0.5 />
+<landmark id = 51 x = 29.5  y = 19.5  theta = -0.5 />
+<landmark id = 52 x = 29.5  y = 19.0  theta = -0.5 />
+<landmark id = 53 x = 29.5  y = 18.5  theta = -0.5 />
+<landmark id = 61 x = 0.5  y = 13.5  theta = -0.5 />
+<landmark id = 62 x = 0.5  y = 14.0  theta = -0.5 />
+<landmark id = 63 x = 0.5  y = 14.5  theta = -0.5 />
+<landmark id = 61 x = 29.5  y = 24.5  theta = -0.5 />
+<landmark id = 62 x = 29.5  y = 24.0  theta = -0.5 />
+<landmark id = 63 x = 29.5  y = 23.5  theta = -0.5 />
+<landmark id = 101 x = 15  y = 19.5  theta = -0.5 />
+<landmark id = 102 x = 14  y = 19.0  theta = -0.5 />
+<landmark id = 103 x = 16  y = 19.0  theta = -0.5 />
+<landmark id = 104 x = 15  y = 18.5  theta = -0.5 />
+<landmark id = 21 x = 7.5  y = 9.5  theta = -0.5 />
+<landmark id = 21 x = 15.5  y = 9.5  theta = -0.5 />
+<landmark id = 21 x = 23.5  y = 9.5  theta = -0.5 />
+<landmark id = 21 x = 6.5   y = 28.5  theta = -0.5 />
+<landmark id = 21 x = 14.5  y = 28.5  theta = -0.5 />
+<landmark id = 21 x = 22.5  y = 28.5  theta = -0.5 />
+<landmark id = 22 x = 11.5  y = 9.5  theta = -0.5 />
+<landmark id = 22 x = 19.5  y = 9.5  theta = -0.5 />
+<landmark id = 22 x = 10.5   y = 28.5  theta = -0.5 />
+<landmark id = 22 x = 18.5  y = 28.5  theta = -0.5 />
+<landmark id = 201 x = 2.0  y = 19  theta = -0.5 />
+<landmark id = 202 x = 3.0  y = 19  theta = -0.5 />
+<landmark id = 203 x = 4.0  y = 19  theta = -0.5 />
+<landmark id = 204 x = 5.0  y = 19  theta = -0.5 />
+<landmark id = 205 x = 6.0  y = 19  theta = -0.5 />
+<landmark id = 206 x = 7.0  y = 19  theta = -0.5 />
+<landmark id = 207 x = 8.0  y = 19  theta = -0.5 />
+<landmark id = 208 x = 9.0  y = 19  theta = -0.5 />
+<landmark id = 209 x = 10.0  y = 19  theta = -0.5 />
+<landmark id = 210 x = 11.0  y = 19  theta = -0.5 />
+<landmark id = 211 x = 12.0  y = 19  theta = -0.5 />
+<landmark id = 201 x = 28.0  y = 19  theta = -0.5 />
+<landmark id = 202 x = 27.0  y = 19  theta = -0.5 />
+<landmark id = 203 x = 26.0  y = 19  theta = -0.5 />
+<landmark id = 204 x = 25.0  y = 19  theta = -0.5 />
+<landmark id = 205 x = 24.0  y = 19  theta = -0.5 />
+<landmark id = 206 x = 23.0  y = 19  theta = -0.5 />
+<landmark id = 207 x = 22.0  y = 19  theta = -0.5 />
+<landmark id = 208 x = 21.0  y = 19  theta = -0.5 />
+<landmark id = 209 x = 20.0  y = 19  theta = -0.5 />
+<landmark id = 210 x = 19.0  y = 19  theta = -0.5 />
+<landmark id = 211 x = 18.0  y = 19  theta = -0.5 />
+</LandmarkList>
+<ObservationModels>
+  <CamAruco2DObservationModel
+    camera_range = "2.0"
+    camera_half_fov = "180"    
+    sigma_range="0.05"
+    sigma_angle="1.0"
+    eta_rd="0.0"
+    eta_rphi = "0.0"
+    eta_thetad="0.0"
+    eta_thetaphi = "0.0"
+    vcLabel = "cd1"
+  >
+  </CamAruco2DObservationModel>
+</ObservationModels>
+<MotionModels>
+  <!--UnicycleMotionModel
+    sigmaV="0.001"
+    etaV="0.001"
+    sigmaOmega="0.0001"
+    etaOmega="0.001"
+    P_Wg_filename=""
+    orbit_radius=5.0
+    wind_noise_pos="0.000001"
+    wind_noise_ang="0.000001" 
+    min_linear_velocity= 0.2
+    max_linear_velocity= 0.2
+    max_angular_velocity= 0.3
+    dt= 0.1
+    /> <!--No Noise--> 
+  <UnicycleMotionModel
+    sigmaV="0.006"
+    etaV="0.025"
+    sigmaOmega="0.005"
+    etaOmega="0.01"
+    P_Wg_filename=""
+    orbit_radius=5.0
+    wind_noise_pos="0.000001"
+    wind_noise_ang="0.000001" 
+    min_linear_velocity= 0.5
+    max_linear_velocity= 0.5
+    max_angular_velocity= 0.60
+    dt= 0.1
+    /> <!--omega is in radians--> 
+  <OmnidirectionalMotionModel 
+    max_connect_radius="30.0"
+    robot_link_length="0.2"
+    sigma="0.00"
+    eta="0.000"
+    wind_noise_pos="0.05"
+    wind_noise_ang="0.00" 
+    P_Wg_filename=""
+    dt=0.10 
+    V=5.0 
+    omega="1.5708"/> <!--omega is in radians, wind_noise_ang is in degrees -->
+    <!--wind_noise_pos="1.000"
+    wind_noise_ang="7.0"-->
+</MotionModels>
+<PlanningProblem>
+    <Environment
+        environmentFile = "./Models/6CorridorWorld.obj"
+    />
+    <Robot
+        robotFile = "./Models/iRobot.obj"
+    />
+     <StartPose
+        x = "8"
+        y = "4.0"
+        theta = "1.57"
+    />
+    <GoalPose
+        x = "15"
+        y = "35"
+        theta = "1.57"
+    />
+    <PlanningTime
+        maxTime = "600"
+    />
+    <FIRMNodes
+        minNodes = "130"
+    />
+    <KidnappedState
+        x = 6.5 y = 37 theta = 1.57 
+    />
+</PlanningProblem>
