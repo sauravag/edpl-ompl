@@ -186,20 +186,20 @@
         robotFile = "./Models/iRobot.obj"
     />
      <StartPose
-        x = "24"
-        y = "1.0"
-        theta = "1.57"
+        x = "16"
+        y = "28.5"
+        theta = "0"
     />
     <GoalPose
-        x = "15.0"
-        y = "29"
-        theta = "1.57"
+        x = "19.0"
+        y = "29.0"
+        theta = "0"
     />
     <PlanningTime
         maxTime = "600"
     />
     <FIRMNodes
-        minNodes = "130"
+        minNodes = "80"
     />
     <KidnappedState
         x = 6.5 y = 37 theta = 1.57 
