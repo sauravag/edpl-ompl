@@ -94,8 +94,12 @@ void GLWidget::resetCam()
     m_camPos[1] = 11.0;
 
     m_camPos[2] = -250.0;
-    m_camAt[0] = 0.0; m_camAt[1] = 0.0; m_camAt[2] = -1.0;
-    m_camZoom = 50; m_long = -boost::math::constants::pi<double>()/2.0; m_lat = 0.0;
+    m_camAt[0] = 0.0;
+    m_camAt[1] = 0.0;
+    m_camAt[2] = -1.0;
+    m_camZoom = 75; // 50 for 4 corner world
+    m_long = -boost::math::constants::pi<double>()/2.0;
+    m_lat = 0.0;
     updateGL();
 }
 

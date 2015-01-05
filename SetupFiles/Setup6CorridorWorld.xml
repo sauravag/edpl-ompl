@@ -60,12 +60,12 @@
 <landmark id = 14 x = 6.5  y = 32.5  theta = -0.5 />
 <landmark id = 15 x = 6.5  y = 31.5  theta = -0.5 />
 <landmark id = 16 x = 6.5  y = 30.5  theta = -0.5 />
-<landmark id = 31 x = 27.5  y = 8.5  theta = -0.5 />
-<landmark id = 32 x = 27.5  y = 9  theta = -0.5 />
-<landmark id = 33 x = 27.5  y = 9.5  theta = -0.5 />
-<landmark id = 31 x = 2.5  y = 29.5  theta = -0.5 />
-<landmark id = 32 x = 2.5  y = 29.0  theta = -0.5 />
-<landmark id = 33 x = 2.5  y = 28.5  theta = -0.5 />
+<landmark id = 31 x = 27.3  y = 8.5  theta = -0.5 />
+<landmark id = 32 x = 27.3  y = 9  theta = -0.5 />
+<landmark id = 33 x = 27.3  y = 9.5  theta = -0.5 />
+<landmark id = 31 x = 2.7  y = 29.5  theta = -0.5 />
+<landmark id = 32 x = 2.7  y = 29.0  theta = -0.5 />
+<landmark id = 33 x = 2.7  y = 28.5  theta = -0.5 />
 <landmark id = 41 x = 0.5  y = 8.5  theta = -0.5 />
 <landmark id = 42 x = 0.5  y = 9.0  theta = -0.5 />
 <landmark id = 43 x = 0.5  y = 9.5  theta = -0.5 />
@@ -152,7 +152,7 @@
     /> <!--No Noise--> 
   <UnicycleMotionModel
     sigmaV="0.006"
-    etaV="0.025"
+    etaV="0.01"
     sigmaOmega="0.005"
     etaOmega="0.01"
     P_Wg_filename=""
@@ -186,13 +186,13 @@
         robotFile = "./Models/iRobot.obj"
     />
      <StartPose
-        x = "16"
-        y = "28.5"
+        x = "14"
+        y = "36"
         theta = "0"
     />
     <GoalPose
-        x = "19.0"
-        y = "29.0"
+        x = "7.0"
+        y = "5.0"
         theta = "0"
     />
     <PlanningTime
@@ -202,6 +202,6 @@
         minNodes = "80"
     />
     <KidnappedState
-        x = 6.5 y = 37 theta = 1.57 
+        x = 14.5 y = 37 theta = 1.57 
     />
 </PlanningProblem>

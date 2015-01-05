@@ -57,9 +57,9 @@ namespace ompl
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 15;//12.0 ; // range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 30;//12.0 ; // range within which to find neighbors
 
-        static const float MIN_ROBOT_CLEARANCE = 0.30;
+        static const float MIN_ROBOT_CLEARANCE = 0.10;
 
         static const double SIGMA_RANGE = 0.5;// meters
 
@@ -256,6 +256,8 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
             planner->clear();
         }
     }
+
+    Visualizer::doSaveVideo(false);
 
     // Now that you have the open loop controls, need to execute them on all modes to see which is best
     std::vector<ompl::base::Cost> policyInfGains;
@@ -787,15 +789,47 @@ bool MMPolicyGenerator::isConverged()
 }
 
 
- bool MMPolicyGenerator::doCurrentBeliefsSatisfyClearance()
+ bool MMPolicyGenerator::doCurrentBeliefsSatisfyClearance(int currentStep)
 {
+
+    int clearanceHorizon  = 20; // check 10 steps ahead
+
     if(currentBeliefStates_.size()==1)
         return true;
 
     for(int i =0 ; i< currentBeliefStates_.size(); i++)
     {
-        if(si_->getStateValidityChecker()->clearance(currentBeliefStates_[i]) < ompl::magic::MIN_ROBOT_CLEARANCE)
+
+        ompl::base::State* tempState = si_->cloneState(currentBeliefStates_[i]);
+
+        for(int j = currentStep; j < currentStep + clearanceHorizon ; j++)
+        {
+            if(j < previousPolicy_.size())
+            {
+                si_->getMotionModel()->Evolve(tempState, previousPolicy_[j], si_->getMotionModel()->getZeroNoise(),tempState);
+
+                if(!si_->isValid(tempState))
+                {
+                    return false;
+                }
+            }
+
+        }
+
+        si_->freeState(tempState);
+
+        /*
+        double clearance  = si_->getStateValidityChecker()->clearance(currentBeliefStates_[i]) ;
+
+        if( clearance < ompl::magic::MIN_ROBOT_CLEARANCE)
+        {
+            OMPL_INFORM("MMPolicyGenerator: Mode #%u  clearance: %f", i, clearance);
+
+            //std::cin.get();
+
             return false;
+        }
+        */
 
     }
 
@@ -980,6 +1014,13 @@ bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &
     bool isOverlapping = false;
 
     weight = 0;
+
+    // if both nodes dont see anything, that is also an overlap.
+    if(stateObservationProperty_[a].size() ==0 && stateObservationProperty_[b].size()==0)
+    {
+        weight++;
+        return true;
+    }
 
     // Check if there is an overlap
     for(int i = 0; i < stateObservationProperty_[a].size(); i++)

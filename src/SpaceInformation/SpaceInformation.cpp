@@ -51,10 +51,10 @@ void firm::SpaceInformation::setTrueState(const ompl::base::State *state)
 {
     this->copyState(trueState_, state);
 
-    //if(showRobot_)
-    //{
+    if(showRobot_)
+    {
         Visualizer::updateTrueState(trueState_);
-    //}
+    }
 }
 
 void firm::SpaceInformation::applyControl(const ompl::control::Control *control, bool withNoise)

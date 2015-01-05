@@ -82,6 +82,8 @@ void plan()
 
             OMPL_INFORM("Plan Executed.");
 
+            Visualizer::doSaveVideo(false);
+
             keepTrying = 0;
 
         }

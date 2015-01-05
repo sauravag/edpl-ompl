@@ -197,8 +197,8 @@ class MMPolicyGenerator
         /** \brief Returns true if all beliefs are valid i.e. collision free */
         bool areCurrentBeliefsValid();
 
-        /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
-        bool doCurrentBeliefsSatisfyClearance();
+        /** \brief Returns true if all beliefs satisfy a certain minimum clearance for n steps from now, else false. */
+        bool doCurrentBeliefsSatisfyClearance(int currentStep);
 
         /** \brief get the state with the max weight and its weight */
         void getStateWithMaxWeight(ompl::base::State *state, float &weight);
@@ -208,6 +208,10 @@ class MMPolicyGenerator
             return weights_;
         }
 
+        int getNumberOfModes()
+        {
+            return weights_.size();
+        }
 
     private:
 
