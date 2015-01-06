@@ -1640,6 +1640,8 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 {
     Visualizer::doSaveVideo(false);
 
+    Visualizer::clearMostLikelyPath();
+
     Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
 
     policyGenerator_->sampleNewBeliefStates();

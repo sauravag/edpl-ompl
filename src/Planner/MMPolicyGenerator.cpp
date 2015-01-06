@@ -1027,13 +1027,17 @@ bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &
     {
         for(int j= 0; j < stateObservationProperty_[b].size(); j++)
         {
-            if(stateObservationProperty_[a][i] == stateObservationProperty_[b][j])
+            // Check for overlap if they are not looking at the same physical landmark
+            if(si_->distance(stateProperty_[a],stateProperty_[b]) > 4.0) // 4.0 is 2x the camera range
             {
-                // for every overlap, increase weight
-                weight++;
+                if(stateObservationProperty_[a][i] == stateObservationProperty_[b][j])
+                {
+                    // for every overlap, increase weight
+                    weight++;
 
-                isOverlapping = true;
+                    isOverlapping = true;
 
+                }
             }
         }
     }
