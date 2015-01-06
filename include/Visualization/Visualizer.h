@@ -313,7 +313,7 @@ class Visualizer
             return saveVideo_;
         }
 
-        static bool doSaveVideo(bool flag)
+        static void doSaveVideo(bool flag)
         {
             saveVideo_ = flag;
         }

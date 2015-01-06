@@ -109,7 +109,7 @@ namespace ompl
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
-        static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 100;
+        static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 10;
 
         static const int STEPS_TO_ROLLOUT = 30;
     }
@@ -829,6 +829,8 @@ arma::colvec MapToColvec(const Map& _m) {
 void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 {
     OMPL_INFORM("FIRM: Solving DP");
+
+    Visualizer::clearMostLikelyPath();
 
     using namespace arma;
 
@@ -1659,9 +1661,11 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
         policyGenerator_->generatePolicy(policy);
 
+        Visualizer::doSaveVideo(true);
+
         int rndnum = FIRMUtils::generateRandomIntegerInRange(100, ompl::magic::MAX_MM_POLICY_LENGTH/*policy.size()-1*/);
 
-        //int hzn = rndnum > policy.size()? policy.size() : rndnum;
+        //int hzn = policy.size()-1;
         int hzn = ompl::magic::MAX_MM_POLICY_LENGTH > policy.size()? policy.size() : rndnum;
 
 
@@ -1669,12 +1673,20 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
         {
             siF_->applyControl(policy[i],true);
 
+            unsigned int numModesBefore = policyGenerator_->getNumberOfModes();
+
             policyGenerator_->propagateBeliefs(policy[i]);
+
+            unsigned int numModesAfter = policyGenerator_->getNumberOfModes();
+
+            // If any of the modes gets deleted, break and find new policy
+            if(numModesAfter != numModesBefore)
+                break;
 
             siF_->getTrueState(currentTrueState);
 
             // If the belief's clearance gets below the threshold, break loop & replan
-            if(!policyGenerator_->doCurrentBeliefsSatisfyClearance() /*|| siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE*/)
+            if(!policyGenerator_->doCurrentBeliefsSatisfyClearance(i) /*|| siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE*/)
             {
                 if(counter == 0)
                 {

@@ -82,6 +82,8 @@ void plan()
 
             OMPL_INFORM("Plan Executed.");
 
+            Visualizer::doSaveVideo(false);
+
             keepTrying = 0;
 
         }
@@ -133,9 +135,9 @@ void testMultiModal()
 
 int main(int argc, char *argv[])
 {
-    srand(2345);
+    srand(239645);
 
-    arma_rng::set_seed(2345);
+    arma_rng::set_seed(239645);
 
     QApplication app(argc, argv);
 
