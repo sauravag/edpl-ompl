@@ -107,7 +107,7 @@ void Visualizer::drawRobot(const ompl::base::State *state)
     else
     {
 
-        drawState(state,(VZRStateType)0);
+        drawState(state,VZRStateType::TrueState);
         /*
         arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
@@ -125,41 +125,37 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 {
     using namespace arma;
 
+    double outerDiskRadius, z;
+
     switch(stateType)
     {
         case TrueState:
             glColor3d(0,0,1); // blue
+            outerDiskRadius = 0.5;
+            z = -0.1;
             break;
 
         case BeliefState:
+            outerDiskRadius = 0.25;
+            z = -0.1;
             glColor3d(1,0,0); // red
             break;
 
         case GraphNodeState:
+            outerDiskRadius = 0.15;
+            z = -0.5;
             glColor3d(0,1,1); // cyan
             break;
 
         default:
+            outerDiskRadius = 0.15;
+            z = -0.5;
             glColor3d(1,1,1); // grey
             break;
     }
 
     arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
     mat covariance = state->as<SE2BeliefSpace::StateType>()->getCovariance();
-
-    double outerDiskRadius = 0.25;
-    double z = 0;
-
-
-    if(stateType == VZRStateType::TrueState)
-    {
-        outerDiskRadius = 0.5;
-        z = -0.1;
-    }
-    if(stateType == VZRStateType::GraphNodeState)
-    {
-        z = -0.5;
-    }
 
     glPushMatrix();
         glTranslated(x[0], x[1], z);
