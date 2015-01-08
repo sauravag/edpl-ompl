@@ -147,7 +147,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
     mat covariance = state->as<SE2BeliefSpace::StateType>()->getCovariance();
 
-    double outerDiskRadius = 0.12;
+    double outerDiskRadius = 0.25;
     double z = 0;
 
 
