@@ -131,7 +131,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     {
         case TrueState:
             glColor3d(0,0,1); // blue
-            outerDiskRadius = 0.5;
+            outerDiskRadius = 0.45;
             z = -0.1;
             break;
 

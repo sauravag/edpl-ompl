@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/Setup6CorridorWorld.xml";
+    std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
