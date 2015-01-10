@@ -1640,6 +1640,8 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 {
     Visualizer::doSaveVideo(false);
 
+    Visualizer::clearMostLikelyPath();
+
     Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
 
     auto start_time_sampling = std::chrono::high_resolution_clock::now();

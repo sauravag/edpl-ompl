@@ -57,7 +57,7 @@ namespace ompl
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 30;//12.0 ; // range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 20.0 ; // 20(6cw), 12 (4cw) range within which to find neighbors
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
@@ -244,6 +244,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
                 rrtPaths.push_back(gpath);
 
                 Visualizer::addOpenLoopRRTPath(gpath);
+                boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 
                 std::vector<ompl::control::Control*> olc;
 
@@ -257,8 +258,6 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
         }
     }
 
-    Visualizer::doSaveVideo(false);
-
     // Now that you have the open loop controls, need to execute them on all modes to see which is best
     std::vector<ompl::base::Cost> policyInfGains;
 
@@ -267,6 +266,9 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     int maxGainPolicyIndx=-1;
 
     OMPL_INFORM("Evaluating the Open Loop policies on all the modes");
+
+    boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    Visualizer::doSaveVideo(false);
 
     for(unsigned int i = 0; i < openLoopPolicies.size(); i++)
     {
@@ -1031,13 +1033,17 @@ bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &
     {
         for(int j= 0; j < stateObservationProperty_[b].size(); j++)
         {
-            if(stateObservationProperty_[a][i] == stateObservationProperty_[b][j])
+            // Check for overlap if they are not looking at the same physical landmark
+            if(si_->distance(stateProperty_[a],stateProperty_[b]) > 4.0) // 4.0 is 2x the camera range
             {
-                // for every overlap, increase weight
-                weight++;
+                if(stateObservationProperty_[a][i] == stateObservationProperty_[b][j])
+                {
+                    // for every overlap, increase weight
+                    weight++;
 
-                isOverlapping = true;
+                    isOverlapping = true;
 
+                }
             }
         }
     }
