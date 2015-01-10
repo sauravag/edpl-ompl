@@ -1642,9 +1642,18 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
 
+    auto start_time_sampling = std::chrono::high_resolution_clock::now();
+
     policyGenerator_->sampleNewBeliefStates();
 
+    auto end_time_sampling = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to sample beliefs: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_sampling - start_time_sampling).count() << " milli seconds."<<std::endl;
+
+    std::cin.get();
+
     ompl::base::State *currentTrueState = siF_->allocState();
+
     siF_->getTrueState(currentTrueState);
 
     int counter = 0;
@@ -1654,6 +1663,8 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
     int timeSinceKidnap = 0;
 
     weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
+
+    auto start_time_recovery = std::chrono::high_resolution_clock::now();
 
     while(!policyGenerator_->isConverged())
     {
@@ -1712,6 +1723,12 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
         }
 
     }
+
+    auto end_time_recovery = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to sample recover (exclude sampling): "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_recovery - start_time_recovery).count() << " milli seconds."<<std::endl;
+
+    std::cin.get();
 
     std::vector<ompl::base::State*> bstates;
 

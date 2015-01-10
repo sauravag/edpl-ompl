@@ -432,19 +432,23 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, 
 
     }
 
+    /*
     if(!isSimulation)
     {
         OMPL_INFORM("MMPolicyGenerator: BEFORE updating weights in propogate: ");
         this->printWeights();
     }
+    */
 
     this->updateWeights(obs);
 
+    /*
     if(!isSimulation)
     {
         OMPL_INFORM("MMPolicyGenerator: AFTER updating weights in propogate: ");
         this->printWeights();
     }
+    */
 
     this->removeDuplicateModes();
 
