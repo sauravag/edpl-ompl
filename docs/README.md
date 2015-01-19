@@ -1,13 +1,15 @@
-/**************************************
+----------------------------------------
 Feedback Information RoadMaps Using Open Motion Planning Library
 
 Authors:
 Saurav Agarwal (sauravag@tamu.edu)
+
 Ali-akbar Agha-mohammadi (aliagha@mit.edu)
 
 Texas A&M University
+
 Copyright 2014
-**************************************/
+
 
 ----------------------------------------
 Brief: 
@@ -59,7 +61,6 @@ locations etc.
 ---------------------------------------
 License:
 ----------------------------------------
-/*********************************************************************
 * Software License Agreement (BSD License)
 *
 *  Copyright (c) 2014, Texas A&M University
@@ -91,4 +92,3 @@ License:
 *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************/
