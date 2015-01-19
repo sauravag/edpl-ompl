@@ -1,25 +1,21 @@
-----------------------------------------
 Feedback Information RoadMaps Using Open Motion Planning Library
+================================================================
 
 Authors:
-Saurav Agarwal (sauravag@tamu.edu)
-
-Ali-akbar Agha-mohammadi (aliagha@mit.edu)
+* Saurav Agarwal (sauravag@tamu.edu)
+* Ali-akbar Agha-mohammadi (aliagha@mit.edu)
 
 Texas A&M University
-
 Copyright 2014
 
-
-----------------------------------------
 Brief
 ----------------------------------------
 This application is an implementation of Feedback Information Road Maps (FIRM) with OMPL.
 
 "FIRM is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic roadmap 
 
-----------------------------------------
-References:
+
+References
 ----------------------------------------
 1. A. Agha-mohammadi, Suman Chakravorty, Nancy Amato, "FIRM: Sampling-based Feedback Motion Planning Under Motion Uncertainty and Imperfect Measurements", International Journal of Robotics Research, 33(2):268-304, February 2014.
 
@@ -27,7 +23,7 @@ References:
 
 3. ompl.kavrakilab.org : OMPL documentation and code
 
-----------------------------------------
+
 Compilation
 ----------------------------------------
 The application is shared as a codeblocks project. You can use codeblocks to
@@ -45,7 +41,7 @@ and install the full omplapp and QT will automatically be installed as part of t
 
 4. tinyxml: Needed for reading landmark/setup parameters
 
----------------------------------------
+
 How to Use FIRM
 ---------------------------------------
 We have developed FIRM as a planner based on the design philosophy of the planner class in OMPL. On top of the base FIRM planner,
@@ -58,8 +54,7 @@ locations etc.
 
 2. Build you own application by calling FIRM in your scenario.
 
----------------------------------------
-License:
+License
 ----------------------------------------
 Software License Agreement (BSD License)
 
@@ -69,13 +64,13 @@ All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
 are met:
-	* Redistributions of source code must retain the above copyright
+* Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-	* Redistributions in binary form must reproduce the above
+* Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
-	* Neither the name of the Texas A&M University nor the names of its
+* Neither the name of the Texas A&M University nor the names of its
       contributors may be used to endorse or promote products derived
       from this software without specific prior written permission.
 
