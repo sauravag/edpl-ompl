@@ -212,6 +212,9 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     std::vector<ompl::geometric::PathGeometric> rrtPaths;
 
     // Iterate over the mode/target pairs and generate open loop controls
+
+    auto start_time_policygen = std::chrono::high_resolution_clock::now();
+
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
 
@@ -244,7 +247,8 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
                 rrtPaths.push_back(gpath);
 
                 Visualizer::addOpenLoopRRTPath(gpath);
-                boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+
+                //boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 
                 std::vector<ompl::control::Control*> olc;
 
@@ -267,7 +271,8 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
     OMPL_INFORM("Evaluating the Open Loop policies on all the modes");
 
-    boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    //boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
     Visualizer::doSaveVideo(false);
 
     for(unsigned int i = 0; i < openLoopPolicies.size(); i++)
@@ -319,11 +324,16 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
         Visualizer::addOpenLoopRRTPath(rrtPaths[maxGainPolicyIndx]);
 
     }
-
     else
     {
         policy = previousPolicy_;
     }
+
+    auto end_time_policygen = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to evaluate policy: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_policygen - start_time_policygen).count() << " milli seconds."<<std::endl;
+
+    std::cin.get();
 
     si_->showRobotVisualization(true);
 
