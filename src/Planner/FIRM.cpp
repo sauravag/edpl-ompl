@@ -176,7 +176,11 @@ void FIRM::setMaxNearestNeighbors(unsigned int k)
         nn_.reset(ompl::tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(si_->getStateSpace()));
         nn_->setDistanceFunction(boost::bind(&FIRM::distanceFunction, this, _1, _2));
     }
-    connectionStrategy_ = ompl::geometric::KStrategy<Vertex>(k, nn_);
+
+    if (!userSetConnectionStrategy_)
+        connectionStrategy_.clear();
+    if (isSetup())
+        setup();
 }
 
 void FIRM::setProblemDefinition(const ompl::base::ProblemDefinitionPtr &pdef)
@@ -725,17 +729,19 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
             successCount++;
 
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
-            edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
+            //edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
+            edgeCost = ompl::base::Cost(edgeCost.value() + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);
         }
     }
 
     siF_->showRobotVisualization(true);
 
-    edgeCost.v = edgeCost.v / successCount ;
+    //edgeCost.v = edgeCost.v / successCount ;
+    edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
 
     double transitionProbability = successCount / numParticles_ ;
 
-    FIRMWeight weight(edgeCost.v, transitionProbability);
+    FIRMWeight weight(edgeCost.value(), transitionProbability);
 
     return weight;
 }
