@@ -269,27 +269,29 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
     for(unsigned int i = 0; i < openLoopPolicies.size(); i++)
     {
-        ompl::base::Cost pGain;
+        ompl::base::Cost pGain(0);
 
-        pGain.v = 0;
+        //pGain.v = 0;
 
         for(unsigned int j = 0; j < currentBeliefStates_.size(); j++)
         {
 
             ompl::base::Cost c = executeOpenLoopPolicyOnMode(openLoopPolicies[i],currentBeliefStates_[j]);
 
-            pGain.v += c.v;
+            //pGain.v += c.v;
+            pGain = ompl::base::Cost(pGain.value()+c.value());
 
             OMPL_INFORM("MMPolicyGenerator: Evaluating Policy Number #%u  on Mode Number #%u",i,j);
         }
 
-        pGain.v = weights_[i]*pGain.v;
+        //pGain.v = weights_[i]*pGain.v;
+        pGain = ompl::base::Cost(weights_[i]*pGain.value());
 
         policyInfGains.push_back(pGain);
 
-        if(pGain.v >= maxGain)
+        if(pGain.value() >= maxGain)
         {
-            maxGain = pGain.v;
+            maxGain = pGain.value();
 
             maxGainPolicyIndx = i;
         }
@@ -332,16 +334,16 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
     LinearSystem dummy;
 
     ompl::base::State *tempState = si_->allocState();
- ;
+
     ompl::base::State *nextState = si_->allocState();
 
     si_->copyState(tempState, state);
 
     si_->copyState(nextState, state);
 
-    ompl::base::Cost olpInfGain;
+    ompl::base::Cost olpInfGain(0);
 
-    olpInfGain.v = 0;
+    //olpInfGain.v = 0;
 
 
     for(unsigned int i=0; i< controls.size() ; i++)
@@ -364,12 +366,14 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
 
         double I_2 = arma::trace(kfEstimate->as<SE2BeliefSpace::StateType>()->getCovariance());
 
-        olpInfGain.v += 1/I_2-1/I_1;
+        //olpInfGain.v += 1/I_2-1/I_1;
+        olpInfGain = ompl::base::Cost(1/I_2-1/I_1+olpInfGain.value());
 
         if(!si_->isValid(nextState))
         {
 
-            olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1); // add a high cost for collision, the sooner the robot collides, more the cost
+            //olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1);
+            olpInfGain = ompl::base::Cost(olpInfGain.value()-ompl::magic::COLISSION_FAILURE_COST/(i+1)); // add a high cost for collision, the sooner the robot collides, more the cost
             break;
         }
 
