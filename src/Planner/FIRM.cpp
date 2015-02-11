@@ -176,7 +176,11 @@ void FIRM::setMaxNearestNeighbors(unsigned int k)
         nn_.reset(ompl::tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(si_->getStateSpace()));
         nn_->setDistanceFunction(boost::bind(&FIRM::distanceFunction, this, _1, _2));
     }
-    connectionStrategy_ = ompl::geometric::KStrategy<Vertex>(k, nn_);
+
+    if (!userSetConnectionStrategy_)
+        connectionStrategy_.clear();
+    if (isSetup())
+        setup();
 }
 
 void FIRM::setProblemDefinition(const ompl::base::ProblemDefinitionPtr &pdef)
@@ -725,17 +729,19 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
             successCount++;
 
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
-            edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
+            //edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
+            edgeCost = ompl::base::Cost(edgeCost.value() + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);
         }
     }
 
     siF_->showRobotVisualization(true);
 
-    edgeCost.v = edgeCost.v / successCount ;
+    //edgeCost.v = edgeCost.v / successCount ;
+    edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
 
     double transitionProbability = successCount / numParticles_ ;
 
-    FIRMWeight weight(edgeCost.v, transitionProbability);
+    FIRMWeight weight(edgeCost.value(), transitionProbability);
 
     return weight;
 }
@@ -1644,9 +1650,18 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
 
+    auto start_time_sampling = std::chrono::high_resolution_clock::now();
+
     policyGenerator_->sampleNewBeliefStates();
 
+    auto end_time_sampling = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to sample beliefs: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_sampling - start_time_sampling).count() << " milli seconds."<<std::endl;
+
+    std::cin.get();
+
     ompl::base::State *currentTrueState = siF_->allocState();
+
     siF_->getTrueState(currentTrueState);
 
     int counter = 0;
@@ -1656,6 +1671,8 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
     int timeSinceKidnap = 0;
 
     weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
+
+    auto start_time_recovery = std::chrono::high_resolution_clock::now();
 
     while(!policyGenerator_->isConverged())
     {
@@ -1704,7 +1721,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             if(policyGenerator_->isConverged())
                 break;
 
-            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
             timeSinceKidnap++;
 
@@ -1714,6 +1731,12 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
         }
 
     }
+
+    auto end_time_recovery = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to sample recover (exclude sampling): "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_recovery - start_time_recovery).count() << " milli seconds."<<std::endl;
+
+    std::cin.get();
 
     std::vector<ompl::base::State*> bstates;
 
