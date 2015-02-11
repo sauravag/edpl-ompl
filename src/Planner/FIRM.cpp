@@ -70,7 +70,7 @@ namespace ompl
         /** \brief The time in seconds for a single roadmap building operation (dt)*/
         static const double ROADMAP_BUILD_TIME = 200;
 
-        static const double NUM_MONTE_CARLO_PARTICLES = 2;
+        static const double NUM_MONTE_CARLO_PARTICLES = 10;
 
         static const double EXTREMELY_HIGH_EDGE_COST = 1e6;
 
@@ -88,7 +88,7 @@ namespace ompl
 
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
 
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // meters
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 2.5; // meters
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
