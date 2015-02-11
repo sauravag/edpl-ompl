@@ -57,9 +57,9 @@ namespace ompl
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 15.0 ; // range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 20.0 ; // 20(6cw), 12 (4cw) range within which to find neighbors
 
-        static const float MIN_ROBOT_CLEARANCE = 0.30;
+        static const float MIN_ROBOT_CLEARANCE = 0.10;
 
         static const double SIGMA_RANGE = 0.5;// meters
 
@@ -202,15 +202,19 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 
 void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
 {
+    si_->showRobotVisualization(false);
 
-    this->printWeights();
+    Visualizer::clearOpenLoopRRTPaths();
 
     //container to store the sequence of controls for each mode/target pair
     std::vector<std::vector<ompl::control::Control*> > openLoopPolicies;
 
-    Visualizer::ClearFeedbackEdges();
+    std::vector<ompl::geometric::PathGeometric> rrtPaths;
 
     // Iterate over the mode/target pairs and generate open loop controls
+
+    auto start_time_policygen = std::chrono::high_resolution_clock::now();
+
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
 
@@ -218,15 +222,11 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
         if( si_->isValid(currentBeliefStates_[i]) )
         {
 
-            ompl::base::PlannerPtr planner(new ompl::geometric::RRT(si_));
+            ompl::base::PlannerPtr planner(new ompl::geometric::RRTstar(si_));
 
             ompl::base::ProblemDefinitionPtr pdef(new ompl::base::ProblemDefinition(si_));
 
             Vertex targetVertex = findTarget(i);
-
-            //------ To check if target makes sense
-            Visualizer::addFeedbackEdge(currentBeliefStates_[i],stateProperty_[targetVertex], 1.0);
-            //------
 
             pdef->setStartAndGoalStates(currentBeliefStates_[i], stateProperty_[targetVertex], ompl::magic::RRT_FINAL_PROXIMITY_THRESHOLD);
 
@@ -236,15 +236,19 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             planner->setup();
 
-
             ompl::base::PlannerStatus solved = planner->solve(ompl::magic::RRT_PLAN_MAX_TIME);
-
 
             if(solved)
             {
                 const ompl::base::PathPtr &path = pdef->getSolutionPath();
 
                 ompl::geometric::PathGeometric gpath = static_cast<ompl::geometric::PathGeometric&>(*path);
+
+                rrtPaths.push_back(gpath);
+
+                Visualizer::addOpenLoopRRTPath(gpath);
+
+                //boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 
                 std::vector<ompl::control::Control*> olc;
 
@@ -267,57 +271,73 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
     OMPL_INFORM("Evaluating the Open Loop policies on all the modes");
 
+    //boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
+    Visualizer::doSaveVideo(false);
+
     for(unsigned int i = 0; i < openLoopPolicies.size(); i++)
     {
         ompl::base::Cost pGain;
 
-        pGain.v = 0;
+        pGain = ompl::base::Cost(0);
 
         for(unsigned int j = 0; j < currentBeliefStates_.size(); j++)
         {
 
+            OMPL_INFORM("MMPolicyGenerator: Evaluating Policy Number #%u  on Mode Number #%u",i,j);
+
             ompl::base::Cost c = executeOpenLoopPolicyOnMode(openLoopPolicies[i],currentBeliefStates_[j]);
 
-            pGain.v += c.v;
+            //pGain.v += c.v;
+            pGain = ompl::base::Cost(pGain.value() + c.value());
 
-            OMPL_INFORM("MMPolicyGenerator: Evaluating Policy Number #%u  on Mode Number #%u",i,j);
         }
 
-        pGain.v = weights_[i]*pGain.v;
+        //pGain.v = weights_[i]*pGain.v;
+        pGain = ompl::base::Cost(weights_[i]*pGain.value());
+
+        OMPL_INFORM("MMPolicyGenerator: Weighted Information Gain for Policy #%u = %f",i,pGain.value());
 
         policyInfGains.push_back(pGain);
 
-        if(pGain.v >= maxGain)
+        if(pGain.value() >= maxGain)
         {
-            maxGain = pGain.v;
+            maxGain = pGain.value();
 
             maxGainPolicyIndx = i;
         }
     }
 
-    if( !areSimilarWeights() && maxGainPolicyIndx >= 0)
+    OMPL_INFORM("MMPolicyGenerator: Max gain policy index = %u", maxGainPolicyIndx);
+
+    //std::cin.get();
+
+    Visualizer::clearOpenLoopRRTPaths();
+
+    //TODO: If all policies have same expected gain, then pick one randomly
+    if( maxGainPolicyIndx >= 0)
     {
         OMPL_INFORM("MMPolicyGenerator: A minimum cost policy was found");
 
         policy = openLoopPolicies[maxGainPolicyIndx];
 
         previousPolicy_ = policy;
+
+        Visualizer::addOpenLoopRRTPath(rrtPaths[maxGainPolicyIndx]);
+
     }
     else
     {
-        if(openLoopPolicies.size()>0)
-        {
-            int rndp = FIRMUtils::generateRandomIntegerInRange(0, openLoopPolicies.size()-1);
-
-            policy = openLoopPolicies[rndp];
-
-        }
-        else
-        {
-            policy = previousPolicy_;
-        }
-
+        policy = previousPolicy_;
     }
+
+    auto end_time_policygen = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to evaluate policy: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_policygen - start_time_policygen).count() << " milli seconds."<<std::endl;
+
+    std::cin.get();
+
+    si_->showRobotVisualization(true);
 
 }
 
@@ -325,62 +345,82 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
                                                                 const ompl::base::State* state)
 {
 
-    // Execute the open loop policy and get the information gain.
-    // if the mode collides then add a cost of collision.
-    ExtendedKF kf(si_);
-
-    LinearSystem dummy;
-
-    ompl::base::State *tempState = si_->allocState();
- ;
-    ompl::base::State *nextState = si_->allocState();
-
-    si_->copyState(tempState, state);
-
-    si_->copyState(nextState, state);
-
-    ompl::base::Cost olpInfGain;
-
-    olpInfGain.v = 0;
-
-
-    for(unsigned int i=0; i< controls.size() ; i++)
+    double I1 = 0;
+    //get weighted sum of trace of covariance
+    for(int i = 0; i < currentBeliefStates_.size(); i++)
     {
-        ompl::base::State *kfEstimate = si_->allocState();
+         I1 +=   weights_[i]/arma::trace(currentBeliefStates_[i]->as<SE2BeliefSpace::StateType>()->getCovariance());
+    }
 
-        si_->copyState(kfEstimate,tempState);
 
-        arma::colvec motionNoise = si_->getMotionModel()->getZeroNoise();
+    std::vector<float> weightsCopy = weights_;
+    std::vector<ompl::base::State*> currentBeliefStatesCopy;
 
-        si_->getMotionModel()->Evolve(tempState, controls[i], motionNoise, nextState);
+    for(int i=0; i < currentBeliefStates_.size(); i++)
+    {
+        currentBeliefStatesCopy.push_back(si_->cloneState(currentBeliefStates_[i]));
+    }
 
-        si_->copyState(tempState, nextState);
+    ompl::base::State *currentTrueState = si_->allocState();
+    si_->getTrueState(currentTrueState);
 
-        arma::colvec obs = si_->getObservationModel()->getObservation(nextState, false);
+    si_->setTrueState(state);
 
-        double I_1 = arma::trace(kfEstimate->as<SE2BeliefSpace::StateType>()->getCovariance());
+    ompl::base::Cost olpInfGain(0);
 
-        kf.Evolve(kfEstimate, controls[i], obs, dummy, dummy, kfEstimate);
+    for(int i=0; i < controls.size() ; i++)
+    {
+        si_->applyControl(controls[i],false);
 
-        double I_2 = arma::trace(kfEstimate->as<SE2BeliefSpace::StateType>()->getCovariance());
+        propagateBeliefs(controls[i], true);
 
-        olpInfGain.v += 1/I_2-1/I_1;
-
-        if(!si_->isValid(nextState))
+        if(!si_->checkTrueStateValidity()/*!areCurrentBeliefsValid()*/)
         {
-
-            olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1); // add a high cost for collision, the sooner the robot collides, more the cost
+            //olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1);
+            olpInfGain = ompl::base::Cost(olpInfGain.value() - ompl::magic::COLISSION_FAILURE_COST/(i+1));
+            OMPL_INFORM("MMPolicyGenerator: Collided in sim");
+            //std::cin.get();
             break;
         }
 
     }
+
+    double I2 = 0;
+
+    //get weighted sum of trace of covariance
+    for(int i = 0; i < currentBeliefStates_.size(); i++)
+    {
+         I2 +=   weights_[i]/arma::trace(currentBeliefStates_[i]->as<SE2BeliefSpace::StateType>()->getCovariance());
+    }
+
+    double changeInNumberOfModes = (double)(currentBeliefStatesCopy.size() - currentBeliefStates_.size());
+
+    OMPL_INFORM("The discrete change in number of modes: %f",  changeInNumberOfModes);
+
+    //olpInfGain.v +=  changeInNumberOfModes;
+    olpInfGain = ompl::base::Cost(olpInfGain.value() + changeInNumberOfModes);
+
+    // reset old weight values
+    weights_ = weightsCopy;
+
+    // free unneeded states
+    for(int i = 0; i < currentBeliefStates_.size(); i++)
+    {
+         si_->freeState(currentBeliefStates_[i]);
+    }
+
+    // set back to old states
+    currentBeliefStates_ = currentBeliefStatesCopy;
+
+    // set back true state
+    si_->setTrueState(currentTrueState);
 
     return olpInfGain;
 
 }
 
 
-void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
+void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, bool isSimulation)
 {
     // To propagate beliefs we need to apply the control to the true state, get observations and update the beliefs.
     ExtendedKF kf(si_);
@@ -394,8 +434,6 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
         ompl::base::State *kfEstimate = si_->allocState();
         ompl::base::State *kfEstimateUpdated = si_->allocState();
 
-        //si_->printState(currentBeliefStates_[i]);
-
         si_->copyState(kfEstimate, currentBeliefStates_[i]);
 
         kf.Evolve(kfEstimate, control, obs, dummy, dummy, kfEstimateUpdated);
@@ -408,17 +446,28 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control)
 
     }
 
-    OMPL_INFORM("MMPolicyGenerator: BEFORE updating weights in propogate: ");
-    this->printWeights();
+    /*
+    if(!isSimulation)
+    {
+        OMPL_INFORM("MMPolicyGenerator: BEFORE updating weights in propogate: ");
+        this->printWeights();
+    }
+    */
 
     this->updateWeights(obs);
 
-    OMPL_INFORM("MMPolicyGenerator: AFTER updating weights in propogate: ");
-    this->printWeights();
+    /*
+    if(!isSimulation)
+    {
+        OMPL_INFORM("MMPolicyGenerator: AFTER updating weights in propogate: ");
+        this->printWeights();
+    }
+    */
 
     this->removeDuplicateModes();
 
-    this->drawBeliefs();
+    if(!isSimulation)
+        this->drawBeliefs();
 
 }
 
@@ -693,19 +742,19 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
         //weightFactor = std::min(1.0 / abs(1 + landmarksActuallySeen - numIntersection) , 1.0 / abs(1 + predictedLandmarksSeen - numIntersection));
         float heuristicVal = std::max(abs(1 + landmarksActuallySeen - numIntersection) , abs(1 + predictedLandmarksSeen - numIntersection));
 
-        weightFactor = std::exp(-heuristicVal*timeSinceDivergence_[currentBeliefIndx]);
+        weightFactor = std::exp(-heuristicVal*timeSinceDivergence_[currentBeliefIndx]*1e-4);
 
-        timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] + std::pow(si_->getMotionModel()->getTimestepSize(),2);
+        timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] + std::pow(si_->getMotionModel()->getTimestepSize(),1);
 
     }
     else
     {
-         timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] - 1.0;
+         //timeSinceDivergence_[currentBeliefIndx] = timeSinceDivergence_[currentBeliefIndx] - 1.0;
 
-         if(timeSinceDivergence_[currentBeliefIndx] < 0)
-         {
+         //if(timeSinceDivergence_[currentBeliefIndx] < 0)
+         //{
             timeSinceDivergence_[currentBeliefIndx] = 0;
-         }
+         //}
     }
 
 
@@ -758,6 +807,53 @@ bool MMPolicyGenerator::isConverged()
 }
 
 
+ bool MMPolicyGenerator::doCurrentBeliefsSatisfyClearance(int currentStep)
+{
+
+    int clearanceHorizon  = 20; // check 10 steps ahead
+
+    if(currentBeliefStates_.size()==1)
+        return true;
+
+    for(int i =0 ; i< currentBeliefStates_.size(); i++)
+    {
+
+        ompl::base::State* tempState = si_->cloneState(currentBeliefStates_[i]);
+
+        for(int j = currentStep; j < currentStep + clearanceHorizon ; j++)
+        {
+            if(j < previousPolicy_.size())
+            {
+                si_->getMotionModel()->Evolve(tempState, previousPolicy_[j], si_->getMotionModel()->getZeroNoise(),tempState);
+
+                if(!si_->isValid(tempState))
+                {
+                    return false;
+                }
+            }
+
+        }
+
+        si_->freeState(tempState);
+
+        /*
+        double clearance  = si_->getStateValidityChecker()->clearance(currentBeliefStates_[i]) ;
+
+        if( clearance < ompl::magic::MIN_ROBOT_CLEARANCE)
+        {
+            OMPL_INFORM("MMPolicyGenerator: Mode #%u  clearance: %f", i, clearance);
+
+            //std::cin.get();
+
+            return false;
+        }
+        */
+
+    }
+
+    return true;
+}
+
  bool MMPolicyGenerator::areCurrentBeliefsValid()
 {
     if(currentBeliefStates_.size()==1)
@@ -765,7 +861,7 @@ bool MMPolicyGenerator::isConverged()
 
     for(int i =0 ; i< currentBeliefStates_.size(); i++)
     {
-        if(si_->getStateValidityChecker()->clearance(currentBeliefStates_[i]) < ompl::magic::MIN_ROBOT_CLEARANCE)
+        if(!si_->isValid(currentBeliefStates_[i]))
             return false;
 
     }
@@ -819,11 +915,11 @@ void MMPolicyGenerator::removeDuplicateModes()
 void MMPolicyGenerator::drawBeliefs()
 {
 
-    Visualizer::clearStates();
+    Visualizer::clearBeliefModes();
 
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
-        Visualizer::addState(currentBeliefStates_[i]);
+        Visualizer::addBeliefMode(currentBeliefStates_[i]);
     }
 
 }
@@ -870,7 +966,6 @@ void MMPolicyGenerator::assignUniformWeight()
 
 void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
 {
-    //boost::mutex::scoped_lock _(graphMutex_);
 
     // Add state to graph
     Vertex m = boost::add_vertex(g_);
@@ -890,7 +985,6 @@ void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
 
 void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b)
 {
-    //boost::mutex::scoped_lock _(graphMutex_);
 
     // See if there is an overlap in observation between the two vertices
     unsigned int weight = 0;
@@ -939,18 +1033,29 @@ bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &
 
     weight = 0;
 
+    // if both nodes dont see anything, that is also an overlap.
+    if(stateObservationProperty_[a].size() ==0 && stateObservationProperty_[b].size()==0)
+    {
+        weight++;
+        return true;
+    }
+
     // Check if there is an overlap
     for(int i = 0; i < stateObservationProperty_[a].size(); i++)
     {
         for(int j= 0; j < stateObservationProperty_[b].size(); j++)
         {
-            if(stateObservationProperty_[a][i] == stateObservationProperty_[b][j])
+            // Check for overlap if they are not looking at the same physical landmark
+            if(si_->distance(stateProperty_[a],stateProperty_[b]) > 4.0) // 4.0 is 2x the camera range
             {
-                // for every overlap, increase weight
-                weight++;
+                if(stateObservationProperty_[a][i] == stateObservationProperty_[b][j])
+                {
+                    // for every overlap, increase weight
+                    weight++;
 
-                isOverlapping = true;
+                    isOverlapping = true;
 
+                }
             }
         }
     }
@@ -1010,12 +1115,22 @@ MMPolicyGenerator::Vertex MMPolicyGenerator::findTarget(const unsigned int belie
             }
         }
 
-        //TODO: If 2 targets have same weight, then choose the closer one
         if(w < minWeight)
         {
             minWeight = w;
             targetNodeIndx = i;
         }
+
+        //If 2 targets have same weight, then choose the closer one
+        /*
+        if(w==minWeight && targetNodeIndx >= 0)
+        {
+            if(si_->distance(currentBeliefStates_[beliefStateIndx],stateProperty_[i]) <= si_->distance(currentBeliefStates_[beliefStateIndx], stateProperty_[targetNodeIndx]))
+            {
+                targetNodeIndx = i;
+            }
+        }
+        */
 
     }
 

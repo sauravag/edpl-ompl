@@ -14,7 +14,7 @@
 				<Compiler>
 					<Add option="-std=c++0x" />
 					<Add option="-g" />
-					<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
+					<Add directory="/usr/local/include" />
 					<Add directory="/usr/include/qt4/QtCore" />
 					<Add directory="/usr/include/qt4" />
 					<Add directory="/usr/include/qt4/QtGui" />
@@ -32,9 +32,10 @@
 					<Add library="/usr/lib/x86_64-linux-gnu/libX11.so" />
 					<Add library="/usr/lib/x86_64-linux-gnu/libQtOpenGL.so" />
 					<Add library="/usr/lib/libarmadillo.so" />
+					<Add library="/usr/lib/libtinyxml.so" />
 					<Add library="/usr/local/lib/libompl.so" />
 					<Add library="/usr/local/lib/libompl_app.so" />
-					<Add library="/usr/lib/libtinyxml.so" />
+					<Add library="/usr/local/lib/libompl_app_base.so" />
 					<Add directory="/usr/local/lib" />
 					<Add directory="/usr/lib/x86_64-linux-gnu" />
 					<Add directory="/usr/lib" />

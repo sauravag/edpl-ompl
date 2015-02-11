@@ -64,16 +64,35 @@ void plan()
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    if(mySetup->solve())
-    {
-        mySetup->executeSolution(1); //0: FIRM, 1 : rollout , 2: kidnapping-multi-modal
+    int mode = 2;
 
-        OMPL_INFORM("Plan Executed Successfully");
+    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
 
-    }
-    else
+    //cin>>mode;
+
+    int keepTrying = 1;
+
+    mySetup->loadGraphFromFile();
+
+    while(keepTrying)
     {
-        OMPL_INFORM("Unable to find Solution in given time.");
+        if(mySetup->solve())
+        {
+            mySetup->executeSolution(mode);
+
+            OMPL_INFORM("Plan Executed.");
+
+            Visualizer::doSaveVideo(false);
+
+            keepTrying = 0;
+
+        }
+        else
+        {
+            OMPL_INFORM("Unable to find Solution in given time, would you like to continue attempt. (1: yes, 0 :no) ? :");
+
+            std::cin>>keepTrying;
+        }
 
     }
 
@@ -81,6 +100,7 @@ void plan()
 
 }
 
+/*
 void testMultiModal()
 {
 
@@ -111,12 +131,13 @@ void testMultiModal()
 
     exit(0);
 }
+*/
 
 int main(int argc, char *argv[])
 {
-    srand(1234567);
+    srand(239645);
 
-    arma_rng::set_seed(1234567);
+    arma_rng::set_seed(239645);
 
     QApplication app(argc, argv);
 

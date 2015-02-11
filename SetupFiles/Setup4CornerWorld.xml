@@ -49,11 +49,6 @@
 <landmark id = 13 x = 19.5 y = 14.0 theta = -0.5 />
 <landmark id = 14 x = 19.0 y = 14.0 theta = -0.5 />
 <landmark id = 15 x = 18.5 y = 14.0 theta = -0.5 />
-<landmark id = 16 x = 18.0 y = 14.0 theta = -0.5 />
-<landmark id = 17 x = 17.5 y = 14.0 theta = -0.5 />
-<landmark id = 18 x = 17.0 y = 14.0 theta = -0.5 />
-<landmark id = 19 x = 16.5 y = 14.0 theta = -0.5 />
-<landmark id = 20 x = 16.0 y = 14.0 theta = -0.5 />
 <landmark id = 10 x = 14.0 y = 1.0 theta = -0.5 />
 <landmark id = 11 x = 14.0 y = 1.5 theta = -0.5 />
 <landmark id = 12 x = 14.0 y = 2.0 theta = -0.5 />
@@ -65,12 +60,6 @@
 <landmark id = 18 x = 14.0 y = 5.0 theta = -0.5 />
 <landmark id = 19 x = 14.0 y = 5.5 theta = -0.5 />
 <landmark id = 20 x = 14.0 y = 6.0 theta = -0.5 />
-<landmark id = 10 x = 1.0 y = 8.0 theta = -0.5 />
-<landmark id = 11 x = 1.5 y = 8.0 theta = -0.5 />
-<landmark id = 12 x = 2.0 y = 8.0 theta = -0.5 />
-<landmark id = 13 x = 2.5 y = 8.0 theta = -0.5 />
-<landmark id = 14 x = 3.0 y = 8.0 theta = -0.5 />
-<landmark id = 15 x = 3.5 y = 8.0 theta = -0.5 />
 <landmark id = 16 x = 4.0 y = 8.0 theta = -0.5 />
 <landmark id = 17 x = 4.5 y = 8.0 theta = -0.5 />
 <landmark id = 18 x = 5.0 y = 8.0 theta = -0.5 />
@@ -93,11 +82,6 @@
 <landmark id = 24 x = 14.0 y = 19.5 theta = -0.5 />
 <landmark id = 25 x = 14.0 y = 19.0 theta = -0.5 />
 <landmark id = 26 x = 14.0 y = 18.5 theta = -0.5 />
-<landmark id = 27 x = 14.0 y = 18.0 theta = -0.5 />
-<landmark id = 28 x = 14.0 y = 17.5 theta = -0.5 />
-<landmark id = 29 x = 14.0 y = 17.0 theta = -0.5 />
-<landmark id = 30 x = 14.0 y = 16.5 theta = -0.5 />
-<landmark id = 31 x = 14.0 y = 16.0 theta = -0.5 />
 <landmark id = 21 x = 21.0 y = 8.0 theta = -0.5 />
 <landmark id = 22 x = 20.5 y = 8.0 theta = -0.5 />
 <landmark id = 23 x = 20.0 y = 8.0 theta = -0.5 />
@@ -136,16 +120,27 @@
 <landmark id = 101 x = 16.0 y = 1.0 theta = -0.5 />
 <landmark id = 100 x = 1.0 y = 5.0 theta = -0.5 />
 <landmark id = 101 x = 1.0 y = 6.0 theta = -0.5 />
+<landmark id = 102 x = 1.3 y = 8.7 theta = -0.5 />
+<landmark id = 103 x = 1.7 y = 8.7 theta = -0.5 />
+<landmark id = 104 x = 2.3 y = 8.7 theta = -0.5 />
+<landmark id = 105 x = 15.5 y = 14.0 theta = -0.5 />
+<landmark id = 106 x = 16.0 y = 14.0 theta = -0.5 />
+<landmark id = 107 x = 16.5 y = 15.0 theta = -0.5 />
+<landmark id = 108 x = 16.5 y = 14.5 theta = -0.5 />
+<landmark id = 109 x = 15.5 y = 15.8 theta = -0.5 />
+<landmark id = 110 x = 15.2 y = 15.8 theta = -0.5 />
+<landmark id = 111 x = 14.8 y = 15.4 theta = -0.5 />
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
+    camera_range = "2.0"
+    camera_half_fov = "180"    
     sigma_range="0.05"
     sigma_angle="1.0"
     eta_rd="0.0"
     eta_rphi = "0.0"
     eta_thetad="0.0"
     eta_thetaphi = "0.0"
-    camera_horizontal_fov = "45"
     vcLabel = "cd1"
   >
   </CamAruco2DObservationModel>
@@ -195,23 +190,23 @@
 </MotionModels>
 <PlanningProblem>
     <Environment
-        environmentFile = "./Models/ICRA2015Exp2.obj"
+        environmentFile = "./Models/4CornerWorld.obj"
     />
     <Robot
         robotFile = "./Models/iRobot.obj"
     />
      <StartPose
-        x = "15.0"
-        y = "19.5"
+        x = "20"
+        y = "2.9"
         theta = "1.57"
     />
     <GoalPose
-        x = "19.0"
-        y = "1.5"
-        theta = "0"
+        x = "1.5"
+        y = "8.2"
+        theta = "1.57"
     />
     <PlanningTime
-        maxTime = "2400"
+        maxTime = "600"
     />
     <FIRMNodes
         minNodes = "125"

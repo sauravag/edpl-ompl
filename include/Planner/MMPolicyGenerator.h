@@ -38,7 +38,7 @@
 
 
 #include <ompl/geometric/planners/rrt/RRT.h>
-//#include <ompl/geometric/planners/rrt/RRTstar.h>
+#include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/pending/disjoint_sets.hpp>
@@ -168,7 +168,7 @@ class MMPolicyGenerator
         virtual ompl::base::Cost executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls, const ompl::base::State* state);
 
         /** \brief advances the beliefs/modes by applying the given controls*/
-        virtual void propagateBeliefs(const ompl::control::Control *control);
+        virtual void propagateBeliefs(const ompl::control::Control *control, bool isSimulation = false);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
         virtual void updateWeights(const arma::colvec trueObservation);
@@ -194,12 +194,24 @@ class MMPolicyGenerator
         /** \brief checks if the beliefs have converged */
         bool isConverged();
 
-        /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
+        /** \brief Returns true if all beliefs are valid i.e. collision free */
         bool areCurrentBeliefsValid();
+
+        /** \brief Returns true if all beliefs satisfy a certain minimum clearance for n steps from now, else false. */
+        bool doCurrentBeliefsSatisfyClearance(int currentStep);
 
         /** \brief get the state with the max weight and its weight */
         void getStateWithMaxWeight(ompl::base::State *state, float &weight);
 
+        std::vector<float> getWeights()
+        {
+            return weights_;
+        }
+
+        int getNumberOfModes()
+        {
+            return weights_.size();
+        }
 
     private:
 

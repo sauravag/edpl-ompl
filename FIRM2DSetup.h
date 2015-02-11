@@ -64,13 +64,13 @@ public:
         // setting the mean and norm weights (used in reachability check)
         StateType::covNormWeight_  =  1.0;
         StateType::meanNormWeight_ =  2.0;
-        StateType::reachDist_ =  0.15;
+        StateType::reachDist_ =  0.20;
 
         // set the state component norm weights
         arma::colvec normWeights(3);
-        normWeights(0) = 2.0/3.0;
-        normWeights(1) = 2.0/3.0;
-        normWeights(2) = 1.0/3.0;
+        normWeights(0) = 2.0/std::sqrt(9);
+        normWeights(1) = 2.0/std::sqrt(9);
+        normWeights(2) = 1.0/std::sqrt(9);
         StateType::normWeights_ = normWeights;
 
         // The bounds should be inferred from the geometry files,
@@ -180,7 +180,7 @@ public:
             ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
-            siF_->setPropagationStepSize(0.01); // this is the duration that a control is applied
+            siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
             siF_->setStateValidityCheckingResolution(0.005);
             siF_->setMinMaxControlDuration(1,100);
 
@@ -208,16 +208,23 @@ public:
 
     }
 
-    ompl::base::PlannerStatus solve()
+    void loadGraphFromFile(std::string pathToRoadMapFile = "FIRMRoadMap.xml")
     {
         if(!setup_)
         {
             this->setup();
         }
 
-        std::string pathXML = "FIRMRoadMap.xml";
+        planner_->as<FIRM>()->loadRoadMapFromFile(pathToRoadMapFile);
 
-        planner_->as<FIRM>()->loadRoadMapFromFile(pathXML);
+    }
+
+    ompl::base::PlannerStatus solve()
+    {
+        if(!setup_)
+        {
+            this->setup();
+        }
 
         return planner_->solve(planningTime_);
     }
@@ -250,6 +257,10 @@ public:
         return boost::bind(&FIRM2DSetup::getGeometricComponentStateInternal, this, _1, _2);
     }
 
+    void saveRoadmap()
+    {
+        planner_->as<FIRM>()->savePlannerData();
+    }
 protected:
 
     const ompl::base::State* getGeometricComponentStateInternal(const ompl::base::State *state, unsigned int /*index*/) const
@@ -394,8 +405,6 @@ protected:
 
         std::cout<<"Path to robot mesh: "<<robotFilePath<<std::endl;
 
-        //std::cout<<"Path to roadmap file: "<<pathToRoadMapFile_<<std::endl;
-
         std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
 
         std::cout<<"Goal Pose X: "<<goalX<<" Y: "<<goalY<<" Theta: "<<goalTheta<<std::endl;
@@ -437,7 +446,5 @@ private:
     unsigned int minNodes_;
 
     bool setup_;
-
-    std::string pathToRoadMapFile_;
 };
 #endif

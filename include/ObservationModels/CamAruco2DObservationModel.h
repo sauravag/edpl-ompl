@@ -132,6 +132,9 @@ class CamAruco2DObservationModel : public ObservationModelMethod
     void loadLandmarks(const char *pathToSetupFile);
 
     void loadParameters(const char *pathToSetupFile);
+
+    double cameraRange_;
+    double cameraHalfFov_;
 };
 
 #endif

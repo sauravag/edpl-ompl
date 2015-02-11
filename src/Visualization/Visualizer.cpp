@@ -40,6 +40,8 @@ boost::mutex Visualizer::drawMutex_;
 
 std::list<ompl::base::State*> Visualizer::states_;
 
+std::list<ompl::base::State*> Visualizer::beliefModes_;
+
 ompl::base::State* Visualizer::trueState_;
 
 ompl::base::State* Visualizer::currentBelief_;
@@ -60,6 +62,8 @@ boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > 
 
 std::vector<const ompl::base::State*> Visualizer::robotPath_;
 
+std::vector<ompl::geometric::PathGeometric> Visualizer::openLoopRRTPaths_;
+
 Visualizer::VZRDrawingMode Visualizer::mode_;
 
 ompl::app::RenderGeometry* Visualizer::renderGeom_;
@@ -68,6 +72,8 @@ int Visualizer::robotIndx_ = -1;
 
 int Visualizer::envIndx_   = -1;
 
+bool Visualizer::saveVideo_ = false;
+
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
 
@@ -75,7 +81,7 @@ void Visualizer::drawLandmark(arma::colvec& landmark)
 
     glPushMatrix();
 
-    glColor3d(0.0,0.0,1.0);
+    glColor3d(0.0,0.0,0.0);
 
     glTranslated(landmark[1], landmark[2], 0.0);
     glVertex3f(0.8,0.8,0.8);
@@ -100,13 +106,18 @@ void Visualizer::drawRobot(const ompl::base::State *state)
     }
     else
     {
+
+        drawState(state,VZRStateType::TrueState);
+        /*
         arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
         glPushMatrix();
-            glTranslated(x[0], x[1], 0);
+            glTranslated(x[0], x[1], 0.0);
             glRotated(-90+(180/3.14157)*x[2],0,0,1);
             glCallList(robotIndx_);
         glPopMatrix();
+        */
+
     }
 }
 
@@ -114,22 +125,32 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 {
     using namespace arma;
 
+    double outerDiskRadius, z;
+
     switch(stateType)
     {
         case TrueState:
-            glColor3d(1.0,0.0,0.0);
+            glColor3d(0,0,1); // blue
+            outerDiskRadius = 0.45;
+            z = -0.1;
             break;
 
         case BeliefState:
+            outerDiskRadius = 0.25;
+            z = -0.1;
             glColor3d(1,0,0); // red
             break;
 
         case GraphNodeState:
-            glColor3d(1.0,1.0,1.0); // white
+            outerDiskRadius = 0.15;
+            z = -0.5;
+            glColor3d(0,1,1); // cyan
             break;
 
         default:
-            glColor3d(1.0,1.0,1.0); // grey
+            outerDiskRadius = 0.15;
+            z = -0.5;
+            glColor3d(1,1,1); // grey
             break;
     }
 
@@ -137,15 +158,22 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     mat covariance = state->as<SE2BeliefSpace::StateType>()->getCovariance();
 
     glPushMatrix();
-        glTranslated(x[0], x[1], 0);
+        glTranslated(x[0], x[1], z);
 
         //draw a black disk
         GLUquadric *disk = gluNewQuadric();
-        gluDisk(disk, 0, 0.15, 15, 1);
+        gluDisk(disk, 0, outerDiskRadius, 100, 1);
         gluDeleteQuadric(disk);
         glBegin(GL_LINES);
         glVertex3f(0, 0, 0);
-        glVertex3f(1.0*cos(x[2]), 1.0*sin(x[2]), 0);
+        if(stateType == VZRStateType::TrueState)
+        {
+            glVertex3f(1.0*cos(x[2]), 1.0*sin(x[2]), 0);
+        }
+        else
+        {
+            glVertex3f(0.5*cos(x[2]), 0.5*sin(x[2]), 0);
+        }
         glEnd();
 
         double fovRadius = 2.5; //meters
@@ -159,22 +187,13 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         fovRight << fovRadius*cos(x[2] - fovAngle) 	<< endr
                  << fovRadius*sin(x[2] - fovAngle) 	<< endr
                  <<	0								<< endr;
-        glColor3d(0.5,0.5,0.5);
 
-        //Remove comment to show field of view of robot
-        /*
-        glBegin(GL_LINE_LOOP);
-            glVertex3f(0,0,0);
-            glVertex3f(fovRight[0], fovRight[1], 0);
-            glVertex3f(fovLeft[0], fovLeft[1], 0);
-        glEnd();
-        */
     glPopMatrix();
 
-    if(trace(covariance) != 0)
+    if(trace(covariance) != 0 && stateType == VZRStateType::BeliefState)
     {
         double chi2 = 9.21034;
-        double magnify = 1.0; // scaled up for viewing
+        double magnify = 5.0; // scaled up for viewing
         mat pos;
         for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())
         {
@@ -187,7 +206,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         pos *= magnify;
 
         int nPoints = pos.n_rows;
-        /*
+
         try
         {
             mat K = trans(chol(covariance.submat(0,0,1,1)));
@@ -214,7 +233,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         {
             OMPL_INFORM("Visualizer: Covariance cholesky did not converge...proceeding");
         }
-        */
+
     }
 
 }
@@ -223,12 +242,17 @@ void Visualizer::refresh()
 {
     boost::mutex::scoped_lock sl(drawMutex_);
 
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
+
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    drawRobotPath();
 
     drawEnvironment();
 
     glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
 
     switch(mode_)
     {
@@ -266,16 +290,27 @@ void Visualizer::refresh()
             if(chosenRolloutConnection_)
             {
                 glColor3d(0.0 , 1.0 , 0.0);
-                glLineWidth(2.0);
-                drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
+                glLineWidth(3.0);
+                    drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
                 glLineWidth(1.0);
             }
 
             robotPath_.push_back(si_->cloneState(trueState_));
 
-            drawRobotPath();
+            break;
+
+        case MultiModalMode:
+
+            drawOpenLoopRRTPaths();
+
+            drawGraphBeliefNodes();
+
+            drawRobot(trueState_);
+
+            drawBeliefModes();
 
             break;
+
 
         default:
 
@@ -290,12 +325,12 @@ void Visualizer::refresh()
         drawLandmark(landmarks_[i]);
     }
 
-    if(trueState_)
+    if(trueState_ && mode_ !=MultiModalMode)
     {
         drawRobot(trueState_);
     }
 
-    if(currentBelief_)
+    if(currentBelief_ && mode_ !=MultiModalMode)
     {
         drawState(currentBelief_, (VZRStateType)1);
     }
@@ -353,6 +388,7 @@ void Visualizer::drawObstacle()
     glEnd();
 
 }
+
 void Visualizer::drawGraphBeliefNodes()
 {
     for(typename std::list<ompl::base::State*>::iterator s=states_.begin(), e=states_.end(); s!=e; ++s)
@@ -362,10 +398,20 @@ void Visualizer::drawGraphBeliefNodes()
 
 }
 
+void Visualizer::drawBeliefModes()
+{
+    for(typename std::list<ompl::base::State*>::iterator s=beliefModes_.begin(), e=beliefModes_.end(); s!=e; ++s)
+    {
+          drawState(*s, (VZRStateType)1);
+    }
+
+}
+
 void Visualizer::drawGraphEdges()
 {
     for(unsigned int i=0; i<graphEdges_.size();i++)
     {
+        glColor3d(0.5,0.5,0.5);
         drawEdge(graphEdges_[i].first,graphEdges_[i].second);
     }
 }
@@ -378,7 +424,10 @@ void Visualizer::drawRolloutConnections()
     for(int i=0; i<rolloutConnections_.size();i++)
     {
         glColor3d(1.0,0.0,0);
+        glLineWidth(3.0);
         drawEdge(rolloutConnections_[i].first,rolloutConnections_[i].second);
+        glLineWidth(1.0);
+
     }
 }
 
@@ -392,6 +441,7 @@ void Visualizer::drawFeedbackEdges()
         maxCost = std::max(maxCost, i->cost);
     }
 
+    glLineWidth(2.0);
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
         std::pair<const ompl::base::State*, const ompl::base::State*> vertexPair = std::make_pair(i->source, i->target);
@@ -404,40 +454,60 @@ void Visualizer::drawFeedbackEdges()
             double costFactor = sqrt(i->cost/maxCost);
             glColor3d(0.0,1.0,0.0);
 
-            glLineWidth(1.0);
-                drawEdge(i->source, i->target);
-            glLineWidth(1.f);
+            drawEdge(i->source, i->target);
+
         }
     }
+    glLineWidth(1.0);
 }
 
 void Visualizer::drawMostLikelyPath()
 {
     glDisable(GL_LIGHTING);
 
+    glLineWidth(4.0);
     for(int i=0; i<mostLikelyPath_.size();i++)
     {
         glColor3d(1.0 , 1.0 , 0.0);
-
-        glLineWidth(4.0);
-            drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
-        glLineWidth(1.f);
+        drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
     }
+    glLineWidth(1.f);
 }
 
 void Visualizer::drawRobotPath()
 {
-    glDisable(GL_LIGHTING);
-
-    for(int i=0; i<robotPath_.size()-1;i++)
+    if(robotPath_.size()>=2)
     {
-        glColor3d(1.0 , 1.0 , 1.0);
+        glDisable(GL_LIGHTING);
+        glColor3d(0.0 , 1.0 , 1.0);
 
-        glLineWidth(4.0);
-            drawEdge(robotPath_[i],robotPath_[i+1]);
-        glLineWidth(1.f);
+        for(int i=0; i<robotPath_.size()-1;i++)
+        {
+            glColor3d(1.0 , 1.0 , 1.0);
+
+            glLineWidth(4.0);
+                drawEdge(robotPath_[i],robotPath_[i+1]);
+            glLineWidth(1.f);
+        }
     }
 }
 
+void Visualizer::drawGeometricPath(ompl::geometric::PathGeometric path)
+{
+    for(int i=0;i<path.getStateCount()-1;i++)
+    {
+        glColor3d(0 , 1.0, 0);
+        glLineWidth(2.0);
+        drawEdge(path.getState(i),path.getState(i+1)) ;
+        glLineWidth(1.0);
+    }
+}
 
+void Visualizer::drawOpenLoopRRTPaths()
+{
+    for(int i=0;i<openLoopRRTPaths_.size();i++)
+    {
+        drawGeometricPath(openLoopRRTPaths_[i]);
+    }
+}
 

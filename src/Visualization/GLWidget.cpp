@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan */
+/* Authors: Saurav Agarwal, Aditya Mahadevan, Ali-akbar Agha-mohammadi */
 
 /* Handles all the GL functions, camera, and drawing for the general window.
  * Owns the simulation so that it can draw its contents.
@@ -52,7 +52,6 @@ using namespace std;
 
 #include "../../include/Visualization/GLWidget.h"
 
-
 GLWidget::GLWidget(QWidget *parent)
   : QGLWidget(QGLFormat(QGL::SampleBuffers), parent),
     m_drawAxes(false),
@@ -61,15 +60,15 @@ GLWidget::GLWidget(QWidget *parent)
 {
     using namespace arma;
     arma::colvec campos(3);
-    campos<<13.5<<endr
-         <<3.5<<endr
-         <<32.0<<endr;
+    campos<<11.0<<endr
+         <<11.0<<endr
+         <<-1.0<<endr;
     m_camPos =campos;
 
     arma::colvec camat(3);
     camat<<0.0<<endr
         <<0.0<<endr
-        <<-1.0<<endr;
+        <<-1.5<<endr;
     m_camAt = camat;
 
     //GetEnvironmentPolygons();
@@ -91,12 +90,16 @@ QSize GLWidget::sizeHint() const
 
 void GLWidget::resetCam()
 {
-    m_camPos[0] = 10.0;
-    m_camPos[1] = 10.0;
+    m_camPos[0] = 11.0;
+    m_camPos[1] = 11.0;
 
-    m_camPos[2] = 30.0;
-    m_camAt[0] = 0.0; m_camAt[1] = 0.0; m_camAt[2] = -1.0;
-    m_camZoom = 45; m_long = -boost::math::constants::pi<double>()/2.0; m_lat = 0.0;
+    m_camPos[2] = -250.0;
+    m_camAt[0] = 0.0;
+    m_camAt[1] = 0.0;
+    m_camAt[2] = -1.0;
+    m_camZoom = 75; // 50 for 4 corner world
+    m_long = -boost::math::constants::pi<double>()/2.0;
+    m_lat = 0.0;
     updateGL();
 }
 
@@ -159,7 +162,7 @@ void GLWidget::saveFrame()
 {
   static unsigned int frameNum = 0;
 
-  //the first time, make a good snapshot directory
+   //the first time, make a good snapshot directory
     if(m_framePath == "")
     {
         QString dateTime = QDateTime::currentDateTime().toString("MMM.dd.yyyy_hh.mmap");
@@ -189,12 +192,11 @@ void GLWidget::ChangeMode(int mode)
 //initalize GL defaults and construct the simulator
 void GLWidget::initializeGL()
 {
-    glClearColor(0.5,0.5,0.5,1.);
-    glDisable(GL_LIGHTING);
+    glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
     glDisable(GL_DEPTH_TEST);
-    //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
@@ -207,19 +209,19 @@ void GLWidget::initializeGL()
 //Update function for GL Scene
 void GLWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT /*| GL_DEPTH_BUFFER_BIT*/);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(1.0, 1.0, 1.0, 1.0);
 
     //projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glOrtho (0, 640, 480, 0, 0, 1);
-    gluPerspective(m_camZoom, (GLfloat) width()/(GLfloat) height(), 1.0, 100.0);
+    gluPerspective(m_camZoom, (GLfloat) width()/(GLfloat) height(), 1.0, 1000.0);
+    glOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 300.0f);
+
     //model
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    //gluLookAt(0,0,3, 0,0,-5, 0,1,0);
 
     //camera at m_camPos looking down z-axis with positive y (0,1,0) as up (was
     //m_camAt with up direction of 0, 0, 1)
@@ -228,7 +230,7 @@ void GLWidget::paintGL()
         vector<double> pos(3);
         pos[0] = 0;
         pos[1] = 0;
-        gluLookAt(pos[0], pos[1], 0, pos[0], pos[1], 0,0, 1, 0);
+        gluLookAt(pos[0], pos[1], 0, pos[0], pos[1], 0, 0, 1, 0);
     }
     else
     {
@@ -261,12 +263,12 @@ void GLWidget::paintGL()
         glPopMatrix();
     }
 
-    /**
+
     if(Display::saveVideo())
     {
         saveFrame();
     }
-    */
+
 
     glPopMatrix();
 
@@ -274,10 +276,10 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int width, int height)
 {
-    glViewport (0, 0, (GLsizei) width, (GLsizei) height);
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    gluPerspective(m_camZoom, (GLfloat) width/(GLfloat) height, 1.0, 100.0);
+    gluPerspective(m_camZoom, (GLfloat) width/(GLfloat) height, 1.0, 1000.0);
+    glViewport (0, 0, (GLsizei) width, (GLsizei) height);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 

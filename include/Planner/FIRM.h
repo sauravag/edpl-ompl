@@ -185,7 +185,17 @@ public:
         method will also improve the roadmap, as needed.*/
     virtual void growRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
 
-    /** \brief  */
+     /** \brief Attempt to connect disjoint components in the roadmap
+                using random bouncing motions (the PRM expansion step) for the
+                given time (seconds). */
+    virtual void expandRoadmap(double expandTime);
+
+    /** \brief Attempt to connect disjoint components in the roadmap
+        using random bouncing motions (the PRM expansion step) until the
+        given condition evaluates true. */
+    virtual void expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
+
+    /** \brief  The key function that solves the planning problem.*/
     virtual ompl::base::PlannerStatus solve(const ompl::base::PlannerTerminationCondition &ptc);
 
     /** \brief  */
@@ -279,6 +289,11 @@ protected:
          in the roadmap. Stop this process when the termination condition*/
     virtual void growRoadmap(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::State *workState);
 
+     /** \brief Attempt to connect disjoint components in the
+                roadmap using random bounding motions (the PRM
+                expansion step) */
+    virtual void expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc, std::vector<ompl::base::State*> &workStates);
+
     /** \brief Thread that checks for solution */
     void checkForSolution(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::PathPtr &solution);
 
@@ -293,7 +308,7 @@ protected:
     virtual ompl::base::PathPtr constructFeedbackPath(const Vertex &start, const Vertex &goal);
 
     /** \brief Add an edge from vertex a to b in graph */
-    virtual void addEdgeToGraph(const Vertex a, const Vertex b);
+    virtual bool addEdgeToGraph(const Vertex a, const Vertex b);
 
     /** \brief Generates the cost of the edge */
     virtual FIRMWeight generateEdgeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController);
@@ -441,6 +456,19 @@ protected:
                 outfile<<successProbabilityHistory_[i].first<<","<<successProbabilityHistory_[i].second<<std::endl;
             }
         }
+        if(dataName.compare("multiModalWeights")==0)
+        {
+            for(int i=0; i < successProbabilityHistory_.size(); i++)
+            {
+                outfile<<weightsHistory_[i].first<<",";
+
+                for(int j=0; j< weightsHistory_[i].second.size(); j++)
+                {
+                    outfile<<weightsHistory_[i].second[j]<<",";
+                }
+                outfile<<std::endl;
+            }
+        }
 
         outfile.close();
     }
@@ -456,14 +484,17 @@ private:
     /** \brief Add rollout connections to visualization */
     void showRolloutConnections(const Vertex v);
 
-    /** \brief calculate the current success probability from start to goal vertex*/
-    double evaluateSuccessProbability(const Vertex start, const Vertex goal);
+    /** \brief calculate the current success probability by multiplying the success probability of current edge and all future edges to goal vertex*/
+    double evaluateSuccessProbability(const Edge currentEdge, const Vertex start, const Vertex goal);
 
     ompl::base::State *kidnappedState_;
 
     std::vector<std::pair<int, float> > costToGoHistory_;
 
     std::vector<std::pair<int, double> > successProbabilityHistory_;
+
+    std::vector<std::pair<int, std::vector<float> > > weightsHistory_;
+
 
     int currentTimeStep_;
 
