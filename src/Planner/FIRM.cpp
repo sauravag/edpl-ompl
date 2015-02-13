@@ -606,31 +606,29 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
                 addEdgeToGraph(m, n, forwardEdgeAdded);
 
-                if(addReverseEdge)
-                {
-                    // if edge is successfully added to graph
-                    addEdgeToGraph(n, m, reverseEdgeAdded);
-
-                }
-
                 if(forwardEdgeAdded)
                 {
                     successfulConnectionAttemptsProperty_[m]++;
 
-                    if(reverseEdgeAdded)
+                    if(addReverseEdge)
                     {
-                        successfulConnectionAttemptsProperty_[n]++;
+                        addEdgeToGraph(n, m, reverseEdgeAdded);
 
-                        uniteComponents(m, n);
+                        if(reverseEdgeAdded)
+                        {
+                            successfulConnectionAttemptsProperty_[n]++;
 
-                        Visualizer::addGraphEdge(stateProperty_[m], stateProperty_[n]);
+                            uniteComponents(m, n);
 
-                        Visualizer::addGraphEdge(stateProperty_[n], stateProperty_[m]);
+                            Visualizer::addGraphEdge(stateProperty_[m], stateProperty_[n]);
 
-                    }
-                    else
-                    {
-                        boost::remove_edge(m,n,g_); // if you cannot add bidirectional edge, then keep no edge between the two nodes
+                            Visualizer::addGraphEdge(stateProperty_[n], stateProperty_[m]);
+
+                        }
+                        else
+                        {
+                            boost::remove_edge(m,n,g_); // if you cannot add bidirectional edge, then keep no edge between the two nodes
+                        }
                     }
 
                 }
