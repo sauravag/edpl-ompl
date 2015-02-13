@@ -449,6 +449,7 @@ protected:
                 outfile<<costToGoHistory_[i].first<<","<<costToGoHistory_[i].second<<std::endl;
             }
         }
+
         if(dataName.compare("successProbability")==0)
         {
             for(int i=0; i < successProbabilityHistory_.size(); i++)
@@ -456,6 +457,23 @@ protected:
                 outfile<<successProbabilityHistory_[i].first<<","<<successProbabilityHistory_[i].second<<std::endl;
             }
         }
+
+        if(dataName.compare("nodesReached")==0)
+        {
+            for(int i=0; i < nodeReachedHistory_.size(); i++)
+            {
+                outfile<<nodeReachedHistory_[i].first<<","<<nodeReachedHistory_[i].second<<std::endl;
+            }
+        }
+
+        if(dataName.compare("velocity")==0)
+        {
+            for(int i=0; i < velocityHistory_.size(); i++)
+            {
+                outfile<<velocityHistory_[i].first<<","<<velocityHistory_[i].second<<std::endl;
+            }
+        }
+
         if(dataName.compare("multiModalWeights")==0)
         {
             for(int i=0; i < successProbabilityHistory_.size(); i++)
@@ -495,6 +513,9 @@ private:
 
     std::vector<std::pair<int, std::vector<float> > > weightsHistory_;
 
+    std::vector<std::pair<int, int> > nodeReachedHistory_;
+
+    std::vector<std::pair<int, double> > velocityHistory_;
 
     int currentTimeStep_;
 

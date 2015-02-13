@@ -71,7 +71,7 @@ namespace ompl
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-        static const double NUM_MONTE_CARLO_PARTICLES = 10;
+        static const double NUM_MONTE_CARLO_PARTICLES = 4; // 10 for FIRM, 4 for rollout
 
         /** \brief For a node that is not observable, use a high covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
@@ -445,6 +445,8 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         return ompl::base::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
     }
 
+    OMPL_INFORM("%s: Adding start state to roadmap.", getName().c_str());
+
     // Add the valid start states as milestones
     while (const ompl::base::State *st = pis_.nextStart())
         startM_.push_back(addStateToGraph(si_->cloneState(st)));
@@ -466,8 +468,10 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     {
         const ompl::base::State *st = goalM_.empty() ? pis_.nextGoal(ptc) : pis_.nextGoal();
         if (st)
+        {
+            OMPL_INFORM("%s: Adding goal state to roadmap.", getName().c_str());
             goalM_.push_back(addStateToGraph(si_->cloneState(st)));
-
+        }
         if (goalM_.empty())
         {
             OMPL_ERROR("%s: Unable to find any valid goal states", getName().c_str());
@@ -965,7 +969,7 @@ double FIRM::evaluateSuccessProbability(const Edge currentEdge, const FIRM::Vert
 
         const double transitionProbability  = edgeWeight.getSuccessProbability();
 
-        OMPL_INFORM("The success probability of edge is %f", transitionProbability);
+        //OMPL_INFORM("The success probability of edge is %f", transitionProbability);
 
         successProb = successProb * transitionProbability;
 
@@ -1005,6 +1009,12 @@ void FIRM::executeFeedback(void)
 
     Visualizer::doSaveVideo(true);
 
+    int numberofNodesReached = 0;
+
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+
+    siF_->doVelocityLogging(true);
+
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
@@ -1023,7 +1033,7 @@ void FIRM::executeFeedback(void)
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
-         // get a copy of the true state
+        // get a copy of the true state
         ompl::base::State *tempTrueStateCopy = si_->allocState();
 
         siF_->getTrueState(tempTrueStateCopy);
@@ -1038,11 +1048,16 @@ void FIRM::executeFeedback(void)
 
         if(controllerStatus)
         {
+            numberofNodesReached++;
+
+            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+
             currentVertex = boost::target(e, g_);
         }
         else
         {
             Visualizer::doSaveVideo(false);
+            siF_->doVelocityLogging(false);
 
             //
             OMPL_INFORM("Controller stopped due to deviation, need to add new state at: ");
@@ -1057,6 +1072,7 @@ void FIRM::executeFeedback(void)
             solveDynamicProgram(goal);
 
             Visualizer::doSaveVideo(true);
+            siF_->doVelocityLogging(true);
 
         }
 
@@ -1072,6 +1088,19 @@ void FIRM::executeFeedback(void)
     writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
 
     writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory.csv", "successProbability");
+
+    writeTimeSeriesDataToFile("StandardFIRMNodesReachedHistory.csv","nodesReached");
+
+    std::vector<std::pair<double, double> > velLog;
+
+    siF_->getVelocityLog(velLog);
+
+    for(int i=0; i < velLog.size(); i++)
+    {
+        velocityHistory_.push_back(std::make_pair(i, velLog[i].first));
+    }
+
+    writeTimeSeriesDataToFile("StandardFIRMVelocityHistory.csv", "velocity");
 
 }
 
@@ -1257,6 +1286,10 @@ void FIRM::executeFeedbackWithRollout(void)
 
     connectionStrategy_ = FStrategy<Vertex>(1.2*ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
 
+    int numberofNodesReached = 0;
+
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+
     // While the robot state hasn't reached the goal state, keep running
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
@@ -1295,9 +1328,15 @@ void FIRM::executeFeedbackWithRollout(void)
         // else do rollout
         if(stateProperty_[boost::target(e,g_)]->as<SE2BeliefSpace::StateType>()->isReached(cendState))
         {
+            numberofNodesReached++;
+
+            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+
             tempVertex = boost::target(e,g_);
+
             e = feedback_[tempVertex];
         }
+
         else
         {
             siF_->doVelocityLogging(false);
@@ -1343,6 +1382,10 @@ void FIRM::executeFeedbackWithRollout(void)
 
     }
 
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+
+    OMPL_INFORM("FIRM: Number of nodes reached with Rollout: %u", numberofNodesReached);
+
     averageTimeForRolloutComputation = averageTimeForRolloutComputation / (1000*numberOfRollouts);
 
     std::ofstream outfile;
@@ -1359,14 +1402,19 @@ void FIRM::executeFeedbackWithRollout(void)
 
     writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory.csv", "successProbability");
 
+    writeTimeSeriesDataToFile("RolloutFIRMNodesReachedHistory.csv","nodesReached");
+
     std::vector<std::pair<double, double> > velLog;
 
     siF_->getVelocityLog(velLog);
 
     for(int i=0; i < velLog.size(); i++)
     {
-        std::cout<<"Velocity: "<<velLog[i].first <<" "<<velLog[i].second <<std::endl;
+        std::cout<<"Velocity: "<<velLog[i].first <<" "<<velLog[i].first <<std::endl;
+        velocityHistory_.push_back(std::make_pair(i, velLog[i].first));
     }
+
+    writeTimeSeriesDataToFile("RolloutFIRMVelocityHistory.csv", "velocity");
 
 }
 

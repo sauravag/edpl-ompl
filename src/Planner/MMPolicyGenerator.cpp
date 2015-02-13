@@ -335,7 +335,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
     std::cout << "Time to evaluate policy: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_policygen - start_time_policygen).count() << " milli seconds."<<std::endl;
 
-    std::cin.get();
+    //std::cin.get();
 
     si_->showRobotVisualization(true);
 
