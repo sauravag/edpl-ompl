@@ -271,7 +271,13 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 disjointSets_.make_set(m);
 
                 // add the edge to the parent vertex
-                if(addEdgeToGraph(v,m) && addEdgeToGraph(m,v))
+                bool addedEdgeVM, addedEdgeMV;
+
+                addEdgeToGraph(v,m, addedEdgeVM);
+
+                addEdgeToGraph(m,v, addedEdgeMV);
+
+                if(addedEdgeVM && addedEdgeMV)
                 {
                     uniteComponents(v, m);
                 }
@@ -289,7 +295,13 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
             // we add an edge
             if (s > 0 || !sameComponent(v, last))
             {
-                if(addEdgeToGraph(v,last) && addEdgeToGraph(last,v))
+                bool addedEdgeA, addedEdgeB;
+
+                addEdgeToGraph(v,last, addedEdgeA);
+
+                addEdgeToGraph(last,v, addedEdgeB);
+
+                if( addedEdgeA && addedEdgeB)
                 {
                     uniteComponents(v, last);
                 }
@@ -577,6 +589,8 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     // Which milestones will we attempt to connect to?
     const std::vector<Vertex>& neighbors = connectionStrategy_(m);
 
+    std::vector<boost::thread> monteCarloThreads;
+
     foreach (Vertex n, neighbors)
     {
         if ( m!=n )
@@ -586,28 +600,37 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
             if (si_->checkMotion(stateProperty_[m], stateProperty_[n]))
             {
-                // if edge is successfully added to graph
-                bool forwardEdgeAdded = addEdgeToGraph(m, n);
+
+                bool forwardEdgeAdded=false;
+                bool reverseEdgeAdded=false;
+
+                addEdgeToGraph(m, n, forwardEdgeAdded);
+
+                if(addReverseEdge)
+                {
+                    // if edge is successfully added to graph
+                    addEdgeToGraph(n, m, reverseEdgeAdded);
+
+                }
+
                 if(forwardEdgeAdded)
                 {
                     successfulConnectionAttemptsProperty_[m]++;
 
-                    bool reverseEdgeAdded = false;
-
-                    if(addReverseEdge)
+                    if(reverseEdgeAdded)
                     {
-                        reverseEdgeAdded = addEdgeToGraph(n, m);
-                        if(reverseEdgeAdded)
-                        {
-                            successfulConnectionAttemptsProperty_[n]++;
-                            uniteComponents(m, n);
-                            Visualizer::addGraphEdge(stateProperty_[m], stateProperty_[n]);
-                            Visualizer::addGraphEdge(stateProperty_[n], stateProperty_[m]);
-                        }
-                        else
-                        {
-                            boost::remove_edge(m,n,g_); // if you cannot add bidirectional edge, then keep no edge between the two nodes
-                        }
+                        successfulConnectionAttemptsProperty_[n]++;
+
+                        uniteComponents(m, n);
+
+                        Visualizer::addGraphEdge(stateProperty_[m], stateProperty_[n]);
+
+                        Visualizer::addGraphEdge(stateProperty_[n], stateProperty_[m]);
+
+                    }
+                    else
+                    {
+                        boost::remove_edge(m,n,g_); // if you cannot add bidirectional edge, then keep no edge between the two nodes
                     }
 
                 }
@@ -671,7 +694,7 @@ ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Verte
     return ompl::base::PathPtr(p);
 }
 
-bool FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
+void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded)
 {
 
     EdgeControllerType edgeController;
@@ -679,7 +702,10 @@ bool FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
     const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController);
 
     if(weight.getSuccessProbability() == 0)
-        return false; // this edge should not be added as it has no chance of success
+    {
+        edgeAdded = false;
+        return; // this edge should not be added as it has no chance of success
+    }
 
     assert(edgeController.getGoal() && "The generated controller has no goal");
 
@@ -692,7 +718,7 @@ bool FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
 
     edgeControllers_[newEdge.first] = edgeController;
 
-    return true;
+    edgeAdded = true;
 }
 
 FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)

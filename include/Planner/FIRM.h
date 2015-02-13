@@ -308,7 +308,8 @@ protected:
     virtual ompl::base::PathPtr constructFeedbackPath(const Vertex &start, const Vertex &goal);
 
     /** \brief Add an edge from vertex a to b in graph */
-    virtual bool addEdgeToGraph(const Vertex a, const Vertex b);
+    //virtual bool addEdgeToGraph(const Vertex a, const Vertex b);
+    virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
 
     /** \brief Generates the cost of the edge */
     virtual FIRMWeight generateEdgeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController);
