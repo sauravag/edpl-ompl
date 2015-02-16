@@ -1045,7 +1045,11 @@ void FIRM::executeFeedback(void)
 
         Edge e = feedback_[currentVertex];
 
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(e, currentVertex, goal) ) );
+        double succProb = evaluateSuccessProbability(e, currentVertex, goal);
+
+        OMPL_INFORM("FIRM: Moving from Vertex %u to %u with TP = %f", currentVertex, boost::target(e, g_), succProb);
+
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
         controller = edgeControllers_[e];
 
@@ -1166,7 +1170,11 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         Edge e = feedback_[currentVertex];
 
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(e, currentVertex, goal) ) );
+        double succProb = evaluateSuccessProbability(e, currentVertex, goal);
+
+        OMPL_INFORM("FIRM: Moving from Vertex %u to %u with TP = %f", currentVertex, boost::target(e, g_), succProb);
+
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
         controller = edgeControllers_[e];
 
@@ -1318,7 +1326,11 @@ void FIRM::executeFeedbackWithRollout(void)
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
 
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(e, tempVertex, goal) ) );
+        double succProb = evaluateSuccessProbability(e, tempVertex, goal);
+
+        OMPL_INFORM("FIRM: Moving from Vertex %u to %u with TP = %f", tempVertex, boost::target(e, g_), succProb);
+
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
         EdgeControllerType controller = edgeControllers_[e];
 

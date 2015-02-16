@@ -1640,9 +1640,9 @@
     <edge startVertexID="36" endVertexID="137" successProb="1" cost="0.0570199" />
     <edge startVertexID="138" endVertexID="136" successProb="0.9" cost="0.0120288" />
     <edge startVertexID="136" endVertexID="138" successProb="0.9" cost="0.02672" />
-    <edge startVertexID="138" endVertexID="137" successProb="1" cost="0.0142236" />
+    <edge startVertexID="138" endVertexID="137" successProb="0.86" cost="0.0142236" />
     <edge startVertexID="137" endVertexID="138" successProb="0.75" cost="0.0360241" />
-    <edge startVertexID="138" endVertexID="0" successProb="1" cost="0.0164548" />
+    <edge startVertexID="138" endVertexID="0" successProb="0.6" cost="0.0224548" />
     <edge startVertexID="0" endVertexID="138" successProb="0.25" cost="0.0310731" />
     <edge startVertexID="139" endVertexID="26" successProb="1" cost="0.0213805" />
     <edge startVertexID="26" endVertexID="139" successProb="1" cost="0.0340572" />
@@ -1663,7 +1663,7 @@
     <edge startVertexID="141" endVertexID="36" successProb="1" cost="0.0315624" />
     <edge startVertexID="36" endVertexID="141" successProb="1" cost="0.0579653" />
     <edge startVertexID="141" endVertexID="140" successProb="0.25" cost="0.0493504" />
-    <edge startVertexID="140" endVertexID="141" successProb="1" cost="0.018598" />
+    <edge startVertexID="140" endVertexID="141" successProb="0.30" cost="0.038598" />
     <edge startVertexID="141" endVertexID="21" successProb="1" cost="0.0409039" />
     <edge startVertexID="21" endVertexID="141" successProb="1" cost="0.0493817" />
     <edge startVertexID="141" endVertexID="72" successProb="1" cost="0.0501017" />
