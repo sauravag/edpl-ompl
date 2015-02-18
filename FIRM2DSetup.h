@@ -54,7 +54,7 @@ public:
     ss_(ompl::base::StateSpacePtr(new SE2BeliefSpace()))
     {
         // set static variables
-        RHCICreate::setControlQueueSize(10);
+        RHCICreate::setControlQueueSize(5);
         RHCICreate::setTurnOnlyDistance(0.05);
         Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(0.1); // degrees
         Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.01);// meters

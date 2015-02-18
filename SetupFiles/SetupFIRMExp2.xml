@@ -230,13 +230,13 @@
 		robotFile = "./Models/iRobot.obj"
 	/>
 	<StartPose
-		x = "1.50"
-		y = "8"
+		x = "3"
+		y = "18.0"
 		theta = "0"
 	/>
 	<GoalPose
-		x = "17.50"
-		y = "5"
+		x = "18.5"
+		y = "1"
 		theta = "0"
 	/>
 	<PlanningTime

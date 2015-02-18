@@ -1125,7 +1125,8 @@ void FIRM::executeFeedback(void)
 
     for(int i=0; i < velLog.size(); i++)
     {
-        velocityHistory_.push_back(std::make_pair(i, velLog[i].first));
+        //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); //unicycle
+        velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
     }
 
     writeTimeSeriesDataToFile("StandardFIRMVelocityHistory.csv", "velocity");
@@ -1371,6 +1372,8 @@ void FIRM::executeFeedbackWithRollout(void)
             tempVertex = boost::target(e,g_);
 
             e = feedback_[tempVertex];
+
+            costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[tempVertex]));
         }
 
         else
@@ -1447,7 +1450,8 @@ void FIRM::executeFeedbackWithRollout(void)
     for(int i=0; i < velLog.size(); i++)
     {
         std::cout<<"Velocity: "<<velLog[i].first <<" "<<velLog[i].first <<std::endl;
-        velocityHistory_.push_back(std::make_pair(i, velLog[i].first));
+        velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
+        //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); // unicycle
     }
 
     writeTimeSeriesDataToFile("RolloutFIRMVelocityHistory.csv", "velocity");
