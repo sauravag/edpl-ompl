@@ -72,6 +72,7 @@
 		<Unit filename="include/LinearSystem/LinearSystem.h" />
 		<Unit filename="include/LocalPlanners/MotionModelLP.h" />
 		<Unit filename="include/MotionModels/MotionModelMethod.h" />
+		<Unit filename="include/MotionModels/OmnidirectionalMotionModel.h" />
 		<Unit filename="include/MotionModels/UnicycleMotionModel.h" />
 		<Unit filename="include/MotionModels/UnicycleStatePropagator.h" />
 		<Unit filename="include/ObservationModels/CamAruco2DObservationModel.h" />
@@ -95,6 +96,7 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Filters/ExtendedKF.cpp" />
 		<Unit filename="src/Filters/LinearizedKF.cpp" />
+		<Unit filename="src/MotionModels/OmnidirectionalMotionModel.cpp" />
 		<Unit filename="src/MotionModels/UnicycleMotionModel.cpp" />
 		<Unit filename="src/MotionModels/UnicycleStatePropagator.cpp" />
 		<Unit filename="src/ObservationModels/CamAruco2DObservationModel.cpp" />
