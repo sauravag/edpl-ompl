@@ -32,39 +32,38 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Ali-akbar Agha-mohammadi, Saurav Agarwal */
+/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#ifndef UNICYCLE_MOTIONMODEL_
-#define UNICYCLE_MOTIONMODEL_
+#ifndef OMNIDIRECTIONAL_MOTIONMODEL_
+#define OMNIDIRECTIONAL_MOTIONMODEL_
 
 #include "MotionModelMethod.h"
 #include <limits>
 #include <cassert>
 
-class UnicycleMotionModel : public MotionModelMethod
-{
 
+class OmnidirectionalMotionModel: public MotionModelMethod
+{
     //Dimensions of stat vector, control vector, motion noise vector
     //These are constant and specific to the motion model. This also implies
     //the motion model will only work with configurations of a particular dimension
     static const int stateDim = 3;
-    static const int controlDim = 2;
-    static const int motionNoiseDim = 5;
+    static const int controlDim = 3;
+    static const int motionNoiseDim = 6;
 
   public:
     typedef typename MotionModelMethod::ControlType ControlType;
     typedef typename MotionModelMethod::NoiseType NoiseType;
     typedef typename MotionModelMethod::JacobianType JacobianType;
 
-    // XML-based constructor
-    UnicycleMotionModel(const ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) :
-    MotionModelMethod(si, motionNoiseDim)
+    /** \brief XML-based constructor */
+    OmnidirectionalMotionModel(const ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) : MotionModelMethod(si, motionNoiseDim)
     {
         this->loadParameters(pathToSetupFile);
     }
 
     /** \brief Destructor. */
-    ~UnicycleMotionModel() {}
+    ~OmnidirectionalMotionModel() {}
 
     /** \brief Propagate the system to the next state, given the current state, a control and a noise. */
     void Evolve(const ompl::base::State *state, const ompl::control::Control *control, const NoiseType& w, ompl::base::State *result);
@@ -117,11 +116,9 @@ class UnicycleMotionModel : public MotionModelMethod
     /** \brief max translational velocity */
     double maxLinearVelocity_; //
 
-    /** \brief max translational velocity */
-    double orbitRadius_;
-
     /** \brief min translational velocity */
     double minLinearVelocity_;
+
 
 };
 

@@ -40,7 +40,6 @@ using namespace ompl;
 
 UnicycleStatePropagator::UnicycleStatePropagator(const firm::SpaceInformation::SpaceInformationPtr &si) : StatePropagator(si), siF_(si)
 {
-    // The path to this setup file must not be hardcopied, need a better way to do this
     motionModel_ = siF_->getMotionModel();
 }
 

@@ -298,7 +298,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         }
     }
 
-    ompl::base::Cost stabilizationFilteringCost;
+
+    ompl::base::Cost stabilizationFilteringCost(0);
 
     int stepsToStabilize=0;
 

@@ -56,15 +56,15 @@ public:
         // set static variables
         RHCICreate::setControlQueueSize(10);
         RHCICreate::setTurnOnlyDistance(0.05);
-        Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(30); // degrees
-        Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.20);// meters
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(0.1); // degrees
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.01);// meters
         Controller<RHCICreate, ExtendedKF>::setMaxTries(200);
         Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(4.0); // meters
 
         // setting the mean and norm weights (used in reachability check)
         StateType::covNormWeight_  =  1.0;
         StateType::meanNormWeight_ =  2.0;
-        StateType::reachDist_ =  0.20;
+        StateType::reachDist_ =  0.05;
 
         // set the state component norm weights
         arma::colvec normWeights(3);
@@ -86,7 +86,9 @@ public:
         ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space
-        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ;
+        //ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ; // iCreate
+        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) ) ; // Omni
+
         cs_ = controlspace;
 
         // construct an instance of space information from this state space
@@ -174,7 +176,8 @@ public:
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space
-            MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
+            //MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
+            MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));
             siF_->setMotionModel(mm);
 
             ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));

@@ -206,16 +206,18 @@
 		dt= 0.1
 	  /> <!--omega is in radians--> 
 	<OmnidirectionalMotionModel 
-		max_connect_radius="30.0"
-		robot_link_length="0.2"
-		sigma="0.00"
-		eta="0.000"
-		wind_noise_pos="0.05"
-		wind_noise_ang="0.00" 
+		sigmaV="0.02"
+		etaV="0.01"
+        sigmaOmega="0.008"
+        etaOmega="0.005"
 		P_Wg_filename=""
-	  dt=0.10 
-	  V=5.0 
-	  omega="1.5708"
+		orbit_radius=5.0
+		wind_noise_pos="0.001"
+		wind_noise_ang="0.0001" 
+		min_linear_velocity= 0.5
+		max_linear_velocity= 0.5
+		max_angular_velocity= 0.60
+		dt= 0.1
 	  /> <!--omega is in radians, wind_noise_ang is in degrees -->
 		<!--wind_noise_pos="1.000"
 		wind_noise_ang="7.0"-->
