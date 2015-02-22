@@ -298,7 +298,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         }
     }
 
-    ompl::base::Cost stabilizationFilteringCost;
+
+    ompl::base::Cost stabilizationFilteringCost(0);
 
     int stepsToStabilize=0;
 
@@ -308,7 +309,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
     si_->copyState(endState, stabilizedState);
 
-    filteringCost.v = cost + stabilizationFilteringCost.v;
+    //filteringCost.v = cost + stabilizationFilteringCost.v;
+    filteringCost = ompl::base::Cost(cost + stabilizationFilteringCost.value());
 
     stepsTaken = k+stepsToStabilize;
 
@@ -373,7 +375,8 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
 
     if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
-    filteringCost.v = cost;
+    //filteringCost.v = cost;
+    filteringCost = ompl::base::Cost(cost);
 
     si_->freeState(internalState);
 
@@ -508,7 +511,8 @@ void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
 
     }
 
-   stabilizationFilteringCost.v = cost;
+   //stabilizationFilteringCost.v = cost;
+   stabilizationFilteringCost = ompl::base::Cost(cost);
 
    si_->copyState(endState, tempState2);
    si_->freeState(tempState1);

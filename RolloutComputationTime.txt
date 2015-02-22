@@ -49,3 +49,13 @@ Nearest Neighbor Radius: 5, Monte Carlo Particles: 15, Avg Time/neighbor (second
 Nearest Neighbor Radius: 5, Monte Carlo Particles: 5, Avg Time/neighbor (seconds): 0.116526
 Nearest Neighbor Radius: 5, Monte Carlo Particles: 15, Avg Time/neighbor (seconds): 0.2178
 Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.105905
+Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.10806
+Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.118295
+Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.135762
+Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.0806154
+Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.0759286
+Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.100143
+Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.0722667
+Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.0808333
+Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.0825789
+Nearest Neighbor Radius: 5, Monte Carlo Particles: 4, Avg Time/neighbor (seconds): 0.0868235

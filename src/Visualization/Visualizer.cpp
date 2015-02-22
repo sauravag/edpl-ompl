@@ -483,7 +483,7 @@ void Visualizer::drawRobotPath()
 
         for(int i=0; i<robotPath_.size()-1;i++)
         {
-            glColor3d(1.0 , 1.0 , 1.0);
+            glColor3d(0.0 , 1.0 , 1.0);
 
             glLineWidth(4.0);
                 drawEdge(robotPath_[i],robotPath_[i+1]);

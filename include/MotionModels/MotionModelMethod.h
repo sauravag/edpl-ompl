@@ -135,7 +135,7 @@ class MotionModelMethod
         arma::colvec OMPL2ARMA(const ompl::control::Control *control)
         {
 
-            arma::colvec u(2);
+            arma::colvec u(controlDim_);
 
             if(!control) control = si_->allocControl();
 

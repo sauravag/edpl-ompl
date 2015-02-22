@@ -308,7 +308,8 @@ protected:
     virtual ompl::base::PathPtr constructFeedbackPath(const Vertex &start, const Vertex &goal);
 
     /** \brief Add an edge from vertex a to b in graph */
-    virtual bool addEdgeToGraph(const Vertex a, const Vertex b);
+    //virtual bool addEdgeToGraph(const Vertex a, const Vertex b);
+    virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
 
     /** \brief Generates the cost of the edge */
     virtual FIRMWeight generateEdgeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController);
@@ -449,6 +450,7 @@ protected:
                 outfile<<costToGoHistory_[i].first<<","<<costToGoHistory_[i].second<<std::endl;
             }
         }
+
         if(dataName.compare("successProbability")==0)
         {
             for(int i=0; i < successProbabilityHistory_.size(); i++)
@@ -456,6 +458,23 @@ protected:
                 outfile<<successProbabilityHistory_[i].first<<","<<successProbabilityHistory_[i].second<<std::endl;
             }
         }
+
+        if(dataName.compare("nodesReached")==0)
+        {
+            for(int i=0; i < nodeReachedHistory_.size(); i++)
+            {
+                outfile<<nodeReachedHistory_[i].first<<","<<nodeReachedHistory_[i].second<<std::endl;
+            }
+        }
+
+        if(dataName.compare("velocity")==0)
+        {
+            for(int i=0; i < velocityHistory_.size(); i++)
+            {
+                outfile<<velocityHistory_[i].first<<","<<velocityHistory_[i].second<<std::endl;
+            }
+        }
+
         if(dataName.compare("multiModalWeights")==0)
         {
             for(int i=0; i < successProbabilityHistory_.size(); i++)
@@ -495,6 +514,9 @@ private:
 
     std::vector<std::pair<int, std::vector<float> > > weightsHistory_;
 
+    std::vector<std::pair<int, int> > nodeReachedHistory_;
+
+    std::vector<std::pair<int, double> > velocityHistory_;
 
     int currentTimeStep_;
 

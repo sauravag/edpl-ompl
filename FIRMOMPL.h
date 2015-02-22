@@ -57,6 +57,7 @@
 //Motion Models
 #include "include/MotionModels/MotionModelMethod.h"
 #include "include/MotionModels/UnicycleMotionModel.h"
+#include "include/MotionModels/OmnidirectionalMotionModel.h"
 
 //State Propagators
 #include "include/MotionModels/UnicycleStatePropagator.h"

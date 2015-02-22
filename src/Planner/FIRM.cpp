@@ -71,7 +71,7 @@ namespace ompl
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-        static const double NUM_MONTE_CARLO_PARTICLES = 10;
+        static const double NUM_MONTE_CARLO_PARTICLES = 4; // 10 for FIRM, 4 for rollout
 
         /** \brief For a node that is not observable, use a high covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
@@ -176,7 +176,11 @@ void FIRM::setMaxNearestNeighbors(unsigned int k)
         nn_.reset(ompl::tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(si_->getStateSpace()));
         nn_->setDistanceFunction(boost::bind(&FIRM::distanceFunction, this, _1, _2));
     }
-    connectionStrategy_ = ompl::geometric::KStrategy<Vertex>(k, nn_);
+
+    if (!userSetConnectionStrategy_)
+        connectionStrategy_.clear();
+    if (isSetup())
+        setup();
 }
 
 void FIRM::setProblemDefinition(const ompl::base::ProblemDefinitionPtr &pdef)
@@ -267,7 +271,13 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 disjointSets_.make_set(m);
 
                 // add the edge to the parent vertex
-                if(addEdgeToGraph(v,m) && addEdgeToGraph(m,v))
+                bool addedEdgeVM, addedEdgeMV;
+
+                addEdgeToGraph(v,m, addedEdgeVM);
+
+                addEdgeToGraph(m,v, addedEdgeMV);
+
+                if(addedEdgeVM && addedEdgeMV)
                 {
                     uniteComponents(v, m);
                 }
@@ -285,7 +295,13 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
             // we add an edge
             if (s > 0 || !sameComponent(v, last))
             {
-                if(addEdgeToGraph(v,last) && addEdgeToGraph(last,v))
+                bool addedEdgeA, addedEdgeB;
+
+                addEdgeToGraph(v,last, addedEdgeA);
+
+                addEdgeToGraph(last,v, addedEdgeB);
+
+                if( addedEdgeA && addedEdgeB)
                 {
                     uniteComponents(v, last);
                 }
@@ -441,6 +457,8 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         return ompl::base::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
     }
 
+    OMPL_INFORM("%s: Adding start state to roadmap.", getName().c_str());
+
     // Add the valid start states as milestones
     while (const ompl::base::State *st = pis_.nextStart())
         startM_.push_back(addStateToGraph(si_->cloneState(st)));
@@ -462,8 +480,10 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     {
         const ompl::base::State *st = goalM_.empty() ? pis_.nextGoal(ptc) : pis_.nextGoal();
         if (st)
+        {
+            OMPL_INFORM("%s: Adding goal state to roadmap.", getName().c_str());
             goalM_.push_back(addStateToGraph(si_->cloneState(st)));
-
+        }
         if (goalM_.empty())
         {
             OMPL_ERROR("%s: Unable to find any valid goal states", getName().c_str());
@@ -569,6 +589,8 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     // Which milestones will we attempt to connect to?
     const std::vector<Vertex>& neighbors = connectionStrategy_(m);
 
+    std::vector<boost::thread> monteCarloThreads;
+
     foreach (Vertex n, neighbors)
     {
         if ( m!=n )
@@ -578,23 +600,30 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
             if (si_->checkMotion(stateProperty_[m], stateProperty_[n]))
             {
-                // if edge is successfully added to graph
-                bool forwardEdgeAdded = addEdgeToGraph(m, n);
+
+                bool forwardEdgeAdded=false;
+                bool reverseEdgeAdded=false;
+
+                addEdgeToGraph(m, n, forwardEdgeAdded);
+
                 if(forwardEdgeAdded)
                 {
                     successfulConnectionAttemptsProperty_[m]++;
 
-                    bool reverseEdgeAdded = false;
-
                     if(addReverseEdge)
                     {
-                        reverseEdgeAdded = addEdgeToGraph(n, m);
+                        addEdgeToGraph(n, m, reverseEdgeAdded);
+
                         if(reverseEdgeAdded)
                         {
                             successfulConnectionAttemptsProperty_[n]++;
+
                             uniteComponents(m, n);
+
                             Visualizer::addGraphEdge(stateProperty_[m], stateProperty_[n]);
+
                             Visualizer::addGraphEdge(stateProperty_[n], stateProperty_[m]);
+
                         }
                         else
                         {
@@ -663,7 +692,7 @@ ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Verte
     return ompl::base::PathPtr(p);
 }
 
-bool FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
+void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded)
 {
 
     EdgeControllerType edgeController;
@@ -671,7 +700,10 @@ bool FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
     const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController);
 
     if(weight.getSuccessProbability() == 0)
-        return false; // this edge should not be added as it has no chance of success
+    {
+        edgeAdded = false;
+        return; // this edge should not be added as it has no chance of success
+    }
 
     assert(edgeController.getGoal() && "The generated controller has no goal");
 
@@ -684,7 +716,7 @@ bool FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b)
 
     edgeControllers_[newEdge.first] = edgeController;
 
-    return true;
+    edgeAdded = true;
 }
 
 FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
@@ -725,17 +757,19 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
             successCount++;
 
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
-            edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
+            //edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
+            edgeCost = ompl::base::Cost(edgeCost.value() + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);
         }
     }
 
     siF_->showRobotVisualization(true);
 
-    edgeCost.v = edgeCost.v / successCount ;
+    //edgeCost.v = edgeCost.v / successCount ;
+    edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
 
     double transitionProbability = successCount / numParticles_ ;
 
-    FIRMWeight weight(edgeCost.v, transitionProbability);
+    FIRMWeight weight(edgeCost.value(), transitionProbability);
 
     return weight;
 }
@@ -959,7 +993,7 @@ double FIRM::evaluateSuccessProbability(const Edge currentEdge, const FIRM::Vert
 
         const double transitionProbability  = edgeWeight.getSuccessProbability();
 
-        OMPL_INFORM("The success probability of edge is %f", transitionProbability);
+        //OMPL_INFORM("The success probability of edge is %f", transitionProbability);
 
         successProb = successProb * transitionProbability;
 
@@ -999,13 +1033,23 @@ void FIRM::executeFeedback(void)
 
     Visualizer::doSaveVideo(true);
 
+    int numberofNodesReached = 0;
+
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+
+    siF_->doVelocityLogging(true);
+
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
 
         Edge e = feedback_[currentVertex];
 
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(e, currentVertex, goal) ) );
+        double succProb = evaluateSuccessProbability(e, currentVertex, goal);
+
+        OMPL_INFORM("FIRM: Moving from Vertex %u to %u with TP = %f", currentVertex, boost::target(e, g_), succProb);
+
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
         controller = edgeControllers_[e];
 
@@ -1017,7 +1061,7 @@ void FIRM::executeFeedback(void)
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
-         // get a copy of the true state
+        // get a copy of the true state
         ompl::base::State *tempTrueStateCopy = si_->allocState();
 
         siF_->getTrueState(tempTrueStateCopy);
@@ -1032,11 +1076,16 @@ void FIRM::executeFeedback(void)
 
         if(controllerStatus)
         {
+            numberofNodesReached++;
+
+            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+
             currentVertex = boost::target(e, g_);
         }
         else
         {
             Visualizer::doSaveVideo(false);
+            siF_->doVelocityLogging(false);
 
             //
             OMPL_INFORM("Controller stopped due to deviation, need to add new state at: ");
@@ -1051,6 +1100,7 @@ void FIRM::executeFeedback(void)
             solveDynamicProgram(goal);
 
             Visualizer::doSaveVideo(true);
+            siF_->doVelocityLogging(true);
 
         }
 
@@ -1066,6 +1116,20 @@ void FIRM::executeFeedback(void)
     writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
 
     writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory.csv", "successProbability");
+
+    writeTimeSeriesDataToFile("StandardFIRMNodesReachedHistory.csv","nodesReached");
+
+    std::vector<std::pair<double, double> > velLog;
+
+    siF_->getVelocityLog(velLog);
+
+    for(int i=0; i < velLog.size(); i++)
+    {
+        //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); //unicycle
+        velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
+    }
+
+    writeTimeSeriesDataToFile("StandardFIRMVelocityHistory.csv", "velocity");
 
 }
 
@@ -1107,7 +1171,11 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         Edge e = feedback_[currentVertex];
 
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(e, currentVertex, goal) ) );
+        double succProb = evaluateSuccessProbability(e, currentVertex, goal);
+
+        OMPL_INFORM("FIRM: Moving from Vertex %u to %u with TP = %f", currentVertex, boost::target(e, g_), succProb);
+
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
         controller = edgeControllers_[e];
 
@@ -1251,11 +1319,19 @@ void FIRM::executeFeedbackWithRollout(void)
 
     connectionStrategy_ = FStrategy<Vertex>(1.2*ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
 
+    int numberofNodesReached = 0;
+
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+
     // While the robot state hasn't reached the goal state, keep running
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
 
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_,evaluateSuccessProbability(e, tempVertex, goal) ) );
+        double succProb = evaluateSuccessProbability(e, tempVertex, goal);
+
+        OMPL_INFORM("FIRM: Moving from Vertex %u to %u with TP = %f", tempVertex, boost::target(e, g_), succProb);
+
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
         EdgeControllerType controller = edgeControllers_[e];
 
@@ -1289,9 +1365,17 @@ void FIRM::executeFeedbackWithRollout(void)
         // else do rollout
         if(stateProperty_[boost::target(e,g_)]->as<SE2BeliefSpace::StateType>()->isReached(cendState))
         {
+            numberofNodesReached++;
+
+            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+
             tempVertex = boost::target(e,g_);
+
             e = feedback_[tempVertex];
+
+            costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[tempVertex]));
         }
+
         else
         {
             siF_->doVelocityLogging(false);
@@ -1337,6 +1421,10 @@ void FIRM::executeFeedbackWithRollout(void)
 
     }
 
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+
+    OMPL_INFORM("FIRM: Number of nodes reached with Rollout: %u", numberofNodesReached);
+
     averageTimeForRolloutComputation = averageTimeForRolloutComputation / (1000*numberOfRollouts);
 
     std::ofstream outfile;
@@ -1353,14 +1441,20 @@ void FIRM::executeFeedbackWithRollout(void)
 
     writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory.csv", "successProbability");
 
+    writeTimeSeriesDataToFile("RolloutFIRMNodesReachedHistory.csv","nodesReached");
+
     std::vector<std::pair<double, double> > velLog;
 
     siF_->getVelocityLog(velLog);
 
     for(int i=0; i < velLog.size(); i++)
     {
-        std::cout<<"Velocity: "<<velLog[i].first <<" "<<velLog[i].second <<std::endl;
+        std::cout<<"Velocity: "<<velLog[i].first <<" "<<velLog[i].first <<std::endl;
+        velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
+        //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); // unicycle
     }
+
+    writeTimeSeriesDataToFile("RolloutFIRMVelocityHistory.csv", "velocity");
 
 }
 
@@ -1644,9 +1738,18 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
 
+    auto start_time_sampling = std::chrono::high_resolution_clock::now();
+
     policyGenerator_->sampleNewBeliefStates();
 
+    auto end_time_sampling = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to sample beliefs: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_sampling - start_time_sampling).count() << " milli seconds."<<std::endl;
+
+    std::cin.get();
+
     ompl::base::State *currentTrueState = siF_->allocState();
+
     siF_->getTrueState(currentTrueState);
 
     int counter = 0;
@@ -1656,6 +1759,8 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
     int timeSinceKidnap = 0;
 
     weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
+
+    auto start_time_recovery = std::chrono::high_resolution_clock::now();
 
     while(!policyGenerator_->isConverged())
     {
@@ -1704,7 +1809,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             if(policyGenerator_->isConverged())
                 break;
 
-            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
             timeSinceKidnap++;
 
@@ -1714,6 +1819,12 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
         }
 
     }
+
+    auto end_time_recovery = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to sample recover (exclude sampling): "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_recovery - start_time_recovery).count() << " milli seconds."<<std::endl;
+
+    std::cin.get();
 
     std::vector<ompl::base::State*> bstates;
 

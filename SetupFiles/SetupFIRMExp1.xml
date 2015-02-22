@@ -188,4 +188,7 @@
 	<FIRMNodes
 		minNodes = "20"
 	/>
+	<KidnappedState
+        x = 14.5 y = 37 theta = 1.57 
+    />
 </PlanningProblem>

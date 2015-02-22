@@ -212,6 +212,9 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     std::vector<ompl::geometric::PathGeometric> rrtPaths;
 
     // Iterate over the mode/target pairs and generate open loop controls
+
+    auto start_time_policygen = std::chrono::high_resolution_clock::now();
+
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
 
@@ -244,7 +247,8 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
                 rrtPaths.push_back(gpath);
 
                 Visualizer::addOpenLoopRRTPath(gpath);
-                boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+
+                //boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 
                 std::vector<ompl::control::Control*> olc;
 
@@ -267,14 +271,15 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
     OMPL_INFORM("Evaluating the Open Loop policies on all the modes");
 
-    boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    //boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
     Visualizer::doSaveVideo(false);
 
     for(unsigned int i = 0; i < openLoopPolicies.size(); i++)
     {
         ompl::base::Cost pGain;
 
-        pGain.v = 0;
+        pGain = ompl::base::Cost(0);
 
         for(unsigned int j = 0; j < currentBeliefStates_.size(); j++)
         {
@@ -283,19 +288,21 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
             ompl::base::Cost c = executeOpenLoopPolicyOnMode(openLoopPolicies[i],currentBeliefStates_[j]);
 
-            pGain.v += c.v;
+            //pGain.v += c.v;
+            pGain = ompl::base::Cost(pGain.value() + c.value());
 
         }
 
-        pGain.v = weights_[i]*pGain.v;
+        //pGain.v = weights_[i]*pGain.v;
+        pGain = ompl::base::Cost(weights_[i]*pGain.value());
 
-        OMPL_INFORM("MMPolicyGenerator: Weighted Information Gain for Policy #%u = %f",i,pGain.v);
+        OMPL_INFORM("MMPolicyGenerator: Weighted Information Gain for Policy #%u = %f",i,pGain.value());
 
         policyInfGains.push_back(pGain);
 
-        if(pGain.v >= maxGain)
+        if(pGain.value() >= maxGain)
         {
-            maxGain = pGain.v;
+            maxGain = pGain.value();
 
             maxGainPolicyIndx = i;
         }
@@ -319,11 +326,16 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
         Visualizer::addOpenLoopRRTPath(rrtPaths[maxGainPolicyIndx]);
 
     }
-
     else
     {
         policy = previousPolicy_;
     }
+
+    auto end_time_policygen = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to evaluate policy: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_policygen - start_time_policygen).count() << " milli seconds."<<std::endl;
+
+    //std::cin.get();
 
     si_->showRobotVisualization(true);
 
@@ -354,9 +366,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
 
     si_->setTrueState(state);
 
-    ompl::base::Cost olpInfGain;
-
-    olpInfGain.v = 0;
+    ompl::base::Cost olpInfGain(0);
 
     for(int i=0; i < controls.size() ; i++)
     {
@@ -366,7 +376,8 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
 
         if(!si_->checkTrueStateValidity()/*!areCurrentBeliefsValid()*/)
         {
-            olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1);
+            //olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1);
+            olpInfGain = ompl::base::Cost(olpInfGain.value() - ompl::magic::COLISSION_FAILURE_COST/(i+1));
             OMPL_INFORM("MMPolicyGenerator: Collided in sim");
             //std::cin.get();
             break;
@@ -386,7 +397,8 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
 
     OMPL_INFORM("The discrete change in number of modes: %f",  changeInNumberOfModes);
 
-    olpInfGain.v +=  changeInNumberOfModes;
+    //olpInfGain.v +=  changeInNumberOfModes;
+    olpInfGain = ompl::base::Cost(olpInfGain.value() + changeInNumberOfModes);
 
     // reset old weight values
     weights_ = weightsCopy;
@@ -434,19 +446,23 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, 
 
     }
 
+    /*
     if(!isSimulation)
     {
         OMPL_INFORM("MMPolicyGenerator: BEFORE updating weights in propogate: ");
         this->printWeights();
     }
+    */
 
     this->updateWeights(obs);
 
+    /*
     if(!isSimulation)
     {
         OMPL_INFORM("MMPolicyGenerator: AFTER updating weights in propogate: ");
         this->printWeights();
     }
+    */
 
     this->removeDuplicateModes();
 
