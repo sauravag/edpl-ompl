@@ -1069,8 +1069,8 @@ void FIRM::executeFeedback(void)
         if(!si_->isValid(tempTrueStateCopy))
         {
            OMPL_INFORM("Robot Collided :(");
-           exit(1);
-           return;
+           //exit(1);
+           //return;
         }
 
         currentTimeStep_ += stepsExecuted;
