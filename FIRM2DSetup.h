@@ -100,7 +100,6 @@ public:
         pdef_ = prblm;
 
         start_ = siF_->allocState();
-        goal_  = siF_->allocState();
 
         setup_ = false;
     }
@@ -133,23 +132,16 @@ public:
 
     }
 
-    void setGoalState(const double X, const double Y, const double Yaw)
+    void addGoalState(const double X, const double Y, const double Yaw)
     {
         ompl::base::State *temp = siF_->allocState();
 
         temp->as<StateType>()->setXYYaw(X,Y,Yaw);
 
-        siF_->copyState(goal_,temp);
-
-        siF_->freeState(temp);
+        goalList_.push_back(temp);
 
     }
 
-
-    void setStartAndGoalStates()
-    {
-        pdef_->setStartAndGoalStates(start_, goal_, 1.0);
-    }
 
     void setup()
     {
@@ -187,12 +179,12 @@ public:
             siF_->setStateValidityCheckingResolution(0.005);
             siF_->setMinMaxControlDuration(1,100);
 
-            if(!start_ || !goal_)
+            if(!start_ || goalList_.size() == 0)
             {
                 throw ompl::Exception("Start/Goal not set");
             }
 
-            this->setStartAndGoalStates();
+            pdef_->setStartAndGoalStates(start_, goalList_[0], 1.0);
 
             ompl::base::PlannerPtr plnr(new FIRM(siF_, false));
 
@@ -249,7 +241,33 @@ public:
             default:
 
                 planner_->as<FIRM>()->executeFeedback();
+
                 break;
+        }
+
+    }
+
+    void  Run(int choice = 0)
+    {
+
+        executeSolution(choice);
+
+        // Need a function to get terminated state
+        if(goalList_.size() > 1)
+        {
+            for(int i=0; i < goalList_.size()-1;i++)
+            {
+                pdef_->setStartAndGoalStates(goalList_[i], goalList_[i+1], 1.0);
+
+                planner_->setProblemDefinition(pdef_);
+
+                if(this->solve())
+                {
+                    executeSolution(choice);
+                }
+
+            }
+
         }
 
     }
@@ -269,6 +287,54 @@ protected:
     const ompl::base::State* getGeometricComponentStateInternal(const ompl::base::State *state, unsigned int /*index*/) const
     {
         return state;
+    }
+
+    void loadGoals()
+    {
+
+        using namespace arma;
+        // Load XML containing landmarks
+        TiXmlDocument doc(pathToSetupFile_);
+        bool loadOkay = doc.LoadFile();
+
+        if(!loadOkay)
+        {
+            printf( "Could not load setup file. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+
+            exit( 1 );
+        }
+
+        TiXmlNode* node = 0;
+        TiXmlElement* landmarkElement = 0;
+        TiXmlElement* itemElement = 0;
+
+        // Get the landmarklist node
+        node = doc.FirstChild( "GoalList" );
+        assert( node );
+        landmarkElement = node->ToElement(); //convert node to element
+        assert( landmarkElement  );
+
+        TiXmlNode* child = 0;
+
+        //Iterate through all the landmarks and put them into the "landmarks_" list
+        while( (child = landmarkElement ->IterateChildren(child)))
+        {
+            assert( child );
+            itemElement = child->ToElement();
+            assert( itemElement );
+
+            double goalX = 0 , goalY = 0, goalTheta = 0;
+
+            itemElement->QueryDoubleAttribute("x", &goalX);
+            itemElement->QueryDoubleAttribute("y", &goalY);
+            itemElement->QueryDoubleAttribute("theta", &goalTheta);
+
+            std::cout<<"Loaded Goal Pose X: "<<goalX<<" Y: "<<goalY<<" Theta: "<<goalTheta<<std::endl;
+
+            addGoalState(goalX, goalY, goalTheta);
+
+        }
+
     }
 
     void loadParameters()
@@ -344,6 +410,7 @@ protected:
         setStartState(startX, startY, startTheta);
 
         // Read the Goal Pose
+        /*
         child  = node->FirstChild("GoalPose");
         assert( child );
 
@@ -357,6 +424,7 @@ protected:
         itemElement->QueryDoubleAttribute("theta", &goalTheta);
 
         setGoalState(goalX, goalY, goalTheta);
+        */
 
         // read planning time
         child  = node->FirstChild("PlanningTime");
@@ -402,6 +470,8 @@ protected:
 
         kidnappedState_->as<SE2BeliefSpace::StateType>()->setXYYaw(kX, kY, kTheta);
 
+        loadGoals();
+
         OMPL_INFORM("Problem configuration is");
 
         std::cout<<"Path to environment mesh: "<<environmentFilePath<<std::endl;
@@ -409,8 +479,6 @@ protected:
         std::cout<<"Path to robot mesh: "<<robotFilePath<<std::endl;
 
         std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
-
-        std::cout<<"Goal Pose X: "<<goalX<<" Y: "<<goalY<<" Theta: "<<goalTheta<<std::endl;
 
         std::cout<<"Planning Time: "<<planningTime_<<" seconds"<<std::endl;
 
@@ -424,7 +492,7 @@ private:
 
     ompl::base::State *start_;
 
-    ompl::base::State *goal_;
+    std::vector<ompl::base::State*> goalList_;
 
     ompl::base::State *kidnappedState_;
 
