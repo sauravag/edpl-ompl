@@ -86,6 +86,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return covariance_;
             }
 
+
             /** \brief Set the X component of the state */
             void setX(double x)
             {

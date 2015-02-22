@@ -102,9 +102,6 @@ double SE2BeliefSpace::distance(const State* state1, const State *state2)
     double dx = state1->as<StateType>()->getX() - state2->as<StateType>()->getX();
     double dy = state1->as<StateType>()->getY() - state2->as<StateType>()->getY();
 
-    std::cout<<"Getting distance :"<<std::endl;
-    std::cin.get();
-
     return pow(dx*dx+dy*dy, 0.5);
 }
 void SE2BeliefSpace::getRelativeState(const State *from, const State *to, State *state)
