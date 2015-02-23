@@ -55,16 +55,16 @@ public:
     {
         // set static variables
         RHCICreate::setControlQueueSize(5);
-        RHCICreate::setTurnOnlyDistance(0.05);
+        RHCICreate::setTurnOnlyDistance(0.01);
         Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(0.1); // degrees
         Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.01);// meters
-        Controller<RHCICreate, ExtendedKF>::setMaxTries(200);
+        Controller<RHCICreate, ExtendedKF>::setMaxTries(120);
         Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(4.0); // meters
 
         // setting the mean and norm weights (used in reachability check)
         StateType::covNormWeight_  =  1.0;
         StateType::meanNormWeight_ =  2.0;
-        StateType::reachDist_ =  0.05;
+        StateType::reachDist_ =  0.01;
 
         // set the state component norm weights
         arma::colvec normWeights(3);

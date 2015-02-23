@@ -113,24 +113,58 @@ void OmnidirectionalMotionModel::generateOpenLoopControls(const ompl::base::Stat
 
     translation_steps = ceil(fabs(delta_disp/(maxLinearVelocity_*this->dt_)));
 
-    // required angular velocity to orient to target state in calculated number of steps
-    double omega = delta_theta / (translation_steps*this->dt_)  ;
-
-    // checking to see if required angular velocity is within limits
-    //assert(abs(omega) < maxAngularVelocity_);
-
-    colvec u_const_rot;
-    u_const_rot << maxLinearVelocity_*cos(theta_p) << endr
-                << maxLinearVelocity_*sin(theta_p) << endr
-                << omega << endr;
-
-    for(int i=0; i<translation_steps; i++)
+    // If finite number of translation steps required
+    if(translation_steps > 0)
     {
-      ompl::control::Control *tempControl = si_->allocControl();
-      ARMA2OMPL(u_const_rot, tempControl);
-      openLoopControls.push_back(tempControl);
-    }
 
+        // required angular velocity to orient to target state in calculated number of steps
+        double omega = delta_theta / (translation_steps*this->dt_)  ;
+
+        // checking to see if required angular velocity is within limits
+        //assert(abs(omega) < maxAngularVelocity_);
+
+        colvec u_const_rot;
+        u_const_rot << maxLinearVelocity_*cos(theta_p) << endr
+                    << maxLinearVelocity_*sin(theta_p) << endr
+                    << omega << endr;
+
+        for(int i=0; i<translation_steps; i++)
+        {
+          ompl::control::Control *tempControl = si_->allocControl();
+          ARMA2OMPL(u_const_rot, tempControl);
+          openLoopControls.push_back(tempControl);
+        }
+    }
+    else // If only change in heading required
+    {
+        // required angular velocity to orient to target state in calculated number of steps
+        int rotation_steps = ceil(abs(delta_theta / maxAngularVelocity_* this->dt_));
+
+        if(rotation_steps> 0)
+        {
+            double omega =  maxAngularVelocity_*(delta_theta/abs(delta_theta));
+
+            // checking to see if required angular velocity is within limits
+            //assert(abs(omega) < maxAngularVelocity_);
+
+            colvec u_const_rot;
+            u_const_rot << 0 << endr
+                        << 0 << endr
+                        << omega << endr;
+
+            for(int i=0; i<rotation_steps; i++)
+            {
+              ompl::control::Control *tempControl = si_->allocControl();
+              ARMA2OMPL(u_const_rot, tempControl);
+              openLoopControls.push_back(tempControl);
+            }
+        }
+        else
+        {
+            openLoopControls.push_back(this->getZeroControl());
+        }
+
+    }
 
 }
 

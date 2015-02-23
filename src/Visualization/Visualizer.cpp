@@ -291,7 +291,7 @@ void Visualizer::refresh()
             // draw the rollout connection with lowest cost
             if(chosenRolloutConnection_)
             {
-                glColor3d(0.0 , 1.0 , 0.0);
+                glColor3d(1.0 , 0.0 , 0.0);
                 glLineWidth(3.0);
                     drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
                 glLineWidth(1.0);
@@ -481,11 +481,11 @@ void Visualizer::drawRobotPath()
     if(robotPath_.size()>=2)
     {
         glDisable(GL_LIGHTING);
-        glColor3d(0.0 , 1.0 , 1.0);
+        glColor3d(0.0 , 1.0 , 0);
 
         for(int i=0; i<robotPath_.size()-1;i++)
         {
-            glColor3d(0.0 , 1.0 , 1.0);
+            glColor3d(0.0 , 1.0 , 0);
 
             glLineWidth(4.0);
                 drawEdge(robotPath_[i],robotPath_[i+1]);

@@ -542,6 +542,10 @@ private:
 
     int currentTimeStep_;
 
+    int numberofNodesReached_;
+
+    double executionCost_;
+
     std::string logFilePath_;
 
 };

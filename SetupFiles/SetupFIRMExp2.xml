@@ -208,12 +208,12 @@
 	<OmnidirectionalMotionModel 
 		sigmaV="0.02"
 		etaV="0.01"
-        sigmaOmega="0.008"
-        etaOmega="0.005"
+        sigmaOmega="0.05"
+        etaOmega="0.01"
 		P_Wg_filename=""
 		orbit_radius=5.0
-		wind_noise_pos="0.0001"
-		wind_noise_ang="0.0001" 
+		wind_noise_pos="0.000001"
+		wind_noise_ang="0.000001" 
 		min_linear_velocity= 0.5
 		max_linear_velocity= 0.5
 		max_angular_velocity= 0.60
@@ -245,8 +245,8 @@
     />
 </PlanningProblem>
 <GoalList>
-	<GoalPose x = "18.5" y = "1" theta = "0" />
-	<GoalPose x = "1.5" y = "10" theta = "1.57" />
+	<GoalPose x = "18.3" y = "0.88" theta = "-1.0" />
+	<GoalPose x = "1.5" y = "9" theta = "1.57" />
 	<GoalPose x = "15.0" y = "18.1" theta = "0" />
 	<GoalPose x = "6" y = "4" theta = "0" />
 </GoalList>

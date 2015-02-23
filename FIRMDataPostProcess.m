@@ -7,38 +7,40 @@ clc;
 clear all;
 close all;
 
+path = './PlannerDataLog/Feb23Data/';
+
 % Read rollout data
-M_rolloutcost = csvread('RolloutFIRMCostHistory.csv');
+M_rolloutcost = csvread([path,'RolloutFIRMCostHistory.csv']);
 t_rolloutcost = M_rolloutcost(:,1);
 val_rolloutcost = M_rolloutcost(:,2);
 
-M_rolloutnodesreached = csvread('RolloutFIRMNodesReachedHistory.csv');
+M_rolloutnodesreached = csvread([path,'RolloutFIRMNodesReachedHistory.csv']);
 t_rolloutnodes = M_rolloutnodesreached(:,1);
 val_rolloutnodes = M_rolloutnodesreached(:,2);
 
-M_rolloutsp = csvread('RolloutFIRMSuccessProbabilityHistory.csv');
+M_rolloutsp = csvread([path,'RolloutFIRMSuccessProbabilityHistory.csv']);
 t_rolloutsp = M_rolloutsp(:,1);
 val_rolloutsp = M_rolloutsp(:,2);
 
-M_rolloutV = csvread('RolloutFIRMVelocityHistory.csv');
+M_rolloutV = csvread([path,'RolloutFIRMVelocityHistory.csv']);
 t_rolloutV = M_rolloutV(:,1);
 val_rolloutV = M_rolloutV(:,2);
 
 % Read standard FIRM data
 
-M_firmcost = csvread('StandardFIRMCostHistory.csv');
+M_firmcost = csvread([path,'StandardFIRMCostHistory.csv']);
 t_firmcost = M_firmcost(:,1);
 val_firmcost = M_firmcost(:,2);
 
-M_firmnodesreached = csvread('StandardFIRMNodesReachedHistory.csv');
+M_firmnodesreached = csvread([path,'StandardFIRMNodesReachedHistory.csv']);
 t_firmnodes = M_firmnodesreached(:,1);
 val_firmnodes = M_firmnodesreached(:,2);
 
-M_firmsp = csvread('StandardFIRMSuccessProbabilityHistory.csv');
+M_firmsp = csvread([path,'StandardFIRMSuccessProbabilityHistory.csv']);
 t_firmsp = M_firmsp(:,1);
 val_firmsp = M_firmsp(:,2);
 
-M_firmV = csvread('StandardFIRMVelocityHistory.csv');
+M_firmV = csvread([path,'StandardFIRMVelocityHistory.csv']);
 t_firmV = M_firmV(:,1);
 val_firmV = M_firmV(:,2);
 

@@ -137,6 +137,12 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     currentTimeStep_ = 0;
 
+    numberofNodesReached_ = 0;
+
+    executionCost_ = 0;
+
+    costToGoHistory_.push_back(std::make_pair(currentTimeStep_,executionCost_));
+
     policyGenerator_ = new MMPolicyGenerator(si);
 
     loadedRoadmapFromFile_ = false;
@@ -1031,19 +1037,15 @@ void FIRM::executeFeedback(void)
 
     OMPL_INFORM("FIRM: Running policy execution");
 
-    currentTimeStep_ = 0;
-
     Visualizer::doSaveVideo(true);
 
-    int numberofNodesReached = 0;
-
-    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
     siF_->doVelocityLogging(true);
 
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
-        costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
+        //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
 
         Edge e = feedback_[currentVertex];
 
@@ -1063,6 +1065,10 @@ void FIRM::executeFeedback(void)
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
+        executionCost_ += cost.value();
+
+        costToGoHistory_.push_back(std::make_pair(currentTimeStep_,executionCost_));
+
         // get a copy of the true state
         ompl::base::State *tempTrueStateCopy = si_->allocState();
 
@@ -1079,9 +1085,9 @@ void FIRM::executeFeedback(void)
 
         if(controllerStatus)
         {
-            numberofNodesReached++;
+            numberofNodesReached_++;
 
-            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
             currentVertex = boost::target(e, g_);
         }
@@ -1114,7 +1120,7 @@ void FIRM::executeFeedback(void)
 
     }
 
-    costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
+    //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
     writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
 
@@ -1164,13 +1170,11 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     int kidnappingCounter  = 0;
 
-    currentTimeStep_ = 0;
-
     Visualizer::doSaveVideo(true);
 
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)/*currentVertex != goal*/)
     {
-        costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
+        //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
 
         Edge e = feedback_[currentVertex];
 
@@ -1182,13 +1186,17 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         controller = edgeControllers_[e];
 
-        ompl::base::Cost cost;
+        ompl::base::Cost cost(0);
 
         int stepsExecuted = 0;
 
         int stepsToStop = 0;
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
+
+        executionCost_ += cost.value();
+
+        costToGoHistory_.push_back(std::make_pair(currentTimeStep_,executionCost_));
 
          // get a copy of the true state
         ompl::base::State *tempTrueStateCopy = si_->allocState();
@@ -1271,7 +1279,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     }
 
-    costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
+    //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
     //writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
 
@@ -1310,9 +1318,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     si_->printState(goalState);
 
-    currentTimeStep_ = 0;
-
-    costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[start]));
+    //costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[start]));
 
     double averageTimeForRolloutComputation = 0;
 
@@ -1322,9 +1328,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     connectionStrategy_ = FStrategy<Vertex>(1.2*ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
 
-    int numberofNodesReached = 0;
-
-    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
     // While the robot state hasn't reached the goal state, keep running
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
@@ -1352,6 +1356,10 @@ void FIRM::executeFeedbackWithRollout(void)
 
         controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT, cstartState, cendState, cost, stepsExecuted, false);
 
+        executionCost_ += cost.value();
+
+        costToGoHistory_.push_back(std::make_pair(currentTimeStep_, executionCost_));
+
         ompl::base::State *tState = si_->allocState();
 
         siF_->getTrueState(tState);
@@ -1368,15 +1376,15 @@ void FIRM::executeFeedbackWithRollout(void)
         // else do rollout
         if(stateProperty_[boost::target(e,g_)]->as<SE2BeliefSpace::StateType>()->isReached(cendState))
         {
-            numberofNodesReached++;
+            numberofNodesReached_++;
 
-            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
             tempVertex = boost::target(e,g_);
 
             e = feedback_[tempVertex];
 
-            costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[tempVertex]));
+            //costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[tempVertex]));
         }
 
         else
@@ -1424,9 +1432,9 @@ void FIRM::executeFeedbackWithRollout(void)
 
     }
 
-    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached) );
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
-    OMPL_INFORM("FIRM: Number of nodes reached with Rollout: %u", numberofNodesReached);
+    OMPL_INFORM("FIRM: Number of nodes reached with Rollout: %u", numberofNodesReached_);
 
     averageTimeForRolloutComputation = averageTimeForRolloutComputation / (1000*numberOfRollouts);
 
@@ -1438,7 +1446,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     outfile.close();
 
-    costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
+    //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
     writeTimeSeriesDataToFile("RolloutFIRMCostHistory.csv", "costToGo");
 
@@ -1553,7 +1561,7 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
 
     }
 
-    costToGoHistory_.push_back(std::make_pair(currentTimeStep_,minCost));
+    //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,minCost));
 
     return edgeToTake;
 }
