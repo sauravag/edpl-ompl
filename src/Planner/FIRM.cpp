@@ -1049,6 +1049,10 @@ void FIRM::executeFeedback(void)
 
         Edge e = feedback_[currentVertex];
 
+        assert(currentVertex != boost::target(e, g_));
+
+        OMPL_INFORM("FIRM: Moving from Vertex %u to %u", currentVertex, boost::target(e, g_));
+
         double succProb = evaluateSuccessProbability(e, currentVertex, goal);
 
         OMPL_INFORM("FIRM: Moving from Vertex %u to %u with TP = %f", currentVertex, boost::target(e, g_), succProb);
