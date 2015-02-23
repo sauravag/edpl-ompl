@@ -141,6 +141,8 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     loadedRoadmapFromFile_ = false;
 
+    makeDataLogPath();
+
 }
 
 FIRM::~FIRM(void)
@@ -1069,8 +1071,8 @@ void FIRM::executeFeedback(void)
         if(!si_->isValid(tempTrueStateCopy))
         {
            OMPL_INFORM("Robot Collided :(");
-           //exit(1);
-           //return;
+
+           return;
         }
 
         currentTimeStep_ += stepsExecuted;
@@ -1450,7 +1452,6 @@ void FIRM::executeFeedbackWithRollout(void)
 
     for(int i=0; i < velLog.size(); i++)
     {
-        std::cout<<"Velocity: "<<velLog[i].first <<" "<<velLog[i].first <<std::endl;
         velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
         //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); // unicycle
     }

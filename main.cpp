@@ -45,7 +45,6 @@
 #include <iostream>
 #include <istream>
 
-
 using namespace std;
 
 void plan()
@@ -103,6 +102,8 @@ void plan()
 
 int main(int argc, char *argv[])
 {
+
+
     srand(239645);
 
     arma_rng::set_seed(239645);

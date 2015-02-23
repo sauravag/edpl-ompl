@@ -212,7 +212,7 @@
         etaOmega="0.005"
 		P_Wg_filename=""
 		orbit_radius=5.0
-		wind_noise_pos="0.001"
+		wind_noise_pos="0.0001"
 		wind_noise_ang="0.0001" 
 		min_linear_velocity= 0.5
 		max_linear_velocity= 0.5

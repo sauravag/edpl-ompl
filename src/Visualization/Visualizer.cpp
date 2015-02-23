@@ -282,6 +282,8 @@ void Visualizer::refresh()
 
         case RolloutMode:
 
+            drawGraphBeliefNodes();
+
             drawRolloutConnections();
 
             drawMostLikelyPath();

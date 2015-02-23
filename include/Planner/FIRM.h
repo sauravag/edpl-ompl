@@ -44,6 +44,8 @@
 #include <boost/pending/disjoint_sets.hpp>
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/date_time.hpp>
 #include <utility>
 #include <vector>
 #include <map>
@@ -436,12 +438,32 @@ protected:
     /** \brief Send the most likely path to visualizer based on start location*/
     void sendMostLikelyPathToViz(const Vertex start, const Vertex goal);
 
+    void makeDataLogPath()
+    {
+
+        namespace pt = boost::posix_time;
+
+        pt::ptime now = pt::second_clock::local_time();
+
+        std::string timeStamp(to_iso_string(now)) ;
+
+        std::string folderPath = "./PlannerDataLog/FIRMData-" + timeStamp ;
+
+        boost::filesystem::path dir(folderPath);
+
+        boost::filesystem::create_directory(dir);
+
+        logFilePath_ = folderPath + "/";
+
+    }
+
     /** \brief Writes a time series data to a file */
     void writeTimeSeriesDataToFile(std::string fname, std::string dataName)
     {
+
         std::ofstream outfile;
 
-        outfile.open(fname);
+        outfile.open(logFilePath_ + fname);
 
         if(dataName.compare("costToGo")==0)
         {
@@ -519,6 +541,8 @@ private:
     std::vector<std::pair<int, double> > velocityHistory_;
 
     int currentTimeStep_;
+
+    std::string logFilePath_;
 
 };
 

@@ -36,6 +36,8 @@
 					<Add library="/usr/local/lib/libompl.so" />
 					<Add library="/usr/local/lib/libompl_app.so" />
 					<Add library="/usr/local/lib/libompl_app_base.so" />
+					<Add library="/usr/lib/libboost_date_time.a" />
+					<Add library="/usr/lib/libboost_filesystem.a" />
 					<Add directory="/usr/local/lib" />
 					<Add directory="/usr/lib/x86_64-linux-gnu" />
 					<Add directory="/usr/lib" />

@@ -2934,8 +2934,8 @@
     <edge startVertexID="115" endVertexID="223" successProb="1" cost="0.0240102" />
     <edge startVertexID="223" endVertexID="41" successProb="1" cost="0.0258977" />
     <edge startVertexID="41" endVertexID="223" successProb="1" cost="0.0218552" />
-    <edge startVertexID="223" endVertexID="31" successProb="0.5" cost="0.0310507" />
-    <edge startVertexID="31" endVertexID="223" successProb="0.5" cost="0.0291911" />
+    <edge startVertexID="223" endVertexID="31" successProb="0.75" cost="0.0310507" />
+    <edge startVertexID="31" endVertexID="223" successProb="0.70" cost="0.0291911" />
     <edge startVertexID="224" endVertexID="138" successProb="0.25" cost="0.0394212" />
     <edge startVertexID="138" endVertexID="224" successProb="1" cost="0.0405738" />
     <edge startVertexID="224" endVertexID="212" successProb="1" cost="0.0488646" />
