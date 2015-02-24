@@ -160,6 +160,8 @@
 <landmark id = 166 x = 6.0 y = 13.5 theta = 0.0 />
 <landmark id = 167 x = 6.0 y = 16.0 theta = 0.0 />
 <landmark id = 168 x = 6.0 y = 16.5 theta = 0.0 />
+<landmark id = 169 x = 19.5 y = 3.2 theta = 0.0 />
+<landmark id = 170 x = 19.5 y = 3.4 theta = 0.0 />
 </LandmarkList>
 <ObservationModels>
 	<CamAruco2DObservationModel
@@ -208,12 +210,12 @@
 	<OmnidirectionalMotionModel 
 		sigmaV="0.02"
 		etaV="0.01"
-        sigmaOmega="0.05"
-        etaOmega="0.01"
+        sigmaOmega="0.008"
+        etaOmega="0.005"
 		P_Wg_filename=""
 		orbit_radius=5.0
 		wind_noise_pos="0.000001"
-		wind_noise_ang="0.000001" 
+		wind_noise_ang="0.00001" 
 		min_linear_velocity= 0.5
 		max_linear_velocity= 0.5
 		max_angular_velocity= 0.60
@@ -230,12 +232,12 @@
 		robotFile = "./Models/iRobot.obj"
 	/>
 	<StartPose
-		x = "3"
-		y = "18.0"
+		x = "1.2"
+		y = "15.20"
 		theta = "0"
 	/>
 	<PlanningTime
-		maxTime = "1000"
+		maxTime = "600"
 	/>
 	<FIRMNodes
 		minNodes = "100"
@@ -245,8 +247,8 @@
     />
 </PlanningProblem>
 <GoalList>
-	<GoalPose x = "18.3" y = "0.88" theta = "-1.0" />
-	<GoalPose x = "1.5017" y = "9.1141" theta = "-1.0" />
-	<GoalPose x = "15.0" y = "18.1" theta = "0" />
-	<GoalPose x = "6" y = "4" theta = "0" />
+	<GoalPose x = "16.5" y = "16.0" theta = "-1.0" />
+	<GoalPose x = "5.0" y = "5.1141" theta = "-1.0" />
+	<GoalPose x = "19.2" y = "3.0" theta = "0" />
+	<GoalPose x = "10" y = "11" theta = "0" />
 </GoalList>

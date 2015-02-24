@@ -98,6 +98,8 @@ void plan()
 
     delete mySetup;
 
+    OMPL_INFORM("Execution Terminated, Close Terminal");
+
 }
 
 int main(int argc, char *argv[])

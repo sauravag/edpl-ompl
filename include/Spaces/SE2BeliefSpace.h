@@ -135,7 +135,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             }
 
             /** \brief Checks if the input state has stabilized to this state (node reachability check) */
-            bool isReached(ompl::base::State *state) const;
+            bool isReached(ompl::base::State *state, bool relaxedConstraint=false) const;
 
             static double meanNormWeight_, covNormWeight_, reachDist_;
 
@@ -188,49 +188,3 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
 
 };
 #endif
-
-/*
-  BeliefSpace(const SE2StateSpace& state = SE2StateSpace(),
-                const arma::mat& covariance = arma::zeros<arma::mat>(0,0),
-                double reachDist = 0.0,
-                size_t controllerID = -1);
-
-  GaussianBelief& operator-=(const GaussianBelief& b);
-  GaussianBelief operator-(const GaussianBelief& b) const;
-  GaussianBelief operator-() const;
-
-  bool operator==(const GaussianBelief& b) const;
-
-  virtual bool equalStates
-
-  //virtual const string GetName() const {return "GaussianBelief";}
-
-  //template<class DistanceMetricPointer>
-  //void GetRandomRay(double _incr, Environment* _env,  DistanceMetricPointer _dm, bool _norm=true);
-
-  size_t GetControllerID() const {return controllerID_;}
-  void SetControllerID(size_t id){controllerID_ = id;}
-
-  void SetCovariance(const arma::mat& covariance) {covariance_ = covariance;}
-
-  const arma::mat& GetCovariance() const {return covariance_;}
-
-  double Norm();
-
-  bool IsReached(const GaussianBelief& b) const;
-
-  //void Draw();
-
-  static double meanNormWeight_, covNormWeight_;
-
-  //virtual ostream& Write(ostream& _os) {return (_os << *this);}
-
-  //I/O
-  //friend ostream& operator<< (ostream&, const GaussianBelief& _gb);
-  //friend istream& operator>> (istream&, GaussianBelief& _gb);
-
-private:
-  arma::mat covariance_;
-  double reachDist_;
-  size_t controllerID_;
-*/

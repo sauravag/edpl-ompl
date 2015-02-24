@@ -7,7 +7,7 @@ clc;
 clear all;
 close all;
 
-path = './PlannerDataLog/Feb23Data/';
+path = './PlannerDataLog/Feb24DataV2/';
 
 % Read rollout data
 M_rolloutcost = csvread([path,'RolloutFIRMCostHistory.csv']);

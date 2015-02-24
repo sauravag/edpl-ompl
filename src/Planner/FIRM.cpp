@@ -1047,9 +1047,12 @@ void FIRM::executeFeedback(void)
     {
         //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
 
+        if(currentVertex==goal)
+            break;
+
         Edge e = feedback_[currentVertex];
 
-        assert(currentVertex != boost::target(e, g_));
+        assert(currentVertex < boost::num_vertices(g_));
 
         OMPL_INFORM("FIRM: Moving from Vertex %u to %u", currentVertex, boost::target(e, g_));
 
@@ -1144,6 +1147,8 @@ void FIRM::executeFeedback(void)
 
     writeTimeSeriesDataToFile("StandardFIRMVelocityHistory.csv", "velocity");
 
+    Visualizer::doSaveVideo(false);
+
 }
 
 void FIRM::executeFeedbackWithKidnapping(void)
@@ -1179,6 +1184,9 @@ void FIRM::executeFeedbackWithKidnapping(void)
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)/*currentVertex != goal*/)
     {
         //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
+
+        if(currentVertex==goal)
+            break;
 
         Edge e = feedback_[currentVertex];
 
@@ -1289,6 +1297,8 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     //writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory", "successProbability");
 
+    Visualizer::doSaveVideo(false);
+
 }
 
 void FIRM::executeFeedbackWithRollout(void)
@@ -1335,7 +1345,7 @@ void FIRM::executeFeedbackWithRollout(void)
     nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
     // While the robot state hasn't reached the goal state, keep running
-    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
+    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState, true))
     {
 
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
@@ -1378,7 +1388,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
         // If the robot has already reached a FIRM node then take feedback edge
         // else do rollout
-        if(stateProperty_[boost::target(e,g_)]->as<SE2BeliefSpace::StateType>()->isReached(cendState))
+        if(stateProperty_[boost::target(e,g_)]->as<SE2BeliefSpace::StateType>()->isReached(cendState, true))
         {
             numberofNodesReached_++;
 
@@ -1469,6 +1479,9 @@ void FIRM::executeFeedbackWithRollout(void)
     }
 
     writeTimeSeriesDataToFile("RolloutFIRMVelocityHistory.csv", "velocity");
+
+    Visualizer::doSaveVideo(false);
+
 
 }
 
