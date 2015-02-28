@@ -265,6 +265,12 @@ class Visualizer
             renderGeom_ = new ompl::app::RenderGeometry(rbg,se);
         }
 
+        static void clearRobotPath()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            robotPath_.clear();
+        }
+
         /** \brief Draw a single landmark that is passed to this function */
         static void drawLandmark(arma::colvec& landmark);
 

@@ -7,7 +7,7 @@ clc;
 clear all;
 close all;
 
-path = './PlannerDataLog/Feb24DataV2/';
+path = '/home/sauravagarwal/Dropbox/RHC-FIRM-iCreate-Journal/DATA-Sims/RolloutPaperDatav2/';
 
 % Read rollout data
 M_rolloutcost = csvread([path,'RolloutFIRMCostHistory.csv']);
@@ -54,21 +54,21 @@ plot(t_firmcost,val_firmcost,'b',t_rolloutcost,val_rolloutcost,'g');
 legend('FIRM', 'FIRM with Rollout');
 ylabel('Cost');
 xlabel('Time');
-saveas(1,'Results/CostComparison.jpg');
+saveas(1,[path,'CostComparison.png']);
 
 figure(2)
 plot(t_firmnodes,val_firmnodes,'b',t_rolloutnodes,val_rolloutnodes,'g');
 legend('FIRM', 'FIRM with Rollout');
 ylabel('Number of Stabilizations');
 xlabel('Time');
-saveas(2,'Results/NodesReachedComparison.jpg');
+saveas(2,[path,'NodesReachedComparison.png']);
 
 figure(3)
 plot(t_firmsp,val_firmsp,'b',t_rolloutsp,val_rolloutsp,'g');
 legend('FIRM', 'FIRM with Rollout');
 ylabel('Success Probability');
 xlabel('Time');
-saveas(3,'Results/SuccessProbComparison.jpg');
+saveas(3,[path,'SuccessProbComparison.png']);
 
 figure(4)
 plot(t_firmV,val_firmV,'b',t_rolloutV,val_rolloutV,'g');
@@ -76,7 +76,7 @@ legend('FIRM', 'FIRM with Rollout');
 ylabel('Velocity (m/s)');
 ylim([-0.1 0.6]);
 xlabel('Time');
-saveas(4,'Results/VelocityComparison.jpg');
+saveas(4,[path, 'VelocityComparison.png']);
 
 
 

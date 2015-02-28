@@ -693,7 +693,9 @@ ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Verte
         counter++; // the maximum number of nodes that robot can pass through is the total number of nodes
 
         if(counter > boost::num_vertices(g_))
+        {
             OMPL_ERROR("There is no feedback to guide robot to goal. Maybe DP did not converge.");
+        }
 
     }
 
@@ -1304,6 +1306,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 void FIRM::executeFeedbackWithRollout(void)
 {
     Visualizer::setMode(Visualizer::VZRDrawingMode::RolloutMode);
+    Visualizer::clearRobotPath();
 
     const Vertex start = startM_[0];
     const Vertex goal  = goalM_[0] ;

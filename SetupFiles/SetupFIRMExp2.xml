@@ -247,7 +247,7 @@
     />
 </PlanningProblem>
 <GoalList>
-	<GoalPose x = "16.5" y = "16.0" theta = "-1.0" />
+	<GoalPose x = "16.5" y = "15.9" theta = "-1.0" />
 	<GoalPose x = "5.0" y = "5.1141" theta = "-1.0" />
 	<GoalPose x = "19.2" y = "3.0" theta = "0" />
 	<GoalPose x = "10" y = "11" theta = "0" />
