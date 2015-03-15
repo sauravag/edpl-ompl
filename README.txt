@@ -23,7 +23,9 @@ References:
 
 2. A. Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan, Suman Chakravorty, Daniel Tomkins, Jory Denny, Nancy Amato, "Robust Online Belief Space Planning in Changing Environments: Application to Physical Mobile Robots," In Proc. IEEE Int. Conf. Robot. Autom. (ICRA), Hong Kong, China, May 2014.
 
-3. ompl.kavrakilab.org : OMPL documentation and code
+3. http://edplab.org :  Estimation, Decision and Planning Lab Webpage (related work)
+
+4. ompl.kavrakilab.org : OMPL documentation and code
 
 ----------------------------------------
 Compilation
