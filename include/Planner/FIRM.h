@@ -322,8 +322,8 @@ protected:
     /** \brief Generates the edge controller that drives the robot from start to end of edge */
     virtual void generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, EdgeControllerType &edgeController);
 
-    /** \brief Generates the node controller that stabilizes the robot to the node */
-    virtual void generateNodeController(const ompl::base::State *state, NodeControllerType &nodeController);
+    /** \brief Generates the node controller that stabilizes the robot to the node and sets the stationary covariance at the node. */
+    virtual void generateNodeController(ompl::base::State *state, NodeControllerType &nodeController);
 
     /** \brief Solves the dynamic program to return a feedback policy */
     virtual void solveDynamicProgram(const Vertex goalVertex);

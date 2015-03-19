@@ -71,10 +71,10 @@ namespace ompl
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-        static const double NUM_MONTE_CARLO_PARTICLES = 4; // 10 for FIRM, 4 for rollout
+        static const double NUM_MONTE_CARLO_PARTICLES = 4; // minimum 10 for FIRM, 4 for rollout
 
-        /** \brief For a node that is not observable, use a high covariance */
-        static const double NON_OBSERVABLE_NODE_COVARIANCE = 10.0;
+        /** \brief For a node that is not observable, use a fixed covariance */
+        static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1;
 
         /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
         static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
@@ -373,7 +373,7 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                         stateStable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
                                 ls.getM() * ls.getR() * trans(ls.getM()), S );
 
-                        workState->as<SE2BeliefSpace::StateType>()->setCovariance(S);
+                        //workState->as<SE2BeliefSpace::StateType>()->setCovariance(S);
                     }
                     catch(int e)
                     {
@@ -575,6 +575,12 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     boost::mutex::scoped_lock _(graphMutex_);
 
+    // First construct a node stabilizer controller
+    NodeControllerType nodeController;
+
+    generateNodeController(state, nodeController); // Generating the node controller at sampled state, this will set stationary covariance at node
+
+    // Now add belief state to graph as FIRM node
     Vertex m;
 
     m = boost::add_vertex(g_);
@@ -582,9 +588,8 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     addStateToVisualization(state);
 
     stateProperty_[m] = state;
-    NodeControllerType nodeController;
-    generateNodeController(state, nodeController); // Generate the node controller
-    nodeControllers_[m] = nodeController; // Add it to the list
+
+    nodeControllers_[m] = nodeController;
 
     totalConnectionAttemptsProperty_[m] = 1;
     successfulConnectionAttemptsProperty_[m] = 0;
@@ -815,7 +820,7 @@ void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::ba
     edgeController =  ctrlr;
 }
 
-void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeControllerType &nodeController)
+void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeControllerType &nodeController)
 {
     // Create a copy of the node state
     ompl::base::State *node = si_->allocState();
@@ -834,6 +839,7 @@ void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeCont
 
         // set the covariance
         node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
 
         // create a node controller
         std::vector<ompl::control::Control*> dummyControl;
@@ -846,9 +852,13 @@ void FIRM::generateNodeController(const ompl::base::State *state, FIRM::NodeCont
 
     else
     {
-        // Compute a high stationary cov at node state
+        // set a high stationary cov at node state
         int stateDim = si_->getStateDimension();
         arma::mat stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
+
+        // set the covariance
+        node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
 
         // create a node controller
         std::vector<ompl::control::Control*> dummyControl;
@@ -1677,8 +1687,6 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 
             m = boost::add_vertex(g_);
 
-            addStateToVisualization(newState);
-
             stateProperty_[m] = newState;
 
             NodeControllerType nodeController;
@@ -1693,6 +1701,8 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
             nn_->add(m);
 
             policyGenerator_->addFIRMNodeToObservationGraph(newState);
+
+            addStateToVisualization(newState);
 
             assert(m==FIRMNodePosList[i].first && "IDS DONT MATCH !!");
         }

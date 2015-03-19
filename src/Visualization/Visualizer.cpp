@@ -207,9 +207,17 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
         int nPoints = pos.n_rows;
 
-        try
+
+        mat cholDecomp;
+
+        bool cholSucceeded = chol(cholDecomp, covariance.submat(0,0,1,1));
+
+        glLineWidth(2.0);
+
+        if(cholSucceeded)
         {
-            mat K = trans(chol(covariance.submat(0,0,1,1)));
+            mat K = trans(cholDecomp);
+
             mat shift;
 
             shift = join_cols((ones(1,nPoints)*x[0]),(ones(1,nPoints)*x[1]));
@@ -229,10 +237,8 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
             glPopMatrix();
         }
-        catch(int e)
-        {
-            OMPL_INFORM("Visualizer: Covariance cholesky did not converge...proceeding");
-        }
+
+        glLineWidth(1.0);
 
     }
 
@@ -443,7 +449,7 @@ void Visualizer::drawFeedbackEdges()
         maxCost = std::max(maxCost, i->cost);
     }
 
-    glLineWidth(2.0);
+    glLineWidth(4.0);
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
         std::pair<const ompl::base::State*, const ompl::base::State*> vertexPair = std::make_pair(i->source, i->target);
@@ -454,7 +460,7 @@ void Visualizer::drawFeedbackEdges()
         if( it == mostLikelyPath_.end())
         {
             double costFactor = sqrt(i->cost/maxCost);
-            glColor3d(0.0,1.0,0.0);
+            glColor3d(0,0.9,0);
 
             drawEdge(i->source, i->target);
 
@@ -470,7 +476,7 @@ void Visualizer::drawMostLikelyPath()
     glLineWidth(4.0);
     for(int i=0; i<mostLikelyPath_.size();i++)
     {
-        glColor3d(1.0 , 1.0 , 0.0);
+        glColor3d(0.2 , 0.2 , 0.2);
         drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
     }
     glLineWidth(1.f);
@@ -478,6 +484,7 @@ void Visualizer::drawMostLikelyPath()
 
 void Visualizer::drawRobotPath()
 {
+
     if(robotPath_.size()>=2)
     {
         glDisable(GL_LIGHTING);
@@ -485,7 +492,7 @@ void Visualizer::drawRobotPath()
 
         for(int i=0; i<robotPath_.size()-1;i++)
         {
-            glColor3d(0.0 , 1.0 , 0);
+            glColor3d(0.6 , 0.6 , 0.6);
 
             glLineWidth(4.0);
                 drawEdge(robotPath_[i],robotPath_[i+1]);

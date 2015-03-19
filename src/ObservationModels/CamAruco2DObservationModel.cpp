@@ -638,6 +638,8 @@ void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
 
 bool CamAruco2DObservationModel::isStateObservable(const ompl::base::State *state)
 {
+  // TODO: Calculate observability matrix and check rank.
+
   using namespace arma;
 
   colvec obs = this->getObservation(state, false);
