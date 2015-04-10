@@ -85,18 +85,18 @@ void firm::ROSSpaceInformation::applyControl(const ompl::control::Control *contr
 {
     std::cout<<"ROS apply control called"<<std::endl ;
 
-    arma::colvec u = MotionModelMethod::OMPL2ARMA(control);
+    const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
 
     // Create a geometry twist message
     geometry_msgs::Twist cmd_vel;
 
     // put the input control value into the message
-    cmd_vel.linear.x =  u[0];
+    cmd_vel.linear.x =  conVals[0];
     cmd_vel.linear.y =  0.0;
     cmd_vel.linear.z =  0.0;
     cmd_vel.angular.x = 0.0;
     cmd_vel.angular.y = 0.0;
-    cmd_vel.angular.z = u[1];
+    cmd_vel.angular.z = conVals[1];
 
     controlPublisher_.publish(cmd_vel);
 
@@ -108,8 +108,9 @@ ObservationModelMethod::ObservationType firm::ROSSpaceInformation::getObservatio
 {
     std::cout<<"ROS get obs called"<<std::endl ;
 
+    std::cout<<"The observation through ros is : \n"<<cameraObservation_<<std::endl;
+
     return cameraObservation_;
 
-    ros::spinOnce();
 }
 
