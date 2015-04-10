@@ -49,6 +49,7 @@
 //Spaces
 #include "include/Spaces/SE2BeliefSpace.h"
 #include "include/SpaceInformation/SpaceInformation.h"
+#include "include/SpaceInformation/ROSSpaceInformation.h"
 
 //Observation Models
 #include "include/ObservationModels/ObservationModelMethod.h"
@@ -98,5 +99,8 @@
 
 // Utilities
 #include "include/Utils/FIRMUtils.h"
+
+// ROS
+#include "ros/ros.h"
 
 #endif
