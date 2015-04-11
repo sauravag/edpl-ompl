@@ -201,19 +201,24 @@ class MMPolicyGenerator
         /** \brief Returns true if all beliefs satisfy a certain minimum clearance for n steps from now, else false. */
         bool doCurrentBeliefsSatisfyClearance(int currentStep);
 
-        /** \brief get the state with the max weight and its weight */
+        /** \brief Get the state with the max weight and its weight */
         void getStateWithMaxWeight(ompl::base::State *state, float &weight);
 
+        /** \brief Get the weights of the modes */
         std::vector<float> getWeights()
         {
             return weights_;
         }
 
+        /** \brief Get the numbder of modes currently alive */
         int getNumberOfModes()
         {
             return weights_.size();
         }
 
+        /** \brief Set the space information in which the policies are executed. This space may or not be same as the variable si_.
+                   Use this feature to change where the control action is executed (ex. real robot, ros/gazebo).
+        */
         void setPolicyExecutionSpace(firm::SpaceInformation::SpaceInformationPtr executionSI)
         {
             policyExecutionSI_ = executionSI;

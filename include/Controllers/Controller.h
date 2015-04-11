@@ -71,7 +71,10 @@ class Controller
                  const std::vector<ompl::control::Control*>& nominalUs,
                  const firm::SpaceInformation::SpaceInformationPtr si);
 
-        /** \brief Execute the controller i.e. take the system from start to end state of edge. The execution cost is the sum of the trace of covariance at each step. */
+        /** \brief Execute the controller i.e. take the system from start to end state of edge. The execution cost is the sum of the trace of covariance at each step.
+                   The construction mode flag tells the controller to check true state validity. This is useful to detect collision during edge construction (a collision during
+                   a monte carlo sim affects the transition probability of the edge).
+        */
         virtual bool Execute(const ompl::base::State *startState,
                    ompl::base::State* endState,
                    ompl::base::Cost &filteringCost,
@@ -263,15 +266,19 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
         si_->copyState(internalState, tempEndState);
 
-        // if the propagated state is not valid, return false
-        /*
-        if(!si_->checkTrueStateValidity())
-        {
-            si_->copyState(endState, internalState);
-
-            return false;
-        }
+        /** Check if the controller is in construction mode,
+        If true, that means we are doing monte carlo sims,
+        Then need to check if If the propagated state is not valid, to stop controller on account of collision.
         */
+        if(constructionMode)
+        {
+            if(!si_->checkTrueStateValidity())
+            {
+                si_->copyState(endState, internalState);
+
+                return false;
+            }
+        }
 
         if(k<lss_.size())
           nominalX_K = lss_[k].getX();
@@ -350,10 +357,13 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
 
     si_->copyState(internalState, endState);
 
-    // if the propagated state is not valid, return false
-    if(!si_->checkTrueStateValidity())
+    // if the propagated state is not valid, return false (only in construction mode)
+    if(constructionMode)
     {
-        return false;
+        if(!si_->checkTrueStateValidity())
+        {
+            return false;
+        }
     }
 
     if(k<lss_.size())
