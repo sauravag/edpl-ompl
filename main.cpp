@@ -35,6 +35,7 @@
 /* Author: Saurav Agarwal */
 
 #include "FIRM2DSetup.h"
+#include "FIRMAruco2DROSSetup.h"
 #include "MultiModalSetup.h"
 #include "Tests.h"
 #include <QApplication>
@@ -45,14 +46,13 @@
 #include <iostream>
 #include <istream>
 
-
 using namespace std;
 
 void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
+    std::string setupFilePath = "./SetupFiles/SetupFIRMExp2.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -64,29 +64,114 @@ void plan()
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    if(mySetup->solve())
-    {
-        mySetup->executeSolution();
+    int mode = 0;
 
-        OMPL_INFORM("Plan Executed Successfully");
+    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
 
-    }
-    else
+    cin>>mode;
+
+    int keepTrying = 1;
+
+    mySetup->loadGraphFromFile();
+
+    while(keepTrying)
     {
-        OMPL_INFORM("Unable to find Solution in given time.");
+        if(mySetup->solve())
+        {
+            //mySetup->executeSolution(mode);
+            mySetup->Run(mode);
+
+            OMPL_INFORM("Plan Executed.");
+
+            Visualizer::doSaveVideo(false);
+
+            keepTrying = 0;
+
+        }
+        else
+        {
+            OMPL_INFORM("Unable to find Solution in given time, would you like to continue attempt. (1: yes, 0 :no) ? :");
+
+            std::cin>>keepTrying;
+        }
 
     }
 
     delete mySetup;
 
+    OMPL_INFORM("Execution Terminated, Close Terminal");
+
 }
 
 
-int main(int argc, char *argv[])
+void planROS()
 {
-    srand(1234567);
 
-    arma_rng::set_seed(1234567);
+    FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
+
+    std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
+
+    mySetup->setPathToSetupFile(setupFilePath.c_str());
+
+    mySetup->setup();
+
+    Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
+
+    Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
+
+    Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
+
+    int mode = 0;
+
+    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
+
+    //cin>>mode;
+
+    int keepTrying = 1;
+
+    mySetup->loadGraphFromFile();
+
+    ros::spinOnce();
+
+    while(keepTrying)
+    {
+        if(mySetup->solve())
+        {
+            //mySetup->executeSolution(mode);
+            mySetup->Run(mode);
+
+            OMPL_INFORM("Plan Executed.");
+
+            Visualizer::doSaveVideo(false);
+
+            keepTrying = 0;
+
+        }
+        else
+        {
+            OMPL_INFORM("Unable to find Solution in given time, would you like to continue attempt. (1: yes, 0 :no) ? :");
+
+            std::cin>>keepTrying;
+        }
+
+    }
+
+    delete mySetup;
+
+    OMPL_INFORM("Execution Terminated, Close Terminal");
+
+}
+
+
+int main(int argc, char **argv)
+{
+
+    // Initialize the ros node
+    ros::init(argc, argv, "firm_planner");
+
+    srand(239645);
+
+    arma_rng::set_seed(239645);
 
     QApplication app(argc, argv);
 
@@ -98,7 +183,16 @@ int main(int argc, char *argv[])
 
     window.resetCamera();
 
-    boost::thread solveThread(plan);
+    /**
+     Below you have 2 options:
+
+        1. To plan just using the provided simulation
+
+        2. To plan with ROS integration, the provided example listens for aruco_marker_publisher and advertises robot commands to geometry::twist
+    */
+    //boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
+
+    boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
 
     app.exec();
 

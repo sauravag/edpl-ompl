@@ -67,7 +67,7 @@ public:
 
 protected:
 
-    /** \brief Maximum number of nearest neighbors to attempt to connect new milestones to */
+    /** \brief Maximum distance to nearest neighbors to attempt to connect new milestones to */
     double                                     radius_;
 
     /** \brief Nearest neighbors data structure */

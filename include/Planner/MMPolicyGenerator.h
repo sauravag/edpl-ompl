@@ -38,7 +38,7 @@
 
 
 #include <ompl/geometric/planners/rrt/RRT.h>
-//#include <ompl/geometric/planners/rrt/RRTstar.h>
+#include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/pending/disjoint_sets.hpp>
@@ -84,6 +84,7 @@ class MMPolicyGenerator
         edgeIDProperty_(boost::get(boost::edge_index, g_))
         {
             previousPolicy_.push_back(si_->getMotionModel()->getZeroControl());
+            policyExecutionSI_ = si_;
         }
 
         /** \brief Destructor */
@@ -168,7 +169,7 @@ class MMPolicyGenerator
         virtual ompl::base::Cost executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls, const ompl::base::State* state);
 
         /** \brief advances the beliefs/modes by applying the given controls*/
-        virtual void propagateBeliefs(const ompl::control::Control *control);
+        virtual void propagateBeliefs(const ompl::control::Control *control, bool isSimulation = false);
 
         /** \brief Updates the weights of the Gaussians in the mixture */
         virtual void updateWeights(const arma::colvec trueObservation);
@@ -194,12 +195,34 @@ class MMPolicyGenerator
         /** \brief checks if the beliefs have converged */
         bool isConverged();
 
-        /** \brief Returns true if all beliefs satisfy a certain minimum clearance, else false. */
+        /** \brief Returns true if all beliefs are valid i.e. collision free */
         bool areCurrentBeliefsValid();
 
-        /** \brief get the state with the max weight and its weight */
+        /** \brief Returns true if all beliefs satisfy a certain minimum clearance for n steps from now, else false. */
+        bool doCurrentBeliefsSatisfyClearance(int currentStep);
+
+        /** \brief Get the state with the max weight and its weight */
         void getStateWithMaxWeight(ompl::base::State *state, float &weight);
 
+        /** \brief Get the weights of the modes */
+        std::vector<float> getWeights()
+        {
+            return weights_;
+        }
+
+        /** \brief Get the numbder of modes currently alive */
+        int getNumberOfModes()
+        {
+            return weights_.size();
+        }
+
+        /** \brief Set the space information in which the policies are executed. This space may or not be same as the variable si_.
+                   Use this feature to change where the control action is executed (ex. real robot, ros/gazebo).
+        */
+        void setPolicyExecutionSpace(firm::SpaceInformation::SpaceInformationPtr executionSI)
+        {
+            policyExecutionSI_ = executionSI;
+        }
 
     private:
 
@@ -249,6 +272,11 @@ class MMPolicyGenerator
 
         /** \brief Pointer to the state space information*/
         firm::SpaceInformation::SpaceInformationPtr si_;
+
+        /** \brief This is the space in which the policy is executed. By default it is set to the same space that is passed to the constructer.
+                If this space is changed, the observations and controls are both in the context of this new space. Use the setPolicyExecutionSpace
+                function to change this parameter. Particularly useful if you wish to drive a real robot and get sensor readings.*/
+        firm::SpaceInformation::SpaceInformationPtr policyExecutionSI_;
 
         /** \brief Container for the previous open loop policy*/
         std::vector<ompl::control::Control*> previousPolicy_;

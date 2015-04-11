@@ -44,6 +44,8 @@
 #include <boost/pending/disjoint_sets.hpp>
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/date_time.hpp>
 #include <utility>
 #include <vector>
 #include <map>
@@ -185,7 +187,17 @@ public:
         method will also improve the roadmap, as needed.*/
     virtual void growRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
 
-    /** \brief  */
+     /** \brief Attempt to connect disjoint components in the roadmap
+                using random bouncing motions (the PRM expansion step) for the
+                given time (seconds). */
+    virtual void expandRoadmap(double expandTime);
+
+    /** \brief Attempt to connect disjoint components in the roadmap
+        using random bouncing motions (the PRM expansion step) until the
+        given condition evaluates true. */
+    virtual void expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
+
+    /** \brief  The key function that solves the planning problem.*/
     virtual ompl::base::PlannerStatus solve(const ompl::base::PlannerTerminationCondition &ptc);
 
     /** \brief  */
@@ -232,6 +244,9 @@ public:
      /** \brief Executes the generated policy on the system */
     void executeFeedback(void);
 
+    /** \brief Executes the generated policy on the system with kidnapping in the middle of a run */
+    void executeFeedbackWithKidnapping(void);
+
     /** \brief Executes the rollout policy algorithm (See ICRA '14 paper) */
     void executeFeedbackWithRollout(void);
 
@@ -249,7 +264,13 @@ public:
 
     void setKidnappedState(ompl::base::State *state)
     {
-        kidnappedState_ = siF_->cloneState(state);
+        kidnappedState_ = si_->cloneState(state);
+    }
+
+    /** \brief Change the policy execution space. */
+    void setPolicyExecutionSpace(firm::SpaceInformation::SpaceInformationPtr executionSI)
+    {
+        policyExecutionSI_ = executionSI;
     }
 
 protected:
@@ -276,6 +297,11 @@ protected:
          in the roadmap. Stop this process when the termination condition*/
     virtual void growRoadmap(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::State *workState);
 
+     /** \brief Attempt to connect disjoint components in the
+                roadmap using random bounding motions (the PRM
+                expansion step) */
+    virtual void expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc, std::vector<ompl::base::State*> &workStates);
+
     /** \brief Thread that checks for solution */
     void checkForSolution(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::PathPtr &solution);
 
@@ -290,7 +316,7 @@ protected:
     virtual ompl::base::PathPtr constructFeedbackPath(const Vertex &start, const Vertex &goal);
 
     /** \brief Add an edge from vertex a to b in graph */
-    virtual void addEdgeToGraph(const Vertex a, const Vertex b);
+    virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
 
     /** \brief Generates the cost of the edge */
     virtual FIRMWeight generateEdgeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController);
@@ -301,8 +327,8 @@ protected:
     /** \brief Generates the edge controller that drives the robot from start to end of edge */
     virtual void generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, EdgeControllerType &edgeController);
 
-    /** \brief Generates the node controller that stabilizes the robot to the node */
-    virtual void generateNodeController(const ompl::base::State *state, NodeControllerType &nodeController);
+    /** \brief Generates the node controller that stabilizes the robot to the node and sets the stationary covariance at the node. */
+    virtual void generateNodeController(ompl::base::State *state, NodeControllerType &nodeController);
 
     /** \brief Solves the dynamic program to return a feedback policy */
     virtual void solveDynamicProgram(const Vertex goalVertex);
@@ -391,6 +417,11 @@ protected:
     /** \brief The base::SpaceInformation cast as firm::SpaceInformation, for convenience */
     const firm::SpaceInformation::SpaceInformationPtr            siF_;
 
+    /** \brief This is the space in which the policy is executed. By default it is set to the same space that is passed to the constructer.
+                If this space is changed, the observations and controls are both in the context of this new space. Use the setPolicyExecutionSpace
+                function to change this parameter. Particularly useful if you wish to drive a real robot and get sensor readings.*/
+    firm::SpaceInformation::SpaceInformationPtr policyExecutionSI_;
+
     /** \brief A table that stores the edge controllers according to the edges */
     std::map <Edge, EdgeControllerType > edgeControllers_;
 
@@ -414,6 +445,84 @@ protected:
 
     std::vector<std::pair<std::pair<int,int>,FIRMWeight> > loadedEdgeProperties_;
 
+    /** \brief Send the most likely path to visualizer based on start location*/
+    void sendMostLikelyPathToViz(const Vertex start, const Vertex goal);
+
+    void makeDataLogPath()
+    {
+
+        namespace pt = boost::posix_time;
+
+        pt::ptime now = pt::second_clock::local_time();
+
+        std::string timeStamp(to_iso_string(now)) ;
+
+        std::string folderPath = "./PlannerDataLog/FIRMData-" + timeStamp ;
+
+        boost::filesystem::path dir(folderPath);
+
+        boost::filesystem::create_directory(dir);
+
+        logFilePath_ = folderPath + "/";
+
+    }
+
+    /** \brief Writes a time series data to a file */
+    void writeTimeSeriesDataToFile(std::string fname, std::string dataName)
+    {
+
+        std::ofstream outfile;
+
+        outfile.open(logFilePath_ + fname);
+
+        if(dataName.compare("costToGo")==0)
+        {
+            for(int i=0; i < costToGoHistory_.size(); i++)
+            {
+                outfile<<costToGoHistory_[i].first<<","<<costToGoHistory_[i].second<<std::endl;
+            }
+        }
+
+        if(dataName.compare("successProbability")==0)
+        {
+            for(int i=0; i < successProbabilityHistory_.size(); i++)
+            {
+                outfile<<successProbabilityHistory_[i].first<<","<<successProbabilityHistory_[i].second<<std::endl;
+            }
+        }
+
+        if(dataName.compare("nodesReached")==0)
+        {
+            for(int i=0; i < nodeReachedHistory_.size(); i++)
+            {
+                outfile<<nodeReachedHistory_[i].first<<","<<nodeReachedHistory_[i].second<<std::endl;
+            }
+        }
+
+        if(dataName.compare("velocity")==0)
+        {
+            for(int i=0; i < velocityHistory_.size(); i++)
+            {
+                outfile<<velocityHistory_[i].first<<","<<velocityHistory_[i].second<<std::endl;
+            }
+        }
+
+        if(dataName.compare("multiModalWeights")==0)
+        {
+            for(int i=0; i < successProbabilityHistory_.size(); i++)
+            {
+                outfile<<weightsHistory_[i].first<<",";
+
+                for(int j=0; j< weightsHistory_[i].second.size(); j++)
+                {
+                    outfile<<weightsHistory_[i].second[j]<<",";
+                }
+                outfile<<std::endl;
+            }
+        }
+
+        outfile.close();
+    }
 
 private:
 
@@ -423,7 +532,31 @@ private:
     /** \brief Checks if this vertex belongs to the list of goal vertices */
     bool isGoalVertex(const Vertex v);
 
+    /** \brief Add rollout connections to visualization */
+    void showRolloutConnections(const Vertex v);
+
+    /** \brief calculate the current success probability by multiplying the success probability of current edge and all future edges to goal vertex*/
+    double evaluateSuccessProbability(const Edge currentEdge, const Vertex start, const Vertex goal);
+
     ompl::base::State *kidnappedState_;
+
+    std::vector<std::pair<int, float> > costToGoHistory_;
+
+    std::vector<std::pair<int, double> > successProbabilityHistory_;
+
+    std::vector<std::pair<int, std::vector<float> > > weightsHistory_;
+
+    std::vector<std::pair<int, int> > nodeReachedHistory_;
+
+    std::vector<std::pair<int, double> > velocityHistory_;
+
+    int currentTimeStep_;
+
+    int numberofNodesReached_;
+
+    double executionCost_;
+
+    std::string logFilePath_;
 
 };
 

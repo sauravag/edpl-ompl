@@ -41,7 +41,7 @@ double SE2BeliefSpace::StateType::covNormWeight_   = -1;
 double SE2BeliefSpace::StateType::reachDist_   = -1;
 arma::colvec SE2BeliefSpace::StateType::normWeights_ = arma::zeros<arma::colvec>(3);
 
-bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state) const
+bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxedConstraint) const
 {
     // subtract the two beliefs and get the norm
     arma::colvec stateDiff = this->getArmaData() - state->as<SE2BeliefSpace::StateType>()->getArmaData();
@@ -67,11 +67,24 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state) const
 
     double norm2 =  std::max(meanNorm*meanNormWeight_, covDiagNorm*covNormWeight_) ;
 
+<<<<<<< HEAD
     if(norm2 <= reachDist_)
+=======
+    double reachConstraint  = reachDist_;
+
+    if(relaxedConstraint)
+        reachConstraint *= 4;
+
+    if(norm2 <= reachConstraint)
+>>>>>>> dev
     {
         return true;
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev
     return false;
 
 }

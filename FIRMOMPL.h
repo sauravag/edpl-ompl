@@ -49,6 +49,7 @@
 //Spaces
 #include "include/Spaces/SE2BeliefSpace.h"
 #include "include/SpaceInformation/SpaceInformation.h"
+#include "include/SpaceInformation/ROSSpaceInformation.h"
 
 //Observation Models
 #include "include/ObservationModels/ObservationModelMethod.h"
@@ -57,6 +58,7 @@
 //Motion Models
 #include "include/MotionModels/MotionModelMethod.h"
 #include "include/MotionModels/UnicycleMotionModel.h"
+#include "include/MotionModels/OmnidirectionalMotionModel.h"
 
 //State Propagators
 #include "include/MotionModels/UnicycleStatePropagator.h"
@@ -97,5 +99,8 @@
 
 // Utilities
 #include "include/Utils/FIRMUtils.h"
+
+// ROS
+#include "ros/ros.h"
 
 #endif

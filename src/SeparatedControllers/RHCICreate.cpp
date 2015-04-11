@@ -53,6 +53,7 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
     this->motionModel_->generateOpenLoopControls(state , this->goal_, openLoopControls) ;
 
     openLoopControls_ = std::deque<ompl::control::Control*>(openLoopControls.begin(), openLoopControls.end());
+
     //if motion model cannot generate valid open loop controls from start to goal, return an empty vector signifying invalid control
     if(openLoopControls_.size() == 0) {
       return this->motionModel_->getZeroControl();
@@ -62,8 +63,10 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
     if(openLoopControls_.size() > controlQueueSize_)
       openLoopControls_.resize(controlQueueSize_);
     }
+
     // if there are controls left, apply and remove them one-by-one
     ompl::control::Control* control;
+
     control = openLoopControls_.front();
 
     openLoopControls_.pop_front();

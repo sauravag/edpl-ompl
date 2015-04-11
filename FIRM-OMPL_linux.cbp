@@ -14,6 +14,7 @@
 				<Compiler>
 					<Add option="-std=c++0x" />
 					<Add option="-g" />
+					<Add directory="/usr/local/include" />
 					<Add directory="/usr/include/qt4/QtCore" />
 					<Add directory="/usr/include/qt4" />
 					<Add directory="/usr/include/qt4/QtGui" />
@@ -33,9 +34,20 @@
 					<Add library="/usr/lib/x86_64-linux-gnu/libQtOpenGL.so" />
 					<Add library="/usr/lib/libarmadillo.so" />
 					<Add library="/usr/lib/libtinyxml.so" />
-					<Add library="/usr/local/lib/libompl_app.so" />
 					<Add library="/usr/local/lib/libompl.so" />
+					<Add library="/usr/local/lib/libompl_app.so" />
 					<Add library="/usr/local/lib/libompl_app_base.so" />
+					<Add library="/usr/lib/libboost_date_time.a" />
+					<Add library="/usr/lib/libboost_filesystem.a" />
+					<Add library="/opt/ros/indigo/lib/libtf.so" />
+					<Add library="/opt/ros/indigo/lib/libtf2_ros.so" />
+					<Add library="/opt/ros/indigo/lib/libroscpp.so" />
+					<Add library="/opt/ros/indigo/lib/librosconsole.so" />
+					<Add library="/opt/ros/indigo/lib/libtf2.so" />
+					<Add library="/opt/ros/indigo/lib/libroscpp_serialization.so" />
+					<Add library="/opt/ros/indigo/lib/libroslib.so" />
+					<Add library="/opt/ros/indigo/lib/librostime.so" />
+					<Add library="/opt/ros/indigo/lib/librospack.so" />
 					<Add directory="/usr/local/lib" />
 					<Add directory="/usr/lib/x86_64-linux-gnu" />
 					<Add directory="/usr/lib" />
@@ -60,6 +72,7 @@
 			<Add directory="/home/saurav/Research/Softwares/omplapp/ompl/src" />
 		</Compiler>
 		<Unit filename="FIRM2DSetup.h" />
+		<Unit filename="FIRMAruco2DROSSetup.h" />
 		<Unit filename="FIRMOMPL.h" />
 		<Unit filename="MultiModalSetup.h" />
 		<Unit filename="Tests.h" />
@@ -72,6 +85,7 @@
 		<Unit filename="include/LinearSystem/LinearSystem.h" />
 		<Unit filename="include/LocalPlanners/MotionModelLP.h" />
 		<Unit filename="include/MotionModels/MotionModelMethod.h" />
+		<Unit filename="include/MotionModels/OmnidirectionalMotionModel.h" />
 		<Unit filename="include/MotionModels/UnicycleMotionModel.h" />
 		<Unit filename="include/MotionModels/UnicycleStatePropagator.h" />
 		<Unit filename="include/ObservationModels/CamAruco2DObservationModel.h" />
@@ -84,6 +98,7 @@
 		<Unit filename="include/Samplers/UniformValidBeliefSampler.h" />
 		<Unit filename="include/SeparatedControllers/RHCICreate.h" />
 		<Unit filename="include/SeparatedControllers/SeparatedControllerMethod.h" />
+		<Unit filename="include/SpaceInformation/ROSSpaceInformation.h" />
 		<Unit filename="include/SpaceInformation/SpaceInformation.h" />
 		<Unit filename="include/Spaces/SE2BeliefSpace.h" />
 		<Unit filename="include/Utils/FIRMUtils.h" />
@@ -95,6 +110,7 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Filters/ExtendedKF.cpp" />
 		<Unit filename="src/Filters/LinearizedKF.cpp" />
+		<Unit filename="src/MotionModels/OmnidirectionalMotionModel.cpp" />
 		<Unit filename="src/MotionModels/UnicycleMotionModel.cpp" />
 		<Unit filename="src/MotionModels/UnicycleStatePropagator.cpp" />
 		<Unit filename="src/ObservationModels/CamAruco2DObservationModel.cpp" />
@@ -103,6 +119,7 @@
 		<Unit filename="src/Samplers/GaussianValidBeliefSampler.cpp" />
 		<Unit filename="src/Samplers/UniformValidBeliefSampler.cpp" />
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
+		<Unit filename="src/SpaceInformation/ROSSpaceInformation.cpp" />
 		<Unit filename="src/SpaceInformation/SpaceInformation.cpp" />
 		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />
 		<Unit filename="src/Utils/FIRMUtils.cpp" />

@@ -71,28 +71,35 @@ class Controller
                  const std::vector<ompl::control::Control*>& nominalUs,
                  const firm::SpaceInformation::SpaceInformationPtr si);
 
-        /** \brief Execute the controller i.e. take the system from start to end state of edge */
+        /** \brief Execute the controller i.e. take the system from start to end state of edge. The execution cost is the sum of the trace of covariance at each step.
+                   The construction mode flag tells the controller to check true state validity. This is useful to detect collision during edge construction (a collision during
+                   a monte carlo sim affects the transition probability of the edge).
+        */
         virtual bool Execute(const ompl::base::State *startState,
                    ompl::base::State* endState,
-                   ompl::base::Cost &executionCost,
+                   ompl::base::Cost &filteringCost,
+                   int &stepsTaken,
+                   int &timeToStop,
                    bool constructionMode=true);
 
         /** \brief Execute the controller for one step */
-         virtual bool executeOneStep(const ompl::base::State *startState,
+         virtual bool executeOneStep(const int k, const ompl::base::State *startState,
                    ompl::base::State* endState,
-                   ompl::base::Cost &executionCost,
+                   ompl::base::Cost &filteringCost,
                    bool constructionMode=true);
 
         /** \brief Execute the controller for given number of steps */
          virtual bool executeUpto(const int numSteps, const ompl::base::State *startState,
                    ompl::base::State* endState,
-                   ompl::base::Cost &executionCost,
+                   ompl::base::Cost &filteringCost,
+                   int &stepsTaken,
                    bool constructionMode=true);
 
         /** \brief Stabilize the system to an existing FIRM node */
         virtual void  Stabilize(const ompl::base::State *startState,
                                               ompl::base::State* endState,
-                                              ompl::base::Cost &stabilizationCost,
+                                              ompl::base::Cost &stabilizationFilteringCost,
+                                              int &stepsToStabilize,
                                               bool constructionMode=true);
 
         /** \brief Check whether the controller has satisfied its termination condition for e.g. reached target state*/
@@ -135,10 +142,10 @@ class Controller
         SeparatedControllerType separatedController_;
 
         /** \brief  The filter used to estimate the robot belief. */
-    	  FilterType filter_;
+    	FilterType filter_;
 
         /** \brief  The target node to which the controller drives the robot.*/
-    	  ompl::base::State *goal_;
+        ompl::base::State *goal_;
 
         /** \brief Tracks the current number of time steps the robot has executed to align with goal node. */
     	  int tries_;
@@ -148,9 +155,9 @@ class Controller
             for node reachability checking. */
     	static double nodeReachedAngle_;
 
-        /** \brief The distance at which we assume the robot has reached a target node. Reaching the exact node
-            location is almost impractical for real systems. We assume the robot has reached if it is within
-            a certain radius of the target. */
+        /** \brief The distance at which we assume the robot has reached a target node (i.e. b \in B). Reaching the exact node
+            location is almost impractical for stochastic systems. We assume the robot has reached if it is within
+            a certain region around the target. */
         static double nodeReachedDistance_;
 
         /** \brief  The max number of tries to align with target node. */
@@ -167,7 +174,7 @@ class Controller
         /** \brief  The debug mode, if true, controller is verbose.*/
       	bool debug_;
 
-      	unsigned int step_;
+      	//unsigned int step_;
 
 };
 
@@ -220,7 +227,7 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
 
   debug_ = false;
 
-  step_ = 0;
+  //step_ = 0;
 
 }
 
@@ -228,101 +235,113 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
 template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *startState,
                                                               ompl::base::State* endState,
-                                                              ompl::base::Cost &executionCost,
-                                                              bool constructionMode)
-{
-  using namespace std;
-
-  unsigned int k = 0;
-
-  //HOW TO SET INITAL VALUE OF COST
-  //cost = 1 ,for time based only if time per execution is "1"
-  //cost = 0.01 , for covariance based
-  double cost = 0.01;
-
-  ompl::base::State *internalState = si_->allocState();
-
-  si_->copyState(internalState, startState);
-
-  ompl::base::State  *nominalX_K = si_->allocState();
-
-  ompl::base::State *tempEndState = si_->allocState();
-
-  si_->copyState(tempEndState, startState);
-
-  int deviationCounter = 0;
-
-  while(!this->isTerminated(tempEndState, k))
-  {
-    //using namespace std;
-
-    this->Evolve(internalState, k, tempEndState) ;
-
-    si_->copyState(internalState, tempEndState);
-
-    // if the propagated state is not valid, return false
-    if(!si_->checkTrueStateValidity())
-    {
-        si_->copyState(endState, internalState);
-        return false;
-    }
-
-    if(k<lss_.size())
-      nominalX_K = lss_[k].getX();
-
-    else nominalX_K = lss_[lss_.size()-1].getX();
-
-    arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
-    arma::colvec endStateVec =  tempEndState->as<StateType>()->getArmaData();
-    arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
-
-    if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
-    {
-
-        si_->copyState(endState, internalState);
-        return false;
-
-    }
-
-    k++;
-
-    //Increment cost by:
-    //-> 0.01 for time based
-    //-> trace(Covariance) for FIRM
-    cost += arma::trace(tempEndState->as<StateType>()->getCovariance());
-
-    if(!constructionMode)
-    {
-        boost::this_thread::sleep(boost::posix_time::milliseconds(20));
-    }
-  }
-
-  ompl::base::Cost stabilizationCost;
-
-  //si_->copyState(endState, tempEndState);
-
-  this->Stabilize(tempEndState, endState, stabilizationCost, constructionMode) ;
-
-  //executionCost.value() = cost + stabilizationCost.v;
-  executionCost = ompl::base::Cost(cost+stabilizationCost.value());
-
-  si_->freeState(internalState);
-  si_->freeState(tempEndState);
-
-  return true ;
-}
-
-
-template <class SeparatedControllerType, class FilterType>
-bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const ompl::base::State *startState,
-                                                              ompl::base::State* endState,
-                                                              ompl::base::Cost &executionCost,
+                                                              ompl::base::Cost &filteringCost,
+                                                              int &stepsTaken,
+                                                              int &timeToStop,
                                                               bool constructionMode)
 {
     using namespace std;
 
-    unsigned int k = step_;
+    unsigned int k = 0;
 
+    //HOW TO SET INITAL VALUE OF COST
+    //cost = 1 ,for time based only if time per execution is "1"
+    //cost = 0.01 , for covariance based
+    double cost = 0.01;
+
+    ompl::base::State *internalState = si_->allocState();
+
+    si_->copyState(internalState, startState);
+
+    ompl::base::State  *nominalX_K ;
+
+    ompl::base::State *tempEndState = si_->allocState();
+
+    si_->copyState(tempEndState, startState);
+
+    while(!this->isTerminated(tempEndState, k))
+    {
+
+        this->Evolve(internalState, k, tempEndState) ;
+
+        si_->copyState(internalState, tempEndState);
+
+        /** Check if the controller is in construction mode,
+        If true, that means we are doing monte carlo sims,
+        Then need to check if If the propagated state is not valid, to stop controller on account of collision.
+        */
+        if(constructionMode)
+        {
+            if(!si_->checkTrueStateValidity())
+            {
+                si_->copyState(endState, internalState);
+
+                return false;
+            }
+        }
+
+        if(k<lss_.size())
+          nominalX_K = lss_[k].getX();
+
+        else nominalX_K = lss_[lss_.size()-1].getX();
+
+        arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
+        arma::colvec endStateVec =  internalState->as<StateType>()->getArmaData();
+        arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
+
+        if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
+        {
+            si_->copyState(endState, internalState);
+
+            return false;
+        }
+
+        k++;
+
+        //Increment cost by: 0.01 for time based, trace(Covariance) for FIRM
+        cost += arma::trace(internalState->as<StateType>()->getCovariance());
+
+        if(!constructionMode)
+        {
+            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+        }
+    }
+
+
+    ompl::base::Cost stabilizationFilteringCost(0);
+
+    int stepsToStabilize=0;
+
+    ompl::base::State *stabilizedState = si_->allocState();
+
+    this->Stabilize(internalState, stabilizedState, stabilizationFilteringCost, stepsToStabilize, constructionMode) ;
+
+    si_->copyState(endState, stabilizedState);
+
+    //filteringCost.v = cost + stabilizationFilteringCost.v;
+    filteringCost = ompl::base::Cost(cost + stabilizationFilteringCost.value());
+
+    stepsTaken = k+stepsToStabilize;
+
+    timeToStop = k;
+
+    si_->freeState(internalState);
+
+    si_->freeState(tempEndState);
+
+    si_->freeState(stabilizedState);
+
+    return true ;
+}
+
+
+template <class SeparatedControllerType, class FilterType>
+bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k, const ompl::base::State *startState,
+                                                              ompl::base::State* endState,
+                                                              ompl::base::Cost &filteringCost,
+                                                              bool constructionMode)
+{
+    using namespace std;
 
     //HOW TO SET INITAL VALUE OF COST
     //cost = 1 ,for time based only if time per execution is "1"
@@ -338,10 +357,13 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const ompl:
 
     si_->copyState(internalState, endState);
 
-    // if the propagated state is not valid, return false
-    if(!si_->checkTrueStateValidity())
+    // if the propagated state is not valid, return false (only in construction mode)
+    if(constructionMode)
     {
-        return false;
+        if(!si_->checkTrueStateValidity())
+        {
+            return false;
+        }
     }
 
     if(k<lss_.size())
@@ -363,10 +385,10 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const ompl:
     //-> trace(Covariance) for FIRM
     cost += arma::trace(endState->as<StateType>()->getCovariance());
 
-    if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+    if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
-    //executionCost.v = cost;
-    executionCost = ompl::base::Cost(cost);
+    //filteringCost.v = cost;
+    filteringCost = ompl::base::Cost(cost);
 
     si_->freeState(internalState);
 
@@ -377,88 +399,101 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const ompl:
 template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numSteps, const ompl::base::State *startState,
                                                               ompl::base::State* endState,
-                                                              ompl::base::Cost &executionCost,
+                                                              ompl::base::Cost &filteringCost,
+                                                              int &stepsTaken,
                                                               bool constructionMode)
 {
     ompl::base::State *tempState = si_->allocState();
+
     si_->copyState(tempState, startState);
+
     ompl::base::State *tempEndState = si_->allocState();
 
-    //step_ = 0;
+    int k = 0;
 
-    for(int i=0; i < numSteps; i++)
+    while(k < numSteps)
     {
-        bool e = executeOneStep(tempState,tempEndState, executionCost, constructionMode);
+        bool e = executeOneStep(k, tempState,tempEndState, filteringCost, constructionMode);
 
-        step_++;
+        k++;
 
         si_->copyState(tempState, tempEndState);
+
         si_->copyState(endState, tempEndState);
 
         if(!e)
         {
             si_->freeState(tempEndState);
+
             si_->freeState(tempState);
+
             return false;
         }
+
     }
 
     si_->freeState(tempEndState);
+
     si_->freeState(tempState);
+
+    stepsTaken = k;
+
     return true;
 }
 
 template <class SeparatedControllerType, class FilterType>
 void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
 {
+    ompl::control::Control* control = separatedController_.generateFeedbackControl(state);
 
-  ompl::control::Control* control = separatedController_.generateFeedbackControl(state/*, t*/);
+    si_->applyControl(control);
 
-  si_->applyControl(control);
+    ObservationType zCorrected = si_->getObservation();
 
-  ObservationType zCorrected = si_->getObservation();
+    LinearSystem current;
+    LinearSystem next;
 
-  LinearSystem current;
-  LinearSystem next;
-
-  current = next = LinearSystem(si_,goal_,
+    current = next = LinearSystem(si_,goal_,
                                 si_->getMotionModel()->getZeroControl(),
                                 zCorrected,
                                 si_->getMotionModel(),
                                 si_->getObservationModel());
 
-  if( (Length() > 0) && (t <= Length()-1) )
-  {
-
-    if( t == Length() - 1 )
+    if( (Length() > 0) && (t <= Length()-1) )
     {
-      current = lss_[t];
+
+        if( t == Length() - 1 )
+        {
+            current = lss_[t];
+        }
+        else
+        {
+            current = lss_[t];
+            next = lss_[t+1];
+        }
     }
-    else
-    {
-      current = lss_[t];
-      next = lss_[t+1];
-    }
-  }
 
-  ompl::base::State *nextBelief = si_->allocState();
+    ompl::base::State *nextBelief = si_->allocState();
 
-  filter_.Evolve(state, control, zCorrected, current, next, nextBelief);
+    filter_.Evolve(state, control, zCorrected, current, next, nextBelief);
 
-  si_->copyState(nextState, nextBelief);
+    si_->copyState(nextState, nextBelief);
 
-  si_->setBelief(nextBelief);
+    si_->setBelief(nextBelief);
+
 }
 
 
 template <class SeparatedControllerType, class FilterType>
 void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base::State *startState,
                                                                               ompl::base::State* endState,
-                                                                              ompl::base::Cost &stabilizationCost,
+                                                                              ompl::base::Cost &stabilizationFilteringCost,
+                                                                              int &stepsToStabilize,
                                                                               bool constructionMode)
 {
+    int k = lss_.size()-1;
 
-    int k =0;
+    int stepsTaken = 0;
 
     double cost = 0;
 
@@ -466,13 +501,14 @@ void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
     ompl::base::State *tempState2 = si_->allocState();
 
     si_->copyState(tempState1, startState);
+    si_->copyState(tempState2, startState);
 
     while(!goal_->as<StateType>()->isReached(tempState1) && tries_ < maxTries_)
     {
-        //OMPL_INFORM("stabilizing");
+
         this->Evolve(tempState1, k, tempState2);
 
-        k++;
+        stepsTaken++;
 
         cost += arma::trace(tempState2->as<StateType>()->getCovariance());
 
@@ -487,13 +523,14 @@ void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
 
     }
 
-   //stabilizationCost.v = cost;
-   stabilizationCost = ompl::base::Cost(cost);
+   //stabilizationFilteringCost.v = cost;
+   stabilizationFilteringCost = ompl::base::Cost(cost);
 
    si_->copyState(endState, tempState2);
    si_->freeState(tempState1);
    si_->freeState(tempState2);
    tries_ = 0;
+   stepsToStabilize = stepsTaken;
 
 }
 

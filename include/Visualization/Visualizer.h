@@ -73,7 +73,9 @@ class Visualizer
         {
             NodeViewMode,
             FeedbackViewMode,
-            PRMViewMode
+            PRMViewMode,
+            RolloutMode,
+            MultiModalMode
         };
 
         struct VZRFeedbackEdge
@@ -98,6 +100,7 @@ class Visualizer
             states_.push_back(si_->cloneState(state));
         }
 
+
         /** \brief Clear the state container */
         static void clearStates()
         {
@@ -105,12 +108,30 @@ class Visualizer
             states_.clear();
         }
 
+        /** \brief Add state to belief mode list */
+        static void addBeliefMode(ompl::base::State *state)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            assert(state);
+            beliefModes_.push_back(si_->cloneState(state));
+        }
+
+        /** \brief Clear belief Modes */
+        static void clearBeliefModes()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            beliefModes_.clear();
+        }
+
         /** \brief Add a Roadmap Graph edge to the visualization */
         static void addGraphEdge(const ompl::base::State *source, const ompl::base::State *target)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
+
             std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+
             edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
+
             graphEdges_.push_back(edge);
         }
 
@@ -130,6 +151,41 @@ class Visualizer
             feedbackEdges_.push_back(edge);
         }
 
+        /** \brief Add a rollout connection to the visualization */
+        static void addRolloutConnection(const ompl::base::State *source, const ompl::base::State *target)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+
+            std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+
+            edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
+
+            rolloutConnections_.push_back(edge);
+        }
+
+         /** \brief Add a rollout connection to the visualization */
+        static void addMostLikelyPathEdge(const ompl::base::State *source, const ompl::base::State *target)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+
+            std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+
+            edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
+
+            mostLikelyPath_.push_back(edge);
+        }
+
+        static void setChosenRolloutConnection(const ompl::base::State *source, const ompl::base::State *target)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+
+            boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > edge(std::make_pair(si_->cloneState(source),si_->cloneState(target)));
+
+            chosenRolloutConnection_ = edge;
+        }
+
+        static void drawRobotPath();
+
         static void setMode(VZRDrawingMode mode)
         {
             mode_ = mode;
@@ -141,6 +197,29 @@ class Visualizer
             feedbackEdges_.clear();
         }
 
+        static void clearRolloutConnections()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            rolloutConnections_.clear();
+        }
+
+        static void clearMostLikelyPath()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            mostLikelyPath_.clear();
+        }
+
+        static void addOpenLoopRRTPath(const ompl::geometric::PathGeometric path)
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            openLoopRRTPaths_.push_back(path);
+        }
+
+        static void clearOpenLoopRRTPaths()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            openLoopRRTPaths_.clear();
+        }
 
         /** \brief update the robot's true state for drawing */
         static void updateTrueState(const ompl::base::State *state)
@@ -165,8 +244,11 @@ class Visualizer
         static void updateSpaceInformation(const firm::SpaceInformation::SpaceInformationPtr si)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
+
             si_ = si;
+
             trueState_ = si_->allocState();
+
             currentBelief_ = si->allocState();
         }
 
@@ -181,6 +263,12 @@ class Visualizer
             boost::mutex::scoped_lock sl(drawMutex_);
             //ompl::app::RenderGeometry rd(new ompl::app::RenderGeometry(rbg,se));
             renderGeom_ = new ompl::app::RenderGeometry(rbg,se);
+        }
+
+        static void clearRobotPath()
+        {
+            boost::mutex::scoped_lock sl(drawMutex_);
+            robotPath_.clear();
         }
 
         /** \brief Draw a single landmark that is passed to this function */
@@ -198,18 +286,43 @@ class Visualizer
         /** \brief Draw the stored graph nodes */
         static void drawGraphBeliefNodes();
 
+        /** \brief Draw belief modes. */
+        static void drawBeliefModes();
+
         /** \brief Draw the edges in the roadmap graph */
         static void drawGraphEdges();
 
+        /** \brief Draw graph feedback edges */
         static void drawFeedbackEdges();
+
+        /** \brief Draw rollout connections */
+        static void drawRolloutConnections();
+
+        /** \brief Draw the most likely path under FIRM */
+        static void drawMostLikelyPath();
 
         /** \brief Draw the X&Y bounds*/
         static void drawEnvironment();
 
         static void drawObstacle();
 
+        /** \brief Draw geometric path.*/
+        static void drawGeometricPath(const ompl::geometric::PathGeometric path);
+
+        static void drawOpenLoopRRTPaths();
+
         /** \brief Refresh the drawing and show latest scenario*/
         static void refresh();
+
+        static bool saveVideo()
+        {
+            return saveVideo_;
+        }
+
+        static void doSaveVideo(bool flag)
+        {
+            saveVideo_ = flag;
+        }
 
 
     private:
@@ -226,6 +339,9 @@ class Visualizer
         /** \brief Store the robots belief state */
         static ompl::base::State* currentBelief_;
 
+        /** \brief Store the belief modes for multi-modal operation */
+        static std::list<ompl::base::State*> beliefModes_;
+
         /** \brief Store the landmarks */
         static std::vector<arma::colvec> landmarks_;
 
@@ -235,8 +351,23 @@ class Visualizer
         /** \brief Store the Roadmap graph edges */
         static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > graphEdges_;
 
+        /** \brief Store the Rollout connections */
+        static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > rolloutConnections_;
+
+        /** \brief Store the Rollout connections */
+        static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > mostLikelyPath_;
+
+        /** \brief The rollout connection that gets chosen as the next target*/
+        static boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> >chosenRolloutConnection_;
+
         /** \brief Store the feedback edges */
         static std::vector<VZRFeedbackEdge> feedbackEdges_;
+
+        /** \brief stores the sequence of states of the real robot */
+        static std::vector<const ompl::base::State*> robotPath_;
+
+        /** \brief Container for RRT paths generated as candidates during Multi-Modal operation */
+        static std::vector<ompl::geometric::PathGeometric> openLoopRRTPaths_;
 
         /** \brief Visualizer drawing mode setting */
         static VZRDrawingMode mode_;
@@ -249,6 +380,8 @@ class Visualizer
 
         /** \brief The gllistindex of the robot rendering */
         static int robotIndx_;
+
+        static bool saveVideo_;
 
 
 };

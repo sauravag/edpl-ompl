@@ -37,7 +37,6 @@
 #ifndef UNICYCLE_MOTIONMODEL_
 #define UNICYCLE_MOTIONMODEL_
 
-//#include "ValidityChecker.hpp"
 #include "MotionModelMethod.h"
 #include <limits>
 #include <cassert>

@@ -54,23 +54,23 @@ public:
     ss_(ompl::base::StateSpacePtr(new SE2BeliefSpace()))
     {
         // set static variables
-        RHCICreate::setControlQueueSize(10);
-        RHCICreate::setTurnOnlyDistance(0.05);
-        Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(30); // degrees
-        Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.20);// meters
-        Controller<RHCICreate, ExtendedKF>::setMaxTries(200);
+        RHCICreate::setControlQueueSize(5);
+        RHCICreate::setTurnOnlyDistance(0.01);
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(0.1); // degrees
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.01);// meters
+        Controller<RHCICreate, ExtendedKF>::setMaxTries(120);
         Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(4.0); // meters
 
         // setting the mean and norm weights (used in reachability check)
         StateType::covNormWeight_  =  1.0;
         StateType::meanNormWeight_ =  2.0;
-        StateType::reachDist_ =  0.1;
+        StateType::reachDist_ =  0.009;
 
         // set the state component norm weights
         arma::colvec normWeights(3);
-        normWeights(0) = 2.0/3.0;
-        normWeights(1) = 2.0/3.0;
-        normWeights(2) = 1.0/3.0;
+        normWeights(0) = 2.0/std::sqrt(9);
+        normWeights(1) = 2.0/std::sqrt(9);
+        normWeights(2) = 1.0/std::sqrt(9);
         StateType::normWeights_ = normWeights;
 
         // The bounds should be inferred from the geometry files,
@@ -86,7 +86,9 @@ public:
         ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space
-        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ;
+        //ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ; // iCreate
+        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) ) ; // Omni
+
         cs_ = controlspace;
 
         // construct an instance of space information from this state space
@@ -98,7 +100,6 @@ public:
         pdef_ = prblm;
 
         start_ = siF_->allocState();
-        goal_  = siF_->allocState();
 
         setup_ = false;
     }
@@ -131,23 +132,16 @@ public:
 
     }
 
-    void setGoalState(const double X, const double Y, const double Yaw)
+    void addGoalState(const double X, const double Y, const double Yaw)
     {
         ompl::base::State *temp = siF_->allocState();
 
         temp->as<StateType>()->setXYYaw(X,Y,Yaw);
 
-        siF_->copyState(goal_,temp);
-
-        siF_->freeState(temp);
+        goalList_.push_back(temp);
 
     }
 
-
-    void setStartAndGoalStates()
-    {
-        pdef_->setStartAndGoalStates(start_, goal_, 1.0);
-    }
 
     void setup()
     {
@@ -174,22 +168,23 @@ public:
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space
-            MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
+            //MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
+            MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));
             siF_->setMotionModel(mm);
 
             ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
-            siF_->setPropagationStepSize(0.01); // this is the duration that a control is applied
+            siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
             siF_->setStateValidityCheckingResolution(0.005);
             siF_->setMinMaxControlDuration(1,100);
 
-            if(!start_ || !goal_)
+            if(!start_ || goalList_.size() == 0)
             {
                 throw ompl::Exception("Start/Goal not set");
             }
 
-            this->setStartAndGoalStates();
+            pdef_->setStartAndGoalStates(start_, goalList_[0], 1.0);
 
             ompl::base::PlannerPtr plnr(new FIRM(siF_, false));
 
@@ -208,6 +203,17 @@ public:
 
     }
 
+    void loadGraphFromFile(std::string pathToRoadMapFile = "FIRMRoadMap.xml")
+    {
+        if(!setup_)
+        {
+            this->setup();
+        }
+
+        planner_->as<FIRM>()->loadRoadMapFromFile(pathToRoadMapFile);
+
+    }
+
     ompl::base::PlannerStatus solve()
     {
         if(!setup_)
@@ -215,16 +221,56 @@ public:
             this->setup();
         }
 
-        std::string pathXML = "FIRMRoadMap.xml";
-
-        planner_->as<FIRM>()->loadRoadMapFromFile(pathXML);
-
         return planner_->solve(planningTime_);
     }
 
-    void executeSolution()
+    void executeSolution(int choice=0)
     {
-        planner_->as<FIRM>()->executeFeedback();
+
+        switch(choice)
+        {
+            case 1:
+
+                planner_->as<FIRM>()->executeFeedbackWithRollout();
+                break;
+
+            case 2:
+
+                planner_->as<FIRM>()->executeFeedbackWithKidnapping();
+                break;
+
+            default:
+
+                planner_->as<FIRM>()->executeFeedback();
+
+                break;
+        }
+
+    }
+
+    void  Run(int choice = 0)
+    {
+
+        executeSolution(choice);
+
+        // Need a function to get terminated state
+        if(goalList_.size() > 1)
+        {
+            for(int i=0; i < goalList_.size()-1;i++)
+            {
+                pdef_->setStartAndGoalStates(goalList_[i], goalList_[i+1], 1.0);
+
+                planner_->setProblemDefinition(pdef_);
+
+                if(this->solve())
+                {
+                    executeSolution(choice);
+                }
+
+            }
+
+        }
+
     }
 
 
@@ -233,11 +279,63 @@ public:
         return boost::bind(&FIRM2DSetup::getGeometricComponentStateInternal, this, _1, _2);
     }
 
+    void saveRoadmap()
+    {
+        planner_->as<FIRM>()->savePlannerData();
+    }
 protected:
 
     const ompl::base::State* getGeometricComponentStateInternal(const ompl::base::State *state, unsigned int /*index*/) const
     {
         return state;
+    }
+
+    void loadGoals()
+    {
+
+        using namespace arma;
+        // Load XML containing landmarks
+        TiXmlDocument doc(pathToSetupFile_);
+        bool loadOkay = doc.LoadFile();
+
+        if(!loadOkay)
+        {
+            printf( "Could not load setup file. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+
+            exit( 1 );
+        }
+
+        TiXmlNode* node = 0;
+        TiXmlElement* landmarkElement = 0;
+        TiXmlElement* itemElement = 0;
+
+        // Get the landmarklist node
+        node = doc.FirstChild( "GoalList" );
+        assert( node );
+        landmarkElement = node->ToElement(); //convert node to element
+        assert( landmarkElement  );
+
+        TiXmlNode* child = 0;
+
+        //Iterate through all the landmarks and put them into the "landmarks_" list
+        while( (child = landmarkElement ->IterateChildren(child)))
+        {
+            assert( child );
+            itemElement = child->ToElement();
+            assert( itemElement );
+
+            double goalX = 0 , goalY = 0, goalTheta = 0;
+
+            itemElement->QueryDoubleAttribute("x", &goalX);
+            itemElement->QueryDoubleAttribute("y", &goalY);
+            itemElement->QueryDoubleAttribute("theta", &goalTheta);
+
+            std::cout<<"Loaded Goal Pose X: "<<goalX<<" Y: "<<goalY<<" Theta: "<<goalTheta<<std::endl;
+
+            addGoalState(goalX, goalY, goalTheta);
+
+        }
+
     }
 
     void loadParameters()
@@ -313,6 +411,7 @@ protected:
         setStartState(startX, startY, startTheta);
 
         // Read the Goal Pose
+        /*
         child  = node->FirstChild("GoalPose");
         assert( child );
 
@@ -326,6 +425,7 @@ protected:
         itemElement->QueryDoubleAttribute("theta", &goalTheta);
 
         setGoalState(goalX, goalY, goalTheta);
+        */
 
         // read planning time
         child  = node->FirstChild("PlanningTime");
@@ -371,17 +471,15 @@ protected:
 
         kidnappedState_->as<SE2BeliefSpace::StateType>()->setXYYaw(kX, kY, kTheta);
 
+        loadGoals();
+
         OMPL_INFORM("Problem configuration is");
 
         std::cout<<"Path to environment mesh: "<<environmentFilePath<<std::endl;
 
         std::cout<<"Path to robot mesh: "<<robotFilePath<<std::endl;
 
-        //std::cout<<"Path to roadmap file: "<<pathToRoadMapFile_<<std::endl;
-
         std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
-
-        std::cout<<"Goal Pose X: "<<goalX<<" Y: "<<goalY<<" Theta: "<<goalTheta<<std::endl;
 
         std::cout<<"Planning Time: "<<planningTime_<<" seconds"<<std::endl;
 
@@ -395,7 +493,7 @@ private:
 
     ompl::base::State *start_;
 
-    ompl::base::State *goal_;
+    std::vector<ompl::base::State*> goalList_;
 
     ompl::base::State *kidnappedState_;
 
@@ -420,7 +518,5 @@ private:
     unsigned int minNodes_;
 
     bool setup_;
-
-    std::string pathToRoadMapFile_;
 };
 #endif
