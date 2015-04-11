@@ -87,8 +87,8 @@ public:
         ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space
-        //ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ; // iCreate
-        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) ) ; // Omni
+        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ; // iCreate
+        //ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) ) ; // Omni
 
         cs_ = controlspace;
 
@@ -167,14 +167,17 @@ public:
             // Create an FCL state validity checker and assign to space information
             const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
             siF_->setStateValidityChecker(fclSVC);
+            siROS_->setStateValidityChecker(fclSVC);
 
             // provide the observation model to the space
             ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(siF_, pathToSetupFile_.c_str()));
             siF_->setObservationModel(om);
+            siROS_->setObservationModel(om);
 
             // Provide the motion model to the space
             MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
             siF_->setMotionModel(mm);
+            siROS_->setMotionModel(mm);
 
             ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
             statePropagator_ = prop;
@@ -182,6 +185,13 @@ public:
             siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
             siF_->setStateValidityCheckingResolution(0.005);
             siF_->setMinMaxControlDuration(1,100);
+
+            //
+            siROS_->setStatePropagator(statePropagator_);
+            siROS_->setPropagationStepSize(0.1); // this is the duration that a control is applied
+            siROS_->setStateValidityCheckingResolution(0.005);
+            siROS_->setMinMaxControlDuration(1,100);
+            //
 
             if(!start_ || goalList_.size() == 0)
             {
@@ -253,6 +263,8 @@ public:
 
     void  Run(int choice = 0)
     {
+
+        planner_->as<FIRM>()->setPolicyExecutionSpace(siROS_); // we want policy execution in ROS space
 
         executeSolution(choice);
 

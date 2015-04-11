@@ -108,7 +108,7 @@ void planROS()
 
     FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
 
-    std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
+    std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 

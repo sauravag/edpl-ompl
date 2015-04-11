@@ -264,7 +264,13 @@ public:
 
     void setKidnappedState(ompl::base::State *state)
     {
-        kidnappedState_ = siF_->cloneState(state);
+        kidnappedState_ = si_->cloneState(state);
+    }
+
+    /** \brief Change the policy execution space. */
+    void setPolicyExecutionSpace(firm::SpaceInformation::SpaceInformationPtr executionSI)
+    {
+        policyExecutionSI_ = executionSI;
     }
 
 protected:
@@ -310,7 +316,6 @@ protected:
     virtual ompl::base::PathPtr constructFeedbackPath(const Vertex &start, const Vertex &goal);
 
     /** \brief Add an edge from vertex a to b in graph */
-    //virtual bool addEdgeToGraph(const Vertex a, const Vertex b);
     virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
 
     /** \brief Generates the cost of the edge */
@@ -411,6 +416,11 @@ protected:
 
     /** \brief The base::SpaceInformation cast as firm::SpaceInformation, for convenience */
     const firm::SpaceInformation::SpaceInformationPtr            siF_;
+
+    /** \brief This is the space in which the policy is executed. By default it is set to the same space that is passed to the constructer.
+                If this space is changed, the observations and controls are both in the context of this new space. Use the setPolicyExecutionSpace
+                function to change this parameter. Particularly useful if you wish to drive a real robot and get sensor readings.*/
+    firm::SpaceInformation::SpaceInformationPtr policyExecutionSI_;
 
     /** \brief A table that stores the edge controllers according to the edges */
     std::map <Edge, EdgeControllerType > edgeControllers_;

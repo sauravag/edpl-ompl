@@ -147,6 +147,8 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     loadedRoadmapFromFile_ = false;
 
+    policyExecutionSI_ = siF_; // by default policies are executed in the same space that the roadmap is generated
+
     makeDataLogPath();
 
 }
@@ -754,7 +756,6 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
     for(unsigned int i=0; i< numParticles_;i++)
     {
 
-
         siF_->setTrueState(startNodeState);
 
         siF_->setBelief(startNodeState);
@@ -1082,6 +1083,8 @@ void FIRM::executeFeedback(void)
 
         int stepsToStop = 0;
 
+        controller.setSpaceInformation(policyExecutionSI_);
+
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
         executionCost_ += cost.value();
@@ -1215,6 +1218,8 @@ void FIRM::executeFeedbackWithKidnapping(void)
         int stepsExecuted = 0;
 
         int stepsToStop = 0;
+
+        controller.setSpaceInformation(policyExecutionSI_);
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
@@ -1380,6 +1385,8 @@ void FIRM::executeFeedbackWithRollout(void)
             Whichever gives the lowest cost to go, is our new path. Do this at every N steps.
         */
         int stepsExecuted = 0;
+
+        controller.setSpaceInformation(policyExecutionSI_);
 
         controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT, cstartState, cendState, cost, stepsExecuted, false);
 
@@ -1780,6 +1787,8 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     auto start_time_sampling = std::chrono::high_resolution_clock::now();
 
+    policyGenerator_->setPolicyExecutionSpace(policyExecutionSI_);
+
     policyGenerator_->sampleNewBeliefStates();
 
     auto end_time_sampling = std::chrono::high_resolution_clock::now();
@@ -1788,9 +1797,9 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     std::cin.get();
 
-    ompl::base::State *currentTrueState = siF_->allocState();
+    //ompl::base::State *currentTrueState = siF_->allocState();
 
-    siF_->getTrueState(currentTrueState);
+    //siF_->getTrueState(currentTrueState);
 
     int counter = 0;
 
@@ -1815,10 +1824,9 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
         //int hzn = policy.size()-1;
         int hzn = ompl::magic::MAX_MM_POLICY_LENGTH > policy.size()? policy.size() : rndnum;
 
-
         for(int i=0; i < hzn ; i++)
         {
-            siF_->applyControl(policy[i],true);
+            policyExecutionSI_->applyControl(policy[i]);
 
             unsigned int numModesBefore = policyGenerator_->getNumberOfModes();
 
@@ -1830,10 +1838,10 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             if(numModesAfter != numModesBefore)
                 break;
 
-            siF_->getTrueState(currentTrueState);
+            //siF_->getTrueState(currentTrueState);
 
             // If the belief's clearance gets below the threshold, break loop & replan
-            if(!policyGenerator_->doCurrentBeliefsSatisfyClearance(i) /*|| siF_->getStateValidityChecker()->clearance(currentTrueState) < ompl::magic::MIN_ROBOT_CLEARANCE*/)
+            if(!policyGenerator_->doCurrentBeliefsSatisfyClearance(i))
             {
                 if(counter == 0)
                 {

@@ -41,8 +41,6 @@ void firm::ROSSpaceInformation::arucoListenerCallback(const aruco_msgs::MarkerAr
 {
     int numMarkers = msg.markers.size();
 
-    std::cout<<"Num markers :"<<numMarkers<<std::endl ;
-
     ObservationModelMethod::ObservationType z;
 
     // From the aruco observation model, get the dimension of a single observation
@@ -57,8 +55,6 @@ void firm::ROSSpaceInformation::arucoListenerCallback(const aruco_msgs::MarkerAr
         double range, bearing;
 
         calculateRangeBearingToMarker(marker_i.pose.pose.position.x, marker_i.pose.pose.position.y, marker_i.pose.pose.position.z, range, bearing);
-
-        std::cout<<"The range and bearing to marker are: "<<range<<"  : "<<bearing<<std::endl;
 
         z[singleObservationDim*i] = marker_i.id ; // id of the landmark
         z[singleObservationDim*i + 1] = range; // distance to landmark
@@ -83,7 +79,6 @@ void firm::ROSSpaceInformation::calculateRangeBearingToMarker(double x, double y
 
 void firm::ROSSpaceInformation::applyControl(const ompl::control::Control *control, bool withNoise)
 {
-    std::cout<<"ROS apply control called"<<std::endl ;
 
     const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
 
@@ -106,11 +101,6 @@ void firm::ROSSpaceInformation::applyControl(const ompl::control::Control *contr
 
 ObservationModelMethod::ObservationType firm::ROSSpaceInformation::getObservation()
 {
-    std::cout<<"ROS get obs called"<<std::endl ;
-
-    std::cout<<"The observation through ros is : \n"<<cameraObservation_<<std::endl;
-
     return cameraObservation_;
-
 }
 

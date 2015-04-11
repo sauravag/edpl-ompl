@@ -84,6 +84,7 @@ class MMPolicyGenerator
         edgeIDProperty_(boost::get(boost::edge_index, g_))
         {
             previousPolicy_.push_back(si_->getMotionModel()->getZeroControl());
+            policyExecutionSI_ = si_;
         }
 
         /** \brief Destructor */
@@ -213,6 +214,11 @@ class MMPolicyGenerator
             return weights_.size();
         }
 
+        void setPolicyExecutionSpace(firm::SpaceInformation::SpaceInformationPtr executionSI)
+        {
+            policyExecutionSI_ = executionSI;
+        }
+
     private:
 
         //float computeWeightForMode(const int currentBeliefIndx,const arma::colvec trueObservation);
@@ -261,6 +267,11 @@ class MMPolicyGenerator
 
         /** \brief Pointer to the state space information*/
         firm::SpaceInformation::SpaceInformationPtr si_;
+
+        /** \brief This is the space in which the policy is executed. By default it is set to the same space that is passed to the constructer.
+                If this space is changed, the observations and controls are both in the context of this new space. Use the setPolicyExecutionSpace
+                function to change this parameter. Particularly useful if you wish to drive a real robot and get sensor readings.*/
+        firm::SpaceInformation::SpaceInformationPtr policyExecutionSI_;
 
         /** \brief Container for the previous open loop policy*/
         std::vector<ompl::control::Control*> previousPolicy_;

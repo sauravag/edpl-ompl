@@ -146,7 +146,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 
     OMPL_INFORM("MMPolicyGenerator: Sample Belief Weights Added");
 
-    arma::colvec obs = si_->getObservation();
+    arma::colvec obs = policyExecutionSI_->getObservation();
 
     OMPL_INFORM("MMPolicyGenerator: Updating the weights before proceeding");
 
@@ -427,7 +427,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, 
 
     LinearSystem dummy;
 
-    arma::colvec obs = si_->getObservation();
+    arma::colvec obs = policyExecutionSI_->getObservation();
 
     for(unsigned int i = 0; i < currentBeliefStates_.size(); i++)
     {
