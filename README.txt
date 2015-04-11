@@ -65,7 +65,7 @@ space, then you would need to define a new belief space class. For example, if y
 How To Integrate With ROS
 ---------------------------------------
 
-Integration with a real robot through ROS or any other system, simply requires that during policy execution, the apply control and get observation commands are sent to the right "SpaceInformation". For example, we provide a ROSSpaceInformation class that subscribes 
+Integration with a real robot through ROS or any other system, simply requires that during policy execution, the apply control and get observation commands are sent to the right "SpaceInformation". For example, we provide a ROSSpaceInformation class.
 
 ---------------------------------------
 How To Contribute
