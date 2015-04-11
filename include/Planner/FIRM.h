@@ -58,7 +58,7 @@
 #include "../Filters/LinearizedKF.h"
 #include "../Path/FeedbackPath.h"
 #include "../ConnectionStrategy/FStrategy.h"
-#include "MMPolicyGenerator.h"
+#include "NBM3P.h"
 /**
    @anchor FIRM
    @par Short description
@@ -439,7 +439,7 @@ protected:
     /** \brief The minimum number of nodes that should be sampled. */
     unsigned int minFIRMNodes_;
 
-    MMPolicyGenerator *policyGenerator_;
+    NBM3P *policyGenerator_;
 
     bool loadedRoadmapFromFile_;
 

@@ -34,7 +34,7 @@
 
 /* Author: Saurav Agarwal */
 
-#include "../../include/Planner/MMPolicyGenerator.h"
+#include "../../include/Planner/NBM3P.h"
 #include <boost/thread.hpp>
 #include "../../include/Visualization/Visualizer.h"
 #include "../../include/Utils/FIRMUtils.h"
@@ -75,7 +75,7 @@ namespace ompl
     }
 }
 
-void MMPolicyGenerator::sampleNewBeliefStates()
+void NBM3P::sampleNewBeliefStates()
 {
     /**
     Logic:
@@ -110,7 +110,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     cov(1,1) = 0.25;
     cov(2,2) = 0.01;
 
-    OMPL_INFORM("MMPolicyGenerator: Sampling start beliefs");
+    OMPL_INFORM("NBM3P: Sampling start beliefs");
 
 
     for(int i = 0; i <= gridSizeX; i++)
@@ -140,15 +140,15 @@ void MMPolicyGenerator::sampleNewBeliefStates()
         }
     }
 
-    OMPL_INFORM("MMPolicyGenerator: Sampling beliefs Completed");
+    OMPL_INFORM("NBM3P: Sampling beliefs Completed");
 
     assignUniformWeight();
 
-    OMPL_INFORM("MMPolicyGenerator: Sample Belief Weights Added");
+    OMPL_INFORM("NBM3P: Sample Belief Weights Added");
 
     arma::colvec obs = policyExecutionSI_->getObservation();
 
-    OMPL_INFORM("MMPolicyGenerator: Updating the weights before proceeding");
+    OMPL_INFORM("NBM3P: Updating the weights before proceeding");
 
     unsigned int numModes = currentBeliefStates_.size();
     unsigned int updatedNumModes = 0;
@@ -190,7 +190,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
     this->printWeights();
 
     // Print the states
-    OMPL_INFORM("MMPolicyGenerator: The final sampled beliefs are :");
+    OMPL_INFORM("NBM3P: The final sampled beliefs are :");
     for(int i=0; i< currentBeliefStates_.size(); i++)
     {
         si_->printState(currentBeliefStates_[i]);
@@ -200,7 +200,7 @@ void MMPolicyGenerator::sampleNewBeliefStates()
 
 
 
-void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &policy)
+void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
 {
     si_->showRobotVisualization(false);
 
@@ -284,7 +284,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
         for(unsigned int j = 0; j < currentBeliefStates_.size(); j++)
         {
 
-            OMPL_INFORM("MMPolicyGenerator: Evaluating Policy Number #%u  on Mode Number #%u",i,j);
+            OMPL_INFORM("NBM3P: Evaluating Policy Number #%u  on Mode Number #%u",i,j);
 
             ompl::base::Cost c = executeOpenLoopPolicyOnMode(openLoopPolicies[i],currentBeliefStates_[j]);
 
@@ -296,7 +296,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
         //pGain.v = weights_[i]*pGain.v;
         pGain = ompl::base::Cost(weights_[i]*pGain.value());
 
-        OMPL_INFORM("MMPolicyGenerator: Weighted Information Gain for Policy #%u = %f",i,pGain.value());
+        OMPL_INFORM("NBM3P: Weighted Information Gain for Policy #%u = %f",i,pGain.value());
 
         policyInfGains.push_back(pGain);
 
@@ -308,7 +308,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
         }
     }
 
-    OMPL_INFORM("MMPolicyGenerator: Max gain policy index = %u", maxGainPolicyIndx);
+    OMPL_INFORM("NBM3P: Max gain policy index = %u", maxGainPolicyIndx);
 
     //std::cin.get();
 
@@ -317,7 +317,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     //TODO: If all policies have same expected gain, then pick one randomly
     if( maxGainPolicyIndx >= 0)
     {
-        OMPL_INFORM("MMPolicyGenerator: A minimum cost policy was found");
+        OMPL_INFORM("NBM3P: A minimum cost policy was found");
 
         policy = openLoopPolicies[maxGainPolicyIndx];
 
@@ -341,7 +341,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
 
 }
 
-ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls,
+ompl::base::Cost NBM3P::executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls,
                                                                 const ompl::base::State* state)
 {
 
@@ -378,7 +378,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
         {
             //olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1);
             olpInfGain = ompl::base::Cost(olpInfGain.value() - ompl::magic::COLISSION_FAILURE_COST/(i+1));
-            OMPL_INFORM("MMPolicyGenerator: Collided in sim");
+            OMPL_INFORM("NBM3P: Collided in sim");
             //std::cin.get();
             break;
         }
@@ -420,7 +420,7 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
 }
 
 
-void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, bool isSimulation)
+void NBM3P::propagateBeliefs(const ompl::control::Control *control, bool isSimulation)
 {
     // To propagate beliefs we need to apply the control to the true state, get observations and update the beliefs.
     ExtendedKF kf(si_);
@@ -449,7 +449,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, 
     /*
     if(!isSimulation)
     {
-        OMPL_INFORM("MMPolicyGenerator: BEFORE updating weights in propogate: ");
+        OMPL_INFORM("NBM3P: BEFORE updating weights in propogate: ");
         this->printWeights();
     }
     */
@@ -459,7 +459,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, 
     /*
     if(!isSimulation)
     {
-        OMPL_INFORM("MMPolicyGenerator: AFTER updating weights in propogate: ");
+        OMPL_INFORM("NBM3P: AFTER updating weights in propogate: ");
         this->printWeights();
     }
     */
@@ -471,7 +471,7 @@ void MMPolicyGenerator::propagateBeliefs(const ompl::control::Control *control, 
 
 }
 
-bool MMPolicyGenerator::areSimilarWeights()
+bool NBM3P::areSimilarWeights()
 {
 
     arma::colvec w(weights_.size(),1);
@@ -491,7 +491,7 @@ bool MMPolicyGenerator::areSimilarWeights()
     return false;
 }
 
-void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
+void NBM3P::updateWeights(const arma::colvec trueObservation)
 {
 
     arma::colvec sigma(2);
@@ -576,7 +576,7 @@ void MMPolicyGenerator::updateWeights(const arma::colvec trueObservation)
 
 /*
 // Alternate implementation of calculating weight update
-float MMPolicyGenerator::computeWeightForMode(const int currentBeliefIndx,const arma::colvec trueObservation)
+float NBM3P::computeWeightForMode(const int currentBeliefIndx,const arma::colvec trueObservation)
 {
     const int singleObservationDim = 4;//CamAruco2DObservationModel::singleObservationDim;
 
@@ -682,7 +682,7 @@ float MMPolicyGenerator::computeWeightForMode(const int currentBeliefIndx,const 
 */
 
 
-arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,const arma::colvec trueObservation, double &weightFactor)
+arma::colvec NBM3P::computeInnovation(const int currentBeliefIndx,const arma::colvec trueObservation, double &weightFactor)
 {
     const int singleObservationDim = 4;//CamAruco2DObservationModel::singleObservationDim;
 
@@ -761,7 +761,7 @@ arma::colvec MMPolicyGenerator::computeInnovation(const int currentBeliefIndx,co
     return innov;
 }
 
-void MMPolicyGenerator::removeBeliefs(const std::vector<int> Indxs)
+void NBM3P::removeBeliefs(const std::vector<int> Indxs)
 {
     // Make a local copy
     std::vector<ompl::base::State*> currentBeliefStatesCopy = currentBeliefStates_;
@@ -795,7 +795,7 @@ void MMPolicyGenerator::removeBeliefs(const std::vector<int> Indxs)
 }
 
 
-bool MMPolicyGenerator::isConverged()
+bool NBM3P::isConverged()
 {
 
     if(currentBeliefStates_.size()==1)
@@ -807,7 +807,7 @@ bool MMPolicyGenerator::isConverged()
 }
 
 
- bool MMPolicyGenerator::doCurrentBeliefsSatisfyClearance(int currentStep)
+ bool NBM3P::doCurrentBeliefsSatisfyClearance(int currentStep)
 {
 
     int clearanceHorizon  = 20; // check 10 steps ahead
@@ -841,7 +841,7 @@ bool MMPolicyGenerator::isConverged()
 
         if( clearance < ompl::magic::MIN_ROBOT_CLEARANCE)
         {
-            OMPL_INFORM("MMPolicyGenerator: Mode #%u  clearance: %f", i, clearance);
+            OMPL_INFORM("NBM3P: Mode #%u  clearance: %f", i, clearance);
 
             //std::cin.get();
 
@@ -854,7 +854,7 @@ bool MMPolicyGenerator::isConverged()
     return true;
 }
 
- bool MMPolicyGenerator::areCurrentBeliefsValid()
+ bool NBM3P::areCurrentBeliefsValid()
 {
     if(currentBeliefStates_.size()==1)
         return true;
@@ -869,7 +869,7 @@ bool MMPolicyGenerator::isConverged()
     return true;
 }
 
-void MMPolicyGenerator::removeDuplicateModes()
+void NBM3P::removeDuplicateModes()
 {
     std::vector<int> toDelete;
 
@@ -912,7 +912,7 @@ void MMPolicyGenerator::removeDuplicateModes()
 }
 
 
-void MMPolicyGenerator::drawBeliefs()
+void NBM3P::drawBeliefs()
 {
 
     Visualizer::clearBeliefModes();
@@ -924,7 +924,7 @@ void MMPolicyGenerator::drawBeliefs()
 
 }
 
-void MMPolicyGenerator::getStateWithMaxWeight(ompl::base::State *state, float &weight)
+void NBM3P::getStateWithMaxWeight(ompl::base::State *state, float &weight)
 {
 
     std::vector<float>::iterator biggest = std::max_element(weights_.begin(), weights_.end());
@@ -938,7 +938,7 @@ void MMPolicyGenerator::getStateWithMaxWeight(ompl::base::State *state, float &w
 }
 
 
-void MMPolicyGenerator::normalizeWeights()
+void NBM3P::normalizeWeights()
 {
     float totalWeight = std::accumulate(weights_.begin(), weights_.end(), 0.0);
 
@@ -950,7 +950,7 @@ void MMPolicyGenerator::normalizeWeights()
     }
 }
 
-void MMPolicyGenerator::assignUniformWeight()
+void NBM3P::assignUniformWeight()
 {
     int Nm = weights_.size();
 
@@ -964,7 +964,7 @@ void MMPolicyGenerator::assignUniformWeight()
 
 }
 
-void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
+void NBM3P::addStateToObservationGraph(ompl::base::State *state)
 {
 
     // Add state to graph
@@ -983,7 +983,7 @@ void MMPolicyGenerator::addStateToObservationGraph(ompl::base::State *state)
 }
 
 
-void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b)
+void NBM3P::addEdgeToObservationGraph(const Vertex a, const Vertex b)
 {
 
     // See if there is an overlap in observation between the two vertices
@@ -1003,7 +1003,7 @@ void MMPolicyGenerator::addEdgeToObservationGraph(const Vertex a, const Vertex b
 
 }
 
-void MMPolicyGenerator::evaluateObservationListForVertex(const Vertex v)
+void NBM3P::evaluateObservationListForVertex(const Vertex v)
 {
     // get Zero Noise Observation
     arma::colvec obs = si_->getObservationModel()->getObservation(stateProperty_[v], false);
@@ -1020,7 +1020,7 @@ void MMPolicyGenerator::evaluateObservationListForVertex(const Vertex v)
     stateObservationProperty_[v] = obsList;
 }
 
-bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
+bool NBM3P::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
 {
 
     // get the list of observations for both vertices
@@ -1063,7 +1063,7 @@ bool MMPolicyGenerator::getObservationOverlap(Vertex a, Vertex b, unsigned int &
     return isOverlapping;
 }
 
-std::vector<MMPolicyGenerator::Vertex> MMPolicyGenerator::getNeighbors(const ompl::base::State *state)
+std::vector<NBM3P::Vertex> NBM3P::getNeighbors(const ompl::base::State *state)
 {
     std::vector<Vertex> nn;
 
@@ -1078,7 +1078,7 @@ std::vector<MMPolicyGenerator::Vertex> MMPolicyGenerator::getNeighbors(const omp
     return nn;
 }
 
-MMPolicyGenerator::Vertex MMPolicyGenerator::findTarget(const unsigned int beliefStateIndx)
+NBM3P::Vertex NBM3P::findTarget(const unsigned int beliefStateIndx)
 {
     // mapping from index of belief state to its neighbors
     std::map<unsigned int, std::vector<Vertex> > setOfAllNeighbors;
@@ -1139,7 +1139,7 @@ MMPolicyGenerator::Vertex MMPolicyGenerator::findTarget(const unsigned int belie
     return neighborsOfBelief[targetNodeIndx];
 }
 
-int MMPolicyGenerator::calculateIntersectionWithNeighbor(const Vertex v, std::vector<Vertex> neighbors)
+int NBM3P::calculateIntersectionWithNeighbor(const Vertex v, std::vector<Vertex> neighbors)
 {
     int w = 0;
 

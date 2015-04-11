@@ -143,7 +143,7 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     costToGoHistory_.push_back(std::make_pair(currentTimeStep_,executionCost_));
 
-    policyGenerator_ = new MMPolicyGenerator(si);
+    policyGenerator_ = new NBM3P(si);
 
     loadedRoadmapFromFile_ = false;
 

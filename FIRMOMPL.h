@@ -75,9 +75,6 @@
 #include "include/SeparatedControllers/SeparatedControllerMethod.h"
 #include "include/SeparatedControllers/RHCICreate.h"
 
-//ActuationSystems
-//#include "include/ActuationSystems/ActuationSystemMethod.h"
-//#include "include/ActuationSystems/SimulatedActuationSystem.h"
 
 //Controllers
 #include "include/Controllers/Controller.h"
@@ -90,7 +87,7 @@
 #include "include/ValidityCheckers/FIRMValidityChecker.h"
 
 //Multi-Modal
-#include "include/Planner/MMPolicyGenerator.h"
+#include "include/Planner/NBM3P.h"
 
 // FIRM Optimization Objective
 //#include "include/OptimizationObjectives/FIRMOptimizationObjective.h"

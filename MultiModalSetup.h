@@ -213,7 +213,7 @@ public:
 
             planner_->setup();
 
-            policyGenerator_ = new MMPolicyGenerator(siF_);
+            policyGenerator_ = new NBM3P(siF_);
 
             //policyGenerator_->sampleNewBeliefStates();
 
@@ -544,7 +544,7 @@ private:
 
     std::vector<ompl::base::State*> targetStates_;
 
-    MMPolicyGenerator *policyGenerator_;
+    NBM3P *policyGenerator_;
 
 };
 #endif
