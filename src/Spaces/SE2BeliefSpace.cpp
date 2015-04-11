@@ -67,24 +67,16 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxed
 
     double norm2 =  std::max(meanNorm*meanNormWeight_, covDiagNorm*covNormWeight_) ;
 
-<<<<<<< HEAD
-    if(norm2 <= reachDist_)
-=======
     double reachConstraint  = reachDist_;
 
     if(relaxedConstraint)
         reachConstraint *= 4;
 
     if(norm2 <= reachConstraint)
->>>>>>> dev
     {
         return true;
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> dev
     return false;
 
 }

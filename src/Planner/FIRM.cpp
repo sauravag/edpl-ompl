@@ -70,12 +70,8 @@ namespace ompl
         /** \brief The time in seconds for a single roadmap building operation */
         static const double ROADMAP_BUILD_TIME = 60;
 
-<<<<<<< HEAD
-        static const double NUM_MONTE_CARLO_PARTICLES = 10;
-=======
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
         static const double NUM_MONTE_CARLO_PARTICLES = 4; // minimum 10 for FIRM, 4 for rollout
->>>>>>> dev
 
         /** \brief For a node that is not observable, use a fixed covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1;
@@ -195,11 +191,7 @@ void FIRM::setMaxNearestNeighbors(unsigned int k)
         connectionStrategy_.clear();
     if (isSetup())
         setup();
-<<<<<<< HEAD
 
-    //connectionStrategy_ = ompl::geometric::KStrategy<Vertex>(k, nn_);
-=======
->>>>>>> dev
 }
 
 void FIRM::setProblemDefinition(const ompl::base::ProblemDefinitionPtr &pdef)
@@ -773,12 +765,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
         ompl::base::Cost filteringCost(0);
 
-<<<<<<< HEAD
-           //edgeCost.v = edgeCost.v + pcost.v ;
-           edgeCost = ompl::base::Cost(edgeCost.value() + pcost.value());
-=======
         int stepsExecuted = 0;
->>>>>>> dev
 
         int stepsToStop = 0;
 
@@ -792,22 +779,10 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
         }
     }
 
-<<<<<<< HEAD
-    if (successCount > 0)
-    {
-        //edgeCost.v = edgeCost.v / successCount ;
-        edgeCost = ompl::base::Cost(edgeCost.value()/successCount);
-    }
-    else
-    {
-        edgeCost = ompl::base::Cost(ompl::magic::EXTREMELY_HIGH_EDGE_COST); // extremely high cost if no particle could succeed, we can also simply not add this edge
-    }
-=======
     siF_->showRobotVisualization(true);
 
     //edgeCost.v = edgeCost.v / successCount ;
     edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
->>>>>>> dev
 
     double transitionProbability = successCount / numParticles_ ;
 
@@ -1286,8 +1261,6 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         }
 
-<<<<<<< HEAD
-=======
         si_->freeState(tempTrueStateCopy);
 
         /**
@@ -1332,7 +1305,6 @@ void FIRM::executeFeedbackWithKidnapping(void)
             kidnapped_flag = false;
         }
 
->>>>>>> dev
         si_->copyState(cstartState, cendState);
 
     }

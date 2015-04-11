@@ -279,11 +279,7 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
     {
         ompl::base::Cost pGain(0);
 
-<<<<<<< HEAD
-        //pGain.v = 0;
-=======
         pGain = ompl::base::Cost(0);
->>>>>>> dev
 
         for(unsigned int j = 0; j < currentBeliefStates_.size(); j++)
         {
@@ -293,21 +289,15 @@ void MMPolicyGenerator::generatePolicy(std::vector<ompl::control::Control*> &pol
             ompl::base::Cost c = executeOpenLoopPolicyOnMode(openLoopPolicies[i],currentBeliefStates_[j]);
 
             //pGain.v += c.v;
-<<<<<<< HEAD
-            pGain = ompl::base::Cost(pGain.value()+c.value());
-=======
+
             pGain = ompl::base::Cost(pGain.value() + c.value());
->>>>>>> dev
 
         }
 
         //pGain.v = weights_[i]*pGain.v;
         pGain = ompl::base::Cost(weights_[i]*pGain.value());
-<<<<<<< HEAD
-=======
 
         OMPL_INFORM("MMPolicyGenerator: Weighted Information Gain for Policy #%u = %f",i,pGain.value());
->>>>>>> dev
 
         policyInfGains.push_back(pGain);
 
@@ -363,13 +353,6 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
          I1 +=   weights_[i]/arma::trace(currentBeliefStates_[i]->as<SE2BeliefSpace::StateType>()->getCovariance());
     }
 
-<<<<<<< HEAD
-    ompl::base::State *tempState = si_->allocState();
-
-    ompl::base::State *nextState = si_->allocState();
-=======
->>>>>>> dev
-
     std::vector<float> weightsCopy = weights_;
     std::vector<ompl::base::State*> currentBeliefStatesCopy;
 
@@ -378,16 +361,10 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
         currentBeliefStatesCopy.push_back(si_->cloneState(currentBeliefStates_[i]));
     }
 
-<<<<<<< HEAD
-    ompl::base::Cost olpInfGain(0);
-
-    //olpInfGain.v = 0;
-=======
     ompl::base::State *currentTrueState = si_->allocState();
     si_->getTrueState(currentTrueState);
 
     si_->setTrueState(state);
->>>>>>> dev
 
     ompl::base::Cost olpInfGain(0);
 
@@ -423,13 +400,8 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
     //olpInfGain.v +=  changeInNumberOfModes;
     olpInfGain = ompl::base::Cost(olpInfGain.value() + changeInNumberOfModes);
 
-<<<<<<< HEAD
-        //olpInfGain.v += 1/I_2-1/I_1;
-        olpInfGain = ompl::base::Cost(1/I_2-1/I_1+olpInfGain.value());
-=======
     // reset old weight values
     weights_ = weightsCopy;
->>>>>>> dev
 
     // free unneeded states
     for(int i = 0; i < currentBeliefStates_.size(); i++)
@@ -437,15 +409,8 @@ ompl::base::Cost MMPolicyGenerator::executeOpenLoopPolicyOnMode(std::vector<ompl
          si_->freeState(currentBeliefStates_[i]);
     }
 
-<<<<<<< HEAD
-            //olpInfGain.v -= ompl::magic::COLISSION_FAILURE_COST/(i+1);
-            olpInfGain = ompl::base::Cost(olpInfGain.value()-ompl::magic::COLISSION_FAILURE_COST/(i+1)); // add a high cost for collision, the sooner the robot collides, more the cost
-            break;
-        }
-=======
     // set back to old states
     currentBeliefStates_ = currentBeliefStatesCopy;
->>>>>>> dev
 
     // set back true state
     si_->setTrueState(currentTrueState);
