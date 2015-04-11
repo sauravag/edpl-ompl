@@ -264,12 +264,14 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         si_->copyState(internalState, tempEndState);
 
         // if the propagated state is not valid, return false
+        /*
         if(!si_->checkTrueStateValidity())
         {
             si_->copyState(endState, internalState);
 
             return false;
         }
+        */
 
         if(k<lss_.size())
           nominalX_K = lss_[k].getX();

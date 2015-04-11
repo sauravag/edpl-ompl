@@ -74,7 +74,7 @@ void firm::ROSSpaceInformation::calculateRangeBearingToMarker(double x, double y
     double markerX_wrt_robot = z; // The distance to marker along x axis of robot
     double markerY_wrt_robot = x; // the distamce to marker along y axis of robot
 
-    bearing = atan2(markerY_wrt_robot, markerX_wrt_robot) ;
+    bearing = -atan2(markerY_wrt_robot, markerX_wrt_robot) ;
 }
 
 void firm::ROSSpaceInformation::applyControl(const ompl::control::Control *control, bool withNoise)
