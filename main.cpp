@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/SetupFIRMExp2.xml";
+    std::string setupFilePath = "./SetupFiles/SetupFIRMExp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
