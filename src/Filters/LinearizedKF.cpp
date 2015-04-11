@@ -39,14 +39,14 @@
 void LinearizedKF::Predict(const ompl::base::State *belief,
   const ompl::control::Control* control, const LinearSystem& ls, ompl::base::State *predictedState)
 {
-  using namespace arma;
+    using namespace arma;
 
-  this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predictedState);
+    this->motionModel_->Evolve(belief, control,this->motionModel_->getZeroNoise(), predictedState);
 
-  mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
+    mat covPred = ls.getA() * belief->as<StateType>()->getCovariance() * trans(ls.getA()) +
     ls.getG() * ls.getQ() * trans(ls.getG());
 
-  predictedState->as<StateType>()->setCovariance(covPred);
+    predictedState->as<StateType>()->setCovariance(covPred);
 
 }
 
@@ -55,35 +55,35 @@ void LinearizedKF::Update(const ompl::base::State *belief, const typename Observ
 const LinearSystem& ls, ompl::base::State *updatedState)
 {
 
-  using namespace arma;
+    using namespace arma;
 
-  colvec innov = this->observationModel_->computeInnovation(belief, obs);
+    colvec innov = this->observationModel_->computeInnovation(belief, obs);
 
-  if(!innov.n_rows || !innov.n_cols)
-  {
-    updatedState = si_->cloneState(belief);
-    return; // return the prediction if you don't have any innovation
-  }
+    if(!innov.n_rows || !innov.n_cols)
+    {
+        updatedState = si_->cloneState(belief);
+        return; // return the prediction if you don't have any innovation
+    }
 
-  assert(innov.n_rows);
-  assert(innov.n_cols);
+    assert(innov.n_rows);
+    assert(innov.n_cols);
 
-  mat covPred = belief->as<StateType>()->getCovariance();
+    mat covPred = belief->as<StateType>()->getCovariance();
 
-  mat rightMatrix = ls.getH() * covPred * trans(ls.getH()) + ls.getR();
-  mat leftMatrix = covPred * trans(ls.getH());
-  mat KalmanGain = solve(trans(rightMatrix), trans(leftMatrix));
-  KalmanGain = KalmanGain.t();
+    mat rightMatrix = ls.getH() * covPred * trans(ls.getH()) + ls.getR();
+    mat leftMatrix = covPred * trans(ls.getH());
+    mat KalmanGain = solve(trans(rightMatrix), trans(leftMatrix));
+    KalmanGain = KalmanGain.t();
 
-  colvec xPredVec = belief->as<StateType>()->getArmaData();
+    colvec xPredVec = belief->as<StateType>()->getArmaData();
 
-  colvec xEstVec = xPredVec + KalmanGain*innov;
+    colvec xEstVec = xPredVec + KalmanGain*innov;
 
-  updatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
+    updatedState->as<StateType>()->setXYYaw(xEstVec[0], xEstVec[1], xEstVec[2]);
 
-  mat covEst = covPred - KalmanGain* ls.getH() * covPred;
+    mat covEst = covPred - KalmanGain* ls.getH() * covPred;
 
-  updatedState->as<StateType>()->setCovariance(covEst);
+    updatedState->as<StateType>()->setCovariance(covEst);
 
  }
 
@@ -96,45 +96,50 @@ void LinearizedKF::Evolve(const ompl::base::State *belief,
     ompl::base::State *evolvedState)
 {
 
-  using namespace arma;
+    using namespace arma;
 
-  ompl::base::State *bPred = si_->allocState();
+    ompl::base::State *bPred = si_->allocState();
 
-  Predict(belief, control, lsPred, bPred);
+    Predict(belief, control, lsPred, bPred);
 
-  if(!obs.n_rows || !obs.n_cols) {
-    return;
-  }
+    if(!obs.n_rows || !obs.n_cols)
+    {
+        return;
+    }
 
-  Update(bPred, obs, lsUpdate, evolvedState);
+    Update(bPred, obs, lsUpdate, evolvedState);
 
-  si_->freeState(bPred);
+    si_->freeState(bPred);
 }
 
 
 
 arma::mat LinearizedKF::computeStationaryCovariance (const LinearSystem& ls)
 {
-  using namespace arma;
+    using namespace arma;
 
-  mat H = ls.getH();
-  mat M = ls.getM();
-  mat R = ls.getR();
+    mat H = ls.getH();
+    mat M = ls.getM();
+    mat R = ls.getR();
 
-  mat Pprd;
-  bool dareSolvable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
+    mat Pprd;
+    bool dareSolvable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
     ls.getM() * ls.getR() * trans(ls.getM()), Pprd );
 
-  if(!dareSolvable) OMPL_ERROR("Dare Unsolvable: The given system state is not stable/observable.");
+    if(!dareSolvable)
+    {
+        OMPL_ERROR("Dare Unsolvable: The given system state is not stable/observable. Try a different state.");
+        exit(1);
+    }
 
-  //makes this symmetric
-  Pprd = (Pprd + trans(Pprd)) / 2;
+    //makes this symmetric
+    Pprd = (Pprd + trans(Pprd)) / 2;
 
-  mat Pest = Pprd - ( Pprd * H.t()) * inv( H*Pprd*H.t() + M * R * M.t(), true) * trans(Pprd * H.t()) ;
+    mat Pest = Pprd - ( Pprd * H.t()) * inv( H*Pprd*H.t() + M * R * M.t(), true) * trans(Pprd * H.t()) ;
 
-  //makes this symmetric
-  Pest = (Pest + trans(Pest)) / 2;
+    //makes this symmetric
+    Pest = (Pest + trans(Pest)) / 2;
 
-  return Pest;
+    return Pest;
 
 }

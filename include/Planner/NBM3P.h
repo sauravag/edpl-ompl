@@ -33,8 +33,8 @@
 *********************************************************************/
 /* Author: Saurav Agarwal */
 
-#ifndef FIRM_OMPL_MM_POLICY_GENERATOR_H
-#define FIRM_OMPL_MM_POLICY_GENERATOR_H
+#ifndef NBM3P_H
+#define NBM3P_H
 
 
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -50,11 +50,26 @@
 #include "../Filters/ExtendedKF.h"
 
 /** \para
-The MMPolicyGenerator class's job is to generate the best next control to disambiguate the belief
+NBM3P is a planner for Non-Gaussian Belief State. Stated simply, its job is to generate the best next control to disambiguate the belief
 given the current modes.
+Key features:
+
+1) We represent the belief with a Gaussian Mixture Model (GMM) rather than particles.
+
+2) Instead of basing actions on the most-likely hypothesis, we create candidate actions based on each mode and evaluate
+the best one.
+
+3) We use a sampling based planner i.e. RRT* to plan candidate trajectories. (One can also simply use RRTs but
+due to insignificant overhead in using RRT* over RRT we prefer RRT* as it gives us the benefit of optimality)
+
+4) We introduce a switching behavior in the belief representation during the online-phase from Gaussian to non-Gaussian,
+and back, as required. Our argument is that most of the times, the belief is well represented by a Gaussian, wherever
+this is not the case, we switch to a GMM and our algorithm creates plans that converge back to a uni-modal Gaussian.
+
+5) We present simulation results for a 2D navigation problem in which a robot is kidnapped.
 */
 
-class MMPolicyGenerator
+class NBM3P
 {
 
     public:
@@ -77,7 +92,7 @@ class MMPolicyGenerator
         typedef boost::shared_ptr< ompl::NearestNeighbors<Vertex> > RoadmapNeighbors;
 
         /** \brief Constructor */
-        MMPolicyGenerator(firm::SpaceInformation::SpaceInformationPtr si):si_(si),
+        NBM3P(firm::SpaceInformation::SpaceInformationPtr si):si_(si),
         maxEdgeID_(0),
         stateProperty_(boost::get(vertex_state_t(), g_)),
         weightProperty_(boost::get(boost::edge_weight, g_)),
@@ -88,7 +103,7 @@ class MMPolicyGenerator
         }
 
         /** \brief Destructor */
-        virtual ~MMPolicyGenerator()
+        virtual ~NBM3P()
         {
             while(!currentBeliefStates_.empty())
             {
@@ -183,11 +198,11 @@ class MMPolicyGenerator
         /** \brief Print the mode weights*/
         void printWeights() const
         {
-            OMPL_INFORM("MMPolicyGenerator: Printing Weights");
+            OMPL_INFORM("NBM3P: Printing Weights");
 
             for(unsigned int i=0; i < weights_.size(); i++)
             {
-                OMPL_INFORM("MMPolicyGenerator: The Weight of mode #%u = %f ",i,weights_[i]);
+                OMPL_INFORM("NBM3P: The Weight of mode #%u = %f ",i,weights_[i]);
             }
 
         }
@@ -308,6 +323,7 @@ class MMPolicyGenerator
         /** \brief Mutex to guard access to the Graph member (g_) */
         mutable boost::mutex                                   graphMutex_;
 
+        /** \brief Used to track the maximum number of Edges in the Uniqueness graph */
         unsigned int maxEdgeID_;
 
         /** \brief keep a track of how long a belief has been predicting to observe something that is not seen by the robot*/

@@ -190,11 +190,6 @@
         y = "36"
         theta = "0"
     />
-    <GoalPose
-        x = "7.0"
-        y = "5.0"
-        theta = "0"
-    />
     <PlanningTime
         maxTime = "600"
     />
@@ -205,3 +200,6 @@
         x = 14.5 y = 37 theta = 1.57 
     />
 </PlanningProblem>
+<GoalList>
+    <GoalPose  x = "7.0"   y = "5.0"  theta = "0" />
+</GoalList>
