@@ -93,9 +93,12 @@ void firm::ROSSpaceInformation::applyControl(const ompl::control::Control *contr
     cmd_vel.angular.y = 0.0;
     cmd_vel.angular.z = conVals[1];
 
+    OMPL_INFORM("The published commands are v: %f  w: %f", conVals[0], conVals[1]);
+
     controlPublisher_.publish(cmd_vel);
 
     ros::spinOnce();
+
 
 }
 

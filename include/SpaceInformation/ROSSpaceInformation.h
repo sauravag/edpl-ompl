@@ -59,7 +59,7 @@ namespace firm
         public:
             /** \brief Constructer */
             ROSSpaceInformation(const ompl::base::StateSpacePtr &stateSpace, const ompl::control::ControlSpacePtr &controlSpace) :
-            firm::SpaceInformation(stateSpace, controlSpace), nHandle_("~")
+            firm::SpaceInformation(stateSpace, controlSpace), nHandle_("~"), loopRate_(30)
             {
                 // Subscribe to the Aruco Marker Publisher
                 arucoSubscriber_  = nHandle_.subscribe("/aruco_marker_publisher/markers", 1, &ROSSpaceInformation::arucoListenerCallback, this);
@@ -99,6 +99,8 @@ namespace firm
 
             /** \brief A subscriber for the aruco topic */
             ros::Subscriber arucoSubscriber_;
+
+            ros::Rate loopRate_;
 
     };
 }
