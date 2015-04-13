@@ -88,7 +88,6 @@ public:
 
         //Construct the control space
         ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ; // iCreate
-        //ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) ) ; // Omni
 
         cs_ = controlspace;
 

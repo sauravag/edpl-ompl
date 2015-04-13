@@ -303,7 +303,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
         if(!constructionMode)
         {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     }
 
@@ -385,7 +385,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     //-> trace(Covariance) for FIRM
     cost += arma::trace(endState->as<StateType>()->getCovariance());
 
-    if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+    //if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
     //filteringCost.v = cost;
     filteringCost = ompl::base::Cost(cost);
@@ -518,7 +518,7 @@ void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
 
         if(!constructionMode)
         {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
 
     }

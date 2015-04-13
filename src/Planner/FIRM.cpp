@@ -1115,13 +1115,17 @@ void FIRM::executeFeedback(void)
         }
         else
         {
+            // dont record video of sim while adding current state to graph
             Visualizer::doSaveVideo(false);
+
+            // dont log velocity
             siF_->doVelocityLogging(false);
 
-            //
+            // apply stop command to robot
+            policyExecutionSI_->applyControl(policyExecutionSI_->getMotionModel()->getZeroControl());
+
             OMPL_INFORM("Controller stopped due to deviation, need to add new state at: ");
             siF_->printState(cendState);
-            //
 
             currentVertex = addStateToGraph(cendState);
 
@@ -1141,6 +1145,9 @@ void FIRM::executeFeedback(void)
 
 
     }
+
+    //Stop robot after policy has been executed
+    policyExecutionSI_->applyControl(policyExecutionSI_->getMotionModel()->getZeroControl());
 
     //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
@@ -1246,6 +1253,8 @@ void FIRM::executeFeedbackWithKidnapping(void)
         }
         else
         {
+            //Stop robot after policy has been executed
+            policyExecutionSI_->applyControl(policyExecutionSI_->getMotionModel()->getZeroControl());
 
             Visualizer::doSaveVideo(false);
 
@@ -1281,6 +1290,9 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         if(kidnapped_flag) //if(this->detectKidnapping(cstartState, cendState))
         {
+            //Stop robot after policy has been executed
+            policyExecutionSI_->applyControl(policyExecutionSI_->getMotionModel()->getZeroControl());
+
             recoverLostRobot(cendState);
 
             siF_->setBelief(cendState);
@@ -1313,6 +1325,9 @@ void FIRM::executeFeedbackWithKidnapping(void)
     //writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
 
     //writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory", "successProbability");
+
+    //Stop robot after policy has been executed
+    policyExecutionSI_->applyControl(policyExecutionSI_->getMotionModel()->getZeroControl());
 
     Visualizer::doSaveVideo(false);
 
@@ -1423,6 +1438,9 @@ void FIRM::executeFeedbackWithRollout(void)
 
         else
         {
+            //Stop robot to compute rollout, future versions will not require robot to stop to compute rollout
+            policyExecutionSI_->applyControl(policyExecutionSI_->getMotionModel()->getZeroControl());
+
             siF_->doVelocityLogging(false);
 
             Visualizer::doSaveVideo(false);
@@ -1465,6 +1483,9 @@ void FIRM::executeFeedbackWithRollout(void)
         si_->copyState(cstartState, cendState);
 
     }
+
+    //Stop robot after policy has been executed
+    policyExecutionSI_->applyControl(policyExecutionSI_->getMotionModel()->getZeroControl());
 
     nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 

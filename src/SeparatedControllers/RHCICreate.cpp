@@ -34,6 +34,7 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 #include "../../include/SeparatedControllers/RHCICreate.h"
+#include "../../include/Utils/FIRMUtils.h"
 
 int RHCICreate::controlQueueSize_ = -1;
 
@@ -43,25 +44,28 @@ ompl::control::Control*
 RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t& _t)
 {
 
-  using namespace arma;
+    using namespace arma;
 
-  //if no more controls left, regenerate controls
-  if(openLoopControls_.size() == 0) {
+    //if no more controls left, regenerate controls
+    if(openLoopControls_.size() == 0)
+    {
 
-    std::vector<ompl::control::Control*> openLoopControls;
+        std::vector<ompl::control::Control*> openLoopControls;
 
-    this->motionModel_->generateOpenLoopControls(state , this->goal_, openLoopControls) ;
+        this->motionModel_->generateOpenLoopControls(state , this->goal_, openLoopControls) ;
 
-    openLoopControls_ = std::deque<ompl::control::Control*>(openLoopControls.begin(), openLoopControls.end());
+        openLoopControls_ = std::deque<ompl::control::Control*>(openLoopControls.begin(), openLoopControls.end());
 
-    //if motion model cannot generate valid open loop controls from start to goal, return an empty vector signifying invalid control
-    if(openLoopControls_.size() == 0) {
-      return this->motionModel_->getZeroControl();
-    }
+        //if motion model cannot generate valid open loop controls from start to goal, return an empty vector signifying invalid control
+        if(openLoopControls_.size() == 0) {
+          return this->motionModel_->getZeroControl();
+        }
 
-    //if we generate more controls than the length of controlQueueSize (user-defined), we truncate the rest
-    if(openLoopControls_.size() > controlQueueSize_)
-      openLoopControls_.resize(controlQueueSize_);
+        //if we generate more controls than the length of controlQueueSize (user-defined), we truncate the rest
+        if(openLoopControls_.size() > controlQueueSize_)
+        {
+          openLoopControls_.resize(controlQueueSize_);
+        }
     }
 
     // if there are controls left, apply and remove them one-by-one
@@ -71,6 +75,7 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
 
     openLoopControls_.pop_front();
 
+    /*
     colvec diff =  (this->goal_)->as<StateType>()->getArmaData() - state->as<StateType>()->getArmaData();
 
     double distance  = norm(diff.subvec(0,1), 2);
@@ -84,24 +89,19 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
 
     colvec relativeCfg =  relativeState->as<StateType>()->getArmaData();
 
-    //cout<<"RHCICreate controller,                        goal_: "<<endl<<this->goal_.GetArmaData()<<endl;
-    //cout<<"RHCICreate controller, relativeCfg bearing (degrees): "<<relativeCfg[2]*180/PI<<endl;
-    //cout<<"RHCICreate controller, relativeCfg distance (cm )   : "<<distance*100<<endl;
-    //if( distance < 0.20 && !this->m_reachedFlag)  this->m_reachedFlag = true;
+    if(distance < turnOnlyDistance_)
+    {
 
-    if(distance < turnOnlyDistance_){
+        ompl::control::Control* newcontrol  = this->motionModel_->getZeroControl();
 
-      ompl::control::Control* newcontrol  = this->motionModel_->getZeroControl();
-      //cout<<"Applying Only Turn Control !"<<endl;
-      if (abs(relativeCfg[2]) > 1e-6)
-      {
-        //cout<<"control val:  "<<0.2 * relativeCfg[2]/abs(relativeCfg[2])<<endl;
-        //SO std::cin.get();
-        newcontrol->as<ompl::control::RealVectorControlSpace::ControlType>()->values[1] = 0.2 * relativeCfg[2]/abs(relativeCfg[2]);
-      }
+        if (abs(relativeCfg[2]) > 1e-6)
+        {
+            newcontrol->as<ompl::control::RealVectorControlSpace::ControlType>()->values[1] = 0.5184 * FIRMUtils::signum(relativeCfg[2]) ;
+        }
 
-      return newcontrol;
+        return newcontrol;
     }
+    */
 
     return control;
 }
