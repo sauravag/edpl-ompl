@@ -55,9 +55,9 @@ namespace ompl
 
         static const double RRT_PLAN_MAX_TIME = 1.0; // maximum time allowed for RRT to plan
 
-        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 1.0; // maximum distance for RRT to succeed
+        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.2; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 20.0 ; // 20(6cw), 12 (4cw) range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 4.0 ; // 20(6cw), 12 (4cw), 4 (M3PEnv2) range within which to find neighbors
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
@@ -71,7 +71,7 @@ namespace ompl
 
         static const double SAMPLING_ROTATION_SPACING = 5.0; // degrees
 
-        static const double SAMPLING_GRID_SIZE = 0.50 ; // meters
+        static const double SAMPLING_GRID_SIZE = 0.10 ; // 0.5: ICreate, 0.1 :  Ardubot
     }
 }
 

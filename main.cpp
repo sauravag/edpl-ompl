@@ -108,7 +108,7 @@ void planROS()
 
     FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
 
-    std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
+    std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -120,9 +120,9 @@ void planROS()
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    int mode = 0;
+    int mode = 3;
 
-    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
+    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: FIRM with Kidnapping, 3: Lost Robot)? : ");
 
     //cin>>mode;
 

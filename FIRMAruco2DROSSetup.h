@@ -239,6 +239,8 @@ public:
 
     void executeSolution(int choice=0)
     {
+        ompl::base::State *s = siF_->allocState();
+
         switch(choice)
         {
             case 1:
@@ -249,6 +251,11 @@ public:
             case 2:
 
                 planner_->as<FIRM>()->executeFeedbackWithKidnapping();
+                break;
+
+            case 3:
+
+                planner_->as<FIRM>()->recoverLostRobot(s);
                 break;
 
             default:
