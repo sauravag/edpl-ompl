@@ -43,7 +43,7 @@ namespace ompl
 {
     namespace magic
     {
-        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.5 ; // meters
+        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.05 ; // meters, 0.5 for create
     }
 }
 
