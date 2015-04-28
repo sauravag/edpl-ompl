@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/SetupFIRMExp2.xml";
+    std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -66,7 +66,7 @@ void plan()
 
     int mode = 0;
 
-    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
+    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal 3: M3P Lost Robot)? : ");
 
     cin>>mode;
 
@@ -108,7 +108,7 @@ void planROS()
 
     FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
 
-    std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
+    std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -122,7 +122,7 @@ void planROS()
 
     int mode = 3;
 
-    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: FIRM with Kidnapping, 3: Lost Robot)? : ");
+    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: FIRM with Kidnapping, 3: M3P Lost Robot)? : ");
 
     //cin>>mode;
 

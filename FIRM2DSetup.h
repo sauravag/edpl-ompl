@@ -86,8 +86,8 @@ public:
         ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space
-        //ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ; // iCreate
-        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) ) ; // Omni
+        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ; // unicycle
+        //ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) ) ; // Omni
 
         cs_ = controlspace;
 
@@ -168,8 +168,8 @@ public:
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space
-            //MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
-            MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));
+            MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
+            //MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));
             siF_->setMotionModel(mm);
 
             ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
@@ -226,6 +226,8 @@ public:
 
     void executeSolution(int choice=0)
     {
+        ompl::base::State *s = siF_->allocState();
+
         switch(choice)
         {
             case 1:
@@ -236,6 +238,11 @@ public:
             case 2:
 
                 planner_->as<FIRM>()->executeFeedbackWithKidnapping();
+                break;
+
+            case 3:
+
+                planner_->as<FIRM>()->recoverLostRobot(s);
                 break;
 
             default:

@@ -90,14 +90,14 @@ QSize GLWidget::sizeHint() const
 
 void GLWidget::resetCam()
 {
-    m_camPos[0] = 11.0;
-    m_camPos[1] = 11.0;
+    m_camPos[0] = 2.0;  // 11
+    m_camPos[1] = 2.0;  // 11
 
-    m_camPos[2] = -250.0;
+    m_camPos[2] = -100.0; // -250
     m_camAt[0] = 0.0;
     m_camAt[1] = 0.0;
     m_camAt[2] = -1.0;
-    m_camZoom = 50; // 75 for 6 cordr world
+    m_camZoom = 45; //50 for normal stuff, 75 for 6 cordr world
     m_long = -boost::math::constants::pi<double>()/2.0;
     m_lat = 0.0;
     updateGL();
@@ -217,7 +217,7 @@ void GLWidget::paintGL()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(m_camZoom, (GLfloat) width()/(GLfloat) height(), 1.0, 1000.0);
-    glOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 300.0f);
+    glOrtho(-5.0f, 5.0f, -5.0f, 5.0f, 0.2f, 300.0f); //glOrtho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 300.0f);
 
     //model
     glMatrixMode(GL_MODELVIEW);

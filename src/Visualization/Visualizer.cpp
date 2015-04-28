@@ -77,7 +77,7 @@ bool Visualizer::saveVideo_ = false;
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
 
-    double scale = 0.15;
+    double scale = 0.05;
 
     glPushMatrix();
 
@@ -131,24 +131,24 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     {
         case TrueState:
             glColor3d(0,0,1); // blue
-            outerDiskRadius = 0.45;
+            outerDiskRadius = 0.09; // 0.45
             z = -0.1;
             break;
 
         case BeliefState:
-            outerDiskRadius = 0.25;
+            outerDiskRadius = 0.045; // 0.25
             z = -0.1;
             glColor3d(1,0,0); // red
             break;
 
         case GraphNodeState:
-            outerDiskRadius = 0.15;
+            outerDiskRadius = 0.02; //0.15
             z = -0.5;
             glColor3d(0,1,1); // cyan
             break;
 
         default:
-            outerDiskRadius = 0.15;
+            outerDiskRadius = 0.02; // 0.15
             z = -0.5;
             glColor3d(1,1,1); // grey
             break;
@@ -156,6 +156,8 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
     arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
     mat covariance = state->as<SE2BeliefSpace::StateType>()->getCovariance();
+
+    double directionLineLength = 0.08;
 
     glPushMatrix();
         glTranslated(x[0], x[1], z);
@@ -168,11 +170,11 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         glVertex3f(0, 0, 0);
         if(stateType == VZRStateType::TrueState)
         {
-            glVertex3f(1.0*cos(x[2]), 1.0*sin(x[2]), 0);
+            glVertex3f(directionLineLength*cos(x[2]), directionLineLength*sin(x[2]), 0);
         }
         else
         {
-            glVertex3f(0.5*cos(x[2]), 0.5*sin(x[2]), 0);
+            glVertex3f(0.5*directionLineLength*cos(x[2]), 0.5*directionLineLength*sin(x[2]), 0);
         }
         glEnd();
 
@@ -193,7 +195,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     if(trace(covariance) != 0 && stateType == VZRStateType::BeliefState)
     {
         double chi2 = 9.21034;
-        double magnify = 5.0; // scaled up for viewing
+        double magnify = 1.0; // scaled up for viewing
         mat pos;
         for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())
         {

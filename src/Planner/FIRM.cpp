@@ -65,19 +65,19 @@ namespace ompl
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 8;
 
         /** \brief The time in seconds for a single roadmap building operation */
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-        static const double NUM_MONTE_CARLO_PARTICLES = 4; // minimum 10 for FIRM, 4 for rollout
+        static const double NUM_MONTE_CARLO_PARTICLES = 10; // minimum 10 for FIRM, 4 for rollout
 
         /** \brief For a node that is not observable, use a fixed covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1;
 
         /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
-        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
+        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 0.999;
 
         /** \brief Maximum allowed number of iterations to solve DP */
         static const int DP_MAX_ITERATIONS = 20000;
@@ -101,13 +101,13 @@ namespace ompl
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
 
         /** \brief Default neighborhood radius */
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // meters
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 1.5; // meters
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
         static const unsigned int MAX_MM_POLICY_LENGTH   = 1000;
 
-        static const float MIN_ROBOT_CLEARANCE = 0.10;
+        static const float MIN_ROBOT_CLEARANCE = 0.05; // 0.1 for create
 
         static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 10;
 
@@ -374,8 +374,6 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                     {
                         stateStable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
                                 ls.getM() * ls.getR() * trans(ls.getM()), S );
-
-                        //workState->as<SE2BeliefSpace::StateType>()->setCovariance(S);
                     }
                     catch(int e)
                     {
@@ -385,6 +383,7 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 }
                 attempts++;
             } while (attempts < ompl::magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found && !stateStable);
+
         }
         // add it as a milestone
         if (found && stateStable)

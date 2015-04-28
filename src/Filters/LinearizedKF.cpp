@@ -129,6 +129,7 @@ arma::mat LinearizedKF::computeStationaryCovariance (const LinearSystem& ls)
     if(!dareSolvable)
     {
         OMPL_ERROR("Dare Unsolvable: The given system state is not stable/observable. Try a different state.");
+
         exit(1);
     }
 

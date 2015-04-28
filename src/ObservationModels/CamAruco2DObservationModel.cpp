@@ -43,7 +43,7 @@ namespace ompl
 {
     namespace magic
     {
-        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.05 ; // meters, 0.5 for create
+        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.09 ; // meters, 0.5 for create (Use radius of robot)
     }
 }
 
@@ -273,7 +273,9 @@ bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *st
 
     double distance = norm(robot_to_landmark_ray,2);
 
-    int steps = std::floor(distance/ompl::magic::ONE_STEP_DISTANCE_FOR_VISIBILITY);
+    int steps = std::floor(distance/ompl::magic::ONE_STEP_DISTANCE_FOR_VISIBILITY) - 1 ; // subtract 1 one step because you dont need robot center to be at landmark
+
+    if(steps < 0) steps = 0;
 
     ompl::base::State *tempState = this->si_->allocState();
 
