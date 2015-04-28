@@ -77,7 +77,7 @@ namespace ompl
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1;
 
         /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
-        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 0.999;
+        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
 
         /** \brief Maximum allowed number of iterations to solve DP */
         static const int DP_MAX_ITERATIONS = 20000;
@@ -525,7 +525,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     }
 
     // If roadmap wasn't loaded from file, then save the newly constructed roadmap
-    if(!loadedRoadmapFromFile_)
+    //if(!loadedRoadmapFromFile_)
     {
         this->savePlannerData();
     }
