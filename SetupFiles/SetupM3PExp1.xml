@@ -160,7 +160,7 @@
     camera_range = "2.0"
     camera_half_fov = "22"    
     sigma_range="0.04"
-    sigma_angle="2.0"
+    sigma_angle="1.0"
     eta_rd="0.0"
     eta_rphi = "0.0"
     eta_thetad="0.0"
@@ -170,20 +170,6 @@
   </CamAruco2DObservationModel>
 </ObservationModels>
 <MotionModels>
-  <!--UnicycleMotionModel
-    sigmaV="0.001"
-    etaV="0.001"
-    sigmaOmega="0.0001"
-    etaOmega="0.001"
-    P_Wg_filename=""
-    orbit_radius=5.0
-    wind_noise_pos="0.000001"
-    wind_noise_ang="0.000001" 
-    min_linear_velocity= 0.2
-    max_linear_velocity= 0.2
-    max_angular_velocity= 0.3
-    dt= 0.1
-    /> <!--No Noise--> 
   <UnicycleMotionModel
     sigmaV="0.012"
     etaV="0.05"
@@ -223,9 +209,9 @@
         robotFile = "./Models/ArduinoRobot.obj"
     />
      <StartPose
-        x = "2.3"
-        y = "2.2"
-        theta = "1.31"
+        x = "3.4"
+        y = "0.7"
+        theta = "-1.57"
     />
     <PlanningTime
         maxTime = "800"
@@ -238,5 +224,5 @@
     />
 </PlanningProblem>
 <GoalList>
-    <GoalPose  x = "2.3"  y = "1.5" theta = "-1.31" />
+    <GoalPose  x = "2.35"  y = "2.2" theta = "-1.57" />
 </GoalList>

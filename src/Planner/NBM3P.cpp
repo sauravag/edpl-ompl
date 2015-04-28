@@ -61,17 +61,17 @@ namespace ompl
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
-        static const double SIGMA_RANGE = 0.15;// 0.5 meters
+        static const double SIGMA_RANGE = 0.1;// 0.5 meters
 
-        static const double SIGMA_THETA = 0.09; // 0.2 radians
+        static const double SIGMA_THETA = 0.1; // 0.2 radians
 
         static const double MODE_DELETION_THRESHOLD = 1e-4; // the percentage of weight a mode should hold, below which it gets deleted
 
         static const double ZERO_CONTROL_UPDATE_TIME = 1.0 ;
 
-        static const double SAMPLING_ROTATION_SPACING = 15.0; // degrees
+        static const double SAMPLING_ROTATION_SPACING = 30.0; // degrees
 
-        static const double SAMPLING_GRID_SIZE = 0.09 ; // 0.5: ICreate, 0.18 :  Ardubot
+        static const double SAMPLING_GRID_SIZE = 0.10 ; // 0.5: ICreate, 0.18 :  Ardubot
     }
 }
 

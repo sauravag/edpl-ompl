@@ -71,7 +71,7 @@ namespace ompl
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-        static const double NUM_MONTE_CARLO_PARTICLES = 4; // minimum 10 for FIRM, 4 for rollout
+        static const double NUM_MONTE_CARLO_PARTICLES = 2; // minimum 10 for FIRM, 4 for rollout
 
         /** \brief For a node that is not observable, use a fixed covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1;
@@ -525,10 +525,10 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     }
 
     // If roadmap wasn't loaded from file, then save the newly constructed roadmap
-    //if(!loadedRoadmapFromFile_)
-    //{
+    if(!loadedRoadmapFromFile_)
+    {
         this->savePlannerData();
-    //}
+    }
 
     slnThread.join();
 
@@ -1814,12 +1814,6 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
     auto end_time_sampling = std::chrono::high_resolution_clock::now();
 
     std::cout << "Time to sample beliefs: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_sampling - start_time_sampling).count() << " milli seconds."<<std::endl;
-
-    std::cin.get();
-
-    //ompl::base::State *currentTrueState = siF_->allocState();
-
-    //siF_->getTrueState(currentTrueState);
 
     int counter = 0;
 
