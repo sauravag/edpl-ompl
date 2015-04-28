@@ -57,7 +57,7 @@ namespace ompl
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.2; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 4.0 ; // 20(6cw), 12 (4cw), 4 (M3PEnv2) range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 3.0 ; // 20(6cw), 12 (4cw), 4 (M3PEnv2) range within which to find neighbors
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
