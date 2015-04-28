@@ -157,7 +157,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
     mat covariance = state->as<SE2BeliefSpace::StateType>()->getCovariance();
 
-    double directionLineLength = 0.08;
+    double directionLineLength = 0.12;
 
     glPushMatrix();
         glTranslated(x[0], x[1], z);

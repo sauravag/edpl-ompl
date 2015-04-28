@@ -242,7 +242,7 @@ public:
 
             case 3:
 
-                planner_->as<FIRM>()->recoverLostRobot(s);
+                planner_->as<FIRM>()->executeM3P(s);
                 break;
 
             default:

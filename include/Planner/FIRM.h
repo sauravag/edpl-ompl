@@ -253,6 +253,17 @@ public:
     /** \brief Called when robot is lost, uses multi-modal planner to recover true position of robot */
     void recoverLostRobot(ompl::base::State *recoveredState);
 
+    /*** \brief Directly run multi-modal motion planner */
+    void executeM3P(ompl::base::State *recoveredState)
+    {
+        const Vertex start = startM_[0];
+
+        siF_->setTrueState(stateProperty_[start]);
+
+        recoverLostRobot(recoveredState);
+
+    }
+
     /** \brief Set the minimum number of FIRM nodes */
     void setMinFIRMNodes(const unsigned int numNodes)
     {

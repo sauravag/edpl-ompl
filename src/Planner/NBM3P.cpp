@@ -57,21 +57,21 @@ namespace ompl
 
         static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.2; // maximum distance for RRT to succeed
 
-        static const double NEIGHBORHOOD_RANGE = 3.0 ; // 20(6cw), 12 (4cw), 4 (M3PEnv2) range within which to find neighbors
+        static const double NEIGHBORHOOD_RANGE = 4.0 ; // 20(6cw), 12 (4cw), 4 (M3PEnv2) range within which to find neighbors
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
-        static const double SIGMA_RANGE = 0.5;// meters
+        static const double SIGMA_RANGE = 0.15;// 0.5 meters
 
-        static const double SIGMA_THETA = 0.2; // radians
+        static const double SIGMA_THETA = 0.09; // 0.2 radians
 
         static const double MODE_DELETION_THRESHOLD = 1e-4; // the percentage of weight a mode should hold, below which it gets deleted
 
         static const double ZERO_CONTROL_UPDATE_TIME = 1.0 ;
 
-        static const double SAMPLING_ROTATION_SPACING = 5.0; // degrees
+        static const double SAMPLING_ROTATION_SPACING = 15.0; // degrees
 
-        static const double SAMPLING_GRID_SIZE = 0.10 ; // 0.5: ICreate, 0.1 :  Ardubot
+        static const double SAMPLING_GRID_SIZE = 0.09 ; // 0.5: ICreate, 0.18 :  Ardubot
     }
 }
 
