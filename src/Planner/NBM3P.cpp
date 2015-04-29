@@ -61,9 +61,9 @@ namespace ompl
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
-        static const double SIGMA_RANGE = 0.1;// 0.5 meters
+        static const double SIGMA_RANGE = 0.12;// 0.5 meters
 
-        static const double SIGMA_THETA = 0.1; // 0.2 radians
+        static const double SIGMA_THETA = 0.12; // 0.2 radians
 
         static const double MODE_DELETION_THRESHOLD = 1e-4; // the percentage of weight a mode should hold, below which it gets deleted
 

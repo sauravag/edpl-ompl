@@ -1884,7 +1884,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     auto end_time_recovery = std::chrono::high_resolution_clock::now();
 
-    std::cout << "Time to sample recover (exclude sampling): "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_recovery - start_time_recovery).count() << " milli seconds."<<std::endl;
+    std::cout << "Time to recover lost robot (exclude sampling): "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_recovery - start_time_recovery).count() << " milli seconds."<<std::endl;
 
     std::cin.get();
 
