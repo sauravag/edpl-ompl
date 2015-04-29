@@ -93,12 +93,12 @@ void firm::ROSSpaceInformation::applyControl(const ompl::control::Control *contr
     cmd_vel.angular.y = 0.0;
     cmd_vel.angular.z = -conVals[1]; // In FIRM robot's x-axis is forward, y-left, z-up, need to change sign so that ros turns robot in correct direction, in ros z is down
 
-    OMPL_INFORM("The published commands are v: %f  w: %f", conVals[0], conVals[1]);
+    //OMPL_INFORM("The published commands are v: %f  w: %f", conVals[0], conVals[1]);
 
-    if(fabs(conVals[1]) > 0.0  && fabs(conVals[1]) < 0.5)
-    {
-        OMPL_INFORM("Issue with angular vel");
-    }
+    //if(fabs(conVals[1]) > 0.0  && fabs(conVals[1]) < 0.5)
+    //{
+    //    OMPL_INFORM("Issue with angular vel");
+    //}
 
     controlPublisher_.publish(cmd_vel);
 

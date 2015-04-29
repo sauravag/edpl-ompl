@@ -157,10 +157,10 @@
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
-    camera_range = "2.0"
+    camera_range = "1.0"
     camera_half_fov = "22"    
-    sigma_range="0.05"
-    sigma_angle="2.0"
+    sigma_range="0.005"
+    sigma_angle="1.0"
     eta_rd="0.0"
     eta_rphi = "0.0"
     eta_thetad="0.0"
@@ -179,9 +179,9 @@
     orbit_radius=5.0
     wind_noise_pos="0.000001"
     wind_noise_ang="0.000001" 
-    min_linear_velocity= 0.189
-    max_linear_velocity= 0.189
-    max_angular_velocity= 0.514
+    min_linear_velocity= 0.1
+    max_linear_velocity= 0.1
+    max_angular_velocity= 0.3
     dt= 0.1
     /> <!--omega is in radians--> 
   <OmnidirectionalMotionModel 

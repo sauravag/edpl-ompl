@@ -61,17 +61,17 @@ namespace ompl
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
-        static const double SIGMA_RANGE = 0.12;// 0.5 meters
+        static const double SIGMA_RANGE = 0.2;// 0.5 meters
 
-        static const double SIGMA_THETA = 0.12; // 0.2 radians
+        static const double SIGMA_THETA = 0.2; // 0.2 radians
 
-        static const double MODE_DELETION_THRESHOLD = 1e-4; // the percentage of weight a mode should hold, below which it gets deleted
+        static const double MODE_DELETION_THRESHOLD = 1e-3; // the percentage of weight a mode should hold, below which it gets deleted
 
         static const double ZERO_CONTROL_UPDATE_TIME = 1.0 ;
 
         static const double SAMPLING_ROTATION_SPACING = 30.0; // degrees
 
-        static const double SAMPLING_GRID_SIZE = 0.10 ; // 0.5: ICreate, 0.18 :  Ardubot
+        static const double SAMPLING_GRID_SIZE = 0.09 ; // 0.5: ICreate, 0.18 :  Ardubot
     }
 }
 
@@ -370,6 +370,7 @@ ompl::base::Cost NBM3P::executeOpenLoopPolicyOnMode(std::vector<ompl::control::C
 
     for(int i=0; i < controls.size() ; i++)
     {
+
         si_->applyControl(controls[i],false);
 
         propagateBeliefs(controls[i], true);
@@ -886,7 +887,7 @@ void NBM3P::removeDuplicateModes()
                 double yd = xi(1) - xj(1);
                 double thetad = xi(2) - xj(2);
 
-                if(std::abs(xd) < 0.01 && std::abs(yd) < 0.01 &&  std::abs(thetad) < FIRMUtils::degree2Radian(1.0) )
+                if(std::abs(xd) < 0.05 && std::abs(yd) < 0.05 &&  std::abs(thetad) < FIRMUtils::degree2Radian(1.0) )
                 {
 
                     if(weights_[i] >= weights_[j] )

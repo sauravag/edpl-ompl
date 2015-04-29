@@ -1813,7 +1813,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     auto end_time_sampling = std::chrono::high_resolution_clock::now();
 
-    std::cout << "Time to sample beliefs: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_sampling - start_time_sampling).count() << " milli seconds."<<std::endl;
+    std::cout << "Time taken to generate multi-modal belief: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_sampling - start_time_sampling).count() << " milli seconds."<<std::endl;
 
     int counter = 0;
 
@@ -1879,6 +1879,9 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
 
         }
+
+        // apply stop command to robot while planning next move
+        policyExecutionSI_->applyControl(policyExecutionSI_->getMotionModel()->getZeroControl());
 
     }
 
