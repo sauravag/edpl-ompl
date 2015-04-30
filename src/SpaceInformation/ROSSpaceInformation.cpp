@@ -48,24 +48,26 @@ void firm::ROSSpaceInformation::arucoListenerCallback(const aruco_msgs::MarkerAr
 
     for(int i=0; i < numMarkers; i++)
     {
-        z.resize((i+1)*singleObservationDim ,  1);
-
         aruco_msgs::Marker marker_i = msg.markers.at(i);
 
-        double range, bearing;
+        if(marker_i.id>= 1 && marker_i.id <= 40)
+        {
+            z.resize((i+1)*singleObservationDim ,  1);
 
-        calculateRangeBearingToMarker(marker_i.pose.pose.position.x, marker_i.pose.pose.position.y, marker_i.pose.pose.position.z, range, bearing);
+            double range, bearing;
 
-        z[singleObservationDim*i] = marker_i.id ; // id of the landmark
-        z[singleObservationDim*i + 1] = range; // distance to landmark
-        z[singleObservationDim*i + 2] = bearing; // bearing
-        z[singleObservationDim*i + 3] = 0; // in simulation we used this to add the relative angle of observation, not needed now
+            calculateRangeBearingToMarker(marker_i.pose.pose.position.x, marker_i.pose.pose.position.y, marker_i.pose.pose.position.z, range, bearing);
 
+            z[singleObservationDim*i] = marker_i.id ; // id of the landmark
+            z[singleObservationDim*i + 1] = range; // distance to landmark
+            z[singleObservationDim*i + 2] = bearing; // bearing
+            z[singleObservationDim*i + 3] = 0; // in simulation we used this to add the relative angle of observation, not needed now
+        }
     }
 
     cameraObservation_ = z;
 
-    std::cout<<"The robot sees \n"<<z<<std::endl;
+    std::cout<<"ARUCO SPACE: The robot sees \n"<<z<<std::endl;
     //std::cin.get();
 
 }
@@ -98,14 +100,6 @@ void firm::ROSSpaceInformation::applyControl(const ompl::control::Control *contr
 
     OMPL_INFORM("ROS: The published commands are v: %f  w: %f",  cmd_vel.linear.x, cmd_vel.angular.z);
 
-    if( cmd_vel.linear.x == 0)
-    {
-        if( fabs(cmd_vel.angular.z) < 0.3)
-        {
-            OMPL_INFORM("Problem in angular velocity");
-        }
-    }
-
     controlPublisher_.publish(cmd_vel);
 
     ros::spinOnce();
@@ -116,6 +110,13 @@ void firm::ROSSpaceInformation::applyControl(const ompl::control::Control *contr
 
 ObservationModelMethod::ObservationType firm::ROSSpaceInformation::getObservation()
 {
-    return cameraObservation_;
+    // put the previoius observation in a temporary holder
+    ObservationModelMethod::ObservationType z = cameraObservation_;
+
+    ObservationModelMethod::ObservationType temp;
+
+    cameraObservation_ = temp; // set global containter to be empty, it is only filled when aruco returns markers
+
+    return z;
 }
 

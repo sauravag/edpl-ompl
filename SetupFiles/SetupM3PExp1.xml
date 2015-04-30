@@ -181,7 +181,7 @@
     wind_noise_ang="0.00001" 
     min_linear_velocity= 0.1
     max_linear_velocity= 0.1
-    max_angular_velocity= 0.3
+    max_angular_velocity= 0.2
     dt= 0.1
     /> <!--omega is in radians--> 
   <OmnidirectionalMotionModel 

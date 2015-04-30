@@ -250,12 +250,10 @@ int CamAruco2DObservationModel::findCorrespondingLandmark(const ompl::base::Stat
 
     }
 
-    assert(candidateIndx >= 0 && "Candidate index cannot be negative");
+    assert(candidateIndx >= 0 && "Candidate index cannot be negative, maybe robot saw landmark that is not in map");
 
     // The observation is id, range, bearing, orientation of the landmark
     candidateObservation<<landmarkID<<candidatelandmarkRange<<candidatelandmarkBearing<<landmarks_[candidateIndx][3]<<endr;
-
-    assert(candidateIndx>=0);
 
     return candidateIndx;
 
@@ -476,7 +474,6 @@ CamAruco2DObservationModel::computeInnovation(const ompl::base::State *predicted
     return innov;
 
 }
-
 
 typename CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::removeSpuriousObservations(const ObservationType& Zg)
 {
