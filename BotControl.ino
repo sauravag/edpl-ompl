@@ -78,7 +78,7 @@ void generatePWMFromVel(double v, double omega, double &pwmLeft, double &pwmRigh
   }
   else
   {
-    double v_turn = a_omega*omega + b_omega ;
+    double v_turn = a_omega*fabs(omega) + b_omega ;
     // right rurn
     if(omega>0)
     {
