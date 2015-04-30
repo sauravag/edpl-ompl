@@ -65,7 +65,7 @@ void firm::ROSSpaceInformation::arucoListenerCallback(const aruco_msgs::MarkerAr
 
     cameraObservation_ = z;
 
-    //std::cout<<"The robot sees \n"<<z<<std::endl;
+    std::cout<<"The robot sees \n"<<z<<std::endl;
     //std::cin.get();
 
 }
@@ -96,12 +96,15 @@ void firm::ROSSpaceInformation::applyControl(const ompl::control::Control *contr
     cmd_vel.angular.y = 0.0;
     cmd_vel.angular.z = -conVals[1]; // In FIRM robot's x-axis is forward, y-left, z-up, need to change sign so that ros turns robot in correct direction, in ros z is down
 
-    //OMPL_INFORM("The published commands are v: %f  w: %f", conVals[0], conVals[1]);
+    OMPL_INFORM("ROS: The published commands are v: %f  w: %f",  cmd_vel.linear.x, cmd_vel.angular.z);
 
-    //if(fabs(conVals[1]) > 0.0  && fabs(conVals[1]) < 0.5)
-    //{
-    //    OMPL_INFORM("Issue with angular vel");
-    //}
+    if( cmd_vel.linear.x == 0)
+    {
+        if( fabs(cmd_vel.angular.z) < 0.3)
+        {
+            OMPL_INFORM("Problem in angular velocity");
+        }
+    }
 
     controlPublisher_.publish(cmd_vel);
 

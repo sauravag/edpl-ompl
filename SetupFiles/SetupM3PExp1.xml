@@ -157,13 +157,13 @@
 </LandmarkList>
 <ObservationModels>
   <CamAruco2DObservationModel
-    camera_range = "1.0"
-    camera_half_fov = "22"    
-    sigma_range="0.02"
-    sigma_angle="2.0"
-    eta_rd="0.0"
+    camera_range = "1.61"
+    camera_half_fov = "18"    
+    sigma_range="0.01"
+    sigma_angle="1.0"
+    eta_rd="0.05"
     eta_rphi = "0.0"
-    eta_thetad="0.0"
+    eta_thetad="0.01"
     eta_thetaphi = "0.0"
     vcLabel = "cd1"
   >
@@ -171,14 +171,14 @@
 </ObservationModels>
 <MotionModels>
   <UnicycleMotionModel
-    sigmaV="0.01"
-    etaV="0.005"
-    sigmaOmega="0.03"
-    etaOmega="0.003"
+    sigmaV="0.005"
+    etaV="0.05"
+    sigmaOmega="0.015"
+    etaOmega="0.05"
     P_Wg_filename=""
     orbit_radius=5.0
-    wind_noise_pos="0.0000000000000001"
-    wind_noise_ang="0.0000000000000001" 
+    wind_noise_pos="0.00001"
+    wind_noise_ang="0.00001" 
     min_linear_velocity= 0.1
     max_linear_velocity= 0.1
     max_angular_velocity= 0.3
@@ -209,7 +209,7 @@
         robotFile = "./Models/ArduinoRobot.obj"
     />
      <StartPose
-        x = "3.4"
+        x = "3.42"
         y = "0.7"
         theta = "-1.57"
     />

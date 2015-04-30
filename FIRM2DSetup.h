@@ -128,9 +128,9 @@ public:
 
         mat startCov(3,3);
 
-        startCov<<0.2<<0.0<<0.0<<endr
-                <<0.0<<0.2<<0.0<<endr
-                <<0.0<<0.0<<0.2<<endr;
+        startCov<<0.04<<0.0<<0.0<<endr
+                <<0.0<<0.04<<0.0<<endr
+                <<0.0<<0.0<<0.04<<endr;
 
         temp->as<StateType>()->setXYYaw(X,Y,Yaw);
 
@@ -150,9 +150,9 @@ public:
 
         mat goalCov(3,3);
 
-        goalCov<<0.05<<0.0<<0.0<<endr
-                <<0.0<<0.05<<0.0<<endr
-                <<0.0<<0.0<<0.05<<endr;
+        goalCov<<0.0001<<0.0<<0.0<<endr
+                <<0.0<<0.0001<<0.0<<endr
+                <<0.0<<0.0<<0.0001<<endr;
 
         temp->as<StateType>()->setXYYaw(X,Y,Yaw);
 
