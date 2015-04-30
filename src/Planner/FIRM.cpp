@@ -470,7 +470,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
 
     // Add the valid start states as milestones
     while (const ompl::base::State *st = pis_.nextStart())
-        startM_.push_back(addStateToGraph(si_->cloneState(st)));
+        startM_.push_back(addStateToGraph(si_->cloneState(st), true, false));
 
     if (startM_.size() == 0)
     {
@@ -491,7 +491,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         if (st)
         {
             OMPL_INFORM("%s: Adding goal state to roadmap.", getName().c_str());
-            goalM_.push_back(addStateToGraph(si_->cloneState(st)));
+            goalM_.push_back(addStateToGraph(si_->cloneState(st), true, false));
         }
         if (goalM_.empty())
         {
@@ -571,7 +571,7 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
     si_->freeStates(xstates);
 }
 
-FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge, bool shouldCreateNodeController)
+FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge, bool shouldSetStationaryCovariance)
 {
 
     boost::mutex::scoped_lock _(graphMutex_);
@@ -579,7 +579,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     // First construct a node stabilizer controller
     NodeControllerType nodeController;
 
-    generateNodeController(state, nodeController); // Generating the node controller at sampled state, this will set stationary covariance at node
+    generateNodeController(state, nodeController, shouldSetStationaryCovariance); // Generating the node controller at sampled state, this will set stationary covariance at node
 
     // Now add belief state to graph as FIRM node
     Vertex m;
@@ -820,7 +820,7 @@ void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::ba
     edgeController =  ctrlr;
 }
 
-void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeControllerType &nodeController)
+void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeControllerType &nodeController, bool shouldSetStationaryCovariance)
 {
     // Create a copy of the node state
     ompl::base::State *node = si_->allocState();
@@ -838,8 +838,11 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
         arma::mat stationaryCovariance = linearizedKF.computeStationaryCovariance(linearSystem);
 
         // set the covariance
-        node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
-        state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        if(shouldSetStationaryCovariance)
+        {
+            node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+            state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        }
 
         // create a node controller
         std::vector<ompl::control::Control*> dummyControl;
@@ -857,9 +860,11 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
         arma::mat stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
 
         // set the covariance
-        node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
-        state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
-
+        if(shouldSetStationaryCovariance)
+        {
+            node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+            state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        }
         // create a node controller
         std::vector<ompl::control::Control*> dummyControl;
         std::vector<ompl::base::State*> dummyStates;
@@ -1037,6 +1042,10 @@ void FIRM::executeFeedback(void)
 
     siF_->setTrueState(stateProperty_[start]);
     siF_->setBelief(stateProperty_[start]);
+
+    OMPL_INFORM("FIRM: Starting State and Covariance: \n");
+    siF_->printState(stateProperty_[start]);
+    std::cout<<stateProperty_[start]->as<SE2BeliefSpace::StateType>()->getCovariance();
 
     Vertex currentVertex =  start;
 
@@ -1707,8 +1716,6 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 
             newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
             newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
-
-            //Vertex v = addStateToGraph(siF_->cloneState(newState));
 
             Vertex m;
 

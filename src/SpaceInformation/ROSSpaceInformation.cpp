@@ -65,6 +65,9 @@ void firm::ROSSpaceInformation::arucoListenerCallback(const aruco_msgs::MarkerAr
 
     cameraObservation_ = z;
 
+    //std::cout<<"The robot sees \n"<<z<<std::endl;
+    //std::cin.get();
+
 }
 
 void firm::ROSSpaceInformation::calculateRangeBearingToMarker(double x, double y, double z, double &range, double &bearing)

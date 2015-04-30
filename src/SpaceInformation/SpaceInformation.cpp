@@ -88,7 +88,13 @@ void firm::SpaceInformation::applyControl(const ompl::control::Control *control,
 
 ObservationModelMethod::ObservationType firm::SpaceInformation::getObservation()
 {
-    return observationModel_->getObservation(trueState_, true);
+    ObservationType z = observationModel_->getObservation(trueState_, true);
+
+    //std::cout<<"The robot sees \n"<<z<<std::endl;
+
+    //std::cin.get();
+
+    return z;
 }
 
 

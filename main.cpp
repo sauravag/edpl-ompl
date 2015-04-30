@@ -64,11 +64,11 @@ void plan()
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    int mode = 3;
+    int mode = 0;
 
     OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal 3: M3P Lost Robot)? : ");
 
-    //cin>>mode;
+    cin>>mode;
 
     int keepTrying = 1;
 

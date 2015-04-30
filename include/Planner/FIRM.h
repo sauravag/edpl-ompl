@@ -294,7 +294,7 @@ protected:
 
     /** \brief Construct a graph node for a given state (\e state), store it in the nearest neighbors data structure
         and then connect it to the roadmap in accordance to the connection strategy. */
-    virtual Vertex addStateToGraph(ompl::base::State *state, bool addReverseEdge = true, bool shouldCreateNodeController=true);
+    virtual Vertex addStateToGraph(ompl::base::State *state, bool addReverseEdge = true, bool shouldSetStationaryCovariance=true);
 
     /** \brief Load a state from XML and add to Graph*/
     //virtual Vertex loadStateToGraph(ompl::base::State *state);
@@ -342,7 +342,7 @@ protected:
     virtual void generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, EdgeControllerType &edgeController);
 
     /** \brief Generates the node controller that stabilizes the robot to the node and sets the stationary covariance at the node. */
-    virtual void generateNodeController(ompl::base::State *state, NodeControllerType &nodeController);
+    virtual void generateNodeController(ompl::base::State *state, NodeControllerType &nodeController, bool shouldSetStationaryCovariance=true);
 
     /** \brief Solves the dynamic program to return a feedback policy */
     virtual void solveDynamicProgram(const Vertex goalVertex);

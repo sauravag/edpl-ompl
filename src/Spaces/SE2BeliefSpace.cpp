@@ -165,37 +165,3 @@ void SE2BeliefSpace::printBeliefState(const State *state)
     std::cout<<state->as<SE2BeliefSpace::StateType>()->getCovariance()<<std::endl;
     std::cout<<"------End BeliefState-------"<<std::endl;
 }
-
-/*
-void SE2BeliefSpace::registerProjections(void)
-{
-    class SE2DefaultProjection : public ProjectionEvaluator
-    {
-    public:
-
-        SE2DefaultProjection(const StateSpace *space) : ProjectionEvaluator(space)
-        {
-        }
-
-        virtual unsigned int getDimension(void) const
-        {
-            return 2;
-        }
-
-        virtual void defaultCellSizes(void)
-        {
-            cellSizes_.resize(2);
-            const RealVectorBounds &b = space_->as<SE2StateSpace>()->getBounds();
-            cellSizes_[0] = (b.high[0] - b.low[0]) / magic::PROJECTION_DIMENSION_SPLITS;
-            cellSizes_[1] = (b.high[1] - b.low[1]) / magic::PROJECTION_DIMENSION_SPLITS;
-        }
-
-        virtual void project(const State *state, EuclideanProjection &projection) const
-        {
-            memcpy(&projection(0), state->as<SE2StateSpace::StateType>()->as<RealVectorStateSpace::StateType>(0)->values, 2 * sizeof(double));
-        }
-    };
-
-    registerDefaultProjection(ProjectionEvaluatorPtr(dynamic_cast<ProjectionEvaluator*>(new SE2DefaultProjection(this))));
-}
-*/
