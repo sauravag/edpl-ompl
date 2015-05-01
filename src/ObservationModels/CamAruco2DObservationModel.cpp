@@ -266,7 +266,7 @@ bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *st
     using namespace arma;
 
     colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
-
+/*
     colvec robot_to_landmark_ray =  landmark.subvec(1,2) - xVec.subvec(0,1);
 
     double distance = norm(robot_to_landmark_ray,2);
@@ -295,6 +295,24 @@ bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *st
     si_->freeState(tempState);
 
     return true;
+*/
+    for(int i = 0 ; i < lineSegments_.size(); i++)
+    {
+        arma::colvec p1 = lineSegments_[i].subvec(0,1);
+        arma::colvec q1 = lineSegments_[i].subvec(2,3);
+
+        arma::colvec p2 = xVec.subvec(0,1);
+        arma::colvec q2 = landmark.subvec(1,2);
+
+        if(FIRMUtils::doLineSegmentsIntersect(p1,q1,p2,q2))
+        {
+            return false;
+        }
+
+    }
+
+    return true;
+
 }
 
 
@@ -564,6 +582,59 @@ void CamAruco2DObservationModel::loadLandmarks(const char *pathToSetupFile)
     OMPL_INFORM("CamArucoObservationModel: Total number of landmarks loaded successfully : %u", landmarks_.size() );
 
     Visualizer::addLandmarks(landmarks_);
+}
+
+void CamAruco2DObservationModel::loadLineSegments(const char *pathToSetupFile)
+{
+  using namespace arma;
+  // Load XML containing landmarks
+  TiXmlDocument doc(pathToSetupFile);
+  bool loadOkay = doc.LoadFile();
+
+  if ( !loadOkay )
+  {
+    printf( "Could not load line segment list ." );
+
+    return; // return without doing anything
+  }
+
+  TiXmlNode* node = 0;
+  TiXmlElement* landmarkElement = 0;
+  TiXmlElement* itemElement = 0;
+
+  // Get the landmarklist node
+  node = doc.FirstChild( "LineSegmentList" );
+  assert( node );
+  landmarkElement = node->ToElement(); //convert node to element
+  assert( landmarkElement  );
+
+  TiXmlNode* child = 0;
+
+  //Iterate through all the landmarks and put them into the "landmarks_" list
+  while( (child = landmarkElement ->IterateChildren(child)))
+  {
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+
+    arma::colvec lineSegment(4);
+    lineSegment.zeros();
+    double attributeVal;
+    itemElement->QueryDoubleAttribute("x1", &attributeVal) ;
+    lineSegment[0] = attributeVal;
+    itemElement->QueryDoubleAttribute("y1", &attributeVal) ;
+    lineSegment[1] = attributeVal;
+    itemElement->QueryDoubleAttribute("x2", &attributeVal) ;
+    lineSegment[2] = attributeVal;
+    itemElement->QueryDoubleAttribute("y2", &attributeVal) ;
+    lineSegment[3] = attributeVal;
+
+    this->lineSegments_.push_back(lineSegment);
+
+  }
+
+    OMPL_INFORM("CamArucoObservationModel: Total number of line segments loaded successfully : %u", lineSegments_.size() );
+
 }
 
 void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)

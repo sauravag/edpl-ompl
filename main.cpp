@@ -189,6 +189,7 @@ int main(int argc, char **argv)
 
         2. To plan with ROS integration, the provided example listens for aruco_marker_publisher and advertises robot commands to geometry::twist
     */
+
     boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
 
     //boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
@@ -199,6 +200,32 @@ int main(int argc, char **argv)
 
     OMPL_INFORM("Task Complete");
 
+/*
+    arma::colvec p1(2);
+    p1(0) = 1.265;
+    p1(1) = 2.285;
+
+    arma::colvec q1(2);
+    q1(0) = 1.52;
+    q1(1) = 2.285;
+
+    arma::colvec robot(2);
+    robot(0) = 1.20;
+    robot(1) = 2;
+
+    arma::colvec landmark(2);
+    landmark(0) = 1.435;
+    landmark(1) = 2.295;
+
+    if(FIRMUtils::doLineSegmentsIntersect(p1,q1,robot,landmark))
+    {
+        std::cout<<"The landmark wasn't visible"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"The landmark was visible"<<std::endl;
+    }
+*/
     return 0;
 
 

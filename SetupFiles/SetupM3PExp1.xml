@@ -155,6 +155,64 @@
 <landmark id = 39 x = 2.376 y = 1.89 theta = -0.5/>
 <landmark id = 40 x = 2.448 y = 1.89 theta = -0.5/>
 </LandmarkList>
+<LineSegmentList>
+<linesegment x1 = 0 y1 = 1.515 x2 = 0.25 y2 = 1.515 />
+<linesegment x1 = 0.505 y1 = 1.515 x2 = 1.01 y2 = 1.515 />
+<linesegment x1 = 1.265 y1 = 1.515 x2 = 1.515 y2 = 1.515 />
+<linesegment x1 = 0 y1 = 1.52 x2 = 0.25 y2 = 1.52 />
+<linesegment x1 = 0.505 y1 = 1.52 x2 = 1.01 y2 = 1.52 />
+<linesegment x1 = 1.265 y1 = 1.52 x2 = 1.52 y2 = 1.52 />
+<linesegment x1 = 3.04 y1 = 1.515 x2 = 3.29 y2 = 1.515 />
+<linesegment x1 = 3.545 y1 = 1.515 x2 = 4.05 y2 = 1.515 />
+<linesegment x1 = 4.305 y1 = 1.515 x2 = 4.555 y2 = 1.515 />
+<linesegment x1 = 3.04 y1 = 1.52 x2 = 3.29 y2 = 1.52 />
+<linesegment x1 = 3.545 y1 = 1.52 x2 = 4.05 y2 = 1.52 />
+<linesegment x1 = 4.305 y1 = 1.52 x2 = 4.56 y2 = 1.52 />
+<linesegment x1 = 3.04 y1 = 2.285 x2 = 3.29 y2 = 2.285 />
+<linesegment x1 = 3.545 y1 = 2.285 x2 = 4.05 y2 = 2.285 />
+<linesegment x1 = 4.305 y1 = 2.285 x2 = 4.555 y2 = 2.285 />
+<linesegment x1 = 3.04 y1 = 2.29 x2 = 3.29 y2 = 2.29 />
+<linesegment x1 = 3.545 y1 = 2.29 x2 = 4.05 y2 = 2.29 />
+<linesegment x1 = 4.305 y1 = 2.29 x2 = 4.56 y2 = 2.29 />
+<linesegment x1 = 0 y1 = 2.285 x2 = 0.25 y2 = 2.285 />
+<linesegment x1 = 0.505 y1 = 2.285 x2 = 1.01 y2 = 2.285 />
+<linesegment x1 = 1.265 y1 = 2.285 x2 = 1.515 y2 = 2.285 />
+<linesegment x1 = 0 y1 = 2.29 x2 = 0.25 y2 = 2.29 />
+<linesegment x1 = 0.505 y1 = 2.29 x2 = 1.01 y2 = 2.29 />
+<linesegment x1 = 1.265 y1 = 2.29 x2 = 1.52 y2 = 2.29 />
+<linesegment x1 = 0.755 y1 = 0 x2 = 0.755 y2 = 1.515 />
+<linesegment x1 = 0.76 y1 = 0 x2 = 0.76 y2 = 1.515 />
+<linesegment x1 = 1.515 y1 = 0 x2 = 1.515 y2 = 1.515 />
+<linesegment x1 = 1.52 y1 = 0 x2 = 1.52 y2 = 1.52 />
+<linesegment x1 = 3.04 y1 = 0 x2 = 3.04 y2 = 1.52 />
+<linesegment x1 = 3.045 y1 = 0 x2 = 3.045 y2 = 1.515 />
+<linesegment x1 = 3.8 y1 = 0 x2 = 3.8 y2 = 1.515 />
+<linesegment x1 = 3.805 y1 = 0 x2 = 3.805 y2 = 1.515 />
+<linesegment x1 = 0.755 y1 = 2.29 x2 = 0.755 y2 = 3.805 />
+<linesegment x1 = 0.76 y1 = 2.29 x2 = 0.76 y2 = 3.805 />
+<linesegment x1 = 1.515 y1 = 2.29 x2 = 1.515 y2 = 3.805 />
+<linesegment x1 = 1.52 y1 = 2.285 x2 = 1.52 y2 = 3.805 />
+<linesegment x1 = 3.04 y1 = 2.285 x2 = 3.04 y2 = 3.805 />
+<linesegment x1 = 3.045 y1 = 2.29 x2 = 3.045 y2 = 3.805 />
+<linesegment x1 = 3.8 y1 = 2.29 x2 = 3.8 y2 = 3.805 />
+<linesegment x1 = 3.805 y1 = 2.29 x2 = 3.805 y2 = 3.805 />
+<linesegment x1 = 2.075 y1 = 1.14 x2 = 2.075 y2 = 2.66 />
+<linesegment x1 = 2.08 y1 = 1.14 x2 = 2.08 y2 = 2.66 />
+<linesegment x1 = 2.48 y1 = 1.14 x2 = 2.48 y2 = 2.66 />
+<linesegment x1 = 2.485 y1 = 1.14 x2 = 2.485 y2 = 2.66 />
+<linesegment x1 = 2.35 y1 = 1.888 x2 = 2.48 y2 = 1.888 />
+<linesegment x1 = 2.35 y1 = 1.903 x2 = 2.48 y2 = 1.903 />
+<linesegment x1 = 0 y1 = 0 x2 = 4.56 y2 = 0 />
+<linesegment x1 = 0 y1 = 0 x2 = 0 y2 = 3.805 />
+<linesegment x1 = 4.56 y1 = 0 x2 = 4.56 y2 = 3.805 />
+<linesegment x1 = 0 y1 = 3.805 x2 = 4.56 y2 = 3.805 />
+<linesegment x1 = 0 y1 = 1.515 x2 = 0.25 y2 = 1.515 />
+<linesegment x1 = 0.505 y1 = 1.515 x2 = 1.01 y2 = 1.515 />
+<linesegment x1 = 1.265 y1 = 1.515 x2 = 1.515 y2 = 1.515 />
+<linesegment x1 = 0 y1 = 1.52 x2 = 0.25 y2 = 1.52 />
+<linesegment x1 = 0.505 y1 = 1.52 x2 = 1.01 y2 = 1.52 />
+<linesegment x1 = 1.265 y1 = 1.52 x2 = 1.52 y2 = 1.52 />
+</LineSegmentList>
 <ObservationModels>
   <CamAruco2DObservationModel
     camera_range = "1.61"
@@ -179,8 +237,8 @@
     orbit_radius=5.0
     wind_noise_pos="0.00001"
     wind_noise_ang="0.00001" 
-    min_linear_velocity= 0.6
-    max_linear_velocity= 0.6
+    min_linear_velocity= 0.4
+    max_linear_velocity= 0.4
     max_angular_velocity= 0.6
     dt= 0.1
     /> <!--omega is in radians--> 

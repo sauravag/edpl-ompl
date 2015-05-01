@@ -1878,7 +1878,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             if(policyGenerator_->isConverged())
                 break;
 
-            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
             timeSinceKidnap++;
 

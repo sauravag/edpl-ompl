@@ -90,7 +90,7 @@ ObservationModelMethod::ObservationType firm::SpaceInformation::getObservation()
 {
     ObservationType z = observationModel_->getObservation(trueState_, true);
 
-    std::cout<<"VIRTUALSPACEINFO: The robot sees (press enter) \n"<<z<<std::endl;
+    //std::cout<<"VIRTUALSPACEINFO: The robot sees (press enter) \n"<<z<<std::endl;
 
     //std::cin.get();
 

@@ -63,6 +63,19 @@ class FIRMUtils
 
         /** \brief radians to degree */
         static double radian2Degree(double rads);
+
+        /** \brief Checks if line segments p1q1 and p2q2 intersect or not */
+        static bool doLineSegmentsIntersect(arma::colvec p1, arma::colvec q1, arma::colvec p2, arma::colvec q2);
+
+        /** \brief To find orientation of ordered triplet (p, q, r). The function returns following values
+            0 --> p, q and r are colinear
+            1 --> Clockwise
+            2 --> Counterclockwise
+        */
+        static int orientation(arma::colvec p, arma::colvec q, arma::colvec r);
+
+        /** \brief Given three colinear points p, q, r, the function checks if point q lies on line segment 'pr' */
+        static bool onSegment(arma::colvec p, arma::colvec q, arma::colvec r);
 };
 
 #endif
