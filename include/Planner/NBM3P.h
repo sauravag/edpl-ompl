@@ -317,8 +317,8 @@ class NBM3P
             boost::property_map<Graph, boost::vertex_rank_t>::type,
             boost::property_map<Graph, boost::vertex_predecessor_t>::type >
                                                                     disjointSets_;*/
-        /** \brief Stores the list of ids of landmarks that a vertex in the graph can see*/
-        std::map<Vertex, std::vector<unsigned int> > stateObservationProperty_;
+        /** \brief Stores the landmarks that a vertex in the graph can see*/
+        std::map<Vertex, std::vector<arma::colvec> > stateObservationProperty_;
 
         /** \brief Mutex to guard access to the Graph member (g_) */
         mutable boost::mutex                                   graphMutex_;

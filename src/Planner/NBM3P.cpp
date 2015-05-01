@@ -973,6 +973,8 @@ void NBM3P::addStateToObservationGraph(ompl::base::State *state)
 
     stateProperty_[m] = state;
 
+    evaluateObservationListForVertex(m);
+
     // Iterate over existing nodes and add edges
     foreach (Vertex n, boost::vertices(g_))
     {
@@ -1011,11 +1013,12 @@ void NBM3P::evaluateObservationListForVertex(const Vertex v)
 
     unsigned int singleObsSize = CamAruco2DObservationModel::singleObservationDim;
 
-    std::vector<unsigned int> obsList;
+    std::vector<arma::colvec> obsList;
 
     for(int i = 0; i < obs.n_rows/singleObsSize; i++)
     {
-        obsList.push_back(obs[singleObsSize*i]);
+        // For each landmark observed, keep its id, range and bearing
+        obsList.push_back(obs.subvec(singleObsSize*i,singleObsSize*i+2));
     }
 
     stateObservationProperty_[v] = obsList;
@@ -1025,10 +1028,11 @@ bool NBM3P::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
 {
 
     // get the list of observations for both vertices
-    evaluateObservationListForVertex(a);
+    //evaluateObservationListForVertex(a);
 
-    evaluateObservationListForVertex(b);
+    //evaluateObservationListForVertex(b);
 
+    unsigned int singleObsPropertySize = 3; // because we are storing id, range, bearing
 
     bool isOverlapping = false;
 
@@ -1041,23 +1045,49 @@ bool NBM3P::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
         return true;
     }
 
+    std::vector<arma::colvec> obsA = stateObservationProperty_[a];
+
+    std::vector<arma::colvec> obsB = stateObservationProperty_[b];
+
+    arma::colvec xVecA = stateProperty_[a]->as<SE2BeliefSpace::StateType>()->getArmaData();
+
+    arma::colvec xVecB = stateProperty_[b]->as<SE2BeliefSpace::StateType>()->getArmaData();
+
     // Check if there is an overlap
-    for(int i = 0; i < stateObservationProperty_[a].size(); i++)
+    for(int i = 0; i < obsA.size(); i++)
     {
-        for(int j= 0; j < stateObservationProperty_[b].size(); j++)
+        // x_landmark = x_robot + range*cos(robot_heading+bearing_to_landmark)
+        // y_landmark = y_robot + range*sin(robot_heading+bearing_to_landmark)
+        double landmarkA_x = xVecA(0) + obsA[i](1)*cos(xVecA(2)+obsA[i](2));
+        double landmarkA_y = xVecA(1) + obsA[i](1)*sin(xVecA(2)+obsA[i](2));
+
+        for(int j= 0; j < obsB.size(); j++)
         {
-            // Check for overlap if they are not looking at the same physical landmark
-            if(si_->distance(stateProperty_[a],stateProperty_[b]) > 4.0) // 4.0 is 2x the camera range
+
+            double landmarkB_x = xVecB(0) + obsB[j](1)*cos(xVecB(2)+obsB[j](2));
+            double landmarkB_y = xVecB(1) + obsB[j](1)*sin(xVecB(2)+obsB[j](2));
+
+            // Check if the id is the same
+            if(obsA[i](0) == obsB[j](0))
             {
-                if(stateObservationProperty_[a][i] == stateObservationProperty_[b][j])
+
+                /* If id same, check if looking at same physical landmark.
+                1. Get the state of each node as colvec
+                2. Project the location of landmark into global coordinates.
+                3. Compare the global coordinates and see if same.
+                */
+                double distanceBetweenReprojectedLandmarks = sqrt( pow(landmarkA_x-landmarkB_x,2) + pow(landmarkA_y-landmarkB_y,2) );
+
+                if(distanceBetweenReprojectedLandmarks > 0.01)
                 {
                     // for every overlap, increase weight
                     weight++;
 
                     isOverlapping = true;
-
                 }
+
             }
+
         }
     }
 
