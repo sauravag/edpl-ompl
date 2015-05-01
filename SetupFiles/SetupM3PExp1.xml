@@ -163,7 +163,7 @@
     sigma_angle="1.0"
     eta_rd="0.05"
     eta_rphi = "0.0"
-    eta_thetad="0.01"
+    eta_thetad="0.0"
     eta_thetaphi = "0.0"
     vcLabel = "cd1"
   >
@@ -179,9 +179,9 @@
     orbit_radius=5.0
     wind_noise_pos="0.00001"
     wind_noise_ang="0.00001" 
-    min_linear_velocity= 0.1
-    max_linear_velocity= 0.1
-    max_angular_velocity= 0.2
+    min_linear_velocity= 0.6
+    max_linear_velocity= 0.6
+    max_angular_velocity= 0.6
     dt= 0.1
     /> <!--omega is in radians--> 
   <OmnidirectionalMotionModel 

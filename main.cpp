@@ -189,9 +189,9 @@ int main(int argc, char **argv)
 
         2. To plan with ROS integration, the provided example listens for aruco_marker_publisher and advertises robot commands to geometry::twist
     */
-    //boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
+    boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
 
-    boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
+    //boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
 
     app.exec();
 

@@ -61,17 +61,17 @@ namespace ompl
 
         static const float MIN_ROBOT_CLEARANCE = 0.10;
 
-        static const double SIGMA_RANGE = 0.2;// 0.5 meters
+        static const double SIGMA_RANGE = 0.1;// 0.5 meters
 
-        static const double SIGMA_THETA = 0.2; // 0.2 radians
+        static const double SIGMA_THETA = 0.1; // 0.2 radians
 
         static const double MODE_DELETION_THRESHOLD = 1e-3; // the percentage of weight a mode should hold, below which it gets deleted
 
         static const double ZERO_CONTROL_UPDATE_TIME = 1.0 ;
 
-        static const double SAMPLING_ROTATION_SPACING = 30.0; // degrees
+        static const double SAMPLING_ROTATION_SPACING = 90.0; // degrees
 
-        static const double SAMPLING_GRID_SIZE = 0.09 ; // 0.5: ICreate, 0.18 :  Ardubot
+        static const double SAMPLING_GRID_SIZE = 0.04 ; // 0.5: ICreate, 0.18 :  Ardubot
     }
 }
 
@@ -106,9 +106,9 @@ void NBM3P::sampleNewBeliefStates()
     int numHeadings = std::floor(2*boost::math::constants::pi<double>()/rotationSpacing);
 
     arma::mat cov = arma::eye(3,3);
-    cov(0,0) = 0.25;
-    cov(1,1) = 0.25;
-    cov(2,2) = 0.01;
+    cov(0,0) = 0.04;
+    cov(1,1) = 0.02;
+    cov(2,2) = 0.04;
 
     OMPL_INFORM("NBM3P: Sampling start beliefs");
 
