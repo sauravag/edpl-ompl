@@ -79,7 +79,7 @@ void plan()
 
         if(mySetup->solve())
         {
-            mySetup->executeSolution(mode);
+
             mySetup->Run(mode);
 
             OMPL_INFORM("Plan Executed.");

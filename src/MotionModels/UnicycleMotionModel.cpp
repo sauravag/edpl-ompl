@@ -74,7 +74,8 @@ void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::con
 
 void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *startState,
                                                   const ompl::base::State *endState,
-                                                  std::vector<ompl::control::Control*> &openLoopControls)
+                                                  std::vector<ompl::control::Control*> &openLoopControls,
+                                                  bool withMaxVelocity)
 {
 
     using namespace arma;
@@ -101,6 +102,20 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
     double theta_start = start[2];
     double th_end = end[2];
 
+    double linearVelocity=0;
+    double angularVelocity=0;
+
+    if(withMaxVelocity)
+    {
+        linearVelocity = maxLinearVelocity_;
+        angularVelocity = maxAngularVelocity_;
+    }
+    else
+    {
+        linearVelocity = minLinearVelocity_;
+        angularVelocity = minAngularVelocity_;
+    }
+
     // connceting line slope
     th_p = atan2(y_c[1]-y_c[0], x_c[1]-x_c[0]);
 
@@ -115,12 +130,12 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
     FIRMUtils::normalizeAngleToPiRange(delta_th_p_end);
 
     //count rotational steps
-    rotation_steps_start = fabs(delta_th_p_start/(maxAngularVelocity_*this->dt_));
-    rotation_steps_end = fabs(delta_th_p_end/(maxAngularVelocity_*this->dt_));
+    rotation_steps_start = fabs(delta_th_p_start/(angularVelocity*this->dt_));
+    rotation_steps_end = fabs(delta_th_p_end/(angularVelocity*this->dt_));
 
     //count translation steps
     delta_disp = sqrt( pow(y_c[1]-y_c[0], 2) + pow(x_c[1]-x_c[0], 2) );
-    translation_steps = fabs(delta_disp/(maxLinearVelocity_*this->dt_));
+    translation_steps = fabs(delta_disp/(linearVelocity*this->dt_));
 
     // total number of steps
     kf += ceil(rotation_steps_start) + ceil(translation_steps) + ceil(rotation_steps_end);
@@ -131,7 +146,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
 
     colvec u_const_rot;
     u_const_rot << 0 << endr
-                << maxAngularVelocity_*FIRMUtils::signum(delta_th_p_start) << endr;
+                << angularVelocity*FIRMUtils::signum(delta_th_p_start) << endr;
 
     int ix = 0;
     for(int j=0; j<frsi; ++j, ++ix)
@@ -156,7 +171,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
     static colvec u_const_trans;
 
     if(u_const_trans.n_rows == 0) {
-      u_const_trans << maxLinearVelocity_ << endr
+      u_const_trans << linearVelocity << endr
                     << 0        << endr;
     }
 
@@ -180,7 +195,7 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
     colvec u_const_rot_end;
 
     u_const_rot_end << 0 << endr
-                << maxAngularVelocity_*FIRMUtils::signum(delta_th_p_end) << endr;
+                << angularVelocity*FIRMUtils::signum(delta_th_p_end) << endr;
 
     for(int j=0; j<frsi_end; ++j, ++ix)
     {
@@ -197,13 +212,13 @@ void UnicycleMotionModel::generateOpenLoopControls(const ompl::base::State *star
     }
 }
 
-void UnicycleMotionModel::generateOpenLoopControlsForPath(const ompl::geometric::PathGeometric path, std::vector<ompl::control::Control*> &openLoopControls)
+void UnicycleMotionModel::generateOpenLoopControlsForPath(const ompl::geometric::PathGeometric path, std::vector<ompl::control::Control*> &openLoopControls, bool withMaxVelocity)
 {
     for(int i=0;i<path.getStateCount()-1;i++)
     {
         std::vector<ompl::control::Control*> olc;
 
-        this->generateOpenLoopControls(path.getState(i),path.getState(i+1),olc) ;
+        this->generateOpenLoopControls(path.getState(i),path.getState(i+1),olc, withMaxVelocity) ;
 
         openLoopControls.insert(openLoopControls.end(),olc.begin(),olc.end());
     }
@@ -376,6 +391,7 @@ void UnicycleMotionModel::loadParameters(const char *pathToSetupFile)
     double windNoiseAng = 0;
     double minLinearVelocity=0;
     double maxLinearVelocity=0;
+    double minAngularVelocity =0;
     double maxAngularVelocity =0;
     double dt = 0;
 
@@ -387,6 +403,7 @@ void UnicycleMotionModel::loadParameters(const char *pathToSetupFile)
     itemElement->QueryDoubleAttribute("wind_noise_ang", &windNoiseAng) ;
     itemElement->QueryDoubleAttribute("min_linear_velocity", &minLinearVelocity) ;
     itemElement->QueryDoubleAttribute("max_linear_velocity", &maxLinearVelocity) ;
+    itemElement->QueryDoubleAttribute("min_angular_velocity", &minAngularVelocity) ;
     itemElement->QueryDoubleAttribute("max_angular_velocity", &maxAngularVelocity) ;
     itemElement->QueryDoubleAttribute("dt", &dt) ;
 
@@ -399,6 +416,7 @@ void UnicycleMotionModel::loadParameters(const char *pathToSetupFile)
 
     minLinearVelocity_  = minLinearVelocity;
     maxLinearVelocity_  = maxLinearVelocity;
+    minAngularVelocity_ = minAngularVelocity;
     maxAngularVelocity_ = maxAngularVelocity;
     dt_                 = dt;
 
@@ -414,6 +432,8 @@ void UnicycleMotionModel::loadParameters(const char *pathToSetupFile)
     OMPL_INFORM("UnicycleMotionModel: min Linear Velocity (m/s)    = %f", minLinearVelocity_ );
 
     OMPL_INFORM("UnicycleMotionModel: max Linear Velocity (m/s)    = %f", maxLinearVelocity_);
+
+    OMPL_INFORM("UnicycleMotionModel: min Angular Velocity (rad/s) = %f",minAngularVelocity_);
 
     OMPL_INFORM("UnicycleMotionModel: max Angular Velocity (rad/s) = %f",maxAngularVelocity_);
 

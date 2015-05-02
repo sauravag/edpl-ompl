@@ -70,7 +70,8 @@ void OmnidirectionalMotionModel::Evolve(const ompl::base::State *state, const om
 
 void OmnidirectionalMotionModel::generateOpenLoopControls(const ompl::base::State *startState,
                                                   const ompl::base::State *endState,
-                                                  std::vector<ompl::control::Control*> &openLoopControls)
+                                                  std::vector<ompl::control::Control*> &openLoopControls,
+                                                  bool withMaxVelocity)
 {
 
     using namespace arma;
@@ -168,7 +169,7 @@ void OmnidirectionalMotionModel::generateOpenLoopControls(const ompl::base::Stat
 
 }
 
-void OmnidirectionalMotionModel::generateOpenLoopControlsForPath(const ompl::geometric::PathGeometric path, std::vector<ompl::control::Control*> &openLoopControls)
+void OmnidirectionalMotionModel::generateOpenLoopControlsForPath(const ompl::geometric::PathGeometric path, std::vector<ompl::control::Control*> &openLoopControls, bool withMaxVelocity)
 {
     for(int i=0;i<path.getStateCount()-1;i++)
     {

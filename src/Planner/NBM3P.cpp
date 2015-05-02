@@ -72,6 +72,8 @@ namespace ompl
         static const double SAMPLING_ROTATION_SPACING = 90.0; // degrees
 
         static const double SAMPLING_GRID_SIZE = 0.04 ; // 0.5: ICreate, 0.18 :  Ardubot
+
+        static const double SPEEDUP_FACTOR = 5.0;
     }
 }
 
@@ -209,6 +211,9 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
     //container to store the sequence of controls for each mode/target pair
     std::vector<std::vector<ompl::control::Control*> > openLoopPolicies;
 
+    //Container to store RRT paths
+    std::vector<ompl::geometric::PathGeometric> openLoopPaths;
+
     std::vector<ompl::geometric::PathGeometric> rrtPaths;
 
     // Iterate over the mode/target pairs and generate open loop controls
@@ -244,15 +249,15 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
 
                 ompl::geometric::PathGeometric gpath = static_cast<ompl::geometric::PathGeometric&>(*path);
 
+                openLoopPaths.push_back(gpath);
+
                 rrtPaths.push_back(gpath);
 
                 Visualizer::addOpenLoopRRTPath(gpath);
 
-                //boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-
                 std::vector<ompl::control::Control*> olc;
 
-                si_->getMotionModel()->generateOpenLoopControlsForPath(gpath, olc);
+                si_->getMotionModel()->generateOpenLoopControlsForPath(gpath, olc, true);
 
                 openLoopPolicies.push_back(olc);
 
@@ -319,7 +324,12 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
     {
         OMPL_INFORM("NBM3P: A minimum cost policy was found");
 
-        policy = openLoopPolicies[maxGainPolicyIndx];
+        // Now generate a policy for the same path with slower controls
+        std::vector<ompl::control::Control*> olcSlow ;
+
+        si_->getMotionModel()->generateOpenLoopControlsForPath(openLoopPaths[maxGainPolicyIndx], olcSlow);
+
+        policy = olcSlow;
 
         previousPolicy_ = policy;
 
