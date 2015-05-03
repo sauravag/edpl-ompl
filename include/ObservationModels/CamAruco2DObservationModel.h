@@ -76,6 +76,7 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
         // initialize etaPhi_, etaD_, sigma_;
         this->loadLandmarks(pathToSetupFile);
+        this->loadLineSegments(pathToSetupFile);
         this->loadParameters(pathToSetupFile);
     }
 
@@ -113,6 +114,10 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     bool isStateObservable(const ompl::base::State *state);
 
+    // TODO: write this function
+    /** \brief Check if this landmark is actually in the map, reject extraneous landmarks*/
+    //bool isLandmarkInMap(const arma::colvec landmark);
+
   private:
 
     ObservationType removeSpuriousObservations(const ObservationType& Zg);
@@ -128,8 +133,13 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     std::vector<arma::colvec> landmarks_;
 
+    std::vector<arma::colvec> lineSegments_;
+
     //Function to load landmarks from XML file into the object
     void loadLandmarks(const char *pathToSetupFile);
+
+    /** \brief Load line segments of environment CAD model*/
+    void loadLineSegments(const char *pathToSetupFile);
 
     void loadParameters(const char *pathToSetupFile);
 

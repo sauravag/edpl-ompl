@@ -44,6 +44,23 @@
 inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, const arma::mat& _R, arma::mat &S)
 
 {
+/*
+    std::cout<<"Solving DARE, CHECK INPUT \n";
+
+    std::cout<<"_A"<<_A<<std::endl;
+
+    std::cout<<"_B"<<_B<<std::endl;
+
+    std::cout<<"_Q"<<_Q<<std::endl;
+
+    std::cout<<"_A"<<_A<<std::endl;
+
+    std::cout<<"_R"<<_R<<std::endl;
+
+    //std::cout<<"_S"<<S<<std::endl;
+
+    std::cin.get();
+*/
     using namespace arma;
 
     int n = _A.n_rows, m = _B.n_cols;

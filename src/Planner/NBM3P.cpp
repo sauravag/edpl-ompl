@@ -41,6 +41,7 @@
 #include <boost/foreach.hpp>
 #include "../../include/ObservationModels/CamAruco2DObservationModel.h"
 #include "../../include/LinearSystem/LinearSystem.h"
+#include "../../include/SeparatedControllers/RHCICreate.h"
 #include <numeric>
 
 #define foreach BOOST_FOREACH
@@ -55,23 +56,27 @@ namespace ompl
 
         static const double RRT_PLAN_MAX_TIME = 1.0; // maximum time allowed for RRT to plan
 
-        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.2; // maximum distance for RRT to succeed
+        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.05; // maximum distance for RRT to succeed
 
         static const double NEIGHBORHOOD_RANGE = 4.0 ; // 20(6cw), 12 (4cw), 4 (M3PEnv2) range within which to find neighbors
 
-        static const float MIN_ROBOT_CLEARANCE = 0.10;
+        static const float MIN_ROBOT_CLEARANCE = 0.1;
 
-        static const double SIGMA_RANGE = 0.12;// 0.5 meters
+        static const double SIGMA_RANGE = 0.1;// 0.5 meters
 
-        static const double SIGMA_THETA = 0.12; // 0.2 radians
+        static const double SIGMA_THETA = 0.1; // 0.2 radians
 
-        static const double MODE_DELETION_THRESHOLD = 1e-4; // the percentage of weight a mode should hold, below which it gets deleted
+        static const double MODE_DELETION_THRESHOLD = 1e-3; // the percentage of weight a mode should hold, below which it gets deleted
 
         static const double ZERO_CONTROL_UPDATE_TIME = 1.0 ;
 
-        static const double SAMPLING_ROTATION_SPACING = 30.0; // degrees
+        static const double SAMPLING_ROTATION_SPACING = 90.0; // degrees
 
-        static const double SAMPLING_GRID_SIZE = 0.10 ; // 0.5: ICreate, 0.18 :  Ardubot
+        static const double SAMPLING_GRID_SIZE = 0.04 ; // 0.5: ICreate, 0.18 :  Ardubot
+
+        static const double SPEEDUP_FACTOR = 5.0;
+
+        static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 10;
     }
 }
 
@@ -106,9 +111,9 @@ void NBM3P::sampleNewBeliefStates()
     int numHeadings = std::floor(2*boost::math::constants::pi<double>()/rotationSpacing);
 
     arma::mat cov = arma::eye(3,3);
-    cov(0,0) = 0.25;
-    cov(1,1) = 0.25;
-    cov(2,2) = 0.01;
+    cov(0,0) = 0.04;
+    cov(1,1) = 0.02;
+    cov(2,2) = 0.04;
 
     OMPL_INFORM("NBM3P: Sampling start beliefs");
 
@@ -200,7 +205,7 @@ void NBM3P::sampleNewBeliefStates()
 
 
 
-void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
+void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy, ompl::geometric::PathGeometric &policyPath, unsigned int &chosenMode)
 {
     si_->showRobotVisualization(false);
 
@@ -208,6 +213,9 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
 
     //container to store the sequence of controls for each mode/target pair
     std::vector<std::vector<ompl::control::Control*> > openLoopPolicies;
+
+    //Container to store RRT paths
+    std::vector<ompl::geometric::PathGeometric> openLoopPaths;
 
     std::vector<ompl::geometric::PathGeometric> rrtPaths;
 
@@ -238,21 +246,28 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
 
             ompl::base::PlannerStatus solved = planner->solve(ompl::magic::RRT_PLAN_MAX_TIME);
 
+            int solveCounter = 2;
+            while(!solved && solveCounter < 10)
+            {
+                solved = planner->solve(ompl::magic::RRT_PLAN_MAX_TIME*solveCounter);
+                solveCounter++;
+            }
+
             if(solved)
             {
                 const ompl::base::PathPtr &path = pdef->getSolutionPath();
 
                 ompl::geometric::PathGeometric gpath = static_cast<ompl::geometric::PathGeometric&>(*path);
 
+                openLoopPaths.push_back(gpath);
+
                 rrtPaths.push_back(gpath);
 
                 Visualizer::addOpenLoopRRTPath(gpath);
 
-                //boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-
                 std::vector<ompl::control::Control*> olc;
 
-                si_->getMotionModel()->generateOpenLoopControlsForPath(gpath, olc);
+                si_->getMotionModel()->generateOpenLoopControlsForPath(gpath, olc, true);
 
                 openLoopPolicies.push_back(olc);
 
@@ -267,8 +282,8 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
 
     double maxGain = -1e10;
 
-    int maxGainPolicyIndx=-1;
-
+    int maxGainPolicyIndx= FIRMUtils::generateRandomIntegerInRange(0,openLoopPolicies.size()-1);//-1
+/*
     OMPL_INFORM("Evaluating the Open Loop policies on all the modes");
 
     //boost::this_thread::sleep(boost::posix_time::milliseconds(100));
@@ -286,7 +301,15 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
 
             OMPL_INFORM("NBM3P: Evaluating Policy Number #%u  on Mode Number #%u",i,j);
 
+            auto start_time_openloop = std::chrono::high_resolution_clock::now();
+
             ompl::base::Cost c = executeOpenLoopPolicyOnMode(openLoopPolicies[i],currentBeliefStates_[j]);
+
+            auto end_time_openloop = std::chrono::high_resolution_clock::now();
+
+            double timeToExecuteOpenLoopPolicyOnMode = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_openloop - start_time_openloop).count();
+
+            OMPL_INFORM("NBM3P: Time to execute open loop policy on mode = %f ms", timeToExecuteOpenLoopPolicyOnMode);
 
             //pGain.v += c.v;
             pGain = ompl::base::Cost(pGain.value() + c.value());
@@ -307,7 +330,7 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
             maxGainPolicyIndx = i;
         }
     }
-
+*/
     OMPL_INFORM("NBM3P: Max gain policy index = %u", maxGainPolicyIndx);
 
     //std::cin.get();
@@ -319,7 +342,16 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
     {
         OMPL_INFORM("NBM3P: A minimum cost policy was found");
 
-        policy = openLoopPolicies[maxGainPolicyIndx];
+        // Now generate a policy for the same path with slower controls
+        std::vector<ompl::control::Control*> olcSlow ;
+
+        si_->getMotionModel()->generateOpenLoopControlsForPath(openLoopPaths[maxGainPolicyIndx], olcSlow);
+
+        policy = olcSlow;
+
+        policyPath = openLoopPaths[maxGainPolicyIndx];
+
+        chosenMode = maxGainPolicyIndx;
 
         previousPolicy_ = policy;
 
@@ -328,7 +360,8 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
     }
     else
     {
-        policy = previousPolicy_;
+        OMPL_ERROR("NBM3P: Could not generate any candidate policy!");
+        exit(1);
     }
 
     auto end_time_policygen = std::chrono::high_resolution_clock::now();
@@ -370,6 +403,7 @@ ompl::base::Cost NBM3P::executeOpenLoopPolicyOnMode(std::vector<ompl::control::C
 
     for(int i=0; i < controls.size() ; i++)
     {
+
         si_->applyControl(controls[i],false);
 
         propagateBeliefs(controls[i], true);
@@ -419,6 +453,13 @@ ompl::base::Cost NBM3P::executeOpenLoopPolicyOnMode(std::vector<ompl::control::C
 
 }
 
+/*
+ompl::control::Control* NBM3P::generateSeparatedController()
+{
+
+
+}
+*/
 
 void NBM3P::propagateBeliefs(const ompl::control::Control *control, bool isSimulation)
 {
@@ -886,7 +927,7 @@ void NBM3P::removeDuplicateModes()
                 double yd = xi(1) - xj(1);
                 double thetad = xi(2) - xj(2);
 
-                if(std::abs(xd) < 0.01 && std::abs(yd) < 0.01 &&  std::abs(thetad) < FIRMUtils::degree2Radian(1.0) )
+                if(std::abs(xd) < 0.05 && std::abs(yd) < 0.05 &&  std::abs(thetad) < FIRMUtils::degree2Radian(1.0) )
                 {
 
                     if(weights_[i] >= weights_[j] )
@@ -972,6 +1013,8 @@ void NBM3P::addStateToObservationGraph(ompl::base::State *state)
 
     stateProperty_[m] = state;
 
+    evaluateObservationListForVertex(m);
+
     // Iterate over existing nodes and add edges
     foreach (Vertex n, boost::vertices(g_))
     {
@@ -1010,11 +1053,12 @@ void NBM3P::evaluateObservationListForVertex(const Vertex v)
 
     unsigned int singleObsSize = CamAruco2DObservationModel::singleObservationDim;
 
-    std::vector<unsigned int> obsList;
+    std::vector<arma::colvec> obsList;
 
     for(int i = 0; i < obs.n_rows/singleObsSize; i++)
     {
-        obsList.push_back(obs[singleObsSize*i]);
+        // For each landmark observed, keep its id, range and bearing
+        obsList.push_back(obs.subvec(singleObsSize*i,singleObsSize*i+2));
     }
 
     stateObservationProperty_[v] = obsList;
@@ -1024,10 +1068,11 @@ bool NBM3P::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
 {
 
     // get the list of observations for both vertices
-    evaluateObservationListForVertex(a);
+    //evaluateObservationListForVertex(a);
 
-    evaluateObservationListForVertex(b);
+    //evaluateObservationListForVertex(b);
 
+    unsigned int singleObsPropertySize = 3; // because we are storing id, range, bearing
 
     bool isOverlapping = false;
 
@@ -1040,23 +1085,49 @@ bool NBM3P::getObservationOverlap(Vertex a, Vertex b, unsigned int &weight)
         return true;
     }
 
+    std::vector<arma::colvec> obsA = stateObservationProperty_[a];
+
+    std::vector<arma::colvec> obsB = stateObservationProperty_[b];
+
+    arma::colvec xVecA = stateProperty_[a]->as<SE2BeliefSpace::StateType>()->getArmaData();
+
+    arma::colvec xVecB = stateProperty_[b]->as<SE2BeliefSpace::StateType>()->getArmaData();
+
     // Check if there is an overlap
-    for(int i = 0; i < stateObservationProperty_[a].size(); i++)
+    for(int i = 0; i < obsA.size(); i++)
     {
-        for(int j= 0; j < stateObservationProperty_[b].size(); j++)
+        // x_landmark = x_robot + range*cos(robot_heading+bearing_to_landmark)
+        // y_landmark = y_robot + range*sin(robot_heading+bearing_to_landmark)
+        double landmarkA_x = xVecA(0) + obsA[i](1)*cos(xVecA(2)+obsA[i](2));
+        double landmarkA_y = xVecA(1) + obsA[i](1)*sin(xVecA(2)+obsA[i](2));
+
+        for(int j= 0; j < obsB.size(); j++)
         {
-            // Check for overlap if they are not looking at the same physical landmark
-            if(si_->distance(stateProperty_[a],stateProperty_[b]) > 4.0) // 4.0 is 2x the camera range
+
+            double landmarkB_x = xVecB(0) + obsB[j](1)*cos(xVecB(2)+obsB[j](2));
+            double landmarkB_y = xVecB(1) + obsB[j](1)*sin(xVecB(2)+obsB[j](2));
+
+            // Check if the id is the same
+            if(obsA[i](0) == obsB[j](0))
             {
-                if(stateObservationProperty_[a][i] == stateObservationProperty_[b][j])
+
+                /* If id same, check if looking at same physical landmark.
+                1. Get the state of each node as colvec
+                2. Project the location of landmark into global coordinates.
+                3. Compare the global coordinates and see if same.
+                */
+                double distanceBetweenReprojectedLandmarks = sqrt( pow(landmarkA_x-landmarkB_x,2) + pow(landmarkA_y-landmarkB_y,2) );
+
+                if(distanceBetweenReprojectedLandmarks > 0.01)
                 {
                     // for every overlap, increase weight
                     weight++;
 
                     isOverlapping = true;
-
                 }
+
             }
+
         }
     }
 
@@ -1158,4 +1229,125 @@ int NBM3P::calculateIntersectionWithNeighbor(const Vertex v, std::vector<Vertex>
     }
 
     return w;
+}
+
+
+void NBM3P::execute(ompl::base::State *recoveredState)
+{
+
+
+    Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
+
+    auto start_time_sampling = std::chrono::high_resolution_clock::now();
+
+    this->sampleNewBeliefStates();
+
+    auto end_time_sampling = std::chrono::high_resolution_clock::now();
+
+    double timeToGenerateUnderlyingBelief = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_sampling - start_time_sampling).count();
+
+    OMPL_INFORM("NBM3P: Time taken to generate multi-modal belief =  %f", timeToGenerateUnderlyingBelief);
+
+    int counter = 0;
+
+    Visualizer::doSaveVideo(true);
+
+    int timeSinceKidnap = 0;
+
+    //weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
+
+    auto start_time_recovery = std::chrono::high_resolution_clock::now();
+
+    while(!this->isConverged())
+    {
+        std::vector<ompl::control::Control*> policy;
+        ompl::geometric::PathGeometric gpath(si_);
+        unsigned int chosenMode;
+
+        this->generatePolicy(policy, gpath, chosenMode);
+
+        OMPL_INFORM("GPATH STATE COUNT: %u", gpath.getStateCount());
+
+        Visualizer::doSaveVideo(true);
+
+        bool replanFlag = false;
+
+        for(int i=0;i<gpath.getStateCount();i++)
+        {
+            std::vector<ompl::base::State*> dummyStates;
+            std::vector<ompl::control::Control*> dummyControls;
+            std::vector<LinearSystem> dummyLinearSystems;
+
+            // Generate a feedback controller
+            RHCICreate feedbackController(gpath.getState(i), dummyStates, dummyControls, dummyLinearSystems, si_->getMotionModel());
+
+            // While the mode hasnt reached a neighborhood of the waypoint
+            while(si_->distance(currentBeliefStates_[chosenMode],gpath.getState(i)) > 0.05 && !replanFlag)
+            {
+
+                ompl::control::Control* cntrl = feedbackController.generateFeedbackControl(currentBeliefStates_[chosenMode]);
+
+                policyExecutionSI_->applyControl(cntrl);
+
+                unsigned int numModesBefore = this->getNumberOfModes();
+
+                this->propagateBeliefs(cntrl);
+
+                unsigned int numModesAfter = this->getNumberOfModes();
+
+                // If any of the modes gets deleted, break and find new policy
+                if(numModesAfter != numModesBefore)
+                {
+                    replanFlag = true;
+                    break;
+                }
+                //siF_->getTrueState(currentTrueState);
+
+                // If the belief's clearance gets below the threshold, break loop & replan
+                if(!this->doCurrentBeliefsSatisfyClearance(i))
+                {
+                    if(counter == 0)
+                    {
+                        counter++;
+                        replanFlag = true;
+                        break;
+                    }
+
+                }
+
+                if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
+                    counter = 0;
+
+                if(this->isConverged())
+                {
+                    replanFlag = true;
+                    break;
+                }
+                //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+
+                timeSinceKidnap++;
+
+                //weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
+            }
+
+            if(replanFlag)
+                break;
+
+        }
+
+        // apply stop command to robot while planning next move
+        policyExecutionSI_->applyControl(policyExecutionSI_->getMotionModel()->getZeroControl());
+
+    }
+
+    auto end_time_recovery = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to recover lost robot (exclude sampling): "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_recovery - start_time_recovery).count() << " milli seconds."<<std::endl;
+
+    si_->copyState(recoveredState, currentBeliefStates_[0]);
+
+    //Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
+
+    //writeTimeSeriesDataToFile("MultiModalWeightsHistory.csv", "multiModalWeights");
+
 }

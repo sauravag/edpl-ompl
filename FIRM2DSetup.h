@@ -122,9 +122,19 @@ public:
 
     void setStartState(const double X, const double Y, const double Yaw)
     {
+        using namespace arma;
+
         ompl::base::State *temp = siF_->allocState();
 
+        mat startCov(3,3);
+
+        startCov<<0.04<<0.0<<0.0<<endr
+                <<0.0<<0.04<<0.0<<endr
+                <<0.0<<0.0<<0.04<<endr;
+
         temp->as<StateType>()->setXYYaw(X,Y,Yaw);
+
+        temp->as<StateType>()->setCovariance(startCov);
 
         siF_->copyState(start_, temp);
 
@@ -134,9 +144,19 @@ public:
 
     void addGoalState(const double X, const double Y, const double Yaw)
     {
+        using namespace arma;
+
         ompl::base::State *temp = siF_->allocState();
 
+        mat goalCov(3,3);
+
+        goalCov<<0.0001<<0.0<<0.0<<endr
+                <<0.0<<0.0001<<0.0<<endr
+                <<0.0<<0.0<<0.0001<<endr;
+
         temp->as<StateType>()->setXYYaw(X,Y,Yaw);
+
+        temp->as<StateType>()->setCovariance(goalCov);
 
         goalList_.push_back(temp);
 

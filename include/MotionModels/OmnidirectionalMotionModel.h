@@ -72,11 +72,13 @@ class OmnidirectionalMotionModel: public MotionModelMethod
     /** \brief  Generate open loop control that drives robot from start to end state. */
     void generateOpenLoopControls(const ompl::base::State *startState,
                                                   const ompl::base::State *endState,
-                                                  std::vector<ompl::control::Control*> &openLoopControls);
+                                                  std::vector<ompl::control::Control*> &openLoopControls,
+                                                  bool withMaxVelocity = false);
 
      /** \brief Generate open loop controls for a geometric path. */
     void generateOpenLoopControlsForPath(const ompl::geometric::PathGeometric path,
-                                              std::vector<ompl::control::Control*> &openLoopControls);
+                                              std::vector<ompl::control::Control*> &openLoopControls,
+                                              bool withMaxVelocity = false);
 
     /** \brief Generate noise according to specified state and control input. */
     NoiseType generateNoise(const ompl::base::State *state, const ompl::control::Control* control);

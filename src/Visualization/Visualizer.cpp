@@ -157,7 +157,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     arma::colvec x = state->as<SE2BeliefSpace::StateType>()->getArmaData();
     mat covariance = state->as<SE2BeliefSpace::StateType>()->getCovariance();
 
-    double directionLineLength = 0.12;
+    double directionLineLength = 0.14;
 
     glPushMatrix();
         glTranslated(x[0], x[1], z);
@@ -174,7 +174,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         }
         else
         {
-            glVertex3f(0.5*directionLineLength*cos(x[2]), 0.5*directionLineLength*sin(x[2]), 0);
+            glVertex3f(0.6*directionLineLength*cos(x[2]), 0.6*directionLineLength*sin(x[2]), 0);
         }
         glEnd();
 
