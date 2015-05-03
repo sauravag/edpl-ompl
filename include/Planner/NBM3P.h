@@ -178,10 +178,15 @@ class NBM3P
         based on each mode to its target. Then evaluate each policy on each mode and return the best policy to be followed. We will
         then apply this policy to the true state i.e. the robot and update all the beliefs. This process would then get
         repeated.*/
-        virtual void generatePolicy(std::vector<ompl::control::Control*> &policy);
+        virtual void generatePolicy(std::vector<ompl::control::Control*> &policy,  ompl::geometric::PathGeometric &policyPath, unsigned int &chosenMode);
 
         /** \brief Runs the open loop policy on a given mode and outputs the cost*/
         virtual ompl::base::Cost executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls, const ompl::base::State* state);
+
+        /** \brief Once we choose the mode on which to base the policy, that mode must be guided along the path
+                    that was generated for it. For that we generate the open loop control.
+        */
+        //virtual SeparatedControllerMethod generateSeparatedController();
 
         /** \brief advances the beliefs/modes by applying the given controls*/
         virtual void propagateBeliefs(const ompl::control::Control *control, bool isSimulation = false);
@@ -238,6 +243,8 @@ class NBM3P
         {
             policyExecutionSI_ = executionSI;
         }
+
+        void execute(ompl::base::State *recoveredState);
 
     private:
 

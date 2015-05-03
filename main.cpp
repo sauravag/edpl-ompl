@@ -36,7 +36,6 @@
 
 #include "FIRM2DSetup.h"
 #include "FIRMAruco2DROSSetup.h"
-#include "MultiModalSetup.h"
 #include "Tests.h"
 #include <QApplication>
 #include <QtGui/QDesktopWidget>
@@ -64,11 +63,11 @@ void plan()
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    int mode = 0;
+    int mode = 3;
 
     OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal 3: M3P Lost Robot)? : ");
 
-    cin>>mode;
+    //cin>>mode;
 
     int keepTrying = 1;
 
@@ -121,11 +120,11 @@ void planROS()
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    int mode = 0;
+    int mode = 3;
 
     OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: FIRM with Kidnapping, 3: M3P Lost Robot)? : ");
 
-    cin>>mode;
+    //cin>>mode;
 
     int keepTrying = 1;
 
@@ -190,9 +189,9 @@ int main(int argc, char **argv)
         2. To plan with ROS integration, the provided example listens for aruco_marker_publisher and advertises robot commands to geometry::twist
     */
 
-    boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
+    //boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
 
-    //boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
+    boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
 
     app.exec();
 

@@ -262,6 +262,10 @@ public:
 
         recoverLostRobot(recoveredState);
 
+        OMPL_INFORM("NBM3P: Recovered Lost State -> \n");
+
+        si_->printState(recoveredState);
+
     }
 
     /** \brief Set the minimum number of FIRM nodes */

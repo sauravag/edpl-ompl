@@ -41,6 +41,7 @@
 #include <boost/foreach.hpp>
 #include "../../include/ObservationModels/CamAruco2DObservationModel.h"
 #include "../../include/LinearSystem/LinearSystem.h"
+#include "../../include/SeparatedControllers/RHCICreate.h"
 #include <numeric>
 
 #define foreach BOOST_FOREACH
@@ -55,11 +56,11 @@ namespace ompl
 
         static const double RRT_PLAN_MAX_TIME = 1.0; // maximum time allowed for RRT to plan
 
-        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.2; // maximum distance for RRT to succeed
+        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.05; // maximum distance for RRT to succeed
 
         static const double NEIGHBORHOOD_RANGE = 4.0 ; // 20(6cw), 12 (4cw), 4 (M3PEnv2) range within which to find neighbors
 
-        static const float MIN_ROBOT_CLEARANCE = 0.10;
+        static const float MIN_ROBOT_CLEARANCE = 0.1;
 
         static const double SIGMA_RANGE = 0.1;// 0.5 meters
 
@@ -74,6 +75,8 @@ namespace ompl
         static const double SAMPLING_GRID_SIZE = 0.04 ; // 0.5: ICreate, 0.18 :  Ardubot
 
         static const double SPEEDUP_FACTOR = 5.0;
+
+        static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 10;
     }
 }
 
@@ -202,7 +205,7 @@ void NBM3P::sampleNewBeliefStates()
 
 
 
-void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
+void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy, ompl::geometric::PathGeometric &policyPath, unsigned int &chosenMode)
 {
     si_->showRobotVisualization(false);
 
@@ -243,6 +246,13 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
 
             ompl::base::PlannerStatus solved = planner->solve(ompl::magic::RRT_PLAN_MAX_TIME);
 
+            int solveCounter = 2;
+            while(!solved && solveCounter < 10)
+            {
+                solved = planner->solve(ompl::magic::RRT_PLAN_MAX_TIME*solveCounter);
+                solveCounter++;
+            }
+
             if(solved)
             {
                 const ompl::base::PathPtr &path = pdef->getSolutionPath();
@@ -272,8 +282,8 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
 
     double maxGain = -1e10;
 
-    int maxGainPolicyIndx=-1;
-
+    int maxGainPolicyIndx= FIRMUtils::generateRandomIntegerInRange(0,openLoopPolicies.size()-1);//-1
+/*
     OMPL_INFORM("Evaluating the Open Loop policies on all the modes");
 
     //boost::this_thread::sleep(boost::posix_time::milliseconds(100));
@@ -291,7 +301,15 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
 
             OMPL_INFORM("NBM3P: Evaluating Policy Number #%u  on Mode Number #%u",i,j);
 
+            auto start_time_openloop = std::chrono::high_resolution_clock::now();
+
             ompl::base::Cost c = executeOpenLoopPolicyOnMode(openLoopPolicies[i],currentBeliefStates_[j]);
+
+            auto end_time_openloop = std::chrono::high_resolution_clock::now();
+
+            double timeToExecuteOpenLoopPolicyOnMode = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_openloop - start_time_openloop).count();
+
+            OMPL_INFORM("NBM3P: Time to execute open loop policy on mode = %f ms", timeToExecuteOpenLoopPolicyOnMode);
 
             //pGain.v += c.v;
             pGain = ompl::base::Cost(pGain.value() + c.value());
@@ -312,7 +330,7 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
             maxGainPolicyIndx = i;
         }
     }
-
+*/
     OMPL_INFORM("NBM3P: Max gain policy index = %u", maxGainPolicyIndx);
 
     //std::cin.get();
@@ -331,6 +349,10 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
 
         policy = olcSlow;
 
+        policyPath = openLoopPaths[maxGainPolicyIndx];
+
+        chosenMode = maxGainPolicyIndx;
+
         previousPolicy_ = policy;
 
         Visualizer::addOpenLoopRRTPath(rrtPaths[maxGainPolicyIndx]);
@@ -338,7 +360,8 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy)
     }
     else
     {
-        policy = previousPolicy_;
+        OMPL_ERROR("NBM3P: Could not generate any candidate policy!");
+        exit(1);
     }
 
     auto end_time_policygen = std::chrono::high_resolution_clock::now();
@@ -430,6 +453,13 @@ ompl::base::Cost NBM3P::executeOpenLoopPolicyOnMode(std::vector<ompl::control::C
 
 }
 
+/*
+ompl::control::Control* NBM3P::generateSeparatedController()
+{
+
+
+}
+*/
 
 void NBM3P::propagateBeliefs(const ompl::control::Control *control, bool isSimulation)
 {
@@ -1199,4 +1229,125 @@ int NBM3P::calculateIntersectionWithNeighbor(const Vertex v, std::vector<Vertex>
     }
 
     return w;
+}
+
+
+void NBM3P::execute(ompl::base::State *recoveredState)
+{
+
+
+    Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
+
+    auto start_time_sampling = std::chrono::high_resolution_clock::now();
+
+    this->sampleNewBeliefStates();
+
+    auto end_time_sampling = std::chrono::high_resolution_clock::now();
+
+    double timeToGenerateUnderlyingBelief = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_sampling - start_time_sampling).count();
+
+    OMPL_INFORM("NBM3P: Time taken to generate multi-modal belief =  %f", timeToGenerateUnderlyingBelief);
+
+    int counter = 0;
+
+    Visualizer::doSaveVideo(true);
+
+    int timeSinceKidnap = 0;
+
+    //weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
+
+    auto start_time_recovery = std::chrono::high_resolution_clock::now();
+
+    while(!this->isConverged())
+    {
+        std::vector<ompl::control::Control*> policy;
+        ompl::geometric::PathGeometric gpath(si_);
+        unsigned int chosenMode;
+
+        this->generatePolicy(policy, gpath, chosenMode);
+
+        OMPL_INFORM("GPATH STATE COUNT: %u", gpath.getStateCount());
+
+        Visualizer::doSaveVideo(true);
+
+        bool replanFlag = false;
+
+        for(int i=0;i<gpath.getStateCount();i++)
+        {
+            std::vector<ompl::base::State*> dummyStates;
+            std::vector<ompl::control::Control*> dummyControls;
+            std::vector<LinearSystem> dummyLinearSystems;
+
+            // Generate a feedback controller
+            RHCICreate feedbackController(gpath.getState(i), dummyStates, dummyControls, dummyLinearSystems, si_->getMotionModel());
+
+            // While the mode hasnt reached a neighborhood of the waypoint
+            while(si_->distance(currentBeliefStates_[chosenMode],gpath.getState(i)) > 0.05 && !replanFlag)
+            {
+
+                ompl::control::Control* cntrl = feedbackController.generateFeedbackControl(currentBeliefStates_[chosenMode]);
+
+                policyExecutionSI_->applyControl(cntrl);
+
+                unsigned int numModesBefore = this->getNumberOfModes();
+
+                this->propagateBeliefs(cntrl);
+
+                unsigned int numModesAfter = this->getNumberOfModes();
+
+                // If any of the modes gets deleted, break and find new policy
+                if(numModesAfter != numModesBefore)
+                {
+                    replanFlag = true;
+                    break;
+                }
+                //siF_->getTrueState(currentTrueState);
+
+                // If the belief's clearance gets below the threshold, break loop & replan
+                if(!this->doCurrentBeliefsSatisfyClearance(i))
+                {
+                    if(counter == 0)
+                    {
+                        counter++;
+                        replanFlag = true;
+                        break;
+                    }
+
+                }
+
+                if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
+                    counter = 0;
+
+                if(this->isConverged())
+                {
+                    replanFlag = true;
+                    break;
+                }
+                //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+
+                timeSinceKidnap++;
+
+                //weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
+            }
+
+            if(replanFlag)
+                break;
+
+        }
+
+        // apply stop command to robot while planning next move
+        policyExecutionSI_->applyControl(policyExecutionSI_->getMotionModel()->getZeroControl());
+
+    }
+
+    auto end_time_recovery = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to recover lost robot (exclude sampling): "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_recovery - start_time_recovery).count() << " milli seconds."<<std::endl;
+
+    si_->copyState(recoveredState, currentBeliefStates_[0]);
+
+    //Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
+
+    //writeTimeSeriesDataToFile("MultiModalWeightsHistory.csv", "multiModalWeights");
+
 }

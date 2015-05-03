@@ -73,7 +73,6 @@
 		<Unit filename="FIRM2DSetup.h" />
 		<Unit filename="FIRMAruco2DROSSetup.h" />
 		<Unit filename="FIRMOMPL.h" />
-		<Unit filename="MultiModalSetup.h" />
 		<Unit filename="Tests.h" />
 		<Unit filename="include/ConnectionStrategy/FStrategy.h" />
 		<Unit filename="include/Controllers/Controller.h" />
