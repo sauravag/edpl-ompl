@@ -47,7 +47,9 @@
 #include <ompl/control/Control.h>
 #include "../SpaceInformation/SpaceInformation.h"
 #include <ompl/base/Cost.h>
+#include "../../include/SeparatedControllers/RHCICreate.h"
 #include "../Filters/ExtendedKF.h"
+#include "../Controllers/Controller.h"
 
 /** \para
 NBM3P is a planner for Non-Gaussian Belief State. Stated simply, its job is to generate the best next control to disambiguate the belief
@@ -90,6 +92,9 @@ class NBM3P
         typedef boost::graph_traits<Graph>::edge_descriptor   Edge;
 
         typedef boost::shared_ptr< ompl::NearestNeighbors<Vertex> > RoadmapNeighbors;
+
+        /** Defining the edge and node controller types*/
+        typedef Controller<RHCICreate, ExtendedKF> EdgeControllerType;
 
         /** \brief Constructor */
         NBM3P(firm::SpaceInformation::SpaceInformationPtr si):si_(si),
@@ -245,6 +250,8 @@ class NBM3P
         }
 
         void execute(ompl::base::State *recoveredState);
+
+        void generateIntermediateStates(const ompl::base::State *start, const ompl::base::State* target, std::vector<ompl::base::State*> &intermediates);
 
     private:
 

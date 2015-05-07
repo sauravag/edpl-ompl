@@ -41,7 +41,6 @@
 #include <boost/foreach.hpp>
 #include "../../include/ObservationModels/CamAruco2DObservationModel.h"
 #include "../../include/LinearSystem/LinearSystem.h"
-#include "../../include/SeparatedControllers/RHCICreate.h"
 #include <numeric>
 
 #define foreach BOOST_FOREACH
@@ -54,9 +53,9 @@ namespace ompl
     {
         static const double COLISSION_FAILURE_COST  = 1e6;// cost of colliding
 
-        static const double RRT_PLAN_MAX_TIME = 1.0; // maximum time allowed for RRT to plan
+        static const double RRT_PLAN_MAX_TIME = 2.0; // maximum time allowed for RRT to plan
 
-        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.05; // maximum distance for RRT to succeed
+        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.01; // maximum distance for RRT to succeed
 
         static const double NEIGHBORHOOD_RANGE = 4.0 ; // 20(6cw), 12 (4cw), 4 (M3PEnv2) range within which to find neighbors
 
@@ -282,55 +281,78 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy, ompl::g
 
     double maxGain = -1e10;
 
-    int maxGainPolicyIndx= FIRMUtils::generateRandomIntegerInRange(0,openLoopPolicies.size()-1);//-1
-/*
-    OMPL_INFORM("Evaluating the Open Loop policies on all the modes");
+    int maxGainPolicyIndx = -1;
 
-    //boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-
-    Visualizer::doSaveVideo(false);
-
-    for(unsigned int i = 0; i < openLoopPolicies.size(); i++)
+    if(currentBeliefStates_.size() > 2)
     {
-        ompl::base::Cost pGain;
 
-        pGain = ompl::base::Cost(0);
+        maxGainPolicyIndx= FIRMUtils::generateRandomIntegerInRange(0,openLoopPolicies.size()-1);//-1
+    }
+    else
+    {
 
-        for(unsigned int j = 0; j < currentBeliefStates_.size(); j++)
+        OMPL_INFORM("Evaluating the Open Loop policies on all the modes");
+
+        //boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
+        Visualizer::doSaveVideo(false);
+
+        for(unsigned int i = 0; i < openLoopPolicies.size(); i++)
         {
+            ompl::base::Cost pGain;
 
-            OMPL_INFORM("NBM3P: Evaluating Policy Number #%u  on Mode Number #%u",i,j);
+            pGain = ompl::base::Cost(0);
 
-            auto start_time_openloop = std::chrono::high_resolution_clock::now();
+            for(unsigned int j = 0; j < currentBeliefStates_.size(); j++)
+            {
 
-            ompl::base::Cost c = executeOpenLoopPolicyOnMode(openLoopPolicies[i],currentBeliefStates_[j]);
+                OMPL_INFORM("NBM3P: Evaluating Policy Number #%u  on Mode Number #%u",i,j);
 
-            auto end_time_openloop = std::chrono::high_resolution_clock::now();
+                auto start_time_openloop = std::chrono::high_resolution_clock::now();
 
-            double timeToExecuteOpenLoopPolicyOnMode = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_openloop - start_time_openloop).count();
+                ompl::base::Cost c = executeOpenLoopPolicyOnMode(openLoopPolicies[i],currentBeliefStates_[j]);
 
-            OMPL_INFORM("NBM3P: Time to execute open loop policy on mode = %f ms", timeToExecuteOpenLoopPolicyOnMode);
+                auto end_time_openloop = std::chrono::high_resolution_clock::now();
 
-            //pGain.v += c.v;
-            pGain = ompl::base::Cost(pGain.value() + c.value());
+                double timeToExecuteOpenLoopPolicyOnMode = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_openloop - start_time_openloop).count();
 
-        }
+                OMPL_INFORM("NBM3P: Time to execute open loop policy on mode = %f ms", timeToExecuteOpenLoopPolicyOnMode);
 
-        //pGain.v = weights_[i]*pGain.v;
-        pGain = ompl::base::Cost(weights_[i]*pGain.value());
+                //pGain.v += c.v;
+                pGain = ompl::base::Cost(pGain.value() + c.value());
 
-        OMPL_INFORM("NBM3P: Weighted Information Gain for Policy #%u = %f",i,pGain.value());
+            }
 
-        policyInfGains.push_back(pGain);
+            //pGain.v = weights_[i]*pGain.v;
+            pGain = ompl::base::Cost(weights_[i]*pGain.value());
 
-        if(pGain.value() >= maxGain)
-        {
-            maxGain = pGain.value();
+            OMPL_INFORM("NBM3P: Weighted Information Gain for Policy #%u = %f",i,pGain.value());
 
-            maxGainPolicyIndx = i;
+            policyInfGains.push_back(pGain);
+
+            if(pGain.value() >= maxGain)
+            {
+                // if both policies have same gain, pick shorter policy
+                if(pGain.value() ==  maxGain && maxGainPolicyIndx >= 0 )
+                {
+                    // if old maxgain policy was longer, choose this one
+                    if(openLoopPolicies[maxGainPolicyIndx].size() > openLoopPolicies[i].size())
+                    {
+                        maxGain = pGain.value();
+                        maxGainPolicyIndx = i;
+                    }
+                }
+                else
+                {
+                    maxGain = pGain.value();
+
+                    maxGainPolicyIndx = i;
+                }
+
+            }
         }
     }
-*/
+
     OMPL_INFORM("NBM3P: Max gain policy index = %u", maxGainPolicyIndx);
 
     //std::cin.get();
@@ -1274,6 +1296,7 @@ void NBM3P::execute(ompl::base::State *recoveredState)
 
         for(int i=0;i<gpath.getStateCount();i++)
         {
+
             std::vector<ompl::base::State*> dummyStates;
             std::vector<ompl::control::Control*> dummyControls;
             std::vector<LinearSystem> dummyLinearSystems;
@@ -1281,13 +1304,21 @@ void NBM3P::execute(ompl::base::State *recoveredState)
             // Generate a feedback controller
             RHCICreate feedbackController(gpath.getState(i), dummyStates, dummyControls, dummyLinearSystems, si_->getMotionModel());
 
+            std::vector<ompl::base::State*> intermediates;
+
+            generateIntermediateStates(currentBeliefStates_[chosenMode], gpath.getState(i), intermediates);
+
             // While the mode hasnt reached a neighborhood of the waypoint
-            while(si_->distance(currentBeliefStates_[chosenMode],gpath.getState(i)) > 0.05 && !replanFlag)
+            int edgeCounter = 0;
+
+            while(si_->distance(currentBeliefStates_[chosenMode],gpath.getState(i)) > 0.10 && !replanFlag)
             {
 
                 ompl::control::Control* cntrl = feedbackController.generateFeedbackControl(currentBeliefStates_[chosenMode]);
 
                 policyExecutionSI_->applyControl(cntrl);
+
+                edgeCounter++;
 
                 unsigned int numModesBefore = this->getNumberOfModes();
 
@@ -1324,8 +1355,24 @@ void NBM3P::execute(ompl::base::State *recoveredState)
                     break;
                 }
                 //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+                if(numModesAfter == numModesBefore)
+                {
+                    if(edgeCounter > 1.2*intermediates.size())
+                    {
+                        //if(si_->distance(currentBeliefStates_[chosenMode],intermediates[edgeCounter]) > 0.30)
+                        //{
+                            //replanFlag = true;
+                            break;
+                        //}
+                    }
+                    //else
+                   // {
+                   //     replanFlag = true;
+                   // }
+                }
 
                 timeSinceKidnap++;
+
 
                 //weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
             }
@@ -1350,4 +1397,34 @@ void NBM3P::execute(ompl::base::State *recoveredState)
 
     //writeTimeSeriesDataToFile("MultiModalWeightsHistory.csv", "multiModalWeights");
 
+}
+
+void NBM3P::generateIntermediateStates(const ompl::base::State *start, const ompl::base::State* target, std::vector<ompl::base::State*> &intermediates)
+{
+    assert(target && "The target state for generating the edge controller is NULL");
+    //std::vector<ompl::base::State*> intermediates;
+
+    ompl::base::State *intermediate = si_->allocState();
+
+    si_->copyState(intermediate, start);
+
+    std::vector<ompl::control::Control*> openLoopControls;
+
+    // get the open loop controls for this edge
+    si_->getMotionModel()->generateOpenLoopControls(start, target, openLoopControls);
+
+    // generate the intermediate states using the open loop controls
+    for(typename std::vector<ompl::control::Control*>::iterator c=openLoopControls.begin(), e=openLoopControls.end(); c!=e; ++c)
+    {
+        ompl::base::State *x = si_->allocState();
+        si_->getMotionModel()->Evolve(intermediate,*c,si_->getMotionModel()->getZeroNoise(), x);
+        intermediates.push_back(x);
+        si_->copyState(intermediate, x);
+    }
+
+    // create the edge controller
+    //EdgeControllerType ctrlr(target, intermediates, openLoopControls, si_);
+
+    // assign the edge controller
+    //edgeController =  ctrlr;
 }

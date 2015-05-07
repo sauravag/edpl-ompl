@@ -50,7 +50,7 @@ void firm::ROSSpaceInformation::arucoListenerCallback(const aruco_msgs::MarkerAr
     {
         aruco_msgs::Marker marker_i = msg.markers.at(i);
 
-        if(marker_i.id>= 1 && marker_i.id <= 40)
+        if(marker_i.id>= 1 && marker_i.id <= 67)
         {
             z.resize((i+1)*singleObservationDim ,  1);
 
