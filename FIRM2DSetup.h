@@ -196,7 +196,7 @@ public:
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
             siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
-            siF_->setStateValidityCheckingResolution(0.001);
+            siF_->setStateValidityCheckingResolution(0.003);
             siF_->setMinMaxControlDuration(1,100);
 
             if(!start_ || goalList_.size() == 0)

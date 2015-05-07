@@ -202,13 +202,13 @@ public:
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
             siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
-            siF_->setStateValidityCheckingResolution(0.001);
+            siF_->setStateValidityCheckingResolution(0.003);
             siF_->setMinMaxControlDuration(1,100);
 
             //
             siROS_->setStatePropagator(statePropagator_);
             siROS_->setPropagationStepSize(0.1); // this is the duration that a control is applied
-            siROS_->setStateValidityCheckingResolution(0.001);
+            siROS_->setStateValidityCheckingResolution(0.003);
             siROS_->setMinMaxControlDuration(1,100);
             //
 
