@@ -248,8 +248,8 @@
 <landmark id = 43 x = 3.035 y = 0.965 theta = -0.5/>
 <landmark id = 37 x = 2.448 y = 1.905 theta = -0.5/>
 <landmark id = 38 x = 2.376 y = 1.905 theta = -0.5/>
-<landmark id = 39 x = 2.376 y = 1.89 theta = -0.5/>
-<landmark id = 40 x = 2.448 y = 1.89 theta = -0.5/>
+<landmark id = 39 x = 2.376 y = 1.88 theta = -0.5/>
+<landmark id = 40 x = 2.448 y = 1.88 theta = -0.5/>
 <landmark id = 59 x = 2.07 y = 2.639 theta = -0.5/>
 <landmark id = 60 x = 2.07 y = 2.567 theta = -0.5/>
 <landmark id = 61 x = 2.07 y = 2.495 theta = -0.5/>
@@ -262,12 +262,6 @@
 <landmark id = 64 x = 2.49 y = 2.639 theta = -0.5/>
 <landmark id = 63 x = 2.49 y = 2.567 theta = -0.5/>
 <landmark id = 62 x = 2.49 y = 2.495 theta = -0.5/>
-<landmark id = 67 x = 0.531 y = 1.525 theta = -0.5/>
-<landmark id = 66 x = 0.603 y = 1.525 theta = -0.5/>
-<landmark id = 65 x = 0.675 y = 1.525 theta = -0.5/>
-<landmark id = 67 x = 4.029 y = 2.28 theta = -0.5/>
-<landmark id = 66 x = 3.957 y = 2.28 theta = -0.5/>
-<landmark id = 65 x = 3.885 y = 2.28 theta = -0.5/>
 <landmark id = 56 x = 0.531 y = 2.28 theta = -0.5/>
 <landmark id = 57 x = 0.603 y = 2.28 theta = -0.5/>
 <landmark id = 58 x = 0.675 y = 2.28 theta = -0.5/>
@@ -395,9 +389,9 @@
         robotFile = "./Models/ArduinoRobot.obj"
     />
      <StartPose
-        x = "3.42"
-        y = "0.7"
-        theta = "-1.57"
+        x = "0.38"
+        y = "3.1"
+        theta = "1.57"
     />
     <PlanningTime
         maxTime = "800"

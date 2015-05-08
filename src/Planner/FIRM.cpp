@@ -105,10 +105,6 @@ namespace ompl
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
-        static const unsigned int MAX_MM_POLICY_LENGTH   = 1000;
-
-        static const float MIN_ROBOT_CLEARANCE = 0.05; // 0.1 for create
-
         static const int STEPS_TO_ROLLOUT = 30;
     }
 }
@@ -1828,54 +1824,3 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     //writeTimeSeriesDataToFile("MultiModalWeightsHistory.csv", "multiModalWeights");
 }
-
-
-/*
-        //int rndnum = FIRMUtils::generateRandomIntegerInRange(100, ompl::magic::MAX_MM_POLICY_LENGTH);
-
-        //int hzn = policy.size()-1;
-        //int hzn = ompl::magic::MAX_MM_POLICY_LENGTH > policy.size()? policy.size() : rndnum;
-
-
-        for(int i=0; i < hzn ; i++)
-        {
-            policyExecutionSI_->applyControl(policy[i]);
-
-            unsigned int numModesBefore = policyGenerator_->getNumberOfModes();
-
-            policyGenerator_->propagateBeliefs(policy[i]);
-
-            unsigned int numModesAfter = policyGenerator_->getNumberOfModes();
-
-            // If any of the modes gets deleted, break and find new policy
-            if(numModesAfter != numModesBefore)
-                break;
-
-            //siF_->getTrueState(currentTrueState);
-
-            // If the belief's clearance gets below the threshold, break loop & replan
-            if(!policyGenerator_->doCurrentBeliefsSatisfyClearance(i))
-            {
-                if(counter == 0)
-                {
-                    counter++;
-                    break;
-                }
-
-            }
-
-            if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
-                counter = 0;
-
-            if(policyGenerator_->isConverged())
-                break;
-
-            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
-
-            timeSinceKidnap++;
-
-            weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
-
-
-        }
-*/

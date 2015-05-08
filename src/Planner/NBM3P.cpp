@@ -53,19 +53,19 @@ namespace ompl
     {
         static const double COLISSION_FAILURE_COST  = 1e6;// cost of colliding
 
-        static const double RRT_PLAN_MAX_TIME = 2.0; // maximum time allowed for RRT to plan
+        static const double RRT_PLAN_MAX_TIME = 3.0; // maximum time allowed for RRT to plan
 
-        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.01; // maximum distance for RRT to succeed
+        static const double RRT_FINAL_PROXIMITY_THRESHOLD = 0.04; // maximum distance for RRT to succeed
 
         static const double NEIGHBORHOOD_RANGE = 4.0 ; // 20(6cw), 12 (4cw), 4 (M3PEnv2) range within which to find neighbors
 
-        static const float MIN_ROBOT_CLEARANCE = 0.1;
+        static const float MIN_ROBOT_CLEARANCE = 0.15;
 
         static const double SIGMA_RANGE = 0.1;// 0.5 meters
 
         static const double SIGMA_THETA = 0.1; // 0.2 radians
 
-        static const double MODE_DELETION_THRESHOLD = 1e-3; // the percentage of weight a mode should hold, below which it gets deleted
+        static const double MODE_DELETION_THRESHOLD = 1e-2; // the percentage of weight a mode should hold, below which it gets deleted
 
         static const double ZERO_CONTROL_UPDATE_TIME = 1.0 ;
 
@@ -76,6 +76,8 @@ namespace ompl
         static const double SPEEDUP_FACTOR = 5.0;
 
         static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 10;
+
+        static const unsigned int POLICY_HORIZON   = 600;
     }
 }
 
@@ -200,11 +202,16 @@ void NBM3P::sampleNewBeliefStates()
         si_->printState(currentBeliefStates_[i]);
     }
 
+    if(currentBeliefStates_.size()==0)
+    {
+        OMPL_ERROR("Cannot sample the underlying belief");
+        exit(1);
+    }
 }
 
 
 
-void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy, ompl::geometric::PathGeometric &policyPath, unsigned int &chosenMode)
+bool NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy, ompl::geometric::PathGeometric &policyPath, unsigned int &chosenMode)
 {
     si_->showRobotVisualization(false);
 
@@ -243,7 +250,14 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy, ompl::g
 
             planner->setup();
 
-            ompl::base::PlannerStatus solved = planner->solve(ompl::magic::RRT_PLAN_MAX_TIME);
+            double timeAllowedToSolve = ompl::magic::RRT_PLAN_MAX_TIME;
+
+            if(currentBeliefStates_.size() <=2 )
+            {
+                timeAllowedToSolve = 3*timeAllowedToSolve;
+            }
+
+            ompl::base::PlannerStatus solved = planner->solve(timeAllowedToSolve);
 
             int solveCounter = 2;
             while(!solved && solveCounter < 10)
@@ -353,7 +367,7 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy, ompl::g
         }
     }
 
-    OMPL_INFORM("NBM3P: Max gain policy index = %u", maxGainPolicyIndx);
+    OMPL_INFORM("NBM3P: Max gain policy index = %d", maxGainPolicyIndx);
 
     //std::cin.get();
 
@@ -384,6 +398,7 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy, ompl::g
     {
         OMPL_ERROR("NBM3P: Could not generate any candidate policy!");
         exit(1);
+        //return false;
     }
 
     auto end_time_policygen = std::chrono::high_resolution_clock::now();
@@ -393,6 +408,8 @@ void NBM3P::generatePolicy(std::vector<ompl::control::Control*> &policy, ompl::g
     //std::cin.get();
 
     si_->showRobotVisualization(true);
+
+    return true;
 
 }
 
@@ -1286,13 +1303,18 @@ void NBM3P::execute(ompl::base::State *recoveredState)
         ompl::geometric::PathGeometric gpath(si_);
         unsigned int chosenMode;
 
-        this->generatePolicy(policy, gpath, chosenMode);
+        if(!this->generatePolicy(policy, gpath, chosenMode))
+        {
+            continue;
+        }
 
         OMPL_INFORM("GPATH STATE COUNT: %u", gpath.getStateCount());
 
         Visualizer::doSaveVideo(true);
 
         bool replanFlag = false;
+
+        int horizonExecuted = 0;
 
         for(int i=0;i<gpath.getStateCount();i++)
         {
@@ -1318,6 +1340,8 @@ void NBM3P::execute(ompl::base::State *recoveredState)
 
                 policyExecutionSI_->applyControl(cntrl);
 
+                horizonExecuted++;
+
                 edgeCounter++;
 
                 unsigned int numModesBefore = this->getNumberOfModes();
@@ -1325,6 +1349,8 @@ void NBM3P::execute(ompl::base::State *recoveredState)
                 this->propagateBeliefs(cntrl);
 
                 unsigned int numModesAfter = this->getNumberOfModes();
+
+                this->printWeights();
 
                 // If any of the modes gets deleted, break and find new policy
                 if(numModesAfter != numModesBefore)
@@ -1354,26 +1380,27 @@ void NBM3P::execute(ompl::base::State *recoveredState)
                     replanFlag = true;
                     break;
                 }
+
                 //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+                // Check if robot has tried enough to reach this edge goal
                 if(numModesAfter == numModesBefore)
                 {
-                    if(edgeCounter > 1.2*intermediates.size())
+                    if(edgeCounter > 1.1*intermediates.size())
                     {
-                        //if(si_->distance(currentBeliefStates_[chosenMode],intermediates[edgeCounter]) > 0.30)
-                        //{
-                            //replanFlag = true;
                             break;
-                        //}
                     }
-                    //else
-                   // {
-                   //     replanFlag = true;
-                   // }
                 }
 
                 timeSinceKidnap++;
 
+                // If the time steps execute for this policy, exceed horizon, replan
+                if(horizonExecuted >  ompl::magic::POLICY_HORIZON)
+                {
+                    replanFlag = true;
+                    break;
+                }
 
+                //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
                 //weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
             }
 
@@ -1422,9 +1449,4 @@ void NBM3P::generateIntermediateStates(const ompl::base::State *start, const omp
         si_->copyState(intermediate, x);
     }
 
-    // create the edge controller
-    //EdgeControllerType ctrlr(target, intermediates, openLoopControls, si_);
-
-    // assign the edge controller
-    //edgeController =  ctrlr;
 }

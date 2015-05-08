@@ -183,7 +183,7 @@ class NBM3P
         based on each mode to its target. Then evaluate each policy on each mode and return the best policy to be followed. We will
         then apply this policy to the true state i.e. the robot and update all the beliefs. This process would then get
         repeated.*/
-        virtual void generatePolicy(std::vector<ompl::control::Control*> &policy,  ompl::geometric::PathGeometric &policyPath, unsigned int &chosenMode);
+        virtual bool generatePolicy(std::vector<ompl::control::Control*> &policy,  ompl::geometric::PathGeometric &policyPath, unsigned int &chosenMode);
 
         /** \brief Runs the open loop policy on a given mode and outputs the cost*/
         virtual ompl::base::Cost executeOpenLoopPolicyOnMode(std::vector<ompl::control::Control*> controls, const ompl::base::State* state);

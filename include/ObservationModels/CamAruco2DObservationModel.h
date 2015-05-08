@@ -114,9 +114,8 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
     bool isStateObservable(const ompl::base::State *state);
 
-    // TODO: write this function
     /** \brief Check if this landmark is actually in the map, reject extraneous landmarks*/
-    //bool isLandmarkInMap(const arma::colvec landmark);
+    bool isLandmarkInMap(const int landmarkID);
 
   private:
 

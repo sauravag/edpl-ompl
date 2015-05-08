@@ -720,3 +720,16 @@ bool CamAruco2DObservationModel::isStateObservable(const ompl::base::State *stat
   return false;
 
 }
+
+bool CamAruco2DObservationModel::isLandmarkInMap(const int landmarkID)
+{
+    for(unsigned int i = 0; i < landmarks_.size() ; i++)
+    {
+        if(landmarks_[i](0) == landmarkID)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

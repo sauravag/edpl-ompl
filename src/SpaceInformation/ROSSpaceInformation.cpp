@@ -50,7 +50,7 @@ void firm::ROSSpaceInformation::arucoListenerCallback(const aruco_msgs::MarkerAr
     {
         aruco_msgs::Marker marker_i = msg.markers.at(i);
 
-        if(marker_i.id>= 1 && marker_i.id <= 67)
+        if(observationModel_->isLandmarkInMap(marker_i.id) /*marker_i.id>= 1 && marker_i.id <= 64*/)
         {
             z.resize((i+1)*singleObservationDim ,  1);
 
@@ -66,9 +66,6 @@ void firm::ROSSpaceInformation::arucoListenerCallback(const aruco_msgs::MarkerAr
     }
 
     cameraObservation_ = z;
-
-    std::cout<<"ARUCO SPACE: The robot sees \n"<<z<<std::endl;
-    //std::cin.get();
 
 }
 
@@ -98,7 +95,7 @@ void firm::ROSSpaceInformation::applyControl(const ompl::control::Control *contr
     cmd_vel.angular.y = 0.0;
     cmd_vel.angular.z = -conVals[1]; // In FIRM robot's x-axis is forward, y-left, z-up, need to change sign so that ros turns robot in correct direction, in ros z is down
 
-    OMPL_INFORM("ROS: The published commands are v: %f  w: %f",  cmd_vel.linear.x, cmd_vel.angular.z);
+    //OMPL_INFORM("ROS: The published commands are v: %f  w: %f",  cmd_vel.linear.x, cmd_vel.angular.z);
 
     controlPublisher_.publish(cmd_vel);
 
@@ -116,6 +113,8 @@ ObservationModelMethod::ObservationType firm::ROSSpaceInformation::getObservatio
     ObservationModelMethod::ObservationType temp;
 
     cameraObservation_ = temp; // set global containter to be empty, it is only filled when aruco returns markers
+
+    std::cout<<"ARUCO SPACE: The robot sees \n"<<z<<std::endl;
 
     return z;
 }
