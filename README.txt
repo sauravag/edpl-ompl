@@ -50,11 +50,9 @@ How To Use This Application
 We have developed these planner based on the design philosophy of the planner class in OMPL. On top of the base planners,
 we have added additional functionaility to the package such as a motion model class, observation model class, filter class etc. that are required within FIRM and not provided explicity in OMPL.
 
-1. Use the provided application as is: Simply compile the code and run it. By changing the names of the setup paramter file (xml files)
-to use in main.cpp, you can control the motion/observation model parameters, environment geometry file, robot geometry file, landmark
-locations etc. 
+1. Use the provided application as is: Simply compile the code and run it. By changing the names of the setup paramter file (xml files) to use in main.cpp, you can control the motion/observation model parameters, environment geometry file, robot geometry file, landmark locations etc. 
 
-2.  The planner looks for a FIRMRoadMap.xml file in the top directory. We use this file to store a pre-computed roadmap. If this map is found, the planner will load it and use it. If not, a new roadmap will be generated and saved to the same file name. You can then move this xml file to the SavedRoadmaps folder for later use.
+2. In FIRM, we can load a previously computed map or have the planner generate a new one. When the planner starts up, it looks for a FIRMRoadMap.xml file in the top directory. We use this file to load a pre-computed roadmap (the nodes and the edges of the FIRM graph). If this file is found, the planner will load it and use it (so you get to re-use an old map). If there is no such file, a new roadmap will be generated and saved to the same file name (FIRMRoadMap.xml). You can then move this xml file to the SavedRoadmaps folder for later use. 
 
 3. Build you own application by calling FIRM in your scenario. To do this you would need to write a motion/observation model by deriving the MotionModelMethod and ObservationModeMethod class. Currently, we have only defined the SE2BeliefSpace (x,y,yaw). If your robot/system has a different state 
 space, then you would need to define a new belief space class. For example, if you're working with a quadrotor such that your state X = [x,y,z,roll,pitch,yaw] you would need to defie a new SE3BeliefSpace.
