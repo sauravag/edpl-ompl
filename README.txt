@@ -12,7 +12,7 @@ Copyright 2014
 ----------------------------------------
 Brief: 
 ----------------------------------------
-This application is an implementation of Feedback Information Road Maps (FIRM) the Multi-Modal Motion Planner (M3P) planners with OMPL. FIRM is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic roadmap. FIRM relies on a Gaussian representation of the belief state. We also provide a new planner M3P, that enables planning in Non-Gaussian belief spaces. Such a planner is particularly useful if your system has a multi-modal hypothesis about its state. Such a situation could arise from ambigious data-association where the robot sees some information which makes it believe that it could be in one of multiple places (ex. A laser scanner can get confused by geometrically identical rooms in a building).
+This application is an implementation of Feedback Information Road Maps (FIRM) and the Node-Based Multi-Modal Motion Planner (NBM3P) planners with OMPL. FIRM is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic roadmap. FIRM relies on a Gaussian representation of the belief state. We also provide a new planner NBM3P, that enables planning in Non-Gaussian belief spaces. Such a planner is particularly useful if your system has a multi-modal hypothesis about its state. Such a situation could arise from ambigious data-association where the robot sees some information which makes it believe that it could be in one of multiple places (ex. A laser scanner can get confused by geometrically identical rooms in a building).
 
 ----------------------------------------
 References:
@@ -47,9 +47,8 @@ External Depencies: [All of these are hard requirements for this app to run]
 ---------------------------------------
 How To Use This Application
 ---------------------------------------
-We have developed FIRM as a planner based on the design philosophy of the planner class in OMPL. On top of the base FIRM planner,
-we have added additional functionaility to the package such as a motion model class, observation model class, filter class etc. 
-that are required within FIRM and not provided explicity in OMPL.
+We have developed these planner based on the design philosophy of the planner class in OMPL. On top of the base planners,
+we have added additional functionaility to the package such as a motion model class, observation model class, filter class etc. that are required within FIRM and not provided explicity in OMPL.
 
 1. Use the provided application as is: Simply compile the code and run it. By changing the names of the setup paramter file (xml files)
 to use in main.cpp, you can control the motion/observation model parameters, environment geometry file, robot geometry file, landmark
