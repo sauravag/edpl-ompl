@@ -12,10 +12,14 @@ Copyright 2014
 ----------------------------------------
 Brief: 
 ----------------------------------------
-This application is an implementation of Feedback Information Road Maps (FIRM) with OMPL and the M3P Non-Gaussian Planner.
-FIRM is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic roadmap. FIRM relies on a Gaussian
-representation of the belief state. We provide a new planner M3P, that enables planning in Non-Gaussian belief spaces. Such a planner is particularly useful
-if your system has a multi-modal hypothesis about its state. Such a situation could arise from ambigious data-association where the robot sees some information which makes it believe that it could be in one of multiple places (ex. A laser scanner can get confused by geometrically identical rooms in a building).
+This application is an implementation of Feedback Information Road Maps (FIRM) and the Node-Based Multi-Modal Motion Planner (NBM3P) planners with OMPL. FIRM is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic roadmap. FIRM relies on a Gaussian representation of the belief state. We also provide a new planner NBM3P, that enables planning in Non-Gaussian belief spaces. Such a planner is particularly useful if your system has a multi-modal hypothesis about its state. Such a situation could arise from ambigious data-association where the robot sees some information which makes it believe that it could be in one of multiple places (ex. A laser scanner can get confused by geometrically identical rooms in a building).
+
+----------------------------------------
+FAQs, Tips, How To etc. 
+----------------------------------------
+Please visit my webpage which answers most common questions about this library.
+
+http://sauravag.com/2015/10/faq-belief-space-planning-with-ompl/
 
 ----------------------------------------
 References:
@@ -24,7 +28,11 @@ References:
 
 2. A. Agha-mohammadi, Saurav Agarwal, Aditya Mahadevan, Suman Chakravorty, Daniel Tomkins, Jory Denny, Nancy Amato, "Robust Online Belief Space Planning in Changing Environments: Application to Physical Mobile Robots," In Proc. IEEE Int. Conf. Robot. Autom. (ICRA), Hong Kong, China, May 2014.
 
-3. ompl.kavrakilab.org : OMPL documentation and code
+3. Saurav Agarwal, Amirhossein Tamjidi and Suman Chakravorty, “Motion Planning in Non-Gaussian Belief Spaces for Mobile Robots“, IEEE Int. Conf. Robot. Autom. (ICRA), 2016 [submitted for review]
+
+4. http://edplab.org :  Estimation, Decision and Planning Lab Webpage (publications, related work, videos)
+
+5. ompl.kavrakilab.org : OMPL documentation and code
 
 ----------------------------------------
 Compilation
@@ -35,7 +43,7 @@ be sure to link to the correct libraries and set the include paths for your comp
 
 External Depencies: [All of these are hard requirements for this app to run]
 
-1. Open Motion Planning Library (OMPL): Excellent instructions provided on the ompl website [http://ompl.kavrakilab.org/] for installation. Follow the instructions to build and install the full omplapp and QT will automatically be installed as part of that.  
+1. Open Motion Planning Library (OMPL v1.0.0): Excellent instructions provided on the ompl website [http://ompl.kavrakilab.org/] for installation. Follow the instructions to build and install the full omplapp and QT will automatically be installed as part of that.  
  
 2. QT & OpenGL (freeglut): For Visualization
 
@@ -46,15 +54,12 @@ External Depencies: [All of these are hard requirements for this app to run]
 ---------------------------------------
 How To Use This Application
 ---------------------------------------
-We have developed FIRM as a planner based on the design philosophy of the planner class in OMPL. On top of the base FIRM planner,
-we have added additional functionaility to the package such as a motion model class, observation model class, filter class etc. 
-that are required within FIRM and not provided explicity in OMPL.
+We have developed these planner based on the design philosophy of the planner class in OMPL. On top of the base planners,
+we have added additional functionaility to the package such as a motion model class, observation model class, filter class etc. that are required within FIRM and not provided explicity in OMPL.
 
-1. Use the provided application as is: Simply compile the code and run it. By changing the names of the setup paramter file (xml files)
-to use in main.cpp, you can control the motion/observation model parameters, environment geometry file, robot geometry file, landmark
-locations etc. 
+1. Use the provided application as is: Simply compile the code and run it. By changing the names of the setup paramter file (xml files) to use in main.cpp, you can control the motion/observation model parameters, environment geometry file, robot geometry file, landmark locations etc. 
 
-2.  The planner looks for a FIRMRoadMap.xml file in the top directory. We use this file to store a pre-computed roadmap. If this map is found, the planner will load it and use it. If not, a new roadmap will be generated and saved to the same file name. You can then move this xml file to the SavedRoadmaps folder for later use.
+2. In FIRM, we can load a previously computed map or have the planner generate a new one. When the planner starts up, it looks for a FIRMRoadMap.xml file in the top directory. We use this file to load a pre-computed roadmap (the nodes and the edges of the FIRM graph). If this file is found, the planner will load it and use it (so you get to re-use an old map). If there is no such file, a new roadmap will be generated and saved to the same file name (FIRMRoadMap.xml). You can then move this xml file to the SavedRoadmaps folder for later use. 
 
 3. Build you own application by calling FIRM in your scenario. To do this you would need to write a motion/observation model by deriving the MotionModelMethod and ObservationModeMethod class. Currently, we have only defined the SE2BeliefSpace (x,y,yaw). If your robot/system has a different state 
 space, then you would need to define a new belief space class. For example, if you're working with a quadrotor such that your state X = [x,y,z,roll,pitch,yaw] you would need to defie a new SE3BeliefSpace.
@@ -63,14 +68,13 @@ space, then you would need to define a new belief space class. For example, if y
 How To Integrate With ROS
 ---------------------------------------
 
-Integration with a real robot through ROS or any other system, simply requires that during policy execution, the apply control and get observation commands are sent to the right "SpaceInformation". For example, we provide a ROSSpaceInformation class that subscribes 
+Integration with a real robot through ROS or any other system, simply requires that during policy execution, the apply control and get observation commands are sent to the right "SpaceInformation". For example, we provide a ROSSpaceInformation class that is able to send twist messages. The example should be sufficient for you to get started with ROS development.
 
 ---------------------------------------
 How To Contribute
 ---------------------------------------
 
-We welcome contributions to our work. Feel free to fork this code and add new features. Once you're ready to integrate it to our project,
-send us a pull request.
+We welcome contributions to our work. Feel free to fork this code and add new features. Once you're ready to integrate it to our project, send us a pull request.
 
 Some new features that would be exciting to work on:
 
