@@ -266,7 +266,7 @@ bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *st
     using namespace arma;
 
     colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
-/*
+
     colvec robot_to_landmark_ray =  landmark.subvec(1,2) - xVec.subvec(0,1);
 
     double distance = norm(robot_to_landmark_ray,2);
@@ -295,7 +295,9 @@ bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *st
     si_->freeState(tempState);
 
     return true;
-*/
+    // The following is used when we have the line segments in the world
+    // Was used for M3P experiments.
+/*
     for(int i = 0 ; i < lineSegments_.size(); i++)
     {
         arma::colvec p1 = lineSegments_[i].subvec(0,1);
@@ -312,7 +314,7 @@ bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *st
     }
 
     return true;
-
+*/
 }
 
 

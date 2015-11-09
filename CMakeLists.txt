@@ -57,12 +57,11 @@ link_directories(${Boost_LIBRARY_DIRS}
 	${TINYXML_LIBRARY_DIRS}
 )
 
-
-# The following line is very important.
-# It specifies the executable name. Here the executable is the first parameter i.e. MyApp and a file MyApp.exe will be created on
-# compilation in windows platform.
-# Followed by the executable name come all your source and header files.
-# All cpp fles will be clubbed into source folder and all .h files will be added to header files folder of the project.
+# We have commented out ROSSpaceInformation.cpp so that
+# this project can build and run without ROS.
+# To do ros based stuff, add catkinized cmake directives
+#to turn it into a ros node and compile for example
+# M3PROSDemo.cpp as executable instead of main.
 add_executable (bsp-app-demo 
 	main.cpp
 	src/Filters/ExtendedKF.cpp
@@ -96,7 +95,6 @@ target_link_libraries (bsp-app-demo
 	${GLUT_LIBRARIES}
 	${TINYXML_LIBRARIES}
 	${ARMADILLO_LIBRARIES}
-	#/usr/lib/libarmadillo.so
 	libompl.so
 	libompl_app.so
 	libompl_app_base.so

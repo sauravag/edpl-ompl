@@ -76,7 +76,12 @@ class CamAruco2DObservationModel : public ObservationModelMethod
 
         // initialize etaPhi_, etaD_, sigma_;
         this->loadLandmarks(pathToSetupFile);
-        this->loadLineSegments(pathToSetupFile);
+
+        // The next line allows us to load line segments to define an accurate 
+        // Collision checker for rays. Not all setup files have this, therefore,
+        // we will only comment it out as necessary.
+        //this->loadLineSegments(pathToSetupFile);
+
         this->loadParameters(pathToSetupFile);
     }
 

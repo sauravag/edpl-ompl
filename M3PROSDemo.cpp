@@ -34,10 +34,7 @@
 
 /* Author: Saurav Agarwal */
 
-#define USE_ROS false
-
-#include "FIRM2DSetup.h"
-#include "Tests.h"
+#include "FIRMAruco2DROSSetup.h"
 #include <QApplication>
 #include <QtGui/QDesktopWidget>
 #include "include/Visualization/Window.h"
@@ -48,11 +45,12 @@
 
 using namespace std;
 
-void plan()
+void planROS()
 {
-    FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
+    FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
+
+    std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -64,9 +62,9 @@ void plan()
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    int mode = 2;
+    int mode = 3;
 
-    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal 3: M3P Lost Robot)? : ");
+   OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: FIRM with Kidnapping, 3: M3P Lost Robot)? : ");
 
     //cin>>mode;
 
@@ -74,9 +72,10 @@ void plan()
 
     mySetup->loadGraphFromFile();
 
+    ros::spinOnce();
+
     while(keepTrying)
     {
-
         if(mySetup->solve())
         {
 
@@ -106,6 +105,10 @@ void plan()
 
 int main(int argc, char **argv)
 {
+
+    // Initialize the ros node
+    ros::init(argc, argv, "firm_planner");
+
     srand(239645);
 
     arma_rng::set_seed(239645);
@@ -120,7 +123,7 @@ int main(int argc, char **argv)
 
     window.resetCamera();
 
-    boost::thread solveThread(plan);
+    boost::thread solveThread(planROS);
 
     app.exec();
 
