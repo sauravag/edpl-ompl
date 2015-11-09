@@ -37,6 +37,8 @@
 #ifndef FIRM_OMPL_
 #define FIRM_OMPL_
 
+#define USE_ROS false
+
 #include <iostream>
 #include <fstream>
 
@@ -49,8 +51,9 @@
 //Spaces
 #include "include/Spaces/SE2BeliefSpace.h"
 #include "include/SpaceInformation/SpaceInformation.h"
-//#include "include/SpaceInformation/ROSSpaceInformation.h"
-
+#if USE_ROS
+	#include "include/SpaceInformation/ROSSpaceInformation.h"
+#endif
 //Observation Models
 #include "include/ObservationModels/ObservationModelMethod.h"
 #include "include/ObservationModels/CamAruco2DObservationModel.h"

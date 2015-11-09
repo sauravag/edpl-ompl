@@ -37,7 +37,7 @@ References:
 ----------------------------------------
 Compilation
 ----------------------------------------
-The application is shared as a codeblocks project. You can use codeblocks to
+The application is shared as a codeblocks project and a CMakeLists.txt is also provided. You can choose to use codeblocks to
 directly compile the application. For ease of use, two codeblocks projects are provided one for OSX and another for Linux (tested on Ubuntu 14.04), 
 be sure to link to the correct libraries and set the include paths for your compiler build settings.
 
@@ -51,6 +51,15 @@ External Depencies: [All of these are hard requirements for this app to run]
 
 4. tinyxml: Needed for reading landmark/setup parameters
 
+Steps: 
+In FIRM-OMPL folder run the following commands:
+
+1. $mkdir build
+2. $cd build
+3. $cmake ..
+4. $make
+
+This should compile the bsp-app-demo executable!
 ---------------------------------------
 How To Use This Application
 ---------------------------------------

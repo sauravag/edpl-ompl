@@ -34,9 +34,14 @@
 
 /* Author: Saurav Agarwal */
 
+#define USE_ROS false
+
 #include "FIRM2DSetup.h"
-//#include "FIRMAruco2DROSSetup.h"
-#include "MultiModalSetup.h"
+
+#if USE_ROS 
+ #include "FIRMAruco2DROSSetup.h"
+#endif
+
 #include "Tests.h"
 #include <QApplication>
 #include <QtGui/QDesktopWidget>
@@ -104,64 +109,65 @@ void plan()
 
 }
 
-// void planROS()
-// {
+#if USE_ROS
+void planROS()
+{
 
-//     FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
+    FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
 
-//     std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
+    std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
 
-//     mySetup->setPathToSetupFile(setupFilePath.c_str());
+    mySetup->setPathToSetupFile(setupFilePath.c_str());
 
-//     mySetup->setup();
+    mySetup->setup();
 
-//     Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
+    Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
 
-//     Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
+    Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
 
-//     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
+    Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-//     int mode = 3;
+    int mode = 3;
 
-//    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: FIRM with Kidnapping, 3: M3P Lost Robot)? : ");
+   OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: FIRM with Kidnapping, 3: M3P Lost Robot)? : ");
 
-//     //cin>>mode;
+    //cin>>mode;
 
-//     int keepTrying = 1;
+    int keepTrying = 1;
 
-//     mySetup->loadGraphFromFile();
+    mySetup->loadGraphFromFile();
 
-//     ros::spinOnce();
+    ros::spinOnce();
 
-    // while(keepTrying)
-    // {
-    //     if(mySetup->solve())
-    //     {
+    while(keepTrying)
+    {
+        if(mySetup->solve())
+        {
 
-    //         mySetup->Run(mode);
+            mySetup->Run(mode);
 
-//             OMPL_INFORM("Plan Executed.");
+            OMPL_INFORM("Plan Executed.");
 
-//             Visualizer::doSaveVideo(false);
+            Visualizer::doSaveVideo(false);
 
-//             keepTrying = 0;
+            keepTrying = 0;
 
-//         }
-//         else
-//         {
-//             OMPL_INFORM("Unable to find Solution in given time, would you like to continue attempt. (1: yes, 0 :no) ? :");
+        }
+        else
+        {
+            OMPL_INFORM("Unable to find Solution in given time, would you like to continue attempt. (1: yes, 0 :no) ? :");
 
-//             std::cin>>keepTrying;
-//         }
+            std::cin>>keepTrying;
+        }
 
-//     }
+    }
 
-//     delete mySetup;
+    delete mySetup;
 
-//     OMPL_INFORM("Execution Terminated, Close Terminal");
+    OMPL_INFORM("Execution Terminated, Close Terminal");
 
-// }
-
+}
+#endif
 int main(int argc, char **argv)
 {
 
@@ -190,9 +196,9 @@ int main(int argc, char **argv)
         2. To plan with ROS integration, the provided example listens for aruco_marker_publisher and advertises robot commands to geometry::twist
     */
 
-    //boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
+    boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
 
-    boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
+    //boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
 
     app.exec();
 
