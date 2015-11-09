@@ -86,8 +86,8 @@ public:
         ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space
-        //ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ; // iCreate
-        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) ) ; // Omni
+        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ; // unicycle
+        //ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) ) ; // Omni
 
         cs_ = controlspace;
 
@@ -122,9 +122,19 @@ public:
 
     void setStartState(const double X, const double Y, const double Yaw)
     {
+        using namespace arma;
+
         ompl::base::State *temp = siF_->allocState();
 
+        mat startCov(3,3);
+
+        startCov<<0.04<<0.0<<0.0<<endr
+                <<0.0<<0.04<<0.0<<endr
+                <<0.0<<0.0<<0.04<<endr;
+
         temp->as<StateType>()->setXYYaw(X,Y,Yaw);
+
+        temp->as<StateType>()->setCovariance(startCov);
 
         siF_->copyState(start_, temp);
 
@@ -134,9 +144,19 @@ public:
 
     void addGoalState(const double X, const double Y, const double Yaw)
     {
+        using namespace arma;
+
         ompl::base::State *temp = siF_->allocState();
 
+        mat goalCov(3,3);
+
+        goalCov<<0.0001<<0.0<<0.0<<endr
+                <<0.0<<0.0001<<0.0<<endr
+                <<0.0<<0.0<<0.0001<<endr;
+
         temp->as<StateType>()->setXYYaw(X,Y,Yaw);
+
+        temp->as<StateType>()->setCovariance(goalCov);
 
         goalList_.push_back(temp);
 
@@ -168,15 +188,15 @@ public:
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space
-            //MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
-            MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));
+            MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
+            //MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));
             siF_->setMotionModel(mm);
 
             ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
             siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
-            siF_->setStateValidityCheckingResolution(0.001);
+            siF_->setStateValidityCheckingResolution(0.003);
             siF_->setMinMaxControlDuration(1,100);
 
             if(!start_ || goalList_.size() == 0)
@@ -226,6 +246,8 @@ public:
 
     void executeSolution(int choice=0)
     {
+        ompl::base::State *s = siF_->allocState();
+
         switch(choice)
         {
             case 1:
@@ -236,6 +258,11 @@ public:
             case 2:
 
                 planner_->as<FIRM>()->executeFeedbackWithKidnapping();
+                break;
+
+            case 3:
+
+                planner_->as<FIRM>()->executeM3P(s);
                 break;
 
             default:

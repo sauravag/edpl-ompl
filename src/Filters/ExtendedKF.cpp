@@ -66,6 +66,8 @@ const LinearSystem& ls, ompl::base::State *updatedState)
 
   colvec innov = this->observationModel_->computeInnovation(belief, obs);
 
+  //std::cout<<"KALMAN FILTER: The innovation is :\n"<<innov<<std::endl;
+
   if(!innov.n_rows || !innov.n_cols)
   {
     si_->copyState(updatedState, belief);

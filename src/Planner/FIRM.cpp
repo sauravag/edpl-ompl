@@ -65,13 +65,13 @@ namespace ompl
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 8;
 
         /** \brief The time in seconds for a single roadmap building operation */
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-        static const double NUM_MONTE_CARLO_PARTICLES = 4; // minimum 10 for FIRM, 4 for rollout
+        static const double NUM_MONTE_CARLO_PARTICLES = 2; // minimum 10 for FIRM, 4 for rollout
 
         /** \brief For a node that is not observable, use a fixed covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1;
@@ -101,15 +101,9 @@ namespace ompl
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
 
         /** \brief Default neighborhood radius */
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // meters
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 1.5; // meters
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
-
-        static const unsigned int MAX_MM_POLICY_LENGTH   = 1000;
-
-        static const float MIN_ROBOT_CLEARANCE = 0.10;
-
-        static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 10;
 
         static const int STEPS_TO_ROLLOUT = 30;
     }
@@ -374,8 +368,6 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                     {
                         stateStable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
                                 ls.getM() * ls.getR() * trans(ls.getM()), S );
-
-                        //workState->as<SE2BeliefSpace::StateType>()->setCovariance(S);
                     }
                     catch(int e)
                     {
@@ -385,6 +377,7 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                 }
                 attempts++;
             } while (attempts < ompl::magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found && !stateStable);
+
         }
         // add it as a milestone
         if (found && stateStable)
@@ -471,7 +464,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
 
     // Add the valid start states as milestones
     while (const ompl::base::State *st = pis_.nextStart())
-        startM_.push_back(addStateToGraph(si_->cloneState(st)));
+        startM_.push_back(addStateToGraph(si_->cloneState(st), true, false));
 
     if (startM_.size() == 0)
     {
@@ -492,7 +485,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         if (st)
         {
             OMPL_INFORM("%s: Adding goal state to roadmap.", getName().c_str());
-            goalM_.push_back(addStateToGraph(si_->cloneState(st)));
+            goalM_.push_back(addStateToGraph(si_->cloneState(st), true, false));
         }
         if (goalM_.empty())
         {
@@ -572,7 +565,7 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
     si_->freeStates(xstates);
 }
 
-FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge, bool shouldCreateNodeController)
+FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge, bool shouldSetStationaryCovariance)
 {
 
     boost::mutex::scoped_lock _(graphMutex_);
@@ -580,7 +573,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     // First construct a node stabilizer controller
     NodeControllerType nodeController;
 
-    generateNodeController(state, nodeController); // Generating the node controller at sampled state, this will set stationary covariance at node
+    generateNodeController(state, nodeController, shouldSetStationaryCovariance); // Generating the node controller at sampled state, this will set stationary covariance at node
 
     // Now add belief state to graph as FIRM node
     Vertex m;
@@ -821,7 +814,7 @@ void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::ba
     edgeController =  ctrlr;
 }
 
-void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeControllerType &nodeController)
+void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeControllerType &nodeController, bool shouldSetStationaryCovariance)
 {
     // Create a copy of the node state
     ompl::base::State *node = si_->allocState();
@@ -839,8 +832,11 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
         arma::mat stationaryCovariance = linearizedKF.computeStationaryCovariance(linearSystem);
 
         // set the covariance
-        node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
-        state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        if(shouldSetStationaryCovariance)
+        {
+            node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+            state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        }
 
         // create a node controller
         std::vector<ompl::control::Control*> dummyControl;
@@ -858,9 +854,11 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
         arma::mat stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
 
         // set the covariance
-        node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
-        state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
-
+        if(shouldSetStationaryCovariance)
+        {
+            node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+            state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        }
         // create a node controller
         std::vector<ompl::control::Control*> dummyControl;
         std::vector<ompl::base::State*> dummyStates;
@@ -1038,6 +1036,10 @@ void FIRM::executeFeedback(void)
 
     siF_->setTrueState(stateProperty_[start]);
     siF_->setBelief(stateProperty_[start]);
+
+    OMPL_INFORM("FIRM: Starting State and Covariance: \n");
+    siF_->printState(stateProperty_[start]);
+    std::cout<<stateProperty_[start]->as<SE2BeliefSpace::StateType>()->getCovariance();
 
     Vertex currentVertex =  start;
 
@@ -1692,6 +1694,8 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 
     boost::mutex::scoped_lock _(graphMutex_);
 
+    double timeToGenerateUniquenessGraph = 0.0;
+
     if(FIRMUtils::readFIRMGraphFromXML(pathToFile,  FIRMNodePosList, FIRMNodeCovarianceList , loadedEdgeProperties_))
     {
 
@@ -1708,8 +1712,6 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 
             newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
             newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
-
-            //Vertex v = addStateToGraph(siF_->cloneState(newState));
 
             Vertex m;
 
@@ -1728,7 +1730,13 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
 
             nn_->add(m);
 
+            auto start_time_add_node_to_uniqueness_graph = std::chrono::high_resolution_clock::now();
+
             policyGenerator_->addFIRMNodeToObservationGraph(newState);
+
+            auto end_time_add_node_to_uniqueness_graph = std::chrono::high_resolution_clock::now();
+
+            timeToGenerateUniquenessGraph += std::chrono::duration_cast<std::chrono::milliseconds>(end_time_add_node_to_uniqueness_graph - start_time_add_node_to_uniqueness_graph).count();
 
             addStateToVisualization(newState);
 
@@ -1771,6 +1779,8 @@ void FIRM::loadRoadMapFromFile(const std::string pathToFile)
         }
 
     }
+
+    OMPL_INFORM("NBM3P: Time to Generate Uniqueness Graph %f ms", timeToGenerateUniquenessGraph);
 }
 
 bool FIRM::isStartVertex(const Vertex v)
@@ -1806,104 +1816,11 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::MultiModalMode);
 
-    auto start_time_sampling = std::chrono::high_resolution_clock::now();
-
     policyGenerator_->setPolicyExecutionSpace(policyExecutionSI_);
 
-    policyGenerator_->sampleNewBeliefStates();
+    policyGenerator_->execute(recoveredState);
 
-    auto end_time_sampling = std::chrono::high_resolution_clock::now();
+    //Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    std::cout << "Time to sample beliefs: "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_sampling - start_time_sampling).count() << " milli seconds."<<std::endl;
-
-    std::cin.get();
-
-    //ompl::base::State *currentTrueState = siF_->allocState();
-
-    //siF_->getTrueState(currentTrueState);
-
-    int counter = 0;
-
-    Visualizer::doSaveVideo(true);
-
-    int timeSinceKidnap = 0;
-
-    weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
-
-    auto start_time_recovery = std::chrono::high_resolution_clock::now();
-
-    while(!policyGenerator_->isConverged())
-    {
-        std::vector<ompl::control::Control*> policy;
-
-        policyGenerator_->generatePolicy(policy);
-
-        Visualizer::doSaveVideo(true);
-
-        int rndnum = FIRMUtils::generateRandomIntegerInRange(100, ompl::magic::MAX_MM_POLICY_LENGTH/*policy.size()-1*/);
-
-        //int hzn = policy.size()-1;
-        int hzn = ompl::magic::MAX_MM_POLICY_LENGTH > policy.size()? policy.size() : rndnum;
-
-        for(int i=0; i < hzn ; i++)
-        {
-            policyExecutionSI_->applyControl(policy[i]);
-
-            unsigned int numModesBefore = policyGenerator_->getNumberOfModes();
-
-            policyGenerator_->propagateBeliefs(policy[i]);
-
-            unsigned int numModesAfter = policyGenerator_->getNumberOfModes();
-
-            // If any of the modes gets deleted, break and find new policy
-            if(numModesAfter != numModesBefore)
-                break;
-
-            //siF_->getTrueState(currentTrueState);
-
-            // If the belief's clearance gets below the threshold, break loop & replan
-            if(!policyGenerator_->doCurrentBeliefsSatisfyClearance(i))
-            {
-                if(counter == 0)
-                {
-                    counter++;
-                    break;
-                }
-
-            }
-
-            if(counter > ompl::magic::MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING)
-                counter = 0;
-
-            if(policyGenerator_->isConverged())
-                break;
-
-            //boost::this_thread::sleep(boost::posix_time::milliseconds(20));
-
-            timeSinceKidnap++;
-
-            weightsHistory_.push_back(std::make_pair(timeSinceKidnap,policyGenerator_->getWeights()));
-
-
-        }
-
-    }
-
-    auto end_time_recovery = std::chrono::high_resolution_clock::now();
-
-    std::cout << "Time to sample recover (exclude sampling): "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time_recovery - start_time_recovery).count() << " milli seconds."<<std::endl;
-
-    std::cin.get();
-
-    std::vector<ompl::base::State*> bstates;
-
-    policyGenerator_->getCurrentBeliefStates(bstates);
-
-    siF_->copyState(recoveredState, bstates[0]);
-
-    Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
-
-    writeTimeSeriesDataToFile("MultiModalWeightsHistory.csv", "multiModalWeights");
-
-
+    //writeTimeSeriesDataToFile("MultiModalWeightsHistory.csv", "multiModalWeights");
 }

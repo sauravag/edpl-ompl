@@ -91,11 +91,13 @@ class MotionModelMethod
 		/** \brief  Generate open loop control that drives robot from start to end state. */
 		virtual void generateOpenLoopControls(const ompl::base::State *startState,
                                               const ompl::base::State *endState,
-                                              std::vector<ompl::control::Control*> &openLoopControls) = 0;
+                                              std::vector<ompl::control::Control*> &openLoopControls,
+                                              bool withMaxVelocity = false) = 0;
 
         /** \brief Generate open loop controls for a geometric path. */
         virtual void generateOpenLoopControlsForPath(const ompl::geometric::PathGeometric path,
-                                              std::vector<ompl::control::Control*> &openLoopControls) = 0;
+                                              std::vector<ompl::control::Control*> &openLoopControls,
+                                              bool withMaxVelocity = false) = 0;
 
 		/** \brief Generate noise according to specified state and control input. */
 		virtual NoiseType generateNoise(const ompl::base::State *state, const ompl::control::Control* control) = 0;

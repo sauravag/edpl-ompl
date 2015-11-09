@@ -52,7 +52,7 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/SetupFIRMExp2.xml";
+    std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -64,11 +64,11 @@ void plan()
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    int mode = 0;
+    int mode = 3;
 
-    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
+    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal 3: M3P Lost Robot)? : ");
 
-    cin>>mode;
+    //cin>>mode;
 
     int keepTrying = 1;
 
@@ -76,9 +76,10 @@ void plan()
 
     while(keepTrying)
     {
+
         if(mySetup->solve())
         {
-            //mySetup->executeSolution(mode);
+
             mySetup->Run(mode);
 
             OMPL_INFORM("Plan Executed.");
@@ -108,7 +109,7 @@ void plan()
 
 //     FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
 
-//     std::string setupFilePath = "./SetupFiles/Setup4CornerWorld.xml";
+//     std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
 
 //     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -122,7 +123,7 @@ void plan()
 
 //     int mode = 3;
 
-//     OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: FIRM with Kidnapping, 3: Lost Robot)? : ");
+//    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: FIRM with Kidnapping, 3: M3P Lost Robot)? : ");
 
 //     //cin>>mode;
 
@@ -132,12 +133,12 @@ void plan()
 
 //     ros::spinOnce();
 
-//     while(keepTrying)
-//     {
-//         if(mySetup->solve())
-//         {
-//             //mySetup->executeSolution(mode);
-//             mySetup->Run(mode);
+    // while(keepTrying)
+    // {
+    //     if(mySetup->solve())
+    //     {
+
+    //         mySetup->Run(mode);
 
 //             OMPL_INFORM("Plan Executed.");
 
@@ -188,9 +189,10 @@ int main(int argc, char **argv)
 
         2. To plan with ROS integration, the provided example listens for aruco_marker_publisher and advertises robot commands to geometry::twist
     */
-    boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
 
-    //boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
+    //boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
+
+    boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
 
     app.exec();
 
@@ -198,6 +200,32 @@ int main(int argc, char **argv)
 
     OMPL_INFORM("Task Complete");
 
+/*
+    arma::colvec p1(2);
+    p1(0) = 1.265;
+    p1(1) = 2.285;
+
+    arma::colvec q1(2);
+    q1(0) = 1.52;
+    q1(1) = 2.285;
+
+    arma::colvec robot(2);
+    robot(0) = 1.20;
+    robot(1) = 2;
+
+    arma::colvec landmark(2);
+    landmark(0) = 1.435;
+    landmark(1) = 2.295;
+
+    if(FIRMUtils::doLineSegmentsIntersect(p1,q1,robot,landmark))
+    {
+        std::cout<<"The landmark wasn't visible"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"The landmark was visible"<<std::endl;
+    }
+*/
     return 0;
 
 

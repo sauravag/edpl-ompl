@@ -43,7 +43,7 @@ namespace ompl
 {
     namespace magic
     {
-        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.05 ; // meters, 0.5 for create
+        static const double ONE_STEP_DISTANCE_FOR_VISIBILITY = 0.09 ; // meters, 0.5 for create (Use radius of robot)
     }
 }
 
@@ -250,12 +250,10 @@ int CamAruco2DObservationModel::findCorrespondingLandmark(const ompl::base::Stat
 
     }
 
-    assert(candidateIndx >= 0 && "Candidate index cannot be negative");
+    assert(candidateIndx >= 0 && "Candidate index cannot be negative, maybe robot saw landmark that is not in map");
 
     // The observation is id, range, bearing, orientation of the landmark
     candidateObservation<<landmarkID<<candidatelandmarkRange<<candidatelandmarkBearing<<landmarks_[candidateIndx][3]<<endr;
-
-    assert(candidateIndx>=0);
 
     return candidateIndx;
 
@@ -268,12 +266,14 @@ bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *st
     using namespace arma;
 
     colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
-
+/*
     colvec robot_to_landmark_ray =  landmark.subvec(1,2) - xVec.subvec(0,1);
 
     double distance = norm(robot_to_landmark_ray,2);
 
-    int steps = std::floor(distance/ompl::magic::ONE_STEP_DISTANCE_FOR_VISIBILITY);
+    int steps = std::floor(distance/ompl::magic::ONE_STEP_DISTANCE_FOR_VISIBILITY) - 1 ; // subtract 1 one step because you dont need robot center to be at landmark
+
+    if(steps < 0) steps = 0;
 
     ompl::base::State *tempState = this->si_->allocState();
 
@@ -295,6 +295,24 @@ bool CamAruco2DObservationModel::hasClearLineOfSight(const ompl::base::State *st
     si_->freeState(tempState);
 
     return true;
+*/
+    for(int i = 0 ; i < lineSegments_.size(); i++)
+    {
+        arma::colvec p1 = lineSegments_[i].subvec(0,1);
+        arma::colvec q1 = lineSegments_[i].subvec(2,3);
+
+        arma::colvec p2 = xVec.subvec(0,1);
+        arma::colvec q2 = landmark.subvec(1,2);
+
+        if(FIRMUtils::doLineSegmentsIntersect(p1,q1,p2,q2))
+        {
+            return false;
+        }
+
+    }
+
+    return true;
+
 }
 
 
@@ -475,7 +493,6 @@ CamAruco2DObservationModel::computeInnovation(const ompl::base::State *predicted
 
 }
 
-
 typename CamAruco2DObservationModel::ObservationType CamAruco2DObservationModel::removeSpuriousObservations(const ObservationType& Zg)
 {
 
@@ -567,6 +584,59 @@ void CamAruco2DObservationModel::loadLandmarks(const char *pathToSetupFile)
     Visualizer::addLandmarks(landmarks_);
 }
 
+void CamAruco2DObservationModel::loadLineSegments(const char *pathToSetupFile)
+{
+  using namespace arma;
+  // Load XML containing landmarks
+  TiXmlDocument doc(pathToSetupFile);
+  bool loadOkay = doc.LoadFile();
+
+  if ( !loadOkay )
+  {
+    printf( "Could not load line segment list ." );
+
+    return; // return without doing anything
+  }
+
+  TiXmlNode* node = 0;
+  TiXmlElement* landmarkElement = 0;
+  TiXmlElement* itemElement = 0;
+
+  // Get the landmarklist node
+  node = doc.FirstChild( "LineSegmentList" );
+  assert( node );
+  landmarkElement = node->ToElement(); //convert node to element
+  assert( landmarkElement  );
+
+  TiXmlNode* child = 0;
+
+  //Iterate through all the landmarks and put them into the "landmarks_" list
+  while( (child = landmarkElement ->IterateChildren(child)))
+  {
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+
+    arma::colvec lineSegment(4);
+    lineSegment.zeros();
+    double attributeVal;
+    itemElement->QueryDoubleAttribute("x1", &attributeVal) ;
+    lineSegment[0] = attributeVal;
+    itemElement->QueryDoubleAttribute("y1", &attributeVal) ;
+    lineSegment[1] = attributeVal;
+    itemElement->QueryDoubleAttribute("x2", &attributeVal) ;
+    lineSegment[2] = attributeVal;
+    itemElement->QueryDoubleAttribute("y2", &attributeVal) ;
+    lineSegment[3] = attributeVal;
+
+    this->lineSegments_.push_back(lineSegment);
+
+  }
+
+    OMPL_INFORM("CamArucoObservationModel: Total number of line segments loaded successfully : %u", lineSegments_.size() );
+
+}
+
 void CamAruco2DObservationModel::loadParameters(const char *pathToSetupFile)
 {
     using namespace arma;
@@ -649,4 +719,17 @@ bool CamAruco2DObservationModel::isStateObservable(const ompl::base::State *stat
 
   return false;
 
+}
+
+bool CamAruco2DObservationModel::isLandmarkInMap(const int landmarkID)
+{
+    for(unsigned int i = 0; i < landmarks_.size() ; i++)
+    {
+        if(landmarks_[i](0) == landmarkID)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

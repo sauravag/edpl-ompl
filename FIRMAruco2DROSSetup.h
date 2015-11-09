@@ -55,7 +55,7 @@ public:
     ss_(ompl::base::StateSpacePtr(new SE2BeliefSpace()))
     {
         // set static variables
-        RHCICreate::setControlQueueSize(5);
+        RHCICreate::setControlQueueSize(10);
         RHCICreate::setTurnOnlyDistance(0.01);
         Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(0.1); // degrees
         Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.01);// meters
@@ -126,9 +126,19 @@ public:
 
     void setStartState(const double X, const double Y, const double Yaw)
     {
+        using namespace arma;
+
         ompl::base::State *temp = siF_->allocState();
 
+        mat startCov;
+
+        startCov<<0.04<<0.0<<0.0<<endr
+                <<0.0<<0.04<<0.0<<endr
+                <<0.0<<0.0<<0.04<<endr;
+
         temp->as<StateType>()->setXYYaw(X,Y,Yaw);
+
+        temp->as<StateType>()->setCovariance(startCov);
 
         siF_->copyState(start_, temp);
 
@@ -138,9 +148,19 @@ public:
 
     void addGoalState(const double X, const double Y, const double Yaw)
     {
+        using namespace arma;
+
         ompl::base::State *temp = siF_->allocState();
 
+        mat goalCov(3,3);
+
+        goalCov<<0.05<<0.0<<0.0<<endr
+                <<0.0<<0.05<<0.0<<endr
+                <<0.0<<0.0<<0.05<<endr;
+
         temp->as<StateType>()->setXYYaw(X,Y,Yaw);
+
+        temp->as<StateType>()->setCovariance(goalCov);
 
         goalList_.push_back(temp);
 
@@ -182,13 +202,13 @@ public:
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
             siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied
-            siF_->setStateValidityCheckingResolution(0.001);
+            siF_->setStateValidityCheckingResolution(0.003);
             siF_->setMinMaxControlDuration(1,100);
 
             //
             siROS_->setStatePropagator(statePropagator_);
             siROS_->setPropagationStepSize(0.1); // this is the duration that a control is applied
-            siROS_->setStateValidityCheckingResolution(0.001);
+            siROS_->setStateValidityCheckingResolution(0.003);
             siROS_->setMinMaxControlDuration(1,100);
             //
 
@@ -255,7 +275,7 @@ public:
 
             case 3:
 
-                planner_->as<FIRM>()->recoverLostRobot(s);
+                planner_->as<FIRM>()->executeM3P(s);
                 break;
 
             default:

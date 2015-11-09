@@ -101,6 +101,9 @@ class ObservationModelMethod
         /** \brief Returns the zero observation noise.*/
         virtual const NoiseType getZeroNoise() {return zeroNoise_; }
 
+        /** \brief Check if this landmark is actually in the map, reject extraneous landmarks*/
+        virtual bool isLandmarkInMap(const int landmarkID) = 0;
+
         /** \brief */
         arma::colvec etaPhi_;
 

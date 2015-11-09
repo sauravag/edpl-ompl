@@ -123,12 +123,16 @@ arma::mat LinearizedKF::computeStationaryCovariance (const LinearSystem& ls)
     mat R = ls.getR();
 
     mat Pprd;
+
+    //std::cout<<"MM Q :"<< ls.getQ()<<std::endl;
+
     bool dareSolvable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
     ls.getM() * ls.getR() * trans(ls.getM()), Pprd );
 
     if(!dareSolvable)
     {
         OMPL_ERROR("Dare Unsolvable: The given system state is not stable/observable. Try a different state.");
+
         exit(1);
     }
 
