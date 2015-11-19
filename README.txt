@@ -1,10 +1,11 @@
 /**************************************
-Feedback Information RoadMaps Using Open Motion Planning Library
+Belief Space Planning Using Open Motion Planning Library
 
 Authors:
 Saurav Agarwal (sauravag@tamu.edu)
 Ali-akbar Agha-mohammadi (aliagha@mit.edu)
 
+Estimation, Decision and Planning Lab
 Texas A&M University
 Copyright 2014
 **************************************/
