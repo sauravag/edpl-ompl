@@ -34,8 +34,18 @@
 
 /* Author: Saurav Agarwal */
 
+///////////////////////////////////////////////////////////////////////////////////////
+//                                      TIP
+//          Look at the top of FIRMOMPL.h to see how to include ROS and build.
+//      Over there, uncomment #define USE_ROS to allow ROS dependent files to compiled.
+///////////////////////////////////////////////////////////////////////////////////////
+
 #include "FIRM2DSetup.h"
-#include "FIRMAruco2DROSSetup.h"
+
+#ifdef USE_ROS
+    #include "FIRMAruco2DROSSetup.h"
+#endif
+
 #include "MultiModalSetup.h"
 #include "Tests.h"
 #include <QApplication>
@@ -103,7 +113,7 @@ void plan()
 
 }
 
-
+#ifdef USE_ROS
 void planROS()
 {
 
@@ -161,13 +171,15 @@ void planROS()
     OMPL_INFORM("Execution Terminated, Close Terminal");
 
 }
-
+#endif
 
 int main(int argc, char **argv)
 {
 
-    // Initialize the ros node
-    ros::init(argc, argv, "firm_planner");
+    #ifdef USE_ROS
+        // Initialize the ros node
+        ros::init(argc, argv, "firm_planner");
+    #endif
 
     srand(239645);
 
@@ -190,9 +202,13 @@ int main(int argc, char **argv)
 
         2. To plan with ROS integration, the provided example listens for aruco_marker_publisher and advertises robot commands to geometry::twist
     */
-    boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
+    #ifndef USE_ROS
+        boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
+    #endif
 
-    //boost::thread solveThread(planROS); // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
+    #ifdef USE_ROS
+        boost::thread solveThread(planROS);
+    #endif
 
     app.exec();
 
