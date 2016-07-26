@@ -476,7 +476,8 @@ void Visualizer::drawMostLikelyPath()
     glLineWidth(4.0);
     for(int i=0; i<mostLikelyPath_.size();i++)
     {
-        glColor3d(0.2 , 0.2 , 0.2);
+        glColor3d(1.0 , 1.0 , 0.0); // yellow
+        //glColor3d(0.2 , 0.2 , 0.2); // almost black
         drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
     }
     glLineWidth(1.f);
@@ -492,7 +493,8 @@ void Visualizer::drawRobotPath()
 
         for(int i=0; i<robotPath_.size()-1;i++)
         {
-            glColor3d(0.6 , 0.6 , 0.6);
+//            glColor3d(0.6 , 0.6 , 0.6); // grey
+            glColor3d(0.0 , 1.0 , 0.6); // green
 
             glLineWidth(4.0);
                 drawEdge(robotPath_[i],robotPath_[i+1]);

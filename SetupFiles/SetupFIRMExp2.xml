@@ -233,7 +233,7 @@
 	/>
 	<StartPose
 		x = "1.2"
-		y = "15.20"
+		y = "14.0"
 		theta = "0"
 	/>
 	<PlanningTime

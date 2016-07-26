@@ -101,7 +101,7 @@ namespace ompl
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
 
         /** \brief Default neighborhood radius */
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // meters
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is good
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
@@ -886,6 +886,8 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 {
     OMPL_INFORM("FIRM: Solving DP");
 
+    auto start_time = std::chrono::high_resolution_clock::now();
+
     Visualizer::clearMostLikelyPath();
 
     using namespace arma;
@@ -951,7 +953,18 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
     }
 
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    double timeDP = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+    OMPL_INFORM("FIRM: DP Solve Time: %2.3f seconds<----", timeDP/1000.0);
+
     OMPL_INFORM("FIRM: Solved DP");
+
+    std::ofstream outfile;
+    outfile.open(logFilePath_+"DPSolveTime.txt",std::ios::app);
+    outfile<<"Time: "<<timeDP<<" ms"<<std::endl;
+    outfile.close();
 
     sendFeedbackEdgesToViz();
 
@@ -1059,7 +1072,6 @@ void FIRM::executeFeedback(void)
 
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
     {
-        //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
 
         if(currentVertex==goal)
             break;
@@ -1143,8 +1155,6 @@ void FIRM::executeFeedback(void)
 
     }
 
-    //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
-
     writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
 
     writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory.csv", "successProbability");
@@ -1199,7 +1209,6 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)/*currentVertex != goal*/)
     {
-        //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,costToGo_[currentVertex]));
 
         if(currentVertex==goal)
             break;
@@ -1309,8 +1318,6 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     }
 
-    //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
-
     //writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
 
     //writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory", "successProbability");
@@ -1322,6 +1329,12 @@ void FIRM::executeFeedbackWithKidnapping(void)
 // Experimental
 void FIRM::executeFeedbackWithRollout(void)
 {
+
+    // Open a file for writing rollout computation time
+    std::ofstream outfile;
+    outfile.open(logFilePath_+"RolloutComputationTime.csv");
+    outfile<<"RolloutNum, RadiusNN, NumNN, MCParticles, avgTimePerNeighbor, totalTimeSecs" <<std::endl;
+
     Visualizer::setMode(Visualizer::VZRDrawingMode::RolloutMode);
     Visualizer::clearRobotPath();
 
@@ -1351,8 +1364,6 @@ void FIRM::executeFeedbackWithRollout(void)
     OMPL_INFORM("Goal State is: \n");
 
     si_->printState(goalState);
-
-    //costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[start]));
 
     double averageTimeForRolloutComputation = 0;
 
@@ -1420,7 +1431,6 @@ void FIRM::executeFeedbackWithRollout(void)
 
             e = feedback_[tempVertex];
 
-            //costToGoHistory_.push_back(std::make_pair(currentTimeStep_, costToGo_[tempVertex]));
         }
 
         else
@@ -1447,9 +1457,14 @@ void FIRM::executeFeedbackWithRollout(void)
 
             int numNN = connectionStrategy_(tempVertex).size();
 
-            averageTimeForRolloutComputation += (std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count()) / numNN;
+            double timeToDoRollout = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
-            std::cout << "Time to execute rollout : "<<std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << " milli seconds."<<std::endl;
+            averageTimeForRolloutComputation +=  timeToDoRollout / numNN;
+
+            outfile<<numberOfRollouts<<","<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<","
+                   <<numNN<<","<<ompl::magic::NUM_MONTE_CARLO_PARTICLES<<","<<timeToDoRollout / (1000*numNN)<<","<<timeToDoRollout/1000<<std::endl;
+
+            std::cout << "Time to execute rollout : "<<timeToDoRollout << " milli seconds."<<std::endl;
 
             showRolloutConnections(tempVertex);
 
@@ -1474,15 +1489,9 @@ void FIRM::executeFeedbackWithRollout(void)
 
     averageTimeForRolloutComputation = averageTimeForRolloutComputation / (1000*numberOfRollouts);
 
-    std::ofstream outfile;
-
-    outfile.open("RolloutComputationTime.txt",  std::ios::app );
-
-    outfile<<"Nearest Neighbor Radius: "<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<", Monte Carlo Particles: "<<ompl::magic::NUM_MONTE_CARLO_PARTICLES<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;
+    std::cout<<"Nearest Neighbor Radius: "<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<", Monte Carlo Particles: "<<ompl::magic::NUM_MONTE_CARLO_PARTICLES<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;
 
     outfile.close();
-
-    //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,0));
 
     writeTimeSeriesDataToFile("RolloutFIRMCostHistory.csv", "costToGo");
 
@@ -1599,8 +1608,6 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
         }
 
     }
-
-    //costToGoHistory_.push_back(std::make_pair(currentTimeStep_,minCost));
 
     return edgeToTake;
 }

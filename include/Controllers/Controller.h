@@ -249,6 +249,9 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     //cost = 0.01 , for covariance based
     double cost = 0.01;
 
+    //float totalCollisionCheckComputeTime = 0;
+    //int totalNumCollisionChecks = 0;
+
     ompl::base::State *internalState = si_->allocState();
 
     si_->copyState(internalState, startState);
@@ -272,7 +275,18 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         */
         if(constructionMode)
         {
-            if(!si_->checkTrueStateValidity())
+            //totalNumCollisionChecks++;
+
+            // start profiling time to compute rollout
+            //auto start_time = std::chrono::high_resolution_clock::now();
+
+            bool isThisStateValid = si_->checkTrueStateValidity();
+
+            //auto end_time = std::chrono::high_resolution_clock::now();
+
+            //totalCollisionCheckComputeTime += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+
+            if(!isThisStateValid)
             {
                 si_->copyState(endState, internalState);
 
@@ -306,6 +320,14 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
             boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     }
+
+//    arma::colvec xStart = startState->as<StateType>()->getArmaData();
+//    arma::colvec xEnd = endState->as<StateType>()->getArmaData();
+
+//    std::cout<<"Edge Length = "<<norm(xStart.subvec(0,1)-xEnd.subvec(0,1),2)
+//             <<" m, Total Number of Collision Checks = "<< totalNumCollisionChecks
+//             << ",  Avg. Time Per Collision Check = "<< totalCollisionCheckComputeTime/(1000000*totalNumCollisionChecks)<<" sec"
+//             <<std::endl;
 
 
     ompl::base::Cost stabilizationFilteringCost(0);

@@ -76,9 +76,9 @@ void plan()
 
     int mode = 0;
 
-    OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
+    //OMPL_INFORM("Choose what mode (0: Standard FIRM, 1 : Rollout , 2: Kidnapping-Multi-Modal)? : ");
 
-    cin>>mode;
+    //cin>>mode;
 
     int keepTrying = 1;
 
@@ -100,17 +100,21 @@ void plan()
         }
         else
         {
-            OMPL_INFORM("Unable to find Solution in given time, would you like to continue attempt. (1: yes, 0 :no) ? :");
+            break;
+            //OMPL_INFORM("Unable to find Solution in given time, would you like to continue attempt. (1: yes, 0 :no) ? :");
 
-            std::cin>>keepTrying;
+            //std::cin>>keepTrying;
         }
 
     }
 
     delete mySetup;
 
-    OMPL_INFORM("Execution Terminated, Close Terminal");
+    OMPL_INFORM("Execution Terminated.");
 
+    QApplication::quit();
+
+    return;
 }
 
 #ifdef USE_ROS
@@ -181,9 +185,9 @@ int main(int argc, char **argv)
         ros::init(argc, argv, "firm_planner");
     #endif
 
-    srand(239645);
+    //srand(239645);
 
-    arma_rng::set_seed(239645);
+    //arma_rng::set_seed(239645);
 
     QApplication app(argc, argv);
 
@@ -216,7 +220,7 @@ int main(int argc, char **argv)
 
     OMPL_INFORM("Task Complete");
 
-    return 0;
+    exit(0);
 
 
 }
