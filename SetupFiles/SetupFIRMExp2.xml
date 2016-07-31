@@ -237,18 +237,19 @@
 		theta = "0"
 	/>
 	<PlanningTime
-		maxTime = "600"
+		maxTime = "30"
 	/>
 	<FIRMNodes
-		minNodes = "100"
+		minNodes = "50"
 	/>
 	<KidnappedState
         x = 1.5 y = 19.5 theta = 1.57 
     />
 </PlanningProblem>
-<GoalList>
+<GoalList>	
 	<GoalPose x = "16.5" y = "15.9" theta = "-1.0" />
 	<GoalPose x = "5.0" y = "5.1141" theta = "-1.0" />
 	<GoalPose x = "19.2" y = "3.0" theta = "0" />
 	<GoalPose x = "10" y = "11" theta = "0" />
 </GoalList>
+

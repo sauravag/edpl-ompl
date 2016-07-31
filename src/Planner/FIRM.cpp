@@ -520,17 +520,17 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     ompl::base::PlannerTerminationCondition ptcOrSolutionFound =
         ompl::base::plannerOrTerminationCondition(ptc, ompl::base::PlannerTerminationCondition(boost::bind(&FIRM::addedNewSolution, this)));
 
-    // If no roadmap was loaded, then construct one
-    if(!loadedRoadmapFromFile_)
+    // If no roadmap was loaded or the number of loaded is less than min required by setup, then construct one
+    if(!loadedRoadmapFromFile_ || boost::num_vertices(g_) < minFIRMNodes_)
     {
         constructRoadmap(ptcOrSolutionFound);
     }
 
     // If roadmap wasn't loaded from file, then save the newly constructed roadmap
-    if(!loadedRoadmapFromFile_)
-    {
+    //if(!loadedRoadmapFromFile_)
+    //{
         this->savePlannerData();
-    }
+    //}
 
     slnThread.join();
 
