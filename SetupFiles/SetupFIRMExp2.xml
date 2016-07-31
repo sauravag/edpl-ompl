@@ -237,7 +237,7 @@
 		theta = "0"
 	/>
 	<PlanningTime
-		maxTime = "30"
+		maxTime = "600"
 	/>
 	<FIRMNodes
 		minNodes = "50"
