@@ -249,8 +249,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     //cost = 0.01 , for covariance based
     double cost = 0.01;
 
-    //float totalCollisionCheckComputeTime = 0;
-    //int totalNumCollisionChecks = 0;
+//    float totalCollisionCheckComputeTime = 0;
+//    int totalNumCollisionChecks = 0;
 
     ompl::base::State *internalState = si_->allocState();
 
@@ -275,16 +275,16 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         */
         if(constructionMode)
         {
-            //totalNumCollisionChecks++;
+//            totalNumCollisionChecks++;
 
             // start profiling time to compute rollout
-            //auto start_time = std::chrono::high_resolution_clock::now();
+//            auto start_time = std::chrono::high_resolution_clock::now();
 
             bool isThisStateValid = si_->checkTrueStateValidity();
 
-            //auto end_time = std::chrono::high_resolution_clock::now();
+//            auto end_time = std::chrono::high_resolution_clock::now();
 
-            //totalCollisionCheckComputeTime += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+//            totalCollisionCheckComputeTime += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
 
             if(!isThisStateValid)
             {
@@ -321,14 +321,18 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         }
     }
 
-//    arma::colvec xStart = startState->as<StateType>()->getArmaData();
-//    arma::colvec xEnd = endState->as<StateType>()->getArmaData();
-
-//    std::cout<<"Edge Length = "<<norm(xStart.subvec(0,1)-xEnd.subvec(0,1),2)
-//             <<" m, Total Number of Collision Checks = "<< totalNumCollisionChecks
-//             << ",  Avg. Time Per Collision Check = "<< totalCollisionCheckComputeTime/(1000000*totalNumCollisionChecks)<<" sec"
-//             <<std::endl;
-
+//    if(constructionMode)
+//    {
+//        arma::colvec diff = startState->as<StateType>()->getArmaData() - goal_->as<StateType>()->getArmaData();
+//
+//        std::ofstream outfile;
+//        outfile.open("/home/sauravagarwal/Dropbox/SLAP_Rollout_FIRM/DATA-Sims/TRO-Sims-Latest/CollisionChecks.csv",std::ios::app);
+//        outfile<<arma::norm(diff.subvec(0,1),2)<<","
+//                 <<totalNumCollisionChecks<<","
+//                 <<totalCollisionCheckComputeTime/(1000000)
+//                 <<std::endl;
+//        outfile.close();
+//    }
 
     ompl::base::Cost stabilizationFilteringCost(0);
 

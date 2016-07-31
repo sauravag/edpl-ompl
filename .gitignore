@@ -6,4 +6,8 @@
 *.html
 *.png
 *.map
-PlannerDataLog/
+./PlannerDataLog/
+./report/
+./VideoFrames/
+./Videos/
+./Result/

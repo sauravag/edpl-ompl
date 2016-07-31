@@ -457,7 +457,7 @@ protected:
 
         std::string timeStamp(to_iso_string(now)) ;
 
-        std::string folderPath = "./PlannerDataLog/50FIRM/RunData-" + timeStamp ;
+        std::string folderPath = "./PlannerDataLog/RunData-" + timeStamp ;
 
         boost::filesystem::path dir(folderPath);
 
