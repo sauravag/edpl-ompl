@@ -37,7 +37,7 @@
 #ifndef FIRM_OMPL_
 #define FIRM_OMPL_
 
-// #define USE_ROS // COMMENT OUT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
+// #define USE_ROS // REMOVE COMMENT TO PLAN WITH ROS, Access simulated/real sensor and robot through ROS
 
 #include <iostream>
 #include <fstream>

@@ -1,3 +1,5 @@
+*.layout
+*.depend
 *.o
 *.pdf
 *.aux
@@ -6,8 +8,14 @@
 *.html
 *.png
 *.map
-./PlannerDataLog/
-./report/
-./VideoFrames/
-./Videos/
-./Result/
+*.xml~
+*.csv~
+*.txt~
+*.bkp
+PlannerDataLog/
+report/
+VideoFrames/
+Videos/
+Results/
+bin/
+build/

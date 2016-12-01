@@ -478,6 +478,7 @@ void Visualizer::drawMostLikelyPath()
     {
         glColor3d(1.0 , 1.0 , 0.0); // yellow
         //glColor3d(0.2 , 0.2 , 0.2); // almost black
+
         drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
     }
     glLineWidth(1.f);

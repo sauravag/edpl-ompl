@@ -1341,7 +1341,7 @@ void FIRM::executeFeedbackWithRollout(void)
     const Vertex start = startM_[0];
     const Vertex goal  = goalM_[0] ;
 
-    sendMostLikelyPathToViz(start, goal);
+    sendMostLikelyPathToViz(start, goal) ;
 
     ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
 
@@ -1435,6 +1435,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
         else
         {
+	    
             siF_->doVelocityLogging(false);
 
             Visualizer::doSaveVideo(false);
@@ -1546,9 +1547,9 @@ void FIRM::sendFeedbackEdgesToViz()
         sourceVertex = i->first;
         edge = i->second;
         targetVertex = boost::target(edge, g_);
-
+        //OMPL_INFORM("FIRM: MLP from Vertex %u to %u", sourceVertex,targetVertex);
         Visualizer::addFeedbackEdge(stateProperty_[sourceVertex], stateProperty_[targetVertex], 0);
-  }
+    }
 
 }
 
@@ -1566,6 +1567,8 @@ void FIRM::sendMostLikelyPathToViz(const FIRM::Vertex start, const FIRM::Vertex 
 
         targetVertex = boost::target(edge, g_);
 
+        OMPL_INFORM("Most Likely Path from %u to %u", v, targetVertex);
+        
         Visualizer::addMostLikelyPathEdge(stateProperty_[v], stateProperty_[targetVertex]);
 
         v = targetVertex;
@@ -1606,6 +1609,7 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
             edgeToTake = e;
 
         }
+
 
     }
 

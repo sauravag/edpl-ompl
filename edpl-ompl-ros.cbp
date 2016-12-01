@@ -2,12 +2,12 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="FIRM-OMPL" />
+		<Option title="edpl-ompl-ros" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/FIRM-OMPL" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/edpl-ompl-ros" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -20,6 +20,7 @@
 					<Add directory="/usr/include/qt4/QtGui" />
 					<Add directory="/usr/include/qt4/Qt" />
 					<Add directory="/usr/include" />
+					<Add directory="/usr/local/include" />
 				</Compiler>
 				<Linker>
 					<Add library="/usr/lib/libboost_system.so" />
@@ -38,13 +39,22 @@
 					<Add library="/usr/local/lib/libompl_app_base.so" />
 					<Add library="/usr/lib/libboost_date_time.a" />
 					<Add library="/usr/lib/libboost_filesystem.a" />
+					<Add library="/opt/ros/indigo/lib/libtf.so" />
+					<Add library="/opt/ros/indigo/lib/libtf2_ros.so" />
+					<Add library="/opt/ros/indigo/lib/libroscpp.so" />
+					<Add library="/opt/ros/indigo/lib/librosconsole.so" />
+					<Add library="/opt/ros/indigo/lib/libtf2.so" />
+					<Add library="/opt/ros/indigo/lib/libroscpp_serialization.so" />
+					<Add library="/opt/ros/indigo/lib/libroslib.so" />
+					<Add library="/opt/ros/indigo/lib/librostime.so" />
+					<Add library="/opt/ros/indigo/lib/librospack.so" />
 					<Add directory="/usr/local/lib" />
 					<Add directory="/usr/lib/x86_64-linux-gnu" />
 					<Add directory="/usr/lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/FIRM-OMPL" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/edpl-ompl-ros" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -109,6 +119,7 @@
 		<Unit filename="src/Samplers/GaussianValidBeliefSampler.cpp" />
 		<Unit filename="src/Samplers/UniformValidBeliefSampler.cpp" />
 		<Unit filename="src/SeparatedControllers/RHCICreate.cpp" />
+		<Unit filename="src/SpaceInformation/ROSSpaceInformation.cpp" />
 		<Unit filename="src/SpaceInformation/SpaceInformation.cpp" />
 		<Unit filename="src/Spaces/SE2BeliefSpace.cpp" />
 		<Unit filename="src/Utils/FIRMUtils.cpp" />

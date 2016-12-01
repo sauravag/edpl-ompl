@@ -160,4 +160,3 @@ void SE2BeliefSpace::printBeliefState(const State *state)
     std::cout<<state->as<SE2BeliefSpace::StateType>()->getCovariance()<<std::endl;
     std::cout<<"------End BeliefState-------"<<std::endl;
 }
-
