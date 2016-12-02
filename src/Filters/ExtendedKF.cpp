@@ -34,7 +34,7 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#include "../../include/Filters/ExtendedKF.h"
+#include "Filters/ExtendedKF.h"
 #include "boost/date_time/local_time/local_time.hpp"
 
 const int ExtendedKF::covGrowthFactor_=1.01;

@@ -39,8 +39,8 @@
 
 using namespace std;
 
-#include "../../include/Visualization/GLWidget.h"
-#include "../../include/Visualization/Window.h"
+#include "Visualization/GLWidget.h"
+#include "Visualization/Window.h"
 
 //When given a list of polygons
 MyWindow::MyWindow()

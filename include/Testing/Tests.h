@@ -37,7 +37,7 @@
 #ifndef FIRM_OMPL_TESTS_
 #define FIRM_OMPL_TESTS_
 
-#include "FIRMOMPL.h"
+#include "edplompl.h"
 #include <tinyxml.h>
 
 

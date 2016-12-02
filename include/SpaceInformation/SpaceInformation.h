@@ -39,8 +39,8 @@
 
 
 #include "ompl/control/SpaceInformation.h"
-#include "../MotionModels/MotionModelMethod.h"
-#include "../ObservationModels/ObservationModelMethod.h"
+#include "MotionModels/MotionModelMethod.h"
+#include "ObservationModels/ObservationModelMethod.h"
 
 
 /**

@@ -36,11 +36,10 @@ References:
 5. ompl.kavrakilab.org : OMPL documentation and code
 
 ----------------------------------------
-Compilation
+Compiling & Running
 ----------------------------------------
-The application is shared as a codeblocks project. You can use codeblocks to
-directly compile the application. For ease of use, two codeblocks projects are provided one for OSX and another for Linux (tested on Ubuntu 14.04), 
-be sure to link to the correct libraries and set the include paths for your compiler build settings.
+
+A CMakeLists.txt file is provided for easy compilation with cmake.
 
 External Depencies: [All of these are hard requirements for this app to run]
 
@@ -51,6 +50,17 @@ External Depencies: [All of these are hard requirements for this app to run]
 3. Armadillo C++ Matrix Algebra Library: Recommended to download and build from source
 
 4. tinyxml: Needed for reading landmark/setup parameters
+
+5. Cmake and a C++ compiler (gcc etc.)
+
+Build:
+
+1. $mkdir build
+2. $cd build
+3. $cmake ..
+4. $make -j4
+
+Run: In project directory do $./bsp-app-demo
 
 ---------------------------------------
 How To Use This Application
@@ -69,7 +79,7 @@ space, then you would need to define a new belief space class. For example, if y
 How To Integrate With ROS
 ---------------------------------------
 
-Integration with a real robot through ROS or any other system, simply requires that during policy execution, the apply control and get observation commands are sent to the right "SpaceInformation". For example, we provide a ROSSpaceInformation class that is able to send twist messages. The example should be sufficient for you to get started with ROS development.
+Integration with a real robot through ROS or any other system, simply requires that during policy execution, the apply control and get observation commands are sent to the right "SpaceInformation". For example, we provide a ROSSpaceInformation class that is able to send twist messages. The example should be sufficient for you to get started with ROS development. You may need to update the CMakeLists accordingly.
 
 ---------------------------------------
 How To Contribute

@@ -38,8 +38,8 @@
 #define MULTI_MODAL_SETUP_H
 
 #include <omplapp/geometry/RigidBodyGeometry.h>
-#include "include/Planner/FIRM.h"
-#include "FIRMOMPL.h"
+#include "Planner/FIRM.h"
+#include "edplompl.h"
 
 #include <tinyxml.h>
 

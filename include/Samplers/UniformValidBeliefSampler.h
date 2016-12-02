@@ -39,7 +39,7 @@
 
 #include "ompl/base/ValidStateSampler.h"
 #include "ompl/base/StateSampler.h"
-#include "../SpaceInformation/SpaceInformation.h"
+#include "SpaceInformation/SpaceInformation.h"
 
 /*
 Samples states in the belief space uniformly.

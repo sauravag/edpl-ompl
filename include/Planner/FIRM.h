@@ -37,8 +37,6 @@
 #ifndef FIRM_PLANNER_
 #define FIRM_PLANNER_
 
-#include "ompl/geometric/planners/PlannerIncludes.h"
-#include "ompl/datastructures/NearestNeighbors.h"
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/pending/disjoint_sets.hpp>
@@ -49,15 +47,17 @@
 #include <utility>
 #include <vector>
 #include <map>
-#include "../Weight/FIRMWeight.h"
+#include "ompl/geometric/planners/PlannerIncludes.h"
+#include "ompl/datastructures/NearestNeighbors.h"
 #include "ompl/control/ControlSpace.h"
 #include "ompl/control/SpaceInformation.h"
-#include "../Controllers/Controller.h"
-#include "../SeparatedControllers/RHCICreate.h"
-#include "../Filters/ExtendedKF.h"
-#include "../Filters/LinearizedKF.h"
-#include "../Path/FeedbackPath.h"
-#include "../ConnectionStrategy/FStrategy.h"
+#include "Weight/FIRMWeight.h"
+#include "Controllers/Controller.h"
+#include "SeparatedControllers/RHCICreate.h"
+#include "Filters/ExtendedKF.h"
+#include "Filters/LinearizedKF.h"
+#include "Path/FeedbackPath.h"
+#include "ConnectionStrategy/FStrategy.h"
 #include "NBM3P.h"
 /**
    @anchor FIRM

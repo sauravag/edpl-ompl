@@ -34,8 +34,8 @@
 
 /* Authors: Saurav Agarwal */
 
-#include "../../include/SpaceInformation/SpaceInformation.h"
-#include "../../include/Visualization/Visualizer.h"
+#include "SpaceInformation/SpaceInformation.h"
+#include "Visualization/Visualizer.h"
 
 void firm::SpaceInformation::setBelief(const ompl::base::State *state)
 {

@@ -38,8 +38,8 @@
 #define SEPARATED_CONTROLLER_METHOD_
 
 
-#include "../MotionModels/MotionModelMethod.h"
-#include "../LinearSystem/LinearSystem.h"
+#include "MotionModels/MotionModelMethod.h"
+#include "LinearSystem/LinearSystem.h"
 #include "ompl/control/Control.h"
 
 class SeparatedControllerMethod

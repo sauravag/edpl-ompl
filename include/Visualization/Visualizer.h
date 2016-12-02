@@ -48,8 +48,8 @@
 #include <list>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
-#include "../Spaces/SE2BeliefSpace.h"
-#include "../SpaceInformation/SpaceInformation.h"
+#include "Spaces/SE2BeliefSpace.h"
+#include "SpaceInformation/SpaceInformation.h"
 #include <omplapp/graphics/RenderGeometry.h>
 
 class Visualizer

@@ -34,14 +34,15 @@
 
 /* Author: Saurav Agarwal */
 
-#include "../../include/Planner/NBM3P.h"
-#include <boost/thread.hpp>
-#include "../../include/Visualization/Visualizer.h"
-#include "../../include/Utils/FIRMUtils.h"
-#include <boost/foreach.hpp>
-#include "../../include/ObservationModels/CamAruco2DObservationModel.h"
-#include "../../include/LinearSystem/LinearSystem.h"
 #include <numeric>
+#include <boost/thread.hpp>
+#include <boost/foreach.hpp>
+#include "Planner/NBM3P.h"
+#include "Visualization/Visualizer.h"
+#include "Utils/FIRMUtils.h"
+#include "ObservationModels/CamAruco2DObservationModel.h"
+#include "LinearSystem/LinearSystem.h"
+
 
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH

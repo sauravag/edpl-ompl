@@ -39,9 +39,9 @@
 
 #include "ompl/base/OptimizationObjective.h"
 #include "ompl/control/SpaceInformation.h"
-#include "../Controllers/Controller.h"
-#include "../SeparatedControllers/RHCICreate.h"
-#include "../Filters/ExtendedKF.h"
+#include "Controllers/Controller.h"
+#include "SeparatedControllers/RHCICreate.h"
+#include "Filters/ExtendedKF.h"
 
 /**
 The cost to execute an edge i.e. going from some node A to some node B

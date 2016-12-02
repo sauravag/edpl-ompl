@@ -37,10 +37,10 @@
 #define FIRM_FEEDBACK_PATH_
 
 #include "ompl/base/Path.h"
-#include "../SpaceInformation/SpaceInformation.h"
-#include "../Controllers/Controller.h"
-#include "../SeparatedControllers/RHCICreate.h"
-#include "../Filters/ExtendedKF.h"
+#include "SpaceInformation/SpaceInformation.h"
+#include "Controllers/Controller.h"
+#include "SeparatedControllers/RHCICreate.h"
+#include "Filters/ExtendedKF.h"
 
 class FeedbackPath : public ompl::base::Path
 {

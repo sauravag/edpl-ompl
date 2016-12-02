@@ -34,7 +34,7 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#include "../../include/Filters/LinearizedKF.h"
+#include "Filters/LinearizedKF.h"
 
 void LinearizedKF::Predict(const ompl::base::State *belief,
   const ompl::control::Control* control, const LinearSystem& ls, ompl::base::State *predictedState)

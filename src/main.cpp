@@ -40,21 +40,23 @@
 //      Over there, uncomment #define USE_ROS to allow ROS dependent files to compiled.
 ///////////////////////////////////////////////////////////////////////////////////////
 
-#include "FIRM2DSetup.h"
-
-#ifdef USE_ROS
-    #include "FIRMAruco2DROSSetup.h"
-#endif
-
-#include "MultiModalSetup.h"
-#include "Tests.h"
 #include <QApplication>
 #include <QtGui/QDesktopWidget>
-#include "include/Visualization/Window.h"
-#include "include/Visualization/Visualizer.h"
 #include <boost/thread.hpp>
 #include <iostream>
 #include <istream>
+
+#include "Setup/FIRM2DSetup.h"
+
+#ifdef USE_ROS
+    #include "Setup/FIRMAruco2DROSSetup.h"
+#endif
+
+#include "Setup/MultiModalSetup.h"
+//#include "Testing/Tests.h"
+#include "Visualization/Window.h"
+#include "Visualization/Visualizer.h"
+
 
 using namespace std;
 

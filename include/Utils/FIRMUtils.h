@@ -35,8 +35,8 @@
 #ifndef FIRM_UTILS_H
 #define FIRM_UTILS_H
 
-#include "../Weight/FIRMWeight.h"
-#include "../Spaces/SE2BeliefSpace.h"
+#include "Weight/FIRMWeight.h"
+#include "Spaces/SE2BeliefSpace.h"
 
 /** \brief A class containing utility functions used commonly*/
 class FIRMUtils

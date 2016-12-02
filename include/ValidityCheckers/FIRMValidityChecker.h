@@ -35,7 +35,7 @@
 /* Authors: Saurav Agarwal */
 
 
-#include "../ObservationModels/ObservationModelMethod.h"
+#include "ObservationModels/ObservationModelMethod.h"
 /*
 Used to check if a state is in collission or not moreover,
 in FIRM we need to know if a state is observable or not

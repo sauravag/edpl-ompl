@@ -34,7 +34,7 @@
 
 /* Authors: Saurav Agarwal */
 
-#include "../../include/Spaces/SE2BeliefSpace.h"
+#include "Spaces/SE2BeliefSpace.h"
 
 double SE2BeliefSpace::StateType::meanNormWeight_  = -1;
 double SE2BeliefSpace::StateType::covNormWeight_   = -1;

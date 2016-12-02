@@ -33,7 +33,7 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
-#include "../../include/SeparatedControllers/RHCICreate.h"
+#include "SeparatedControllers/RHCICreate.h"
 
 int RHCICreate::controlQueueSize_ = -1;
 

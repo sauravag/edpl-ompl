@@ -34,7 +34,7 @@
 
 /* Authors: Aditya Mahadevan, Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#include "../../include/Visualization/Visualizer.h"
+#include "Visualization/Visualizer.h"
 
 boost::mutex Visualizer::drawMutex_;
 

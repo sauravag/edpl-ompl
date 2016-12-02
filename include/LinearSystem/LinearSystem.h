@@ -36,11 +36,11 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#include "../MotionModels/MotionModelMethod.h"
-#include "../ObservationModels/ObservationModelMethod.h"
+#include "MotionModels/MotionModelMethod.h"
+#include "ObservationModels/ObservationModelMethod.h"
 #include <ompl/base/SpaceInformation.h>
 #include "armadillo"
-#include "../SpaceInformation/SpaceInformation.h"
+#include "SpaceInformation/SpaceInformation.h"
 
 /**
     @par Description of the Linear System Class

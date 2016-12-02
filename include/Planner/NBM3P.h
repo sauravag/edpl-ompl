@@ -45,9 +45,9 @@
 #include <boost/thread.hpp>
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/control/Control.h>
-#include "../SpaceInformation/SpaceInformation.h"
 #include <ompl/base/Cost.h>
-#include "../Filters/ExtendedKF.h"
+#include "SpaceInformation/SpaceInformation.h"
+#include "Filters/ExtendedKF.h"
 
 /** \para
 NBM3P is a planner for Non-Gaussian Belief State. Stated simply, its job is to generate the best next control to disambiguate the belief

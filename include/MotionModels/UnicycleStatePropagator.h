@@ -36,7 +36,7 @@
 #ifndef UNICYCLE_STATE_PROPAGATOR_
 #define UNICYCLE_STATE_PROPAGATOR_
 
-#include "../SpaceInformation/SpaceInformation.h"
+#include "SpaceInformation/SpaceInformation.h"
 #include "UnicycleMotionModel.h"
 
 /** \brief State propagation for a unicycle motion model.

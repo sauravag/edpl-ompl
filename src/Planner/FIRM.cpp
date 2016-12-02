@@ -33,7 +33,6 @@
 *********************************************************************/
 /* Author: Ali-akbar Agha-mohammadi, Saurav Agarwal */
 
-#include "../../include/Planner/FIRM.h"
 #include "ompl/geometric/planners/prm/PRM.h"
 #include "ompl/geometric/planners/prm/ConnectionStrategy.h"
 #include "ompl/base/goals/GoalSampleableRegion.h"
@@ -47,8 +46,9 @@
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
-#include "../../include/Visualization/Visualizer.h"
-#include "../../include/Utils/FIRMUtils.h"
+#include "Visualization/Visualizer.h"
+#include "Utils/FIRMUtils.h"
+#include "Planner/FIRM.h"
 
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH

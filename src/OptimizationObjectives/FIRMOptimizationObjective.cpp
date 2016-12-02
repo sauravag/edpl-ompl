@@ -34,7 +34,7 @@
 
 /* Authors: Saurav Agarwal */
 
-#include "../../include/OptimizationObjectives/FIRMOptimizationObjective.h"
+#include "OptimizationObjectives/FIRMOptimizationObjective.h"
 
 ompl::base::Cost FIRMOptimizationObjective::motionCost(const ompl::base::State *s1, const ompl::base::State *s2)
 {

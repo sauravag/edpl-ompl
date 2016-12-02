@@ -50,7 +50,7 @@ using namespace std;
 
 #include "GL/glu.h"
 
-#include "../../include/Visualization/GLWidget.h"
+#include "Visualization/GLWidget.h"
 
 GLWidget::GLWidget(QWidget *parent)
   : QGLWidget(QGLFormat(QGL::SampleBuffers), parent),

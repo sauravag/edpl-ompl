@@ -38,8 +38,8 @@
 #define FIRM_2D_SETUP_H
 
 #include <omplapp/geometry/RigidBodyGeometry.h>
-#include "include/Planner/FIRM.h"
-#include "FIRMOMPL.h"
+#include "Planner/FIRM.h"
+#include "edplompl.h"
 #include <tinyxml.h>
 
 /** \brief Wrapper for ompl::app::RigidBodyPlanning that plans for rigid bodies in SE2BeliefSpace using FIRM */

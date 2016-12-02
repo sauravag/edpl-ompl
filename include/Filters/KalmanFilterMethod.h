@@ -37,11 +37,11 @@
 #ifndef KALMAN_FILTER_METHOD_
 #define KALMAN_FILTER_METHOD_
 
-#include "../MotionModels/MotionModelMethod.h"
-#include "../ObservationModels/ObservationModelMethod.h"
-#include "../LinearSystem/LinearSystem.h"
+#include "MotionModels/MotionModelMethod.h"
+#include "ObservationModels/ObservationModelMethod.h"
+#include "LinearSystem/LinearSystem.h"
 #include "dare.h"
-#include "../SpaceInformation/SpaceInformation.h"
+#include "SpaceInformation/SpaceInformation.h"
 
 
 /** \brief  The base class for Kalman filter implementations.*/

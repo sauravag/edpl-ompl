@@ -36,9 +36,9 @@
 
 
 #include <tinyxml.h>
-#include "../../include/Spaces/SE2BeliefSpace.h"
-#include "../../include/MotionModels/UnicycleMotionModel.h"
-#include "../../include/Utils/FIRMUtils.h"
+#include "Spaces/SE2BeliefSpace.h"
+#include "MotionModels/UnicycleMotionModel.h"
+#include "Utils/FIRMUtils.h"
 
 //Produce the next state, given the current state, a control and a noise
 void UnicycleMotionModel::Evolve(const ompl::base::State *state, const ompl::control::Control *control, const NoiseType& w, ompl::base::State *result)

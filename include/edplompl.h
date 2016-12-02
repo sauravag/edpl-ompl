@@ -49,58 +49,58 @@
 #include <ompl/base/DiscreteMotionValidator.h>
 
 //Spaces
-#include "include/Spaces/SE2BeliefSpace.h"
-#include "include/SpaceInformation/SpaceInformation.h"
+#include "Spaces/SE2BeliefSpace.h"
+#include "SpaceInformation/SpaceInformation.h"
 
 #ifdef USE_ROS
-    #include "include/SpaceInformation/ROSSpaceInformation.h"
+    #include "SpaceInformation/ROSSpaceInformation.h"
 #endif
 
 //Observation Models
-#include "include/ObservationModels/ObservationModelMethod.h"
-#include "include/ObservationModels/CamAruco2DObservationModel.h"
+#include "ObservationModels/ObservationModelMethod.h"
+#include "ObservationModels/CamAruco2DObservationModel.h"
 
 //Motion Models
-#include "include/MotionModels/MotionModelMethod.h"
-#include "include/MotionModels/UnicycleMotionModel.h"
-#include "include/MotionModels/OmnidirectionalMotionModel.h"
+#include "MotionModels/MotionModelMethod.h"
+#include "MotionModels/UnicycleMotionModel.h"
+#include "MotionModels/OmnidirectionalMotionModel.h"
 
 //State Propagators
-#include "include/MotionModels/UnicycleStatePropagator.h"
+#include "MotionModels/UnicycleStatePropagator.h"
 
 //LinearSystem
-#include "include/LinearSystem/LinearSystem.h"
+#include "LinearSystem/LinearSystem.h"
 
 //Filters
-#include "include/Filters/dare.h"
-#include "include/Filters/KalmanFilterMethod.h"
-#include "include/Filters/ExtendedKF.h"
+#include "Filters/dare.h"
+#include "Filters/KalmanFilterMethod.h"
+#include "Filters/ExtendedKF.h"
 
 //Separated Controllers
-#include "include/SeparatedControllers/SeparatedControllerMethod.h"
-#include "include/SeparatedControllers/RHCICreate.h"
+#include "SeparatedControllers/SeparatedControllerMethod.h"
+#include "SeparatedControllers/RHCICreate.h"
 
 
 //Controllers
-#include "include/Controllers/Controller.h"
+#include "Controllers/Controller.h"
 
 // Samplers
-#include "include/Samplers/GaussianValidBeliefSampler.h"
-#include "include/Samplers/UniformValidBeliefSampler.h"
+#include "Samplers/GaussianValidBeliefSampler.h"
+#include "Samplers/UniformValidBeliefSampler.h"
 
 // Validity checkers
-#include "include/ValidityCheckers/FIRMValidityChecker.h"
+#include "ValidityCheckers/FIRMValidityChecker.h"
 
 //Multi-Modal
-#include "include/Planner/NBM3P.h"
+#include "Planner/NBM3P.h"
 
 // FIRM Optimization Objective
-//#include "include/OptimizationObjectives/FIRMOptimizationObjective.h"
+//#include "OptimizationObjectives/FIRMOptimizationObjective.h"
 
-//#include "include/Spaces/ICreateControlSampler.h"
+//#include "Spaces/ICreateControlSampler.h"
 
 // Utilities
-#include "include/Utils/FIRMUtils.h"
+#include "Utils/FIRMUtils.h"
 
 // ROS
 #ifdef USE_ROS

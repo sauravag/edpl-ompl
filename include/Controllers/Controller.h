@@ -37,11 +37,11 @@
 #ifndef CONTROLLER_
 #define CONTROLLER_
 
-#include "../SeparatedControllers/SeparatedControllerMethod.h"
-#include "../Filters/KalmanFilterMethod.h"
-#include "../MotionModels/MotionModelMethod.h"
-#include "../ObservationModels/ObservationModelMethod.h"
-#include "../SpaceInformation/SpaceInformation.h"
+#include "SeparatedControllers/SeparatedControllerMethod.h"
+#include "Filters/KalmanFilterMethod.h"
+#include "MotionModels/MotionModelMethod.h"
+#include "ObservationModels/ObservationModelMethod.h"
+#include "SpaceInformation/SpaceInformation.h"
 #include "ompl/base/Cost.h"
 #include "boost/date_time/local_time/local_time.hpp"
 #include <boost/thread.hpp>

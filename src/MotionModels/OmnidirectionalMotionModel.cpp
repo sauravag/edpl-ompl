@@ -36,9 +36,9 @@
 
 
 #include <tinyxml.h>
-#include "../../include/Spaces/SE2BeliefSpace.h"
-#include "../../include/MotionModels/OmnidirectionalMotionModel.h"
-#include "../../include/Utils/FIRMUtils.h"
+#include "Spaces/SE2BeliefSpace.h"
+#include "MotionModels/OmnidirectionalMotionModel.h"
+#include "Utils/FIRMUtils.h"
 #include<cassert>
 
 //Produce the next state, given the current state, a control and a noise

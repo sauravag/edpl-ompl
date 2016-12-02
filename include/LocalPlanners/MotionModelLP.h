@@ -36,7 +36,7 @@
 #ifndef MOTIONMODEL_LOCAL_PLANNER_
 #define MOTIONMODEL_LOCAL_PLANNER_
 
-#include "../../include/MotionModels/MotionModelMethod.h"
+#include "MotionModels/MotionModelMethod.h"
 
 
 

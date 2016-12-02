@@ -34,8 +34,8 @@
 
 /* Authors: Saurav Agarwal */
 
-#include "../../include/SpaceInformation/ROSSpaceInformation.h"
-#include "../../include/ObservationModels/CamAruco2DObservationModel.h"
+#include "SpaceInformation/ROSSpaceInformation.h"
+#include "ObservationModels/CamAruco2DObservationModel.h"
 
 void firm::ROSSpaceInformation::arucoListenerCallback(const aruco_msgs::MarkerArray &msg)
 {

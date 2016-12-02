@@ -38,7 +38,7 @@
 #define MOTIONMODELMETHOD_
 
 #include <armadillo>
-#include "../Spaces/SE2BeliefSpace.h"
+#include "Spaces/SE2BeliefSpace.h"
 #include <ompl/control/Control.h>
 #include <ompl/control/spaces/RealVectorControlSpace.h>
 #include <ompl/control/SpaceInformation.h>

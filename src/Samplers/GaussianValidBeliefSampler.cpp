@@ -34,11 +34,11 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#include "../../include/Samplers/GaussianValidBeliefSampler.h"
 #include "ompl/base/SpaceInformation.h"
 #include "ompl/tools/config/MagicConstants.h"
-#include "../../include/Filters/dare.h"
-#include "../../include/LinearSystem/LinearSystem.h"
+#include "Samplers/GaussianValidBeliefSampler.h"
+#include "Filters/dare.h"
+#include "LinearSystem/LinearSystem.h"
 
 GaussianValidBeliefSampler::GaussianValidBeliefSampler(const ompl::base::SpaceInformation *si) :
     ValidStateSampler(si), sampler_(si->allocStateSampler()), stddev_(si->getMaximumExtent() * ompl::magic::STD_DEV_AS_SPACE_EXTENT_FRACTION)
