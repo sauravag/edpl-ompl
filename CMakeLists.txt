@@ -31,6 +31,12 @@ find_package(TINYXML REQUIRED)
 
 set(QT_USE_QTOPENGL true)
 
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   # Mac OS X specific code
+   SET(QT_QMAKE_EXECUTABLE /opt/local/libexec/qt4/bin/qmake)
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+
 # here we specify the additional include directories for the project. These files come in additional include directories option of VC++
 # project.
 # either the variable values from package like ${PCL_INCLUDE_DIRS} or absolute paths as shown in second and third line may be used.
