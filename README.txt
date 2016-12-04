@@ -43,7 +43,7 @@ A CMakeLists.txt file is provided for easy compilation with cmake.
 
 External Depencies: [All of these are hard requirements for this app to run]
 
-1. Open Motion Planning Library (OMPL v1.2.1): Excellent instructions provided on the ompl website [http://ompl.kavrakilab.org/] for installation. Follow the instructions to build and install the full omplapp and QT will automatically be installed as part of that.  
+1. Open Motion Planning Library (OMPL v1.2.1 minimum): Excellent instructions provided on the ompl website [http://ompl.kavrakilab.org/] for installation. Follow the instructions to build and install the full omplapp and QT will automatically be installed as part of that.  
  
 2. QT4 & OpenGL (freeglut): For Visualization (Ubuntu: sudo apt-get install freeglut3-dev libqt4-dev)
 

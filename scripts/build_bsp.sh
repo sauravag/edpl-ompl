@@ -1,4 +1,5 @@
 #!/bin/bash
+# run this script from project main directory
 
 rm -rf build/
 mkdir build
