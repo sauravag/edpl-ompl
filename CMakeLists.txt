@@ -129,6 +129,7 @@ add_executable (bsp-app-demo src/main.cpp)
 
 target_link_libraries (bsp-app-demo
 	bsp_lib
+	${OMPLAPP_LIBRARY}
 	${OMPLAPPBASE_LIBRARY}
 )
 
