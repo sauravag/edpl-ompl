@@ -34,7 +34,6 @@ set(QT_USE_QTOPENGL true)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
-   set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /opt/local/lib)
    SET(QT_QMAKE_EXECUTABLE /opt/local/libexec/qt4/bin/qmake)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
