@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
+
 if(${CMAKE_VERSION} VERSION_GREATER 2.8.3)
     cmake_policy(SET CMP0017 NEW)
 endif()
@@ -18,7 +19,7 @@ message(STATUS "Building ${CMAKE_BUILD_TYPE}")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
-SET(CMAKE_CXX_FLAGS "-std=c++0x")
+SET(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/usr/share/cmake-2.8/Modules/" "${PROJECT_SOURCE_DIR}/CMakeModules/")
 # reqd packages
 find_package(Boost QUIET 1.50)
@@ -33,6 +34,7 @@ set(QT_USE_QTOPENGL true)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
+   set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /opt/local/lib)
    SET(QT_QMAKE_EXECUTABLE /opt/local/libexec/qt4/bin/qmake)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
@@ -71,9 +73,7 @@ link_directories(${Boost_LIBRARY_DIRS}
 # To do ros based stuff, add catkinized cmake directives
 # to turn it into a ros node and compile for example
 # M3PROSDemo.cpp as executable instead of main.
-add_library (bsp_lib
-	src/Filters/ExtendedKF.cpp
-	src/Filters/LinearizedKF.cpp
+add_library (bsp_lib	
 	src/MotionModels/OmnidirectionalMotionModel.cpp
 	src/MotionModels/UnicycleMotionModel.cpp
 	src/MotionModels/UnicycleStatePropagator.cpp
@@ -92,6 +92,8 @@ add_library (bsp_lib
 	src/Visualization/Window.cpp
 	src/Visualization/moc_GLWidget.cpp
 	src/Visualization/moc_Window.cpp
+	src/Filters/ExtendedKF.cpp
+	src/Filters/LinearizedKF.cpp
 )
 
 target_link_libraries (bsp_lib
@@ -103,15 +105,14 @@ target_link_libraries (bsp_lib
 	${ARMADILLO_LIBRARIES}
 	libompl.so
 	libompl_app.so
-	libompl_app_base.so
 	# You may add ROS dependencies like this
 	#/opt/ros/<VERSION>/lib/libroslib.so
 )
-
 
 # Add the main as executable
 add_executable (bsp-app-demo src/main.cpp)
 
 target_link_libraries (bsp-app-demo 
 	bsp_lib
+	libompl_app_base.so
 )

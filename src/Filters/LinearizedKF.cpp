@@ -135,7 +135,7 @@ arma::mat LinearizedKF::computeStationaryCovariance (const LinearSystem& ls)
     //makes this symmetric
     Pprd = (Pprd + trans(Pprd)) / 2;
 
-    mat Pest = Pprd - ( Pprd * H.t()) * inv( H*Pprd*H.t() + M * R * M.t(), true) * trans(Pprd * H.t()) ;
+    mat Pest = Pprd - ( Pprd * H.t()) * inv( H*Pprd*H.t() + M * R * M.t()) * trans(Pprd * H.t()) ;
 
     //makes this symmetric
     Pest = (Pest + trans(Pest)) / 2;

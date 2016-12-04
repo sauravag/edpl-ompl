@@ -43,7 +43,7 @@ public:
 
     /** \brief Constructor takes the maximum number of nearest neighbors to return (\e k) and the
         nearest neighbors datastruture to use (\e nn) */
-    FStrategy(double r, const boost::shared_ptr< ompl::NearestNeighbors<Milestone> > &nn) :
+    FStrategy(double r, const std::shared_ptr< ompl::NearestNeighbors<Milestone> > &nn) :
         radius_(r), nn_(nn){}
 
     virtual ~FStrategy(void)
@@ -51,7 +51,7 @@ public:
     }
 
     /** \brief Set the nearest neighbors datastructure to use */
-    void setNearestNeighbors(const boost::shared_ptr< ompl::NearestNeighbors<Milestone> > &nn)
+    void setNearestNeighbors(const std::shared_ptr< ompl::NearestNeighbors<Milestone> > &nn)
     {
         nn_ = nn;
     }
@@ -71,7 +71,7 @@ protected:
     double                                     radius_;
 
     /** \brief Nearest neighbors data structure */
-    boost::shared_ptr< ompl::NearestNeighbors<Milestone> > nn_;
+    std::shared_ptr< ompl::NearestNeighbors<Milestone> > nn_;
 
     /** \brief Scratch space for storing k-nearest neighbors */
     std::vector<Milestone>                           neighbors_;

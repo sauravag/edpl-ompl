@@ -59,7 +59,7 @@ class MotionModelMethod
         typedef SE2BeliefSpace SpaceType;
 		typedef SpaceType::StateType StateType;
 		typedef arma::mat     JacobianType;
-        typedef boost::shared_ptr<MotionModelMethod> MotionModelPointer;
+        typedef std::shared_ptr<MotionModelMethod> MotionModelPointer;
 
         /** \brief Constructor */
 		MotionModelMethod(const ompl::control::SpaceInformationPtr si, int nDim=0):

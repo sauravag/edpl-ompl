@@ -55,7 +55,7 @@ class ObservationModelMethod
         typedef arma::colvec NoiseType;
         typedef arma::mat ObsToStateJacobianType;
         typedef arma::mat ObsToNoiseJacobianType;
-        typedef boost::shared_ptr<ObservationModelMethod> ObservationModelPointer;
+        typedef std::shared_ptr<ObservationModelMethod> ObservationModelPointer;
 
         /** \brief Constructor. */
         ObservationModelMethod(ompl::control::SpaceInformationPtr si,int nDim=0) : si_(si), noiseDim_(nDim), zeroNoise_(nDim) {}

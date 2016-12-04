@@ -59,7 +59,7 @@ namespace firm
             typedef typename ObservationModelMethod::ObservationType ObservationType;
             typedef MotionModelMethod::MotionModelPointer MotionModelPointer;
             typedef ObservationModelMethod::ObservationModelPointer ObservationModelPointer;
-            typedef boost::shared_ptr<SpaceInformation> SpaceInformationPtr;
+            typedef std::shared_ptr<SpaceInformation> SpaceInformationPtr;
 
             SpaceInformation(const ompl::base::StateSpacePtr &stateSpace,
                                 const ompl::control::ControlSpacePtr &controlSpace) :

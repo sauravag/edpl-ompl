@@ -76,19 +76,18 @@ inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, 
     Z.submat( span(n,2*n-1),  span(n,2*n-1) ) = Z22;
 
     //data structures to store result of generalized eigenvalue computation
-    cx_vec eigval(2*n);
-    cx_mat eigvec;
-    int n_Z = Z.n_rows;
-    mat VL(n_Z, n_Z);
-    mat VR(n_Z, n_Z);
-
+    cx_vec eigval;
+    cx_mat VR;
+    
     //solution to generalized eigenvalue problem
     //internally, calls Fortran's "geev" function
-    eig_gen(eigval, VL, VR, Z);
+    eig_gen(eigval,VR,Z); // by default eig_gen returns right eigen vector
 
-    mat U11(n,n);
-    mat U21(n,n);
-    mat tempZ(n_Z, n);
+    int n_Z = Z.n_rows;
+
+    cx_mat U11(n,n);
+    cx_mat U21(n,n);
+    cx_mat tempZ(n_Z, n);
 
     int c1=0;
     for(int i = 0; i < n_Z; ++i)
@@ -113,7 +112,7 @@ inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, 
     U11 = tempZ.submat(span(0,n-1), span(0,n-1));
     U21 = tempZ.submat(span(n,n_Z-1), span(0,n-1));
 
-    S = U21 * inv(U11);
+    S = real(U21 * inv(U11));
 
     return true; // dare solved successfuly
 }

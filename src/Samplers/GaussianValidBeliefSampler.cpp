@@ -45,8 +45,8 @@ GaussianValidBeliefSampler::GaussianValidBeliefSampler(const ompl::base::SpaceIn
 {
     name_ = "gaussian";
     params_.declareParam<double>("standard_deviation",
-                                 boost::bind(&GaussianValidBeliefSampler::setStdDev, this, _1),
-                                 boost::bind(&GaussianValidBeliefSampler::getStdDev, this));
+                                 std::bind(&GaussianValidBeliefSampler::setStdDev, this, std::placeholders::_1),
+                                 std::bind(&GaussianValidBeliefSampler::getStdDev, this));
 }
 
 bool GaussianValidBeliefSampler::sample(ompl::base::State *state)

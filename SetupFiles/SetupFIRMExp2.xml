@@ -234,7 +234,7 @@
 	<StartPose
 		x = "1.2"
 		y = "14.0"
-		theta = "0"
+		theta = "0.0"
 	/>
 	<PlanningTime
 		maxTime = "600"

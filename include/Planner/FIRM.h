@@ -130,12 +130,12 @@ public:
     typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
     typedef boost::graph_traits<Graph>::edge_descriptor   Edge;
 
-    typedef boost::shared_ptr< ompl::NearestNeighbors<Vertex> > RoadmapNeighbors;
+    typedef std::shared_ptr< ompl::NearestNeighbors<Vertex> > RoadmapNeighbors;
 
     /** @brief A function returning the milestones that should be
      *         attempted to connect to
      */
-    typedef boost::function<std::vector<Vertex>&(const Vertex)> ConnectionStrategy;
+    typedef std::function<std::vector<Vertex>&(const Vertex)> ConnectionStrategy;
 
     /** Defining the edge and node controller types*/
     typedef Controller<RHCICreate, ExtendedKF> EdgeControllerType;
@@ -210,8 +210,10 @@ public:
     void setNearestNeighbors(void)
     {
         nn_.reset(new NN<Vertex>());
-        if (!userSetConnectionStrategy_)
-            connectionStrategy_.clear();
+        
+        //if (!userSetConnectionStrategy_)
+            //connectionStrategy_.clear();
+        
         if (isSetup())
             setup();
     }
@@ -457,7 +459,7 @@ protected:
 
         std::string timeStamp(to_iso_string(now)) ;
 
-        std::string folderPath = "/home/sauravagarwal/Dropbox/SLAP_Rollout_FIRM/DATA-Sims/TRO-Sims-Latest/DifferentGraph/125Nodes/Rollout/RunData-" + timeStamp ;
+        std::string folderPath = "/home/saurav/TMP/RunData-" + timeStamp ;
 
         boost::filesystem::path dir(folderPath);
 

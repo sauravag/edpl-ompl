@@ -78,11 +78,11 @@ public:
         // set the bounds for the R^3 part of SE(3)
         ompl::base::RealVectorBounds bounds(2);
         // set X bound
-        bounds.setLow(0,0.2);
-        bounds.setHigh(0,16.8);
+        bounds.setLow(0,0.5);
+        bounds.setHigh(0,19.3);
         //set Y bound
-        bounds.setLow(1,0.2);
-        bounds.setHigh(1,6.8);
+        bounds.setLow(1,0.5);
+        bounds.setHigh(1,19.3);
         ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space

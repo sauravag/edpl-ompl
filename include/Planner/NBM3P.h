@@ -89,7 +89,7 @@ class NBM3P
 
         typedef boost::graph_traits<Graph>::edge_descriptor   Edge;
 
-        typedef boost::shared_ptr< ompl::NearestNeighbors<Vertex> > RoadmapNeighbors;
+        typedef std::shared_ptr< ompl::NearestNeighbors<Vertex> > RoadmapNeighbors;
 
         /** \brief Constructor */
         NBM3P(firm::SpaceInformation::SpaceInformationPtr si):si_(si),

@@ -164,7 +164,7 @@ void FIRM::setup(void)
     Planner::setup();
     if (!nn_)
     {
-        nn_.reset(ompl::tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(si_->getStateSpace()));
+        nn_.reset(ompl::tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
         nn_->setDistanceFunction(boost::bind(&FIRM::distanceFunction, this, _1, _2));
     }
     if (!connectionStrategy_)
@@ -183,12 +183,13 @@ void FIRM::setMaxNearestNeighbors(unsigned int k)
 {
     if (!nn_)
     {
-        nn_.reset(ompl::tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(si_->getStateSpace()));
+        nn_.reset(ompl::tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
         nn_->setDistanceFunction(boost::bind(&FIRM::distanceFunction, this, _1, _2));
     }
 
-    if (!userSetConnectionStrategy_)
-        connectionStrategy_.clear();
+    //if (!userSetConnectionStrategy_)
+        //connectionStrategy_.clear();
+    
     if (isSetup())
         setup();
 
