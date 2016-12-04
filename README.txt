@@ -16,6 +16,42 @@ Brief:
 This application is an implementation of Feedback Information Road Maps (FIRM) and the Node-Based Multi-Modal Motion Planner (NBM3P) planners with OMPL. FIRM is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic roadmap. FIRM relies on a Gaussian representation of the belief state. We also provide a new planner NBM3P, that enables planning in Non-Gaussian belief spaces. Such a planner is particularly useful if your system has a multi-modal hypothesis about its state. Such a situation could arise from ambigious data-association where the robot sees some information which makes it believe that it could be in one of multiple places (ex. A laser scanner can get confused by geometrically identical rooms in a building).
 
 ----------------------------------------
+Compiling & Running
+----------------------------------------
+
+Quick Instructions: 
+
+From the folder containing this readme
+ 1. $chmod +x scripts/build_bsp.sh
+ 2. $./scripts/build_bsp.sh
+ 3. $./bsp-app-demo
+
+Details:
+
+A CMakeLists.txt file is provided for easy compilation with cmake.
+
+External Depencies: [All of these are hard requirements]
+
+1. Open Motion Planning Library (OMPL v1.2.1 minimum): Excellent instructions provided on the ompl website [http://ompl.kavrakilab.org/] for installation. Follow the instructions to build and install the full omplapp and QT will automatically be installed as part of that.  
+ 
+2. QT4 & OpenGL (freeglut): For Visualization (Ubuntu: sudo apt-get install freeglut3-dev libqt4-dev)
+
+3. Armadillo C++ (version 7.5) Matrix Algebra Library: Recommended to download and build from source (http://arma.sourceforge.net/download.html)
+
+4. tinyxml: Needed for reading landmark/setup parameters (Ubuntu: sudo apt-get install libtinyxml-dev)
+
+5. Cmake and a C++ compiler (Use GNU 5.4.1 which is tested or newer GNU versions, GNU 4.X.X will not work!)
+
+Build:
+
+1. $mkdir build
+2. $cd build
+3. $cmake ..
+4. $make -j4
+
+Run: In project directory do $./bsp-app-demo
+
+----------------------------------------
 FAQs, Tips, How To etc. 
 ----------------------------------------
 Please visit my webpage which answers most common questions about this library.
@@ -34,33 +70,6 @@ References:
 4. http://edplab.org :  Estimation, Decision and Planning Lab Webpage (publications, related work, videos)
 
 5. http://ompl.kavrakilab.org : OMPL documentation and code
-
-----------------------------------------
-Compiling & Running
-----------------------------------------
-
-A CMakeLists.txt file is provided for easy compilation with cmake.
-
-External Depencies: [All of these are hard requirements for this app to run]
-
-1. Open Motion Planning Library (OMPL v1.2.1 minimum): Excellent instructions provided on the ompl website [http://ompl.kavrakilab.org/] for installation. Follow the instructions to build and install the full omplapp and QT will automatically be installed as part of that.  
- 
-2. QT4 & OpenGL (freeglut): For Visualization (Ubuntu: sudo apt-get install freeglut3-dev libqt4-dev)
-
-3. Armadillo C++ (version 7.5) Matrix Algebra Library: Recommended to download and build from source (http://arma.sourceforge.net/download.html)
-
-4. tinyxml: Needed for reading landmark/setup parameters (Ubuntu: sudo apt-get install libtinyxml-dev)
-
-5. Cmake and a C++ compiler (Tested GNU 5.4.1 use this or newer GNU versions, GNU 4.8 won't work)
-
-Build:
-
-1. $mkdir build
-2. $cd build
-3. $cmake ..
-4. $make -j4
-
-Run: In project directory do $./bsp-app-demo
 
 ---------------------------------------
 How To Use This Application
