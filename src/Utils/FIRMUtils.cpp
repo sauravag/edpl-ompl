@@ -35,6 +35,8 @@
 
 #include "Utils/FIRMUtils.h"
 #include <boost/math/constants/constants.hpp>
+#include <boost/date_time.hpp>
+#include <utility>
 #include <random>
 #include <tinyxml.h>
 
@@ -137,12 +139,21 @@ void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<ar
 
    }
 
-	doc.SaveFile( "FIRMRoadMap.xml" );
+   // Generate time stamp for saving roadmap
+    namespace pt = boost::posix_time;
+
+    pt::ptime now = pt::second_clock::local_time();
+
+    std::string timeStamp(to_iso_string(now)) ;
+
+    std::string roadmapFileName =  "FIRMRoadMap.xml" + timeStamp ;
+
+	doc.SaveFile(roadmapFileName);
 }
 
 bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<std::pair<int, arma::colvec> > &FIRMNodePosList, std::vector<std::pair<int, arma::mat> > &FIRMNodeCovarianceList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights)
 {
-    //std::string pathToXML = "/home/sauravagarwal/Research/Development/FIRM-OMPL/FIRMRoadMap.xml";
+    //std::string npathToXML = "/home/saurav/edpl-ompl/SavedRoadMaps/FIRMRoadMap_Env2_Omni_65.xml";
 
     TiXmlDocument doc(pathToXML);
 

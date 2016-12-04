@@ -217,7 +217,7 @@ public:
 
     }
 
-    void loadGraphFromFile(std::string pathToRoadMapFile = "FIRMRoadMap.xml")
+    void loadGraphFromFile(std::string pathToRoadMapFile)
     {
         if(!setup_)
         {

@@ -1532,7 +1532,7 @@ void FIRM::showRolloutConnections(const FIRM::Vertex v)
     boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 }
 
-void FIRM::addStateToVisualization(ompl::base::State *state)
+void FIRM::addStateToVisualization(const ompl::base::State *state)
 {
     Visualizer::addState(state);
 }
@@ -1678,7 +1678,7 @@ void FIRM::savePlannerData()
 }
 
 
-void FIRM::loadRoadMapFromFile(const std::string pathToFile)
+void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
 {
     std::vector<std::pair<int, arma::colvec> > FIRMNodePosList;
     std::vector<std::pair<int, arma::mat> > FIRMNodeCovarianceList;

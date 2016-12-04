@@ -64,9 +64,6 @@
 
 #include "Setup/MultiModalSetup.h"
 //#include "Testing/Tests.h"
-#include "Visualization/Window.h"
-#include "Visualization/Visualizer.h"
-
 
 using namespace std;
 
@@ -74,16 +71,12 @@ void plan()
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
 
-    std::string setupFilePath = "./SetupFiles/SetupFIRMExp2.xml";
+    std::string setupFilePath = "./SetupFiles/SetupTROSims.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
     mySetup->setup();
-
-    Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
-
-    Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
-
+    
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
     int mode = 1;
@@ -93,8 +86,6 @@ void plan()
     //cin>>mode;
 
     int keepTrying = 1;
-
-    mySetup->loadGraphFromFile();
 
     while(keepTrying)
     {
@@ -135,6 +126,9 @@ void planROS()
 
     FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
 
+    // Visualizer needs to know space information as well.
+    Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
+
     std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
@@ -142,8 +136,6 @@ void planROS()
     mySetup->setup();
 
     Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
-
-    Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
@@ -154,8 +146,6 @@ void planROS()
     //cin>>mode;
 
     int keepTrying = 1;
-
-    mySetup->loadGraphFromFile();
 
     ros::spinOnce();
 

@@ -74,8 +74,7 @@ References:
 ---------------------------------------
 How To Use This Application
 ---------------------------------------
-We have developed these planner based on the design philosophy of the planner class in OMPL. On top of the base planners,
-we have added additional functionaility to the package such as a motion model class, observation model class, filter class etc. that are required within FIRM and not provided explicity in OMPL.
+We have developed these planner based on the design philosophy of the planner class in OMPL. On top of the base planners, we have added additional functionaility to the package such as a motion model class, observation model class, filter class etc. that are required within FIRM and not provided explicity in OMPL.
 
 1. Use the provided application as is: Simply compile the code and run it. By changing the names of the setup paramter file (xml files) to use in main.cpp, you can control the motion/observation model parameters, environment geometry file, robot geometry file, landmark locations etc. 
 

@@ -225,6 +225,10 @@
 		wind_noise_ang="7.0"-->
 </MotionModels>
 <PlanningProblem>
+	<RoadMap
+		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_Env2_Omni_65.xml"
+		useRoadMap = "1"
+	/>
 	<Environment
 		environmentFile = "./Models/FIRMEnvExp2.obj"
 	/>		

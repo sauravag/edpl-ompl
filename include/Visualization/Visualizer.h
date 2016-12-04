@@ -93,7 +93,7 @@ class Visualizer
         }
 
         /** \brief Add the states i.e. graph nodes to be drawn*/
-        static void addState(ompl::base::State *state)
+        static void addState(const ompl::base::State *state)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
             assert(state);

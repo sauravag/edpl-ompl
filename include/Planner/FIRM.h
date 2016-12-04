@@ -262,7 +262,7 @@ public:
     virtual void savePlannerData();
 
     /** \brief Load the roadmap info from a file */
-    virtual void loadRoadMapFromFile(const std::string pathToFile);
+    virtual void loadRoadMapFromFile(const std::string &pathToFile);
 
     void setKidnappedState(ompl::base::State *state)
     {
@@ -338,7 +338,7 @@ protected:
     /** \brief Generate the rollout policy */
     virtual Edge generateRolloutPolicy(const Vertex currentVertex);
 
-    void addStateToVisualization(ompl::base::State *state) ;
+    void addStateToVisualization(const ompl::base::State *state) ;
 
     void sendFeedbackEdgesToViz();
 

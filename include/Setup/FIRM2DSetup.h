@@ -38,9 +38,11 @@
 #define FIRM_2D_SETUP_H
 
 #include <omplapp/geometry/RigidBodyGeometry.h>
+#include <tinyxml.h>
 #include "Planner/FIRM.h"
 #include "edplompl.h"
-#include <tinyxml.h>
+#include "Visualization/Window.h"
+#include "Visualization/Visualizer.h"
 
 /** \brief Wrapper for ompl::app::RigidBodyPlanning that plans for rigid bodies in SE2BeliefSpace using FIRM */
 class FIRM2DSetup : public ompl::app::RigidBodyGeometry
@@ -115,9 +117,7 @@ public:
 
     void setPathToSetupFile(const std::string &path)
     {
-        pathToSetupFile_  = path;
-
-        this->loadParameters();
+        pathToSetupFile_  = path;       
     }
 
     void setStartState(const double X, const double Y, const double Yaw)
@@ -147,6 +147,8 @@ public:
     {
         if(!setup_)
         {
+            this->loadParameters();
+
             if(pathToSetupFile_.length() == 0)
             {
                 throw ompl::Exception("Path to setup file not set!");
@@ -198,19 +200,14 @@ public:
 
             planner_->setup();
 
+            Visualizer::updateSpaceInformation(this->getSpaceInformation());
+
+            Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(this), this->getGeometricStateExtractor());
+
+            if (useSavedRoadMap_ == 1) planner_->as<FIRM>()->loadRoadMapFromFile(pathToRoadMapFile_.c_str());
+
             setup_ = true;
         }
-
-    }
-
-    void loadGraphFromFile(std::string pathToRoadMapFile = "FIRMRoadMap.xml")
-    {
-        if(!setup_)
-        {
-            this->setup();
-        }
-
-        planner_->as<FIRM>()->loadRoadMapFromFile(pathToRoadMapFile);
 
     }
 
@@ -385,15 +382,20 @@ protected:
         itemElement->QueryStringAttribute("robotFile", &robotFilePath);
 
         this->setRobotMesh(robotFilePath);
-
-        /*
+       
         // Read the roadmap filename
         child  = node->FirstChild("RoadMap");
         assert( child );
         itemElement = child->ToElement();
         assert( itemElement );
-        itemElement->QueryStringAttribute("roadmapFile", &pathToSetupFile_);
-        */
+
+        std::string tempPathStr;
+        itemElement->QueryStringAttribute("roadmapFile", &tempPathStr);
+        pathToRoadMapFile_ = tempPathStr;
+
+        int usermap = 0;
+        itemElement->QueryIntAttribute("useRoadMap", &usermap);
+        useSavedRoadMap_ = usermap;
 
         // Read the start Pose
         child  = node->FirstChild("StartPose");
@@ -479,11 +481,13 @@ protected:
 
         std::cout<<"Path to robot mesh: "<<robotFilePath<<std::endl;
 
+        std::cout<<"Path to Roadmap File: "<<pathToRoadMapFile_<<std::endl;
+
         std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
 
         std::cout<<"Planning Time: "<<planningTime_<<" seconds"<<std::endl;
 
-        std::cout<<"Min Nodes: "<<minNodes_<<" seconds"<<std::endl;
+        std::cout<<"Min Nodes: "<<minNodes_<<std::endl;
 
         std::cout<<"Kidnapped Pose x:"<<kX<<" y:"<<kY<<" theta:"<<kTheta<<std::endl;
 
@@ -512,6 +516,10 @@ private:
     ompl::base::StateValidityCheckerPtr vc_;
 
     std::string pathToSetupFile_;
+
+    std::string pathToRoadMapFile_;
+
+    int useSavedRoadMap_;
 
     double planningTime_;
 
