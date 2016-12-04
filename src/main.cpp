@@ -34,11 +34,21 @@
 
 /* Author: Saurav Agarwal */
 
-///////////////////////////////////////////////////////////////////////////////////////
-//                                      TIP
-//          Look at the top of FIRMOMPL.h to see how to include ROS and build.
-//      Over there, uncomment #define USE_ROS to allow ROS dependent files to compiled.
-///////////////////////////////////////////////////////////////////////////////////////
+/*! \mainpage EDPL-OMPL
+ *
+ * \section Introduction
+ *
+ * Belief space planning with OMPL as the backend.
+ * 
+ * \section Tips
+ * 
+ *  Look at the top of FIRMOMPL.h to see how to include ROS and build. Over there, uncomment #define USE_ROS to allow ROS dependent files to compiled.
+ *
+ * \section install_sec Installation
+ *
+ *  See README
+ *  
+ */
 
 #include <QApplication>
 #include <QtGui/QDesktopWidget>

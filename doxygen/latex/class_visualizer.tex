@@ -1,0 +1,229 @@
+\hypertarget{class_visualizer}{\section{Visualizer Class Reference}
+\label{class_visualizer}\index{Visualizer@{Visualizer}}
+}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_visualizer_1_1_v_z_r_feedback_edge}{V\-Z\-R\-Feedback\-Edge}
+\end{DoxyCompactItemize}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{class_visualizer_a2710d7bdd6700c034876a3c43c328cd7}{V\-Z\-R\-State\-Type} \{ {\bfseries True\-State}, 
+{\bfseries Belief\-State}, 
+{\bfseries Graph\-Node\-State}
+ \}
+\begin{DoxyCompactList}\small\item\em Helps distinguish between states while drawing. \end{DoxyCompactList}\item 
+enum {\bfseries V\-Z\-R\-Drawing\-Mode} \{ \\*
+{\bfseries Node\-View\-Mode}, 
+{\bfseries Feedback\-View\-Mode}, 
+{\bfseries P\-R\-M\-View\-Mode}, 
+{\bfseries Rollout\-Mode}, 
+\\*
+{\bfseries Multi\-Modal\-Mode}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_visualizer_af1d495ef8b48411cac724f242347b541}{static void \hyperlink{class_visualizer_af1d495ef8b48411cac724f242347b541}{add\-Landmarks} (const std\-::vector$<$ arma\-::colvec $>$ \&landmarks)}\label{class_visualizer_af1d495ef8b48411cac724f242347b541}
+
+\begin{DoxyCompactList}\small\item\em Add the landmarks in the environment. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a6c7ac8469193d405c73ed8d2edd5bc63}{static void \hyperlink{class_visualizer_a6c7ac8469193d405c73ed8d2edd5bc63}{add\-State} (ompl\-::base\-::\-State $\ast$state)}\label{class_visualizer_a6c7ac8469193d405c73ed8d2edd5bc63}
+
+\begin{DoxyCompactList}\small\item\em Add the states i.\-e. graph nodes to be drawn. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a05802a504ef9a4804af730d2848b9689}{static void \hyperlink{class_visualizer_a05802a504ef9a4804af730d2848b9689}{clear\-States} ()}\label{class_visualizer_a05802a504ef9a4804af730d2848b9689}
+
+\begin{DoxyCompactList}\small\item\em Clear the state container. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a19a65a5d08ade114252d809b78976b1f}{static void \hyperlink{class_visualizer_a19a65a5d08ade114252d809b78976b1f}{add\-Belief\-Mode} (ompl\-::base\-::\-State $\ast$state)}\label{class_visualizer_a19a65a5d08ade114252d809b78976b1f}
+
+\begin{DoxyCompactList}\small\item\em Add state to belief mode list. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a9bf180935f50440ed3ab68602f32f78a}{static void \hyperlink{class_visualizer_a9bf180935f50440ed3ab68602f32f78a}{clear\-Belief\-Modes} ()}\label{class_visualizer_a9bf180935f50440ed3ab68602f32f78a}
+
+\begin{DoxyCompactList}\small\item\em Clear belief Modes. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a31ce4b4a4865921d5c8d72b94f6dd7a5}{static void \hyperlink{class_visualizer_a31ce4b4a4865921d5c8d72b94f6dd7a5}{add\-Graph\-Edge} (const ompl\-::base\-::\-State $\ast$source, const ompl\-::base\-::\-State $\ast$target)}\label{class_visualizer_a31ce4b4a4865921d5c8d72b94f6dd7a5}
+
+\begin{DoxyCompactList}\small\item\em Add a Roadmap Graph edge to the visualization. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a728bc4cf562902c5ba4a79aed4685875}{static void {\bfseries add\-Feedback\-Edge} (const ompl\-::base\-::\-State $\ast$source, const ompl\-::base\-::\-State $\ast$target, double cost)}\label{class_visualizer_a728bc4cf562902c5ba4a79aed4685875}
+
+\item 
+\hypertarget{class_visualizer_a207b9cdfc68a6d327ba04bd5d6b5e94e}{static void \hyperlink{class_visualizer_a207b9cdfc68a6d327ba04bd5d6b5e94e}{add\-Rollout\-Connection} (const ompl\-::base\-::\-State $\ast$source, const ompl\-::base\-::\-State $\ast$target)}\label{class_visualizer_a207b9cdfc68a6d327ba04bd5d6b5e94e}
+
+\begin{DoxyCompactList}\small\item\em Add a rollout connection to the visualization. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a364f1254d282cad1717ca9ad0c4b4081}{static void \hyperlink{class_visualizer_a364f1254d282cad1717ca9ad0c4b4081}{add\-Most\-Likely\-Path\-Edge} (const ompl\-::base\-::\-State $\ast$source, const ompl\-::base\-::\-State $\ast$target)}\label{class_visualizer_a364f1254d282cad1717ca9ad0c4b4081}
+
+\begin{DoxyCompactList}\small\item\em Add a rollout connection to the visualization. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a474b9dd973d8b1b490b33587ad9aa86d}{static void {\bfseries set\-Chosen\-Rollout\-Connection} (const ompl\-::base\-::\-State $\ast$source, const ompl\-::base\-::\-State $\ast$target)}\label{class_visualizer_a474b9dd973d8b1b490b33587ad9aa86d}
+
+\item 
+\hypertarget{class_visualizer_a918f5598cf7479d190f8d29600fa16d5}{static void {\bfseries draw\-Robot\-Path} ()}\label{class_visualizer_a918f5598cf7479d190f8d29600fa16d5}
+
+\item 
+\hypertarget{class_visualizer_a652f193100d7d75a85061d170b6e4a5d}{static void {\bfseries set\-Mode} (V\-Z\-R\-Drawing\-Mode mode)}\label{class_visualizer_a652f193100d7d75a85061d170b6e4a5d}
+
+\item 
+\hypertarget{class_visualizer_a7ee82eedc8128237b09d8eefaf421679}{static void {\bfseries Clear\-Feedback\-Edges} ()}\label{class_visualizer_a7ee82eedc8128237b09d8eefaf421679}
+
+\item 
+\hypertarget{class_visualizer_ada63070c0f48730528ae11fe6116cb89}{static void {\bfseries clear\-Rollout\-Connections} ()}\label{class_visualizer_ada63070c0f48730528ae11fe6116cb89}
+
+\item 
+\hypertarget{class_visualizer_a9f2be28abd54f00462af50b1cac3a135}{static void {\bfseries clear\-Most\-Likely\-Path} ()}\label{class_visualizer_a9f2be28abd54f00462af50b1cac3a135}
+
+\item 
+\hypertarget{class_visualizer_afc6c18807bedf44057734905cef8e550}{static void {\bfseries add\-Open\-Loop\-R\-R\-T\-Path} (const ompl\-::geometric\-::\-Path\-Geometric path)}\label{class_visualizer_afc6c18807bedf44057734905cef8e550}
+
+\item 
+\hypertarget{class_visualizer_aae26a006f1d085045429c21649d96d8b}{static void {\bfseries clear\-Open\-Loop\-R\-R\-T\-Paths} ()}\label{class_visualizer_aae26a006f1d085045429c21649d96d8b}
+
+\item 
+\hypertarget{class_visualizer_a65c3c5451f614eda7d0ed83613ad1ed4}{static void \hyperlink{class_visualizer_a65c3c5451f614eda7d0ed83613ad1ed4}{update\-True\-State} (const ompl\-::base\-::\-State $\ast$state)}\label{class_visualizer_a65c3c5451f614eda7d0ed83613ad1ed4}
+
+\begin{DoxyCompactList}\small\item\em update the robot's true state for drawing \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a00b248fc1bc0bf1f445d1b72cbaad301}{static void \hyperlink{class_visualizer_a00b248fc1bc0bf1f445d1b72cbaad301}{update\-Current\-Belief} (const ompl\-::base\-::\-State $\ast$state)}\label{class_visualizer_a00b248fc1bc0bf1f445d1b72cbaad301}
+
+\begin{DoxyCompactList}\small\item\em update the robot's belief for drawing \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a03f2c860d508cee10fdcf221fdfa8899}{static void \hyperlink{class_visualizer_a03f2c860d508cee10fdcf221fdfa8899}{update\-Space\-Information} (const firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr si)}\label{class_visualizer_a03f2c860d508cee10fdcf221fdfa8899}
+
+\begin{DoxyCompactList}\small\item\em Copy the space information pointer. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_acca6818239d3d2e8cabdfb7321e817b9}{static void {\bfseries update\-Renderer} (ompl\-::app\-::\-Render\-Geometry $\ast$renderer)}\label{class_visualizer_acca6818239d3d2e8cabdfb7321e817b9}
+
+\item 
+\hypertarget{class_visualizer_a3218c7fa2f83159188c624f04e982a24}{static void {\bfseries update\-Renderer} (const ompl\-::app\-::\-Rigid\-Body\-Geometry \&rbg, const ompl\-::app\-::\-Geometric\-State\-Extractor \&se)}\label{class_visualizer_a3218c7fa2f83159188c624f04e982a24}
+
+\item 
+\hypertarget{class_visualizer_abacab1d3c34cf91364ea0f45bc0f7473}{static void {\bfseries clear\-Robot\-Path} ()}\label{class_visualizer_abacab1d3c34cf91364ea0f45bc0f7473}
+
+\item 
+\hypertarget{class_visualizer_a2544a80a7ac2f432661f199e4cb08130}{static void \hyperlink{class_visualizer_a2544a80a7ac2f432661f199e4cb08130}{draw\-Landmark} (arma\-::colvec \&landmark)}\label{class_visualizer_a2544a80a7ac2f432661f199e4cb08130}
+
+\begin{DoxyCompactList}\small\item\em Draw a single landmark that is passed to this function. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a355fdbecb72d38f8a651c7dd75d1d6e1}{static void \hyperlink{class_visualizer_a355fdbecb72d38f8a651c7dd75d1d6e1}{draw\-Robot} (const ompl\-::base\-::\-State $\ast$state)}\label{class_visualizer_a355fdbecb72d38f8a651c7dd75d1d6e1}
+
+\begin{DoxyCompactList}\small\item\em Draw the true robot rendering. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_ac4282cfa39ebe59311fee512d46cb9f7}{static void \hyperlink{class_visualizer_ac4282cfa39ebe59311fee512d46cb9f7}{draw\-State} (const ompl\-::base\-::\-State $\ast$state, \hyperlink{class_visualizer_a2710d7bdd6700c034876a3c43c328cd7}{V\-Z\-R\-State\-Type} state\-Type)}\label{class_visualizer_ac4282cfa39ebe59311fee512d46cb9f7}
+
+\begin{DoxyCompactList}\small\item\em Draw a single state that is passed to this function. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_aca4b5a57dbd7d491b3889bd07cc04afa}{static void \hyperlink{class_visualizer_aca4b5a57dbd7d491b3889bd07cc04afa}{draw\-Edge} (const ompl\-::base\-::\-State $\ast$source, const ompl\-::base\-::\-State $\ast$target)}\label{class_visualizer_aca4b5a57dbd7d491b3889bd07cc04afa}
+
+\begin{DoxyCompactList}\small\item\em Draw an edge that belongs to the Roadmap graph. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a93168dcaa16bcb97a647d03183459778}{static void \hyperlink{class_visualizer_a93168dcaa16bcb97a647d03183459778}{draw\-Graph\-Belief\-Nodes} ()}\label{class_visualizer_a93168dcaa16bcb97a647d03183459778}
+
+\begin{DoxyCompactList}\small\item\em Draw the stored graph nodes. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a9755c745e5aeb4dc76b007594f95fd09}{static void \hyperlink{class_visualizer_a9755c745e5aeb4dc76b007594f95fd09}{draw\-Belief\-Modes} ()}\label{class_visualizer_a9755c745e5aeb4dc76b007594f95fd09}
+
+\begin{DoxyCompactList}\small\item\em Draw belief modes. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a12171ebc167f32a2a90c6e94d9505331}{static void \hyperlink{class_visualizer_a12171ebc167f32a2a90c6e94d9505331}{draw\-Graph\-Edges} ()}\label{class_visualizer_a12171ebc167f32a2a90c6e94d9505331}
+
+\begin{DoxyCompactList}\small\item\em Draw the edges in the roadmap graph. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_ab484f66c1477eee940a90c436d320d1d}{static void \hyperlink{class_visualizer_ab484f66c1477eee940a90c436d320d1d}{draw\-Feedback\-Edges} ()}\label{class_visualizer_ab484f66c1477eee940a90c436d320d1d}
+
+\begin{DoxyCompactList}\small\item\em Draw graph feedback edges. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a3d9d939e1deef7f24c10d6ebbf794206}{static void \hyperlink{class_visualizer_a3d9d939e1deef7f24c10d6ebbf794206}{draw\-Rollout\-Connections} ()}\label{class_visualizer_a3d9d939e1deef7f24c10d6ebbf794206}
+
+\begin{DoxyCompactList}\small\item\em Draw rollout connections. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_aae94674acda11f26522581791b310cb1}{static void \hyperlink{class_visualizer_aae94674acda11f26522581791b310cb1}{draw\-Most\-Likely\-Path} ()}\label{class_visualizer_aae94674acda11f26522581791b310cb1}
+
+\begin{DoxyCompactList}\small\item\em Draw the most likely path under \hyperlink{class_f_i_r_m}{F\-I\-R\-M}. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_ada993e034ff9541d069d2e894ed51f5d}{static void \hyperlink{class_visualizer_ada993e034ff9541d069d2e894ed51f5d}{draw\-Environment} ()}\label{class_visualizer_ada993e034ff9541d069d2e894ed51f5d}
+
+\begin{DoxyCompactList}\small\item\em Draw the X\&Y bounds. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_af4b7f35e3dff8daaf9cc79ac1f9140cd}{static void {\bfseries draw\-Obstacle} ()}\label{class_visualizer_af4b7f35e3dff8daaf9cc79ac1f9140cd}
+
+\item 
+\hypertarget{class_visualizer_a35dec37e9c258e2074f1b3ccf7e7a01c}{static void \hyperlink{class_visualizer_a35dec37e9c258e2074f1b3ccf7e7a01c}{draw\-Geometric\-Path} (const ompl\-::geometric\-::\-Path\-Geometric path)}\label{class_visualizer_a35dec37e9c258e2074f1b3ccf7e7a01c}
+
+\begin{DoxyCompactList}\small\item\em Draw geometric path. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a7e56ae25a51fe94ac158f33a0b29fba8}{static void {\bfseries draw\-Open\-Loop\-R\-R\-T\-Paths} ()}\label{class_visualizer_a7e56ae25a51fe94ac158f33a0b29fba8}
+
+\item 
+\hypertarget{class_visualizer_a5dc2040eeebd6568034c3230cccd8530}{static void \hyperlink{class_visualizer_a5dc2040eeebd6568034c3230cccd8530}{refresh} ()}\label{class_visualizer_a5dc2040eeebd6568034c3230cccd8530}
+
+\begin{DoxyCompactList}\small\item\em Refresh the drawing and show latest scenario. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a8a7b15c56dc6823af1cdbafdb238ba1a}{static bool {\bfseries save\-Video} ()}\label{class_visualizer_a8a7b15c56dc6823af1cdbafdb238ba1a}
+
+\item 
+\hypertarget{class_visualizer_a22e7426a0b03231d20a2e7ce37d728e7}{static void {\bfseries do\-Save\-Video} (bool flag)}\label{class_visualizer_a22e7426a0b03231d20a2e7ce37d728e7}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_visualizer_ad6771691744b01cc232ea171e1e2a4ab}{static std\-::list\\*
+$<$ ompl\-::base\-::\-State $\ast$ $>$ \hyperlink{class_visualizer_ad6771691744b01cc232ea171e1e2a4ab}{states\-\_\-}}\label{class_visualizer_ad6771691744b01cc232ea171e1e2a4ab}
+
+\begin{DoxyCompactList}\small\item\em A list that stores the graph nodes. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a7ca3a80de8106a9d53b8b25247aadc07}{static boost\-::mutex \hyperlink{class_visualizer_a7ca3a80de8106a9d53b8b25247aadc07}{draw\-Mutex\-\_\-}}\label{class_visualizer_a7ca3a80de8106a9d53b8b25247aadc07}
+
+\begin{DoxyCompactList}\small\item\em visualizer thread mutex, allows us to place a lock so that class state changes while drawing \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a2a25f3b2372418e1088cd889f26df95d}{static ompl\-::base\-::\-State $\ast$ \hyperlink{class_visualizer_a2a25f3b2372418e1088cd889f26df95d}{true\-State\-\_\-}}\label{class_visualizer_a2a25f3b2372418e1088cd889f26df95d}
+
+\begin{DoxyCompactList}\small\item\em Store the robots true state. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a4f39505b9d7a4590ade4d87b1a9004d7}{static ompl\-::base\-::\-State $\ast$ \hyperlink{class_visualizer_a4f39505b9d7a4590ade4d87b1a9004d7}{current\-Belief\-\_\-}}\label{class_visualizer_a4f39505b9d7a4590ade4d87b1a9004d7}
+
+\begin{DoxyCompactList}\small\item\em Store the robots belief state. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a13a9427e5bbd1301b615bf81ed2bff99}{static std\-::list\\*
+$<$ ompl\-::base\-::\-State $\ast$ $>$ \hyperlink{class_visualizer_a13a9427e5bbd1301b615bf81ed2bff99}{belief\-Modes\-\_\-}}\label{class_visualizer_a13a9427e5bbd1301b615bf81ed2bff99}
+
+\begin{DoxyCompactList}\small\item\em Store the belief modes for multi-\/modal operation. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a0cbfe1d4b50e562395c520fec568299d}{static std\-::vector$<$ arma\-::colvec $>$ \hyperlink{class_visualizer_a0cbfe1d4b50e562395c520fec568299d}{landmarks\-\_\-}}\label{class_visualizer_a0cbfe1d4b50e562395c520fec568299d}
+
+\begin{DoxyCompactList}\small\item\em Store the landmarks. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a111664b7b5b6a2c11e5bb3e3cb8fcd01}{static \\*
+firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \hyperlink{class_visualizer_a111664b7b5b6a2c11e5bb3e3cb8fcd01}{si\-\_\-}}\label{class_visualizer_a111664b7b5b6a2c11e5bb3e3cb8fcd01}
+
+\begin{DoxyCompactList}\small\item\em A pointer to the space information, because the visualizer must know what space its drawing. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a2ff4816da3e84d1132ff0fafbdbadb98}{static std\-::vector$<$ std\-::pair\\*
+$<$ const ompl\-::base\-::\-State \\*
+$\ast$, const ompl\-::base\-::\-State $\ast$ $>$ $>$ \hyperlink{class_visualizer_a2ff4816da3e84d1132ff0fafbdbadb98}{graph\-Edges\-\_\-}}\label{class_visualizer_a2ff4816da3e84d1132ff0fafbdbadb98}
+
+\begin{DoxyCompactList}\small\item\em Store the Roadmap graph edges. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a9a3922205f833fd7a83e33a1501e0d74}{static std\-::vector$<$ std\-::pair\\*
+$<$ const ompl\-::base\-::\-State \\*
+$\ast$, const ompl\-::base\-::\-State $\ast$ $>$ $>$ \hyperlink{class_visualizer_a9a3922205f833fd7a83e33a1501e0d74}{rollout\-Connections\-\_\-}}\label{class_visualizer_a9a3922205f833fd7a83e33a1501e0d74}
+
+\begin{DoxyCompactList}\small\item\em Store the Rollout connections. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a67cb011e12b48a8aa95249324fd9ed87}{static std\-::vector$<$ std\-::pair\\*
+$<$ const ompl\-::base\-::\-State \\*
+$\ast$, const ompl\-::base\-::\-State $\ast$ $>$ $>$ \hyperlink{class_visualizer_a67cb011e12b48a8aa95249324fd9ed87}{most\-Likely\-Path\-\_\-}}\label{class_visualizer_a67cb011e12b48a8aa95249324fd9ed87}
+
+\begin{DoxyCompactList}\small\item\em Store the Rollout connections. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a241e08e6835a4655fb32b0171dcb9d53}{static boost\-::optional\\*
+$<$ std\-::pair$<$ const \\*
+ompl\-::base\-::\-State $\ast$, const \\*
+ompl\-::base\-::\-State $\ast$ $>$ $>$ \hyperlink{class_visualizer_a241e08e6835a4655fb32b0171dcb9d53}{chosen\-Rollout\-Connection\-\_\-}}\label{class_visualizer_a241e08e6835a4655fb32b0171dcb9d53}
+
+\begin{DoxyCompactList}\small\item\em The rollout connection that gets chosen as the next target. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a506f4480f1c47d9105283ca07b600d64}{static std\-::vector\\*
+$<$ \hyperlink{struct_visualizer_1_1_v_z_r_feedback_edge}{V\-Z\-R\-Feedback\-Edge} $>$ \hyperlink{class_visualizer_a506f4480f1c47d9105283ca07b600d64}{feedback\-Edges\-\_\-}}\label{class_visualizer_a506f4480f1c47d9105283ca07b600d64}
+
+\begin{DoxyCompactList}\small\item\em Store the feedback edges. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a887ebf260abf93bf1a88560faf7eccb2}{static std\-::vector$<$ const \\*
+ompl\-::base\-::\-State $\ast$ $>$ \hyperlink{class_visualizer_a887ebf260abf93bf1a88560faf7eccb2}{robot\-Path\-\_\-}}\label{class_visualizer_a887ebf260abf93bf1a88560faf7eccb2}
+
+\begin{DoxyCompactList}\small\item\em stores the sequence of states of the real robot \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a11d99288fa2898f177676f7f40ab52de}{static std\-::vector\\*
+$<$ ompl\-::geometric\-::\-Path\-Geometric $>$ \hyperlink{class_visualizer_a11d99288fa2898f177676f7f40ab52de}{open\-Loop\-R\-R\-T\-Paths\-\_\-}}\label{class_visualizer_a11d99288fa2898f177676f7f40ab52de}
+
+\begin{DoxyCompactList}\small\item\em Container for R\-R\-T paths generated as candidates during Multi-\/\-Modal operation. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_aa43c5908a3ae82a79c06d126fb32b505}{static V\-Z\-R\-Drawing\-Mode \hyperlink{class_visualizer_aa43c5908a3ae82a79c06d126fb32b505}{mode\-\_\-}}\label{class_visualizer_aa43c5908a3ae82a79c06d126fb32b505}
+
+\begin{DoxyCompactList}\small\item\em \hyperlink{class_visualizer}{Visualizer} drawing mode setting. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a4d2cb9a7c08bca45465b3c19b89ec3e1}{static ompl\-::app\-::\-Render\-Geometry $\ast$ \hyperlink{class_visualizer_a4d2cb9a7c08bca45465b3c19b89ec3e1}{render\-Geom\-\_\-}}\label{class_visualizer_a4d2cb9a7c08bca45465b3c19b89ec3e1}
+
+\begin{DoxyCompactList}\small\item\em The render geometry utility in ompl\-::app. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a6374971a2ec9b9802e85f227e1fc02a8}{static int \hyperlink{class_visualizer_a6374971a2ec9b9802e85f227e1fc02a8}{env\-Indx\-\_\-} = -\/1}\label{class_visualizer_a6374971a2ec9b9802e85f227e1fc02a8}
+
+\begin{DoxyCompactList}\small\item\em The gllistindex of the environment rendering. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_a314590f6cbcd1e3d0f47567dd4ced147}{static int \hyperlink{class_visualizer_a314590f6cbcd1e3d0f47567dd4ced147}{robot\-Indx\-\_\-} = -\/1}\label{class_visualizer_a314590f6cbcd1e3d0f47567dd4ced147}
+
+\begin{DoxyCompactList}\small\item\em The gllistindex of the robot rendering. \end{DoxyCompactList}\item 
+\hypertarget{class_visualizer_acd3d34da61205b149eedbf605bba9636}{static bool {\bfseries save\-Video\-\_\-} = false}\label{class_visualizer_acd3d34da61205b149eedbf605bba9636}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Visualization/Visualizer.\-h\item 
+src/\-Visualization/Visualizer.\-cpp\end{DoxyCompactItemize}

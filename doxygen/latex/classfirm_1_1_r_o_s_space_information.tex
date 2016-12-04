@@ -1,0 +1,64 @@
+\hypertarget{classfirm_1_1_r_o_s_space_information}{\section{firm\-:\-:R\-O\-S\-Space\-Information Class Reference}
+\label{classfirm_1_1_r_o_s_space_information}\index{firm\-::\-R\-O\-S\-Space\-Information@{firm\-::\-R\-O\-S\-Space\-Information}}
+}
+
+
+Inheritance diagram for firm\-:\-:R\-O\-S\-Space\-Information\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{classfirm_1_1_r_o_s_space_information__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for firm\-:\-:R\-O\-S\-Space\-Information\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{classfirm_1_1_r_o_s_space_information__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classfirm_1_1_r_o_s_space_information_a29715a6c39ff998144005c42d0b025a2}{\hyperlink{classfirm_1_1_r_o_s_space_information_a29715a6c39ff998144005c42d0b025a2}{R\-O\-S\-Space\-Information} (const ompl\-::base\-::\-State\-Space\-Ptr \&state\-Space, const ompl\-::control\-::\-Control\-Space\-Ptr \&control\-Space)}\label{classfirm_1_1_r_o_s_space_information_a29715a6c39ff998144005c42d0b025a2}
+
+\begin{DoxyCompactList}\small\item\em Constructer. \end{DoxyCompactList}\item 
+\hypertarget{classfirm_1_1_r_o_s_space_information_ad1cf7a840ad6491192ba96577ffdcf91}{virtual \hyperlink{classfirm_1_1_r_o_s_space_information_ad1cf7a840ad6491192ba96577ffdcf91}{$\sim$\-R\-O\-S\-Space\-Information} (void)}\label{classfirm_1_1_r_o_s_space_information_ad1cf7a840ad6491192ba96577ffdcf91}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+\hypertarget{classfirm_1_1_r_o_s_space_information_a56059a1b95d7b35ef2a5dd1a4ddedd86}{void \hyperlink{classfirm_1_1_r_o_s_space_information_a56059a1b95d7b35ef2a5dd1a4ddedd86}{aruco\-Listener\-Callback} (const aruco\-\_\-msgs\-::\-Marker\-Array \&msg)}\label{classfirm_1_1_r_o_s_space_information_a56059a1b95d7b35ef2a5dd1a4ddedd86}
+
+\begin{DoxyCompactList}\small\item\em This function gets called everytime the node hears a message on the aruco marker publisher topic. \end{DoxyCompactList}\item 
+\hypertarget{classfirm_1_1_r_o_s_space_information_a4de87b31909417c88d71cbbfdfddeb65}{void \hyperlink{classfirm_1_1_r_o_s_space_information_a4de87b31909417c88d71cbbfdfddeb65}{calculate\-Range\-Bearing\-To\-Marker} (double x, double y, double z, double \&range, double \&bearing)}\label{classfirm_1_1_r_o_s_space_information_a4de87b31909417c88d71cbbfdfddeb65}
+
+\begin{DoxyCompactList}\small\item\em Calculates the range and bearing to a marker. \end{DoxyCompactList}\item 
+\hypertarget{classfirm_1_1_r_o_s_space_information_ae9f47c1874ef70bbe6ff2aefc73bb395}{virtual void \hyperlink{classfirm_1_1_r_o_s_space_information_ae9f47c1874ef70bbe6ff2aefc73bb395}{apply\-Control} (const ompl\-::control\-::\-Control $\ast$control, bool with\-Noise=true)}\label{classfirm_1_1_r_o_s_space_information_ae9f47c1874ef70bbe6ff2aefc73bb395}
+
+\begin{DoxyCompactList}\small\item\em Applies the control to the robot by publishing geometry twist messages. \end{DoxyCompactList}\item 
+\hypertarget{classfirm_1_1_r_o_s_space_information_ad7cf4b7baabcc90789a2d24c278f5447}{virtual Observation\-Type \hyperlink{classfirm_1_1_r_o_s_space_information_ad7cf4b7baabcc90789a2d24c278f5447}{get\-Observation} ()}\label{classfirm_1_1_r_o_s_space_information_ad7cf4b7baabcc90789a2d24c278f5447}
+
+\begin{DoxyCompactList}\small\item\em Outputs the real sensor observation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classfirm_1_1_r_o_s_space_information_a1c82bc5b08d4f52bbd4db1195149097a}{ros\-::\-Node\-Handle \hyperlink{classfirm_1_1_r_o_s_space_information_a1c82bc5b08d4f52bbd4db1195149097a}{n\-Handle\-\_\-}}\label{classfirm_1_1_r_o_s_space_information_a1c82bc5b08d4f52bbd4db1195149097a}
+
+\begin{DoxyCompactList}\small\item\em A handle for the node. \end{DoxyCompactList}\item 
+\hypertarget{classfirm_1_1_r_o_s_space_information_aeb051c1bfb04da80fb4ab4c25f3b69e8}{Observation\-Model\-Method\-::\-Observation\-Type \hyperlink{classfirm_1_1_r_o_s_space_information_aeb051c1bfb04da80fb4ab4c25f3b69e8}{camera\-Observation\-\_\-}}\label{classfirm_1_1_r_o_s_space_information_aeb051c1bfb04da80fb4ab4c25f3b69e8}
+
+\begin{DoxyCompactList}\small\item\em A container for the observations. \end{DoxyCompactList}\item 
+\hypertarget{classfirm_1_1_r_o_s_space_information_a73991a82ee748f847bdf7b9a25971c60}{ros\-::\-Publisher \hyperlink{classfirm_1_1_r_o_s_space_information_a73991a82ee748f847bdf7b9a25971c60}{control\-Publisher\-\_\-}}\label{classfirm_1_1_r_o_s_space_information_a73991a82ee748f847bdf7b9a25971c60}
+
+\begin{DoxyCompactList}\small\item\em A publisher for robot control commands. \end{DoxyCompactList}\item 
+\hypertarget{classfirm_1_1_r_o_s_space_information_a468fc746ec28db9aa1cb20ef3f72ef0b}{ros\-::\-Subscriber \hyperlink{classfirm_1_1_r_o_s_space_information_a468fc746ec28db9aa1cb20ef3f72ef0b}{aruco\-Subscriber\-\_\-}}\label{classfirm_1_1_r_o_s_space_information_a468fc746ec28db9aa1cb20ef3f72ef0b}
+
+\begin{DoxyCompactList}\small\item\em A subscriber for the aruco topic. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Space\-Information/R\-O\-S\-Space\-Information.\-h\item 
+src/\-Space\-Information/R\-O\-S\-Space\-Information.\-cpp\end{DoxyCompactItemize}

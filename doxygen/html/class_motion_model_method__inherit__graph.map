@@ -1,3 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$class_unicycle_motion_model.html" title="UnicycleMotionModel" alt="" coords="5,83,152,112"/>
+<map id="MotionModelMethod" name="MotionModelMethod">
+<area shape="rect" id="node2" href="$class_omnidirectional_motion_model.html" title="OmnidirectionalMotionModel" alt="" coords="5,80,192,107"/>
+<area shape="rect" id="node3" href="$class_unicycle_motion_model.html" title="UnicycleMotionModel" alt="" coords="216,80,363,107"/>
 </map>

@@ -1,4 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$class_observation_model_method.html" title="ObservationModelMethod" alt="" coords="5,5,176,35"/>
-<area shape="rect" id="node3" href="$class_cam_aruco2_d_observation_model.html" title="A monocular vision based sensor model where the observations are beacons with unique ids..." alt="" coords="225,5,431,35"/>
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$class_motion_model_method.html" title="Abstract class interface for defining a motion model. " alt="" coords="5,31,144,57"/>
+<area shape="rect" id="node2" href="$class_omnidirectional_motion_model.html" title="OmnidirectionalMotionModel" alt="" coords="192,5,379,32"/>
+<area shape="rect" id="node3" href="$class_unicycle_motion_model.html" title="UnicycleMotionModel" alt="" coords="212,56,359,83"/>
 </map>

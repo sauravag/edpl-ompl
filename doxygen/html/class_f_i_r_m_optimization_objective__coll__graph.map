@@ -1,7 +1,7 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$class_controller.html" title="Controller\&lt; RHCICreate, ExtendedKF \&gt;" alt="" coords="49,181,303,211"/>
-<area shape="rect" id="node4" href="$class_extended_k_f.html" title="Implementation of the Extended Kalman Filter." alt="" coords="45,85,139,115"/>
-<area shape="rect" id="node6" href="$class_kalman_filter_method.html" title="The base class for Kalman filter implementations." alt="" coords="5,5,144,35"/>
-<area shape="rect" id="node8" href="$class_r_h_c_i_create.html" title="RHCICreate" alt="" coords="195,85,288,115"/>
-<area shape="rect" id="node10" href="$class_separated_controller_method.html" title="SeparatedControllerMethod" alt="" coords="168,5,347,35"/>
+<map id="FIRMOptimizationObjective" name="FIRMOptimizationObjective">
+<area shape="rect" id="node3" href="$class_controller.html" title="Controller\&lt; RHCICreate,\l ExtendedKF \&gt;" alt="" coords="195,174,361,215"/>
+<area shape="rect" id="node4" href="$class_extended_k_f.html" title="Implementation of the Extended Kalman Filter. " alt="" coords="146,83,240,109"/>
+<area shape="rect" id="node5" href="$class_kalman_filter_method.html" title="The base class for Kalman filter implementations. " alt="" coords="107,5,245,32"/>
+<area shape="rect" id="node6" href="$class_r_h_c_i_create.html" title="RHCICreate" alt="" coords="297,83,391,109"/>
+<area shape="rect" id="node7" href="$class_separated_controller_method.html" title="SeparatedControllerMethod" alt="" coords="270,5,449,32"/>
 </map>

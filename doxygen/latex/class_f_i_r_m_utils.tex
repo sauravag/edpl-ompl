@@ -1,0 +1,45 @@
+\hypertarget{class_f_i_r_m_utils}{\section{F\-I\-R\-M\-Utils Class Reference}
+\label{class_f_i_r_m_utils}\index{F\-I\-R\-M\-Utils@{F\-I\-R\-M\-Utils}}
+}
+
+
+A class containing utility functions used commonly.  
+
+
+
+
+{\ttfamily \#include $<$F\-I\-R\-M\-Utils.\-h$>$}
+
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_f_i_r_m_utils_acfd3f8727df2dbf670a698ee28c7c7e6}{static void \hyperlink{class_f_i_r_m_utils_acfd3f8727df2dbf670a698ee28c7c7e6}{normalize\-Angle\-To\-Pi\-Range} (double \&theta)}\label{class_f_i_r_m_utils_acfd3f8727df2dbf670a698ee28c7c7e6}
+
+\begin{DoxyCompactList}\small\item\em Normalizes angle to between -\/pi and pi. \end{DoxyCompactList}\item 
+\hypertarget{class_f_i_r_m_utils_a5420e20b6bb30264c4d2dfe6af55743e}{static int \hyperlink{class_f_i_r_m_utils_a5420e20b6bb30264c4d2dfe6af55743e}{signum} (const double d)}\label{class_f_i_r_m_utils_a5420e20b6bb30264c4d2dfe6af55743e}
+
+\begin{DoxyCompactList}\small\item\em Returns the sign of the value 'd'. \end{DoxyCompactList}\item 
+\hypertarget{class_f_i_r_m_utils_ab608b5452db980635b7e07e88b1c017a}{static int \hyperlink{class_f_i_r_m_utils_ab608b5452db980635b7e07e88b1c017a}{generate\-Random\-Integer\-In\-Range} (const int floor, const int ceiling)}\label{class_f_i_r_m_utils_ab608b5452db980635b7e07e88b1c017a}
+
+\begin{DoxyCompactList}\small\item\em Generates a random number within the give range. \end{DoxyCompactList}\item 
+\hypertarget{class_f_i_r_m_utils_af7e9eef5fb536ba18c9b1f8ce81c8964}{static void \hyperlink{class_f_i_r_m_utils_af7e9eef5fb536ba18c9b1f8ce81c8964}{write\-F\-I\-R\-M\-Graph\-To\-X\-M\-L} (const std\-::vector$<$ std\-::pair$<$ int, std\-::pair$<$ arma\-::colvec, arma\-::mat $>$ $>$ $>$ nodes, const std\-::vector$<$ std\-::pair$<$ std\-::pair$<$ int, int $>$, \hyperlink{class_f_i_r_m_weight}{F\-I\-R\-M\-Weight} $>$ $>$ edge\-Weights)}\label{class_f_i_r_m_utils_af7e9eef5fb536ba18c9b1f8ce81c8964}
+
+\begin{DoxyCompactList}\small\item\em Save the \hyperlink{class_f_i_r_m}{F\-I\-R\-M} graph to an X\-M\-L file. \end{DoxyCompactList}\item 
+\hypertarget{class_f_i_r_m_utils_a0c4cb647459fcd8e96755958b3d702fd}{static bool \hyperlink{class_f_i_r_m_utils_a0c4cb647459fcd8e96755958b3d702fd}{read\-F\-I\-R\-M\-Graph\-From\-X\-M\-L} (const std\-::string \&path\-To\-X\-M\-L, std\-::vector$<$ std\-::pair$<$ int, arma\-::colvec $>$ $>$ \&F\-I\-R\-M\-Node\-Pos\-List, std\-::vector$<$ std\-::pair$<$ int, arma\-::mat $>$ $>$ \&F\-I\-R\-M\-Node\-Covariance\-List, std\-::vector$<$ std\-::pair$<$ std\-::pair$<$ int, int $>$, \hyperlink{class_f_i_r_m_weight}{F\-I\-R\-M\-Weight} $>$ $>$ \&edge\-Weights)}\label{class_f_i_r_m_utils_a0c4cb647459fcd8e96755958b3d702fd}
+
+\begin{DoxyCompactList}\small\item\em Reads the Graph properties from an X\-M\-L file. \end{DoxyCompactList}\item 
+\hypertarget{class_f_i_r_m_utils_a19b1f1574a8088dc39bc0b0fb7391407}{static double \hyperlink{class_f_i_r_m_utils_a19b1f1574a8088dc39bc0b0fb7391407}{degree2\-Radian} (double deg)}\label{class_f_i_r_m_utils_a19b1f1574a8088dc39bc0b0fb7391407}
+
+\begin{DoxyCompactList}\small\item\em Convert degree to radian. \end{DoxyCompactList}\item 
+\hypertarget{class_f_i_r_m_utils_a9e70aee41474db20d312d7e5fde21775}{static double \hyperlink{class_f_i_r_m_utils_a9e70aee41474db20d312d7e5fde21775}{radian2\-Degree} (double rads)}\label{class_f_i_r_m_utils_a9e70aee41474db20d312d7e5fde21775}
+
+\begin{DoxyCompactList}\small\item\em radians to degree \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A class containing utility functions used commonly. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Utils/F\-I\-R\-M\-Utils.\-h\item 
+src/\-Utils/F\-I\-R\-M\-Utils.\-cpp\end{DoxyCompactItemize}

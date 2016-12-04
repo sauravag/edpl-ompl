@@ -1,0 +1,141 @@
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup}{\section{F\-I\-R\-M\-Aruco2\-D\-R\-O\-S\-Setup Class Reference}
+\label{class_f_i_r_m_aruco2_d_r_o_s_setup}\index{F\-I\-R\-M\-Aruco2\-D\-R\-O\-S\-Setup@{F\-I\-R\-M\-Aruco2\-D\-R\-O\-S\-Setup}}
+}
+
+
+Wrapper for ompl\-::app\-::\-Rigid\-Body\-Planning that plans for rigid bodies in \hyperlink{class_s_e2_belief_space}{S\-E2\-Belief\-Space} using \hyperlink{class_f_i_r_m}{F\-I\-R\-M}.  
+
+
+
+
+{\ttfamily \#include $<$F\-I\-R\-M\-Aruco2\-D\-R\-O\-S\-Setup.\-h$>$}
+
+
+
+Inheritance diagram for F\-I\-R\-M\-Aruco2\-D\-R\-O\-S\-Setup\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{class_f_i_r_m_aruco2_d_r_o_s_setup__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for F\-I\-R\-M\-Aruco2\-D\-R\-O\-S\-Setup\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{class_f_i_r_m_aruco2_d_r_o_s_setup__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a6683597a5e6d8e5ee1b42539df759e36}{const \\*
+firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr \& {\bfseries get\-Space\-Information} () const }\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a6683597a5e6d8e5ee1b42539df759e36}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a48c07d79b998d021486374c3ba2254d9}{void {\bfseries set\-Path\-To\-Setup\-File} (const std\-::string \&path)}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a48c07d79b998d021486374c3ba2254d9}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_af8969d0882171ee7ca972bc6deff50f3}{void {\bfseries set\-Start\-State} (const double X, const double Y, const double Yaw)}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_af8969d0882171ee7ca972bc6deff50f3}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a58dc6966344b3b37d6745dc18a668177}{void {\bfseries add\-Goal\-State} (const double X, const double Y, const double Yaw)}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a58dc6966344b3b37d6745dc18a668177}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a2dd131df0092a0941379337ce6d4cd57}{void {\bfseries setup} ()}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a2dd131df0092a0941379337ce6d4cd57}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_af12f82ff7b16da7b72ae323c5ace24d4}{void {\bfseries load\-Graph\-From\-File} (std\-::string path\-To\-Road\-Map\-File=\char`\"{}F\-I\-R\-M\-Road\-Map.\-xml\char`\"{})}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_af12f82ff7b16da7b72ae323c5ace24d4}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_af520bb8169510ae1cecde71440cd3384}{ompl\-::base\-::\-Planner\-Status {\bfseries solve} ()}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_af520bb8169510ae1cecde71440cd3384}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_acd17d03bc02bd9b919490bbd8de018b4}{void {\bfseries execute\-Solution} (int choice=0)}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_acd17d03bc02bd9b919490bbd8de018b4}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a958e1c4e263e418a59a150a66ea02e4f}{void {\bfseries Run} (int choice=0)}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a958e1c4e263e418a59a150a66ea02e4f}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a43957804db8bdac7b7883793455191e9}{ompl\-::app\-::\-Geometric\-State\-Extractor {\bfseries get\-Geometric\-State\-Extractor} (void) const }\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a43957804db8bdac7b7883793455191e9}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a654d420d6d9fb678040e3c1792910608}{void {\bfseries save\-Roadmap} ()}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a654d420d6d9fb678040e3c1792910608}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a8cebdfc59e6f3e83bb1b08ae7269b1d9}{const ompl\-::base\-::\-State $\ast$ {\bfseries get\-Geometric\-Component\-State\-Internal} (const ompl\-::base\-::\-State $\ast$state, unsigned int) const }\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a8cebdfc59e6f3e83bb1b08ae7269b1d9}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a41e3bafd7028ca7b2bde0deb25f0388a}{void {\bfseries load\-Goals} ()}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a41e3bafd7028ca7b2bde0deb25f0388a}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a4af7401b7752c0801b736eba9b794b60}{void {\bfseries load\-Parameters} ()}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a4af7401b7752c0801b736eba9b794b60}
+
+\end{DoxyCompactItemize}
+\subsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a404b795bd2bcd874ea5b09a496809851}{typedef \hyperlink{class_s_e2_belief_space_1_1_state_type}{S\-E2\-Belief\-Space\-::\-State\-Type} {\bfseries State\-Type}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a404b795bd2bcd874ea5b09a496809851}
+
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a55b6f110497d8337130db5927d79e2d4}{ompl\-::base\-::\-State $\ast$ {\bfseries start\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a55b6f110497d8337130db5927d79e2d4}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a18b6def4def32aeb4a7af28616e388a1}{std\-::vector$<$ ompl\-::base\-::\-State $\ast$ $>$ {\bfseries goal\-List\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a18b6def4def32aeb4a7af28616e388a1}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a37da5e25b562ec18adef4f1b4a7b8b3f}{ompl\-::base\-::\-State $\ast$ {\bfseries kidnapped\-State\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a37da5e25b562ec18adef4f1b4a7b8b3f}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a228fe2d0b51d15f3604452bfeb76244e}{firm\-::\-Space\-Information\-::\-Space\-Information\-Ptr {\bfseries si\-F\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a228fe2d0b51d15f3604452bfeb76244e}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a922efe3cf2820e08df7d8303c110b66e}{firm\-::\-R\-O\-S\-Space\-Information\-::\-Space\-Information\-Ptr {\bfseries si\-R\-O\-S\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a922efe3cf2820e08df7d8303c110b66e}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_aefeb0ee1d30d887364dcfae2ab524b5d}{ompl\-::control\-::\-State\-Propagator\-Ptr {\bfseries state\-Propagator\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_aefeb0ee1d30d887364dcfae2ab524b5d}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a8c6be8acc8cf827400cc41170f432c9d}{ompl\-::control\-::\-Control\-Space\-Ptr {\bfseries cs\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a8c6be8acc8cf827400cc41170f432c9d}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a40779d3b133223f81ef3e218a5d90612}{ompl\-::base\-::\-State\-Space\-Ptr {\bfseries ss\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a40779d3b133223f81ef3e218a5d90612}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a07b3fc5b516305a7555876b8fe34bce7}{ompl\-::base\-::\-Planner\-Ptr {\bfseries planner\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a07b3fc5b516305a7555876b8fe34bce7}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a1f9625d517a8f370ac0c532bb5dc2751}{ompl\-::base\-::\-Problem\-Definition\-Ptr {\bfseries pdef\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a1f9625d517a8f370ac0c532bb5dc2751}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_ab1e92e95e20ed11bd1cca15a0b0590c6}{ompl\-::base\-::\-State\-Validity\-Checker\-Ptr {\bfseries vc\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_ab1e92e95e20ed11bd1cca15a0b0590c6}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_aba4edbbdb8129a2563749064cf4d1111}{std\-::string {\bfseries path\-To\-Setup\-File\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_aba4edbbdb8129a2563749064cf4d1111}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a4f56a34657c037f6fb1a2847b0c1597d}{double {\bfseries planning\-Time\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a4f56a34657c037f6fb1a2847b0c1597d}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a00672b623cb82f20376cedbbd0f5bb92}{unsigned int {\bfseries min\-Nodes\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a00672b623cb82f20376cedbbd0f5bb92}
+
+\item 
+\hypertarget{class_f_i_r_m_aruco2_d_r_o_s_setup_a7e5f55d1f8e440de504cef46d5ec4888}{bool {\bfseries setup\-\_\-}}\label{class_f_i_r_m_aruco2_d_r_o_s_setup_a7e5f55d1f8e440de504cef46d5ec4888}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Wrapper for ompl\-::app\-::\-Rigid\-Body\-Planning that plans for rigid bodies in \hyperlink{class_s_e2_belief_space}{S\-E2\-Belief\-Space} using \hyperlink{class_f_i_r_m}{F\-I\-R\-M}. 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+include/\-Setup/F\-I\-R\-M\-Aruco2\-D\-R\-O\-S\-Setup.\-h\end{DoxyCompactItemize}
