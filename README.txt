@@ -33,7 +33,7 @@ References:
 
 4. http://edplab.org :  Estimation, Decision and Planning Lab Webpage (publications, related work, videos)
 
-5. ompl.kavrakilab.org : OMPL documentation and code
+5. http://ompl.kavrakilab.org : OMPL documentation and code
 
 ----------------------------------------
 Compiling & Running
