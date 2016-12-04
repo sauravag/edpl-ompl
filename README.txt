@@ -87,7 +87,8 @@ space, then you would need to define a new belief space class. For example, if y
 How To Integrate With ROS
 ---------------------------------------
 
-Integration with a real robot through ROS or any other system, simply requires that during policy execution, the apply control and get observation commands are sent to the right "SpaceInformation". For example, we provide a ROSSpaceInformation class that is able to send twist messages. The example should be sufficient for you to get started with ROS development. You may need to update the CMakeLists accordingly.
+Integration with a real robot through ROS or any other system, simply requires that during policy execution, the apply control and get observation commands are sent to the right "SpaceInformation". For example, we provide a ROSSpaceInformation class that is able to send twist messages. The example should be sufficient for you to get started with ROS development. You may need to update the CMakeLists accordingly. There is a variable USE_ROS in edplompl.h that needs to be defined which will
+use FIRMAruco2DROSSetup.h, this setup file has not been fully tested recently but should be fairly easy to use.
 
 ---------------------------------------
 How To Contribute
