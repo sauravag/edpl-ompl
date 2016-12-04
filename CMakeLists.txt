@@ -27,7 +27,6 @@ if(APPLE)
 endif()
 
 if(APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set(QT_QMAKE_EXECUTABLE /opt/local/libexec/qt4/bin/qmake)
     include(GetPrerequisites)
     get_prerequisites("${Boost_SYSTEM_LIBRARY}" _libs 0 0 "/" "")
     set(CXXSTDLIB "")
