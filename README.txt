@@ -43,15 +43,15 @@ A CMakeLists.txt file is provided for easy compilation with cmake.
 
 External Depencies: [All of these are hard requirements for this app to run]
 
-1. Open Motion Planning Library (OMPL v1.0.0): Excellent instructions provided on the ompl website [http://ompl.kavrakilab.org/] for installation. Follow the instructions to build and install the full omplapp and QT will automatically be installed as part of that.  
+1. Open Motion Planning Library (OMPL v1.2.1): Excellent instructions provided on the ompl website [http://ompl.kavrakilab.org/] for installation. Follow the instructions to build and install the full omplapp and QT will automatically be installed as part of that.  
  
-2. QT & OpenGL (freeglut): For Visualization
+2. QT4 & OpenGL (freeglut): For Visualization (Ubuntu: sudo apt-get install freeglut3-dev libqt4-dev)
 
-3. Armadillo C++ Matrix Algebra Library: Recommended to download and build from source
+3. Armadillo C++ (version 7.5) Matrix Algebra Library: Recommended to download and build from source (http://arma.sourceforge.net/download.html)
 
-4. tinyxml: Needed for reading landmark/setup parameters
+4. tinyxml: Needed for reading landmark/setup parameters (Ubuntu: sudo apt-get install libtinyxml-dev)
 
-5. Cmake and a C++ compiler (gcc etc.)
+5. Cmake and a C++ compiler (Tested GNU 5.4.1 use this or newer GNU versions, GNU 4.8 won't work)
 
 Build:
 
