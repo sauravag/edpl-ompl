@@ -126,16 +126,11 @@ void planROS()
 
     FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
 
-    // Visualizer needs to know space information as well.
-    Visualizer::updateSpaceInformation(mySetup->getSpaceInformation());
-
     std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
     mySetup->setup();
-
-    Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(mySetup), mySetup->getGeometricStateExtractor());
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
@@ -209,7 +204,7 @@ int main(int argc, char **argv)
         2. To plan with ROS integration, the provided example listens for aruco_marker_publisher and advertises robot commands to geometry::twist
     */
     #ifndef USE_ROS
-        boost::thread solveThread(plan); //  COMMENT OUT TO PLAN WITHOUT ROS
+        boost::thread solveThread(plan);
     #endif
 
     #ifdef USE_ROS

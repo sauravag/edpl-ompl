@@ -153,7 +153,6 @@ void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<ar
 
 bool FIRMUtils::readFIRMGraphFromXML(const std::string &pathToXML, std::vector<std::pair<int, arma::colvec> > &FIRMNodePosList, std::vector<std::pair<int, arma::mat> > &FIRMNodeCovarianceList, std::vector<std::pair<std::pair<int,int>,FIRMWeight> > &edgeWeights)
 {
-    //std::string npathToXML = "/home/saurav/edpl-ompl/SavedRoadMaps/FIRMRoadMap_Env2_Omni_65.xml";
 
     TiXmlDocument doc(pathToXML);
 
