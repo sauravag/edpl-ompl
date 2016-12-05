@@ -71,7 +71,7 @@ namespace ompl
         static const double ROADMAP_BUILD_TIME = 60;
 
         /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-        static const double NUM_MONTE_CARLO_PARTICLES = 4; // minimum 10 for FIRM, 4 for rollout
+        static const double NUM_MONTE_CARLO_PARTICLES = 10; // minimum 10 for FIRM, 4 for rollout
 
         /** \brief For a node that is not observable, use a fixed covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1;
@@ -521,17 +521,17 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     ompl::base::PlannerTerminationCondition ptcOrSolutionFound =
         ompl::base::plannerOrTerminationCondition(ptc, ompl::base::PlannerTerminationCondition(boost::bind(&FIRM::addedNewSolution, this)));
 
-    // If no roadmap was loaded or the number of loaded is less than min required by setup, then construct one
+    // If no roadmap was loaded or the number of loaded is less than min required by setup, then build roadmap
     if(!loadedRoadmapFromFile_ || boost::num_vertices(g_) < minFIRMNodes_)
     {
         constructRoadmap(ptcOrSolutionFound);
     }
 
     // If roadmap wasn't loaded from file, then save the newly constructed roadmap
-    if(!loadedRoadmapFromFile_)
-    {
+    //if(!loadedRoadmapFromFile_)
+    //{
         this->savePlannerData();
-    }
+    //}
 
     slnThread.join();
 

@@ -146,7 +146,7 @@ void FIRMUtils::writeFIRMGraphToXML(const std::vector<std::pair<int,std::pair<ar
 
     std::string timeStamp(to_iso_string(now)) ;
 
-    std::string roadmapFileName =  "FIRMRoadMap.xml" + timeStamp ;
+    std::string roadmapFileName =  "FIRMRoadMap-" + timeStamp + ".xml";
 
 	doc.SaveFile(roadmapFileName);
 }

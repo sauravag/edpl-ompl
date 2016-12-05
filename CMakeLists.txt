@@ -43,7 +43,7 @@ if(APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 # reqd packages
-find_package(Boost QUIET 1.50)
+find_package(Boost QUIET 1.54)
 find_package(Boost COMPONENTS date_time thread serialization filesystem system program_options unit_test_framework chrono REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Qt4 4.4.3 REQUIRED QtCore QtGui QtXml REQUIRED)
