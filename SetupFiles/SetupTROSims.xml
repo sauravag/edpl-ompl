@@ -229,7 +229,7 @@
 		mode = "0"
 	/><!-- mode is 0 for FIRM 1 for rollout and 2 for Kidnapping Multimodal-->
 	<RoadMap
-		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_Env2_Omni_215.xml"
+		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_Env2_Omni_415.xml"
 		useRoadMap = "1"
 	/>
 	<Environment
@@ -239,22 +239,22 @@
 		robotFile = "./Models/iRobot.obj"
 	/>
 	<StartPose
-		x = "6.0"
-		y = "9.0"
-		theta = "-1.2"
+		x = "4.12"
+		y = "17.70"
+		theta = "-1.0"
 	/>
 	<PlanningTime
 		maxTime = "600"
 	/>
 	<FIRMNodes
-		minNodes = "225"
+		minNodes = "425"
 	/>
 	<KidnappedState
         x = 1.5 y = 19.5 theta = 1.57 
     />
 </PlanningProblem>
 <GoalList>
-	<GoalPose x = "11" y = "10.0" theta = "1.7" />
+	<GoalPose x = "19.3" y = "1.0" theta = "1.5" />
 </GoalList>
 <!--
 	<StartPose
