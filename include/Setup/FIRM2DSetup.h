@@ -200,11 +200,12 @@ public:
 
             planner_->setup();
 
+            planner_->as<FIRM>()->loadParametersFromFile(pathToSetupFile_.c_str());
+
+            // Setup visualizer because it is needed while loading roadmap and visualizing it
             Visualizer::updateSpaceInformation(this->getSpaceInformation());
 
             Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(this), this->getGeometricStateExtractor());
-
-            planner_->as<FIRM>()->loadParametersFromFile(pathToSetupFile_.c_str());
 
             if (useSavedRoadMap_ == 1) planner_->as<FIRM>()->loadRoadMapFromFile(pathToRoadMapFile_.c_str());
 
