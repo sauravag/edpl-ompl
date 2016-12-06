@@ -264,6 +264,9 @@ public:
     /** \brief Load the roadmap info from a file */
     virtual void loadRoadMapFromFile(const std::string &pathToFile);
 
+    /** \brief Load planner parameters specific to this planner. */
+    virtual void loadParametersFromFile(const std::string &pathToFile);
+
     void setKidnappedState(ompl::base::State *state)
     {
         kidnappedState_ = si_->cloneState(state);
@@ -436,7 +439,7 @@ protected:
     std::map <Vertex, Edge> feedback_;
 
     /** \brief The number of particles to use for monte carlo simulations*/
-    unsigned int numParticles_;
+    unsigned int numMCParticles_;
 
     /** \brief The minimum number of nodes that should be sampled. */
     unsigned int minFIRMNodes_;
@@ -450,81 +453,8 @@ protected:
     /** \brief Send the most likely path to visualizer based on start location*/
     void sendMostLikelyPathToViz(const Vertex start, const Vertex goal);
 
-    void makeDataLogPath()
-    {
-
-        namespace pt = boost::posix_time;
-
-        pt::ptime now = pt::second_clock::local_time();
-
-        std::string timeStamp(to_iso_string(now)) ;
-
-        std::string folderPath = "/home/saurav/TROSIMS/545Nodes/Rollout/run-" + timeStamp ;
-
-        boost::filesystem::path dir(folderPath);
-
-        boost::filesystem::create_directory(dir);
-
-        logFilePath_ = folderPath + "/";
-
-    }
-
     /** \brief Writes a time series data to a file */
-    void writeTimeSeriesDataToFile(std::string fname, std::string dataName)
-    {
-
-        std::ofstream outfile;
-
-        outfile.open(logFilePath_ + fname);
-
-        if(dataName.compare("costToGo")==0)
-        {
-            for(int i=0; i < costToGoHistory_.size(); i++)
-            {
-                outfile<<costToGoHistory_[i].first<<","<<costToGoHistory_[i].second<<std::endl;
-            }
-        }
-
-        if(dataName.compare("successProbability")==0)
-        {
-            for(int i=0; i < successProbabilityHistory_.size(); i++)
-            {
-                outfile<<successProbabilityHistory_[i].first<<","<<successProbabilityHistory_[i].second<<std::endl;
-            }
-        }
-
-        if(dataName.compare("nodesReached")==0)
-        {
-            for(int i=0; i < nodeReachedHistory_.size(); i++)
-            {
-                outfile<<nodeReachedHistory_[i].first<<","<<nodeReachedHistory_[i].second<<std::endl;
-            }
-        }
-
-        if(dataName.compare("velocity")==0)
-        {
-            for(int i=0; i < velocityHistory_.size(); i++)
-            {
-                outfile<<velocityHistory_[i].first<<","<<velocityHistory_[i].second<<std::endl;
-            }
-        }
-
-        if(dataName.compare("multiModalWeights")==0)
-        {
-            for(int i=0; i < successProbabilityHistory_.size(); i++)
-            {
-                outfile<<weightsHistory_[i].first<<",";
-
-                for(int j=0; j< weightsHistory_[i].second.size(); j++)
-                {
-                    outfile<<weightsHistory_[i].second[j]<<",";
-                }
-                outfile<<std::endl;
-            }
-        }
-
-        outfile.close();
-    }
+    void writeTimeSeriesDataToFile(std::string fname, std::string dataName);
 
 private:
 
@@ -558,7 +488,14 @@ private:
 
     double executionCost_;
 
+    /** \brief Path to where log files will be stored. */
     std::string logFilePath_;
+
+    /** \brief Flag to save roadmap or not */
+    bool doSavePlannerData_;
+
+    /** \brief Flag to save run time simulation logs or not */
+    bool doSaveLogs_;
 
 };
 

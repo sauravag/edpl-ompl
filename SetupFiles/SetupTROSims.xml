@@ -224,12 +224,17 @@
 		<!--wind_noise_pos="1.000"
 		wind_noise_ang="7.0"-->
 </MotionModels>
+<FIRM>
+	<DataLog save = "1" folder = "../TROSIMS/525Nodes/Rollout/" />
+	<Roadmap save = "0" />
+	<MCParticles numparticles = "4" />
+</FIRM>
 <PlanningProblem>
 	<Mode
 		mode = "1"
 	/><!-- mode is 0 for FIRM 1 for rollout and 2 for Kidnapping Multimodal-->
 	<RoadMap
-		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_Env2_Omni_545.xml"
+		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_Env2_Omni_525.xml"
 		useRoadMap = "1"
 	/>
 	<Environment

@@ -204,6 +204,8 @@ public:
 
             Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(this), this->getGeometricStateExtractor());
 
+            planner_->as<FIRM>()->loadParametersFromFile(pathToSetupFile_.c_str());
+
             if (useSavedRoadMap_ == 1) planner_->as<FIRM>()->loadRoadMapFromFile(pathToRoadMapFile_.c_str());
 
             setup_ = true;

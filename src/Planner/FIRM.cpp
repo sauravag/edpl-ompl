@@ -46,6 +46,7 @@
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
+#include <tinyxml.h>
 #include "Visualization/Visualizer.h"
 #include "Utils/FIRMUtils.h"
 #include "Planner/FIRM.h"
@@ -68,10 +69,7 @@ namespace ompl
         static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
 
         /** \brief The time in seconds for a single roadmap building operation */
-        static const double ROADMAP_BUILD_TIME = 60;
-
-        /** \brief Number of monte carlo simulations to run for one edge when adding an edge to the roadmap */
-        static const double NUM_MONTE_CARLO_PARTICLES = 4; // minimum 10 for FIRM, 4 for rollout
+        static const double ROADMAP_BUILD_TIME = 60;        
 
         /** \brief For a node that is not observable, use a fixed covariance */
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1;
@@ -145,11 +143,17 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     policyGenerator_ = new NBM3P(si);
 
-    loadedRoadmapFromFile_ = false;
-
     policyExecutionSI_ = siF_; // by default policies are executed in the same space that the roadmap is generated
 
-    makeDataLogPath();
+    logFilePath_ = "./";
+
+    loadedRoadmapFromFile_ = false;
+
+    numMCParticles_ = 5;
+
+    doSavePlannerData_ = false;
+
+    doSaveLogs_ = false;
 
 }
 
@@ -173,9 +177,6 @@ void FIRM::setup(void)
         connectionStrategy_ = FStrategy<Vertex>(ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
         //connectionStrategy_ = ompl::geometric::KBoundedStrategy<Vertex>(ompl::magic::DEFAULT_NEAREST_NEIGHBORS, ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
     }
-
-    int np = ompl::magic::NUM_MONTE_CARLO_PARTICLES;
-    numParticles_ = np;
 
 }
 
@@ -527,8 +528,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         constructRoadmap(ptcOrSolutionFound);
     }
 
-    // If roadmap wasn't loaded from file, then save the newly constructed roadmap
-    if(!loadedRoadmapFromFile_)
+    if(doSavePlannerData_)
     {
         this->savePlannerData();
     }
@@ -755,7 +755,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
     // if want/do not want to show monte carlo sim
     siF_->showRobotVisualization(SHOW_MONTE_CARLO);
 
-    for(unsigned int i=0; i< numParticles_;i++)
+    for(unsigned int i=0; i< numMCParticles_;i++)
     {
 
         siF_->setTrueState(startNodeState);
@@ -785,7 +785,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
     //edgeCost.v = edgeCost.v / successCount ;
     edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
 
-    double transitionProbability = successCount / numParticles_ ;
+    double transitionProbability = successCount / numMCParticles_ ;
 
     FIRMWeight weight(edgeCost.value(), transitionProbability);
 
@@ -1156,23 +1156,26 @@ void FIRM::executeFeedback(void)
 
     }
 
-    writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
-
-    writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory.csv", "successProbability");
-
-    writeTimeSeriesDataToFile("StandardFIRMNodesReachedHistory.csv","nodesReached");
-
-    std::vector<std::pair<double, double> > velLog;
-
-    siF_->getVelocityLog(velLog);
-
-    for(int i=0; i < velLog.size(); i++)
+    if(doSaveLogs_)
     {
-        //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); //unicycle
-        velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
-    }
+        std::vector<std::pair<double, double> > velLog;
 
-    writeTimeSeriesDataToFile("StandardFIRMVelocityHistory.csv", "velocity");
+        siF_->getVelocityLog(velLog);
+
+        for(int i=0; i < velLog.size(); i++)
+        {
+            //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); //unicycle
+            velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
+        }
+
+        writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
+
+        writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory.csv", "successProbability");
+
+        writeTimeSeriesDataToFile("StandardFIRMNodesReachedHistory.csv","nodesReached");
+
+        writeTimeSeriesDataToFile("StandardFIRMVelocityHistory.csv", "velocity");
+    }
 
     Visualizer::doSaveVideo(false);
 
@@ -1319,10 +1322,6 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     }
 
-    //writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
-
-    //writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory", "successProbability");
-
     Visualizer::doSaveVideo(false);
 
 }
@@ -1333,8 +1332,11 @@ void FIRM::executeFeedbackWithRollout(void)
 
     // Open a file for writing rollout computation time
     std::ofstream outfile;
-    outfile.open(logFilePath_+"RolloutComputationTime.csv");
-    outfile<<"RolloutNum, RadiusNN, NumNN, MCParticles, avgTimePerNeighbor, totalTimeSecs" <<std::endl;
+    if(doSaveLogs_)
+    {
+        outfile.open(logFilePath_+"RolloutComputationTime.csv");
+        outfile<<"RolloutNum, RadiusNN, NumNN, MCParticles, avgTimePerNeighbor, totalTimeSecs" <<std::endl;
+    }
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::RolloutMode);
     Visualizer::clearRobotPath();
@@ -1463,8 +1465,11 @@ void FIRM::executeFeedbackWithRollout(void)
 
             averageTimeForRolloutComputation +=  timeToDoRollout / numNN;
 
-            outfile<<numberOfRollouts<<","<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<","
-                   <<numNN<<","<<ompl::magic::NUM_MONTE_CARLO_PARTICLES<<","<<timeToDoRollout / (1000*numNN)<<","<<timeToDoRollout/1000<<std::endl;
+            if(doSaveLogs_)
+            {
+                outfile<<numberOfRollouts<<","<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<","
+                   <<numNN<<","<<numMCParticles_<<","<<timeToDoRollout / (1000*numNN)<<","<<timeToDoRollout/1000<<std::endl;
+            }
 
             std::cout << "Time to execute rollout : "<<timeToDoRollout << " milli seconds."<<std::endl;
 
@@ -1491,27 +1496,31 @@ void FIRM::executeFeedbackWithRollout(void)
 
     averageTimeForRolloutComputation = averageTimeForRolloutComputation / (1000*numberOfRollouts);
 
-    std::cout<<"Nearest Neighbor Radius: "<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<", Monte Carlo Particles: "<<ompl::magic::NUM_MONTE_CARLO_PARTICLES<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;
+    std::cout<<"Nearest Neighbor Radius: "<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<", Monte Carlo Particles: "<<numMCParticles_<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;    
 
-    outfile.close();
-
-    writeTimeSeriesDataToFile("RolloutFIRMCostHistory.csv", "costToGo");
-
-    writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory.csv", "successProbability");
-
-    writeTimeSeriesDataToFile("RolloutFIRMNodesReachedHistory.csv","nodesReached");
-
-    std::vector<std::pair<double, double> > velLog;
-
-    siF_->getVelocityLog(velLog);
-
-    for(int i=0; i < velLog.size(); i++)
+    if(doSaveLogs_)
     {
-        velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
-        //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); // unicycle
-    }
 
-    writeTimeSeriesDataToFile("RolloutFIRMVelocityHistory.csv", "velocity");
+        outfile.close();
+
+        writeTimeSeriesDataToFile("RolloutFIRMCostHistory.csv", "costToGo");
+
+        writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory.csv", "successProbability");
+
+        writeTimeSeriesDataToFile("RolloutFIRMNodesReachedHistory.csv","nodesReached");
+
+        std::vector<std::pair<double, double> > velLog;
+
+        siF_->getVelocityLog(velLog);
+
+        for(int i=0; i < velLog.size(); i++)
+        {
+            velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
+            //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); // unicycle
+        }
+
+        writeTimeSeriesDataToFile("RolloutFIRMVelocityHistory.csv", "velocity");
+    }
 
     Visualizer::doSaveVideo(false);
 
@@ -1764,6 +1773,149 @@ void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
         }
 
     }
+}
+
+void FIRM::writeTimeSeriesDataToFile(std::string fname, std::string dataName)
+{
+
+    std::ofstream outfile;
+
+    outfile.open(logFilePath_ + fname);
+
+    if(dataName.compare("costToGo")==0)
+    {
+        for(int i=0; i < costToGoHistory_.size(); i++)
+        {
+            outfile<<costToGoHistory_[i].first<<","<<costToGoHistory_[i].second<<std::endl;
+        }
+    }
+
+    if(dataName.compare("successProbability")==0)
+    {
+        for(int i=0; i < successProbabilityHistory_.size(); i++)
+        {
+            outfile<<successProbabilityHistory_[i].first<<","<<successProbabilityHistory_[i].second<<std::endl;
+        }
+    }
+
+    if(dataName.compare("nodesReached")==0)
+    {
+        for(int i=0; i < nodeReachedHistory_.size(); i++)
+        {
+            outfile<<nodeReachedHistory_[i].first<<","<<nodeReachedHistory_[i].second<<std::endl;
+        }
+    }
+
+    if(dataName.compare("velocity")==0)
+    {
+        for(int i=0; i < velocityHistory_.size(); i++)
+        {
+            outfile<<velocityHistory_[i].first<<","<<velocityHistory_[i].second<<std::endl;
+        }
+    }
+
+    if(dataName.compare("multiModalWeights")==0)
+    {
+        for(int i=0; i < successProbabilityHistory_.size(); i++)
+        {
+            outfile<<weightsHistory_[i].first<<",";
+
+            for(int j=0; j< weightsHistory_[i].second.size(); j++)
+            {
+                outfile<<weightsHistory_[i].second[j]<<",";
+            }
+            outfile<<std::endl;
+        }
+    }
+
+    outfile.close();
+}
+
+void FIRM::loadParametersFromFile(const std::string &pathToFile)
+{
+   TiXmlDocument doc(pathToFile);
+
+    bool loadOkay = doc.LoadFile();
+
+    if( !loadOkay )
+    {
+        printf( "FIRM: Could not load setup file. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+
+        exit( 1 );
+    }
+
+    TiXmlNode* node = 0;
+
+    TiXmlElement* itemElement = 0;
+
+    node = doc.FirstChild( "FIRM" );
+    assert( node );
+
+    TiXmlNode* child = 0;
+
+    child = node->FirstChild("DataLog");
+    assert( child );
+
+    itemElement = child->ToElement();
+    assert( itemElement );
+
+    std::string logpath;
+    itemElement->QueryStringAttribute("folder", &logpath);
+    logFilePath_ = logpath;
+
+    namespace pt = boost::posix_time;
+
+    pt::ptime now = pt::second_clock::local_time();
+
+    std::string timeStamp(to_iso_string(now)) ;
+
+    logFilePath_ = logFilePath_ + "run-" + timeStamp ;
+
+    boost::filesystem::path dir(logFilePath_);
+
+    boost::filesystem::create_directory(dir);
+
+    logFilePath_ = logFilePath_ + "/";
+
+    int saveLog = 0;
+    itemElement->QueryIntAttribute("save", &saveLog);
+    if(saveLog==1)
+    {
+        doSaveLogs_ = true;
+    }
+    else
+    {
+       doSaveLogs_ = false;
+    }
+
+    child = node->FirstChild("Roadmap");
+    assert( child );
+
+    itemElement = child->ToElement();
+    assert( itemElement );
+
+    int saveRoadmap = 0;
+    itemElement->QueryIntAttribute("save", &saveRoadmap);
+
+    if(saveRoadmap == 1)
+    {
+        doSavePlannerData_ = true;
+    }
+    else
+    {
+        doSavePlannerData_ = false;
+    }
+
+    child = node->FirstChild("MCParticles");
+    assert( child );
+
+    itemElement = child->ToElement();
+    assert( itemElement );
+
+    int numP = 0;
+    itemElement->QueryIntAttribute("numparticles", &numP);
+    numMCParticles_ = numP;
+
 }
 
 bool FIRM::isStartVertex(const Vertex v)
