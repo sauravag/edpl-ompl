@@ -226,10 +226,10 @@
 </MotionModels>
 <PlanningProblem>
 	<Mode
-		mode = "0"
+		mode = "1"
 	/><!-- mode is 0 for FIRM 1 for rollout and 2 for Kidnapping Multimodal-->
 	<RoadMap
-		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_Env2_Omni_505.xml"
+		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_Env2_Omni_545.xml"
 		useRoadMap = "1"
 	/>
 	<Environment
@@ -239,30 +239,30 @@
 		robotFile = "./Models/iRobot.obj"
 	/>
 	<StartPose
-		x = "2.51"
-		y = "18.04"
-		theta = "0.3"
+		x = "1.2"	y = "14.0"	theta = "0.0"
 	/>
 	<PlanningTime
 		maxTime = "600"
 	/>
 	<FIRMNodes
-		minNodes = "515"
+		minNodes = "50"
 	/>
 	<KidnappedState
         x = 1.5 y = 19.5 theta = 1.57 
     />
 </PlanningProblem>
 <GoalList>
-	<GoalPose x = "11.45" y = "3.41" theta = "-1.8" />
+	<GoalPose x = "16.5" y = "15.9" theta = "-1.0" />
+	<GoalPose x = "5.0" y = "5.1141" theta = "-1.0" />
+	<GoalPose x = "19.2" y = "3.0" theta = "0" />
+	<GoalPose x = "10" y = "11" theta = "0" />
 </GoalList>
 <!--
 	<StartPose
-		x = "1.2"
-		y = "14.0"
-		theta = "0.0"
+		x = "1.2"	y = "14.0"	theta = "0.0"
 	/>
 	<GoalPose x = "16.5" y = "15.9" theta = "-1.0" />
 	<GoalPose x = "5.0" y = "5.1141" theta = "-1.0" />
 	<GoalPose x = "19.2" y = "3.0" theta = "0" />
-	<GoalPose x = "10" y = "11" theta = "0" />-->
+	<GoalPose x = "10" y = "11" theta = "0" />
+-->

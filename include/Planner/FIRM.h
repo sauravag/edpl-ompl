@@ -459,7 +459,7 @@ protected:
 
         std::string timeStamp(to_iso_string(now)) ;
 
-        std::string folderPath = "/home/saurav/TMP/RunData-" + timeStamp ;
+        std::string folderPath = "/home/saurav/TROSIMS/545Nodes/Rollout/run-" + timeStamp ;
 
         boost::filesystem::path dir(folderPath);
 
