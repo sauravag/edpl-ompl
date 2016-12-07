@@ -225,6 +225,7 @@
 		wind_noise_ang="7.0"-->
 </MotionModels>
 <FIRM>
+	<Video save = "0" />
 	<DataLog save = "1" folder = "../TROSIMS/515Nodes/Rollout/" />
 	<Roadmap save = "0" />
 	<MCParticles numparticles = "4" />

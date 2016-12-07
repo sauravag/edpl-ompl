@@ -497,6 +497,8 @@ private:
     /** \brief Flag to save run time simulation logs or not */
     bool doSaveLogs_;
 
+    /** \brief Flag to save video */
+    bool doSaveVideo_;
 };
 
 

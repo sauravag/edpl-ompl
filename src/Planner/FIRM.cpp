@@ -155,6 +155,8 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     doSaveLogs_ = false;
 
+    doSaveVideo_ = false;
+
 }
 
 FIRM::~FIRM(void)
@@ -1065,7 +1067,7 @@ void FIRM::executeFeedback(void)
 
     OMPL_INFORM("FIRM: Running policy execution");
 
-    Visualizer::doSaveVideo(true);
+    Visualizer::doSaveVideo(doSaveVideo_);
 
     nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
@@ -1144,7 +1146,7 @@ void FIRM::executeFeedback(void)
 
             solveDynamicProgram(goal);
 
-            Visualizer::doSaveVideo(true);
+            Visualizer::doSaveVideo(doSaveVideo_);
             siF_->doVelocityLogging(true);
 
         }
@@ -1209,7 +1211,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     int kidnappingCounter  = 0;
 
-    Visualizer::doSaveVideo(true);
+    Visualizer::doSaveVideo(doSaveVideo_);
 
     while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)/*currentVertex != goal*/)
     {
@@ -1270,7 +1272,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
             solveDynamicProgram(goal);
 
-            Visualizer::doSaveVideo(true);
+            Visualizer::doSaveVideo(doSaveVideo_);
 
         }
 
@@ -1372,7 +1374,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     int numberOfRollouts = 0;
 
-    Visualizer::doSaveVideo(true);
+    Visualizer::doSaveVideo(doSaveVideo_);
 
     connectionStrategy_ = FStrategy<Vertex>(1.2*ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
 
@@ -1455,7 +1457,7 @@ void FIRM::executeFeedbackWithRollout(void)
             // end profiling time to compute rollout
             auto end_time = std::chrono::high_resolution_clock::now();
 
-            Visualizer::doSaveVideo(true);
+            Visualizer::doSaveVideo(doSaveVideo_);
 
             numberOfRollouts++;
 
@@ -1853,6 +1855,18 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
 
     TiXmlNode* child = 0;
 
+    // Video
+    child = node->FirstChild("Video");
+    assert( child );
+
+    itemElement = child->ToElement();
+    assert( itemElement );
+
+    int saveVideo = 0;
+    itemElement->QueryIntAttribute("save", &saveVideo);
+    if(saveVideo == 1) doSaveLogs_ = true;
+
+    // Logging
     child = node->FirstChild("DataLog");
     assert( child );
 
@@ -1888,6 +1902,7 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
        doSaveLogs_ = false;
     }
 
+    // Roadmap output
     child = node->FirstChild("Roadmap");
     assert( child );
 
@@ -1906,6 +1921,7 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
         doSavePlannerData_ = false;
     }
 
+    // Monte carlo parameters
     child = node->FirstChild("MCParticles");
     assert( child );
 
@@ -1969,7 +1985,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     int counter = 0;
 
-    Visualizer::doSaveVideo(true);
+    Visualizer::doSaveVideo(doSaveVideo_);
 
     int timeSinceKidnap = 0;
 
@@ -1983,7 +1999,7 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
         policyGenerator_->generatePolicy(policy);
 
-        Visualizer::doSaveVideo(true);
+        Visualizer::doSaveVideo(doSaveVideo_);
 
         int rndnum = FIRMUtils::generateRandomIntegerInRange(100, ompl::magic::MAX_MM_POLICY_LENGTH/*policy.size()-1*/);
 
