@@ -100,11 +100,9 @@ int methodSetup(const std::string &setupFilePath)
     return m;
 }
 
-void plan()
+void plan(const std::string &setupFilePath)
 {
     FIRM2DSetup *mySetup(new FIRM2DSetup);
-
-    std::string setupFilePath = "./SetupFiles/SetupTROSims.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -150,12 +148,10 @@ void plan()
 }
 
 #ifdef USE_ROS
-void planROS()
+void planROS(const std::string &setupFilePath)
 {
 
     FIRMAruco2DROSSetup *mySetup(new FIRMAruco2DROSSetup);
-
-    std::string setupFilePath = "./SetupFiles/SetupM3PExp1.xml";
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -203,7 +199,7 @@ void planROS()
 }
 #endif
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
 
     #ifdef USE_ROS
@@ -233,11 +229,11 @@ int main(int argc, char **argv)
         2. To plan with ROS integration, the provided example listens for aruco_marker_publisher and advertises robot commands to geometry::twist
     */
     #ifndef USE_ROS
-        boost::thread solveThread(plan);
+        boost::thread solveThread(plan,argv[1]);
     #endif
 
     #ifdef USE_ROS
-        boost::thread solveThread(planROS);
+        boost::thread solveThread(planROS,argv[1]);
     #endif
 
     app.exec();

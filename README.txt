@@ -24,7 +24,7 @@ Quick Instructions:
 From the folder containing this readme
  1. $chmod +x scripts/build_bsp.sh
  2. $./scripts/build_bsp.sh
- 3. $./bsp-app-demo
+ 3. $./bsp-app-demo "./SetupFiles/SetupTROSims.xml"
 
 Details:
 

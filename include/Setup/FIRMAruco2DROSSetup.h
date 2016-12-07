@@ -215,6 +215,8 @@ public:
 
             planner_->setup();
 
+            planner_->as<FIRM>()->loadParametersFromFile(pathToSetupFile_.c_str());
+            
             Visualizer::updateSpaceInformation(this->getSpaceInformation());
 
             Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(this), this->getGeometricStateExtractor());
