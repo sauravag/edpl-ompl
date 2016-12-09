@@ -251,7 +251,7 @@
 		maxTime = "600"
 	/>
 	<FIRMNodes
-		minNodes = "95"
+		minNodes = "105"
 	/>
 	<KidnappedState
         x = 1.5 y = 19.5 theta = 1.57 
