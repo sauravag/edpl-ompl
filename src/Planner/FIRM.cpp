@@ -964,11 +964,14 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
     OMPL_INFORM("FIRM: Solved DP");
 
-    std::ofstream outfile;
-    outfile.open(logFilePath_+"DPSolveTime.txt",std::ios::app);
-    outfile<<"Time: "<<timeDP<<" ms"<<std::endl;
-    outfile.close();
-
+    if(doSaveLogs_)
+    {
+        std::ofstream outfile;
+        outfile.open(logFilePath_+"DPSolveTime.txt",std::ios::app);
+        outfile<<"Time: "<<timeDP<<" ms"<<std::endl;
+        outfile.close();
+    }
+    
     sendFeedbackEdgesToViz();
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::FeedbackViewMode);
@@ -1887,8 +1890,6 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
 
     boost::filesystem::path dir(logFilePath_);
 
-    boost::filesystem::create_directory(dir);
-
     logFilePath_ = logFilePath_ + "/";
 
     int saveLog = 0;
@@ -1896,6 +1897,7 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     if(saveLog==1)
     {
         doSaveLogs_ = true;
+        boost::filesystem::create_directory(dir);
     }
     else
     {
