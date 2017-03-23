@@ -88,6 +88,7 @@ link_directories(${Boost_LIBRARY_DIRS}
 # to turn it into a ros node and compile for example
 # M3PROSDemo.cpp as executable instead of main.
 add_library (bsp_lib
+	src/MotionModels/TwoDPointMotionModel.cpp
 	src/MotionModels/OmnidirectionalMotionModel.cpp
 	src/MotionModels/UnicycleMotionModel.cpp
 	src/MotionModels/UnicycleStatePropagator.cpp

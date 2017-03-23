@@ -34,22 +34,22 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#ifndef OMNIDIRECTIONAL_MOTIONMODEL_
-#define OMNIDIRECTIONAL_MOTIONMODEL_
+#ifndef TWODPOINT_MOTIONMODEL_
+#define TWODPOINT_MOTIONMODEL_
 
 #include "MotionModelMethod.h"
 #include <limits>
 #include <cassert>
 
 
-class OmnidirectionalMotionModel: public MotionModelMethod
+class TwoDPointMotionModel: public MotionModelMethod
 {
     //Dimensions of stat vector, control vector, motion noise vector
     //These are constant and specific to the motion model. This also implies
     //the motion model will only work with configurations of a particular dimension
-    static const int stateDim = 3;
-    static const int controlDim = 3;
-    static const int motionNoiseDim = 6;
+    static const int stateDim = 2;
+    static const int controlDim = 2;
+    static const int motionNoiseDim = 4;
 
   public:
     typedef typename MotionModelMethod::ControlType ControlType;
@@ -57,13 +57,13 @@ class OmnidirectionalMotionModel: public MotionModelMethod
     typedef typename MotionModelMethod::JacobianType JacobianType;
 
     /** \brief XML-based constructor */
-    OmnidirectionalMotionModel(const ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) : MotionModelMethod(si, motionNoiseDim)
+    TwoDPointMotionModel(const ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) : MotionModelMethod(si, motionNoiseDim)
     {
         this->loadParameters(pathToSetupFile);
     }
 
     /** \brief Destructor. */
-    ~OmnidirectionalMotionModel() {}
+    ~TwoDPointMotionModel() {}
 
     /** \brief Propagate the system to the next state, given the current state, a control and a noise. */
     void Evolve(const ompl::base::State *state, const ompl::control::Control *control, const NoiseType& w, ompl::base::State *result);
@@ -110,15 +110,8 @@ class OmnidirectionalMotionModel: public MotionModelMethod
     /** \brief  Covariance of state additive noise */
     arma::mat    P_Wg_; //
 
-    /** \brief max rotational velocity */
-    double maxAngularVelocity_; //
-
     /** \brief max translational velocity */
     double maxLinearVelocity_; //
-
-    /** \brief min translational velocity */
-    double minLinearVelocity_;
-
 
 };
 

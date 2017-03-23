@@ -36,7 +36,7 @@
 
 
 #include <tinyxml.h>
-#include "Spaces/SE2BeliefSpace.h"
+#include "Spaces/R2BeliefSpace.h"
 #include "MotionModels/TwoDPointMotionModel.h"
 #include "Utils/FIRMUtils.h"
 
@@ -58,14 +58,12 @@ void TwoDPointMotionModel::Evolve(const ompl::base::State *state, const ompl::co
 
     colvec x = state->as<StateType>()->getArmaData();
 
-    colvec Un2(3);
-    Un2 << Un[0] << Un[1] << Un[2] << endr;
+    colvec Un2(2);
+    Un2 << Un[0] << Un[1] << endr;
 
     x += (u*this->dt_) + (Un2*sqrt(this->dt_)) + (Wg*sqrt(this->dt_));
 
-    FIRMUtils::normalizeAngleToPiRange(x[2]);
-
-    result->as<StateType>()->setXYYaw(x[0],x[1],x[2]);
+    result->as<StateType>()->setXY(x[0],x[1]);
 }
 
 
@@ -88,84 +86,29 @@ void TwoDPointMotionModel::generateOpenLoopControls(const ompl::base::State *sta
     y_c << start[1] << endr
       << target[1] << endr;
 
-    double theta_p = 0;
-
-    double delta_theta = 0;
-
     double delta_disp = 0;
 
     double translation_steps = 0;
 
-    double theta_start = start[2];
-
-    double theta_target = target[2];
-
     // connecting line slope
     theta_p = atan2(y_c[1]-y_c[0], x_c[1]-x_c[0]);
-
-    // turining anlge from start to target
-    delta_theta = theta_target - theta_start;
-
-    // bringing the delta_th_p_start to the -PI to PI range
-    FIRMUtils::normalizeAngleToPiRange(delta_theta);
 
     //count translation steps
     delta_disp = sqrt( pow(y_c[1]-y_c[0], 2) + pow(x_c[1]-x_c[0], 2) );
 
     translation_steps = ceil(fabs(delta_disp/(maxLinearVelocity_*this->dt_)));
 
-    // If finite number of translation steps required
-    if(translation_steps > 0)
+    colvec u_const;
+    u_const_rot << maxLinearVelocity_*cos(theta_p) << endr
+                << maxLinearVelocity_*sin(theta_p) << endr;
+
+    for(int i=0; i<translation_steps; i++)
     {
-
-        // required angular velocity to orient to target state in calculated number of steps
-        double omega = delta_theta / (translation_steps*this->dt_)  ;
-
-        // checking to see if required angular velocity is within limits
-        //assert(abs(omega) < maxAngularVelocity_);
-
-        colvec u_const_rot;
-        u_const_rot << maxLinearVelocity_*cos(theta_p) << endr
-                    << maxLinearVelocity_*sin(theta_p) << endr
-                    << omega << endr;
-
-        for(int i=0; i<translation_steps; i++)
-        {
-          ompl::control::Control *tempControl = si_->allocControl();
-          ARMA2OMPL(u_const_rot, tempControl);
-          openLoopControls.push_back(tempControl);
-        }
+      ompl::control::Control *tempControl = si_->allocControl();
+      ARMA2OMPL(u_const_rot, tempControl);
+      openLoopControls.push_back(tempControl);
     }
-    else // If only change in heading required
-    {
-        // required angular velocity to orient to target state in calculated number of steps
-        int rotation_steps = ceil(abs(delta_theta / maxAngularVelocity_* this->dt_));
 
-        if(rotation_steps> 0)
-        {
-            double omega =  maxAngularVelocity_*(delta_theta/abs(delta_theta));
-
-            // checking to see if required angular velocity is within limits
-            //assert(abs(omega) < maxAngularVelocity_);
-
-            colvec u_const_rot;
-            u_const_rot << 0 << endr
-                        << 0 << endr
-                        << omega << endr;
-
-            for(int i=0; i<rotation_steps; i++)
-            {
-              ompl::control::Control *tempControl = si_->allocControl();
-              ARMA2OMPL(u_const_rot, tempControl);
-              openLoopControls.push_back(tempControl);
-            }
-        }
-        else
-        {
-            openLoopControls.push_back(this->getZeroControl());
-        }
-
-    }
 
 }
 
@@ -230,13 +173,10 @@ TwoDPointMotionModel::getControlJacobian(const ompl::base::State *state, const o
     colvec xData = state->as<StateType>()->getArmaData();
     assert (xData.n_rows == (size_t)this->stateDim_);
 
-    const double& theta = xData[2];
-
     mat B(3,3);
 
-    B <<  1 <<   0  <<  0   <<  endr
-      <<  0  <<  1  <<  0   << endr
-      <<  0  <<  0  <<  1   <<  endr;
+    B <<  1 <<   0  <<  endr
+      <<  0  <<  1  << endr;
 
     B *= this->dt_;
 
@@ -256,15 +196,10 @@ TwoDPointMotionModel::getNoiseJacobian(const ompl::base::State *state, const omp
 
     assert (xData.n_rows == (size_t)this->stateDim_);
 
-    const double& theta = xData[2];
-
     mat G(3,6);
 
-
-    G   << 1 << 0 << 0 << 1 << 0 << 0 << endr
-        << 0 << 1 << 0 << 0 << 1 << 0 << endr
-        << 0  << 0 << 1 << 0 << 0 << 1 << endr;
-
+    G   << 1 << 0 << 1 << 0 << endr
+        << 0 << 1 << 0 << 1 << endr;
 
     G *= sqrt(this->dt_);
     return G;
@@ -334,36 +269,24 @@ void TwoDPointMotionModel::loadParameters(const char *pathToSetupFile)
 
     double sigmaV=0;
     double etaV = 0;
-    double sigmaOmega=0;
-    double etaOmega=0;
     double windNoisePos=0;
-    double windNoiseAng = 0;
-    double minLinearVelocity=0;
     double maxLinearVelocity=0;
-    double maxAngularVelocity =0;
     double dt = 0;
 
     itemElement->QueryDoubleAttribute("sigmaV", &sigmaV) ;
     itemElement->QueryDoubleAttribute("etaV", &etaV) ;
-    itemElement->QueryDoubleAttribute("sigmaOmega", &sigmaOmega) ;
-    itemElement->QueryDoubleAttribute("etaOmega", &etaOmega) ;
     itemElement->QueryDoubleAttribute("wind_noise_pos", &windNoisePos) ;
-    itemElement->QueryDoubleAttribute("wind_noise_ang", &windNoiseAng) ;
-    itemElement->QueryDoubleAttribute("min_linear_velocity", &minLinearVelocity) ;
     itemElement->QueryDoubleAttribute("max_linear_velocity", &maxLinearVelocity) ;
-    itemElement->QueryDoubleAttribute("max_angular_velocity", &maxAngularVelocity) ;
     itemElement->QueryDoubleAttribute("dt", &dt) ;
 
-    this->sigma_ << sigmaV << sigmaV << sigmaOmega <<endr;
-    this->eta_  << etaV << etaV << etaOmega << endr;
+    this->sigma_ << sigmaV << sigmaV <<endr;
+    this->eta_  << etaV << etaV << endr;
 
-    rowvec Wg_root_vec(3);
-    Wg_root_vec << windNoisePos << windNoisePos << windNoiseAng*boost::math::constants::pi<double>() / 180.0 << endr;
+    rowvec Wg_root_vec(2);
+    Wg_root_vec << windNoisePos << windNoisePos << endr;
     P_Wg_ = diagmat(square(Wg_root_vec));
 
-    minLinearVelocity_  = minLinearVelocity;
     maxLinearVelocity_  = maxLinearVelocity;
-    maxAngularVelocity_ = maxAngularVelocity;
     dt_                 = dt;
 
     OMPL_INFORM("TwoDPointMotionModel: sigma_ = ");
@@ -375,11 +298,7 @@ void TwoDPointMotionModel::loadParameters(const char *pathToSetupFile)
     OMPL_INFORM("TwoDPointMotionModel: P_Wg_ = ");
     std::cout<<P_Wg_<<std::endl;
 
-    OMPL_INFORM("TwoDPointMotionModel: min Linear Velocity (m/s)    = %f", minLinearVelocity_ );
-
     OMPL_INFORM("TwoDPointMotionModel: max Linear Velocity (m/s)    = %f", maxLinearVelocity_);
-
-    OMPL_INFORM("TwoDPointMotionModel: max Angular Velocity (rad/s) = %f",maxAngularVelocity_);
 
     OMPL_INFORM("TwoDPointMotionModel: Timestep (seconds) = %f", dt_);
 
