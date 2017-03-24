@@ -499,6 +499,9 @@ private:
 
     /** \brief Flag to save video */
     bool doSaveVideo_;
+
+    /** \brief Activate dynamic obstacles */
+    bool dynamicObstacles_;
 };
 
 

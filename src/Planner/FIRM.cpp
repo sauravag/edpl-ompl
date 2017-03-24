@@ -157,6 +157,8 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     doSaveVideo_ = false;
 
+    dynamicObstacles_ = false;
+
 }
 
 FIRM::~FIRM(void)
@@ -1933,6 +1935,21 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     int numP = 0;
     itemElement->QueryIntAttribute("numparticles", &numP);
     numMCParticles_ = numP;
+
+    // dynamic obstacles
+    child = node->FirstChild("DynamicObstacles");
+    assert( child );
+
+    itemElement = child->ToElement();
+    assert( itemElement );
+
+    int dynobst = 0;
+    itemElement->QueryIntAttribute("dynobst", &dynobst);
+
+    if(dynobst == 1)
+        dynamicObstacles_ = true;
+    else
+        dynamicObstacles_ = false;
 
 }
 

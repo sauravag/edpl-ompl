@@ -50,6 +50,7 @@
 
 //Spaces
 #include "Spaces/SE2BeliefSpace.h"
+#include "Spaces/R2BeliefSpace.h"
 #include "SpaceInformation/SpaceInformation.h"
 
 #ifdef USE_ROS
@@ -64,9 +65,11 @@
 #include "MotionModels/MotionModelMethod.h"
 #include "MotionModels/UnicycleMotionModel.h"
 #include "MotionModels/OmnidirectionalMotionModel.h"
+#include "MotionModels/TwoDPointMotionModel.h"
 
 //State Propagators
 #include "MotionModels/UnicycleStatePropagator.h"
+#include "MotionModels/TwoDPointStatePropagator.h"
 
 //LinearSystem
 #include "LinearSystem/LinearSystem.h"

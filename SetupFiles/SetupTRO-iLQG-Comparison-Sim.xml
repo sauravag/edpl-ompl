@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
-<landmark id = 1  x = 1   y = 0.3 theta = 0.5 />
+<landmark id = 1  x = 3.5	y = 1.8	theta = 0.5 />
 </LandmarkList>
 <ObservationModels>
 	<CamAruco2DObservationModel
@@ -13,9 +13,12 @@
 		eta_thetad="0.01"
 		eta_thetaphi = "0.02"
 		camera_horizontal_fov = "45"
-		vcLabel = "cd1"
 	>
 	</CamAruco2DObservationModel>
+	<TwoDBeaconObservationModel
+		sigma="0.1"
+	>
+	</TwoDBeaconObservationModel>
 </ObservationModels>
 <MotionModels>
 	<!--UnicycleMotionModel
@@ -62,11 +65,11 @@
 		<!--wind_noise_pos="1.000"
 		wind_noise_ang="7.0"-->
 	<TwoDPointMotionModel 
-		sigmaV="0.028"
+		sigmaV="0.0"
 		etaV="0.0"
-		wind_noise_pos="0.0" 
+		wind_noise_pos="0.028" 
 		max_linear_velocity= "1.0"
-		dt= 0.05
+		dt= "0.05"
 	  />
 </MotionModels>
 <FIRM>
@@ -74,11 +77,12 @@
 	<DataLog save = "0" folder = "../TROSIMS/" />
 	<Roadmap save = "1" />
 	<MCParticles numparticles = "10" />
+	<DynamicObstacles dynobst = "1" /> <!-- Set mode to 1 in planning problem-->
 </FIRM>
 <PlanningProblem>
 	<Mode
 		mode = "0"
-	/><!-- mode is 0 for FIRM 1 for rollout and 2 for Kidnapping Multimodal-->
+	/><!-- mode is 0 for FIRM, 1 for rollout (can use dynamic obstacles) and 2 for Kidnapping Multimodal-->
 	<RoadMap
 		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_Env2_Omni_75.xml"
 		useRoadMap = "0"

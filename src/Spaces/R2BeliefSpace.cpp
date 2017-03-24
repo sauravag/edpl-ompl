@@ -71,14 +71,6 @@ bool R2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxedC
 
 }
 
-
-ompl::base::State* R2BeliefSpace::allocState(void) const
-{
-    StateType *state = new StateType();
-    allocStateComponents(state);
-    return state;
-}
-
 void R2BeliefSpace::copyState(State *destination, const State *source) const
 {
     destination->as<StateType>()->setX(source->as<StateType>()->getX());
@@ -88,7 +80,7 @@ void R2BeliefSpace::copyState(State *destination, const State *source) const
 
 void R2BeliefSpace::freeState(State *state) const
 {
-    CompoundStateSpace::freeState(state);
+    RealVectorStateSpace::freeState(state);
 }
 
 double R2BeliefSpace::distance(const State* state1, const State *state2)

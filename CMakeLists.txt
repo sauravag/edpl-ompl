@@ -92,6 +92,7 @@ add_library (bsp_lib
 	src/MotionModels/OmnidirectionalMotionModel.cpp
 	src/MotionModels/UnicycleMotionModel.cpp
 	src/MotionModels/UnicycleStatePropagator.cpp
+	src/MotionModels/TwoDPointStatePropagator.cpp
 	src/ObservationModels/CamAruco2DObservationModel.cpp
 	src/Planner/FIRM.cpp
 	src/Planner/NBM3P.cpp
@@ -101,6 +102,7 @@ add_library (bsp_lib
 	#src/SpaceInformation/ROSSpaceInformation.cpp
 	src/SpaceInformation/SpaceInformation.cpp
 	src/Spaces/SE2BeliefSpace.cpp
+	src/Spaces/R2BeliefSpace.cpp
 	src/Utils/FIRMUtils.cpp
 	src/Visualization/GLWidget.cpp
 	src/Visualization/Visualizer.cpp

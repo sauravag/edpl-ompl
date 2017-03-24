@@ -64,13 +64,13 @@ class R2BeliefSpace : public ompl::base::RealVectorStateSpace
             /** \brief Get the X component of the state */
             double getX(void) const
             {
-                return as<RealVectorStateSpace::StateType>(0)->values[0];
+                return this->values[0];
             }
 
             /** \brief Get the Y component of the state */
             double getY(void) const
             {
-                return as<RealVectorStateSpace::StateType>(0)->values[1];
+                return this->values[1];
             }           
 
             arma::mat getCovariance(void) const
@@ -128,7 +128,7 @@ class R2BeliefSpace : public ompl::base::RealVectorStateSpace
         R2BeliefSpace(void) : RealVectorStateSpace(2)
         {
             setName("R2_BELIEF" + getName());
-            type_ = STATE_SPACE_R2;
+            type_ = STATE_SPACE_REAL_VECTOR;
         }
 
         virtual ~R2BeliefSpace(void)
@@ -147,8 +147,8 @@ class R2BeliefSpace : public ompl::base::RealVectorStateSpace
             return this->getBounds();
         }
 
-        virtual State* allocState(void) const;
         virtual void copyState(State *destination,const State *source) const;
+
         virtual void freeState(State *state) const;
 
         //virtual void registerProjections(void);

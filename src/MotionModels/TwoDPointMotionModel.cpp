@@ -78,34 +78,20 @@ void TwoDPointMotionModel::generateOpenLoopControls(const ompl::base::State *sta
     colvec start = startState->as<StateType>()->getArmaData(); // turn into colvec (in radian)
     colvec target = endState->as<StateType>()->getArmaData(); // turn into colvec (in radian)
 
-    colvec x_c, y_c;
-
-    x_c << start[0] << endr
-      << target[0] << endr;
-
-    y_c << start[1] << endr
-      << target[1] << endr;
-
     double delta_disp = 0;
 
     double translation_steps = 0;
 
-    // connecting line slope
-    theta_p = atan2(y_c[1]-y_c[0], x_c[1]-x_c[0]);
-
-    //count translation steps
-    delta_disp = sqrt( pow(y_c[1]-y_c[0], 2) + pow(x_c[1]-x_c[0], 2) );
-
-    translation_steps = ceil(fabs(delta_disp/(maxLinearVelocity_*this->dt_)));
+    translation_steps = floor( std::max( fabs((target[0]-start[0])/(maxLinearVelocity_*this->dt_)), fabs((target[1]-start[1])/(maxLinearVelocity_*this->dt_))) );
 
     colvec u_const;
-    u_const_rot << maxLinearVelocity_*cos(theta_p) << endr
-                << maxLinearVelocity_*sin(theta_p) << endr;
+    u_const << (target[0]-start[0]) / (translation_steps*this->dt_) << endr
+            << (target[1]-start[1]) / (translation_steps*this->dt_) << endr;
 
     for(int i=0; i<translation_steps; i++)
     {
       ompl::control::Control *tempControl = si_->allocControl();
-      ARMA2OMPL(u_const_rot, tempControl);
+      ARMA2OMPL(u_const, tempControl);
       openLoopControls.push_back(tempControl);
     }
 
@@ -132,11 +118,15 @@ TwoDPointMotionModel::generateNoise(const ompl::base::State *state, const ompl::
     using namespace arma;
 
     NoiseType noise(this->noiseDim_);
+
     colvec indepUn = randn(this->controlDim_,1);
+    
     mat P_Un = controlNoiseCovariance(control);
+    
     colvec Un = indepUn % sqrt((P_Un.diag()));
 
     colvec Wg = sqrt(P_Wg_) * randn(this->stateDim_,1);
+    
     noise = join_cols(Un, Wg);
 
     return noise;
@@ -148,15 +138,9 @@ TwoDPointMotionModel::getStateJacobian(const ompl::base::State *state, const omp
 
     using namespace arma;
 
-    typedef typename MotionModelMethod::StateType StateType;
-
-    arma::colvec u = OMPL2ARMA(control);
-
     colvec xData = state->as<StateType>()->getArmaData();
 
     assert (xData.n_rows == (size_t)stateDim);
-
-    const colvec& Un = w.subvec(0,this->controlDim_-1);
 
     JacobianType A = eye(this->stateDim_,this->stateDim_) ;
 
@@ -173,7 +157,7 @@ TwoDPointMotionModel::getControlJacobian(const ompl::base::State *state, const o
     colvec xData = state->as<StateType>()->getArmaData();
     assert (xData.n_rows == (size_t)this->stateDim_);
 
-    mat B(3,3);
+    mat B(this->stateDim_,this->controlDim_);
 
     B <<  1 <<   0  <<  endr
       <<  0  <<  1  << endr;
@@ -196,7 +180,7 @@ TwoDPointMotionModel::getNoiseJacobian(const ompl::base::State *state, const omp
 
     assert (xData.n_rows == (size_t)this->stateDim_);
 
-    mat G(3,6);
+    mat G(this->stateDim_,this->noiseDim_);
 
     G   << 1 << 0 << 1 << 0 << endr
         << 0 << 1 << 0 << 1 << endr;
@@ -212,8 +196,8 @@ arma::mat TwoDPointMotionModel::processNoiseCovariance(const ompl::base::State *
     using namespace arma;
 
     mat P_Un = controlNoiseCovariance(control);
-    mat Q_processNoise = zeros<mat>(P_Un.n_rows + P_Wg_.n_rows, P_Un.n_cols +
-    P_Wg_.n_cols);
+
+    mat Q_processNoise = zeros<mat>(P_Un.n_rows + P_Wg_.n_rows, P_Un.n_cols + P_Wg_.n_cols);
 
     Q_processNoise.submat(0, 0, P_Un.n_rows-1, P_Un.n_cols-1) = P_Un;
     Q_processNoise.submat(P_Un.n_rows, P_Un.n_cols,

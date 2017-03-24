@@ -56,7 +56,8 @@
 #include <iostream>
 #include <istream>
 
-#include "Setup/FIRM2DSetup.h"
+//#include "Setup/FIRM2DSetup.h"
+#include "Setup/2DPointRobotSetup.h"
 
 #ifdef USE_ROS
     #include "Setup/FIRMAruco2DROSSetup.h"
