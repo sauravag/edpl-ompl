@@ -53,10 +53,6 @@ void TwoDPointStatePropagator::propagate(const base::State *state, const control
         std::cin.get();
     }
 
-    //motionModel_->setTimeStep(duration);
-
-    typedef R2BeliefSpace::StateType StateType;
-
     ompl::base::State *to = si_->allocState();
 
     // use the motionmodel to apply the controls

@@ -94,6 +94,7 @@ add_library (bsp_lib
 	src/MotionModels/UnicycleStatePropagator.cpp
 	src/MotionModels/TwoDPointStatePropagator.cpp
 	src/ObservationModels/CamAruco2DObservationModel.cpp
+	src/ObservationModels/TwoDBeaconObservationModel.cpp
 	src/Planner/FIRM.cpp
 	src/Planner/NBM3P.cpp
 	src/Samplers/GaussianValidBeliefSampler.cpp

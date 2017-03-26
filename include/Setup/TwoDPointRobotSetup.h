@@ -34,8 +34,8 @@
 
 /* Author: Saurav Agarwal */
 
-#ifndef 2DPOINTROBOT_SETUP_H
-#define 2DPOINTROBOT_SETUP_H
+#ifndef TWODPOINTROBOT_SETUP_H
+#define TWODPOINTROBOT_SETUP_H
 
 #include <omplapp/geometry/RigidBodyGeometry.h>
 #include <tinyxml.h>
@@ -45,14 +45,14 @@
 #include "Visualization/Visualizer.h"
 
 /** \brief Wrapper for ompl::app::RigidBodyPlanning that plans for rigid bodies in R2BeliefSpace using FIRM */
-class 2DPointRobotSetup : public ompl::app::RigidBodyGeometry
+class TwoDPointRobotSetup : public ompl::app::RigidBodyGeometry
 {
 
     typedef R2BeliefSpace::StateType StateType;
 
 public:
 
-    2DPointRobotSetup() : ompl::app::RigidBodyGeometry(ompl::app::Motion_2D),
+    TwoDPointRobotSetup() : ompl::app::RigidBodyGeometry(ompl::app::Motion_2D),
     ss_(ompl::base::StateSpacePtr(new R2BeliefSpace()))
     {
         // set static variables
@@ -107,7 +107,7 @@ public:
         setup_ = false;
     }
 
-    virtual ~2DPointRobotSetup(void)
+    virtual ~TwoDPointRobotSetup(void)
     {
     }
 
@@ -167,7 +167,7 @@ public:
             siF_->setStateValidityChecker(fclSVC);
 
             // provide the observation model to the space
-            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(siF_, pathToSetupFile_.c_str()));
+            ObservationModelMethod::ObservationModelPointer om(new TwoDBeaconObservationModel(siF_, pathToSetupFile_.c_str()));
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space
@@ -276,7 +276,7 @@ public:
 
     ompl::app::GeometricStateExtractor getGeometricStateExtractor(void) const
     {
-        return boost::bind(&2DPointRobotSetup::getGeometricComponentStateInternal, this, _1, _2);
+        return boost::bind(&TwoDPointRobotSetup::getGeometricComponentStateInternal, this, _1, _2);
     }
 
     void saveRoadmap()
@@ -407,13 +407,12 @@ protected:
         itemElement = child->ToElement();
         assert( itemElement );
 
-        double startX = 0,startY = 0, startTheta = 0;
+        double startX = 0,startY = 0;
 
         itemElement->QueryDoubleAttribute("x", &startX);
         itemElement->QueryDoubleAttribute("y", &startY);
-        itemElement->QueryDoubleAttribute("theta", &startTheta);
 
-        setStartState(startX, startY, startTheta);
+        setStartState(startX, startY);
 
         // Read the Goal Pose
         /*
@@ -485,13 +484,13 @@ protected:
 
         std::cout<<"Path to Roadmap File: "<<pathToRoadMapFile_<<std::endl;
 
-        std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
+        std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<std::endl;
 
         std::cout<<"Planning Time: "<<planningTime_<<" seconds"<<std::endl;
 
         std::cout<<"Min Nodes: "<<minNodes_<<std::endl;
 
-        std::cout<<"Kidnapped Pose x:"<<kX<<" y:"<<kY<<" theta:"<<kTheta<<std::endl;
+        std::cout<<"Kidnapped Pose x:"<<kX<<" y:"<<kY<<std::endl;
 
     }
 

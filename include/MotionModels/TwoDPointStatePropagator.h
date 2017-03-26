@@ -37,6 +37,7 @@
 #define TWODPOINT_STATE_PROPAGATOR_
 
 #include "SpaceInformation/SpaceInformation.h"
+#include "Spaces/R2BeliefSpace.h"
 #include "TwoDPointMotionModel.h"
 
 /** \brief State propagation for a 2D point motion model. */

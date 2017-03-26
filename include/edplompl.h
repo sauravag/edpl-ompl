@@ -60,6 +60,7 @@
 //Observation Models
 #include "ObservationModels/ObservationModelMethod.h"
 #include "ObservationModels/CamAruco2DObservationModel.h"
+#include "ObservationModels/TwoDBeaconObservationModel.h"
 
 //Motion Models
 #include "MotionModels/MotionModelMethod.h"

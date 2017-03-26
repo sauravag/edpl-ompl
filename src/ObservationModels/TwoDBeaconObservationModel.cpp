@@ -77,7 +77,7 @@ TwoDBeaconObservationModel::getObservation(const ompl::base::State *state, bool 
             noise = noise_std%randNoiseVec;
         }
 
-        z[singleObservationDim*i] = 1/(pow(range,2)+1) + noise;        
+        z[singleObservationDim*i] = 1.0/(pow(range,2)+1) + noise(0);        
     }
 
  	return z;
@@ -121,13 +121,13 @@ typename TwoDBeaconObservationModel::JacobianType TwoDBeaconObservationModel::ge
     {
         colvec candidate;
 
-        colvec diff =  xVec.subvec(0,1) - landmarks_[Indx].subvec(1,2);
+        colvec diff =  xVec.subvec(0,1) - landmarks_[i].subvec(1,2);
 
         double r = norm(diff,2);
 
         mat H_i(singleObservationDim,stateDim);
 
-        H_i << (-2/(r(i)^2+1)^2) * diff(0) << (-2/(r(i)^2+1)^2) * diff(1) << endr;
+        H_i << (-2/pow(r*r+1,2)) * diff(0) << (-2/pow(r*r+1,2)) * diff(1) << endr;
 
         H.submat(singleObservationDim*i, 0, singleObservationDim*i, 1) = H_i;
 
@@ -156,7 +156,7 @@ typename TwoDBeaconObservationModel::ObservationType TwoDBeaconObservationModel:
 
 	using namespace arma;
 
-	colvec zPrd = getObservationPrediction(predictedState, Zg);
+	colvec Zprd = getObservationPrediction(predictedState, Zg);
 
 	colvec innov = Zg - Zprd;
 
