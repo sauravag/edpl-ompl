@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+/* Authors: Saurav Agarwal */
 
 #ifndef TWODBEACON_H_
 #define TWODBEACON_H_
@@ -51,21 +51,18 @@ class TwoDBeaconObservationModel : public ObservationModelMethod
 
   static const int stateDim = 2;
   //static const int singleObservationDim = 3;
-  static const int landmarkInfoDim = 2; /*[ X, Y]*/
+  static const int landmarkInfoDim = 2; /*[X, Y]*/
   static const int numLandmarksForObservability = 1;
-  //static const int obsNoiseDim = 3;
+  static const int obsNoiseDim = 1;
 
   public:
 
-    static const int singleObservationDim = 2; /*[ ID, signal strength ]*/
+    static const int singleObservationDim = 1; /*[ signal strength ]*/
 
     typedef ObservationModelMethod::ObservationType ObservationType;
     typedef ObservationModelMethod::NoiseType ObsNoiseType;
     typedef arma::mat JacobianType;
 
-    // z = h(x,v)
-    // get the observation for a given configuration,
-    // corrupted by noise from a given distribution
     /** \brief Constructor */
     TwoDBeaconObservationModel(ompl::control::SpaceInformationPtr si, const char *pathToSetupFile) : ObservationModelMethod(si)
     {
@@ -75,52 +72,44 @@ class TwoDBeaconObservationModel : public ObservationModelMethod
         this->loadParameters(pathToSetupFile);
     }
 
+    /** \brief z = h(x,v) get the observation for a given configuration, corrupted by noise from a given distribution */
     ObservationType getObservation(const ompl::base::State *state, bool isSimulation);
 
     ObservationType getObservationPrediction(const ompl::base::State *state, const ObservationType& Zg);
 
-     /** \brief Find the observation based on the given state and landmark to a correspongind landmark.
+     /** \brief Find the observation based on the given state and landmark to a corresponding landmark.
         eg. if ground robot sees landmark 1, then what is the predicted observation to this landmark
+        This function is a dummy for this observation model.
     */
     ObservationType getObservationToCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark)
     {
-        arma::colvec candidate;
 
-        this->findCorrespondingLandmark(state, observedLandmark, candidate);
+        arma::colvec candidate;
 
         return candidate;
     }
 
-    // Jx = dh/dx
+    /** \brief Jx = dh/dx */
     JacobianType getObservationJacobian(const ompl::base::State *state, const ObsNoiseType& v, const ObservationType& z);
-    // Jv = dh/dv
+    
+    /** \brief Jv = dh/dv */
     JacobianType getNoiseJacobian(const ompl::base::State *state, const ObsNoiseType& v, const ObservationType& z);
 
+    /** \brief Compute innovation between actual observation and predicted observation */
     ObservationType computeInnovation(const ompl::base::State *predictedState, const ObservationType& Zg);
 
+    /** \brief The sensor noise covariance */
     arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z);
 
-    /** \brief Checks if there is a clear line of sight from the robot to the landmark */
-    bool hasClearLineOfSight(const ompl::base::State *state, const arma::colvec& landmark);
-
-    bool isLandmarkVisible(const ompl::base::State *state, const arma::colvec& landmark, double& range, double& bearing, double& viewingAngle);
-
-    //void WriteLandmarks();
-
-    bool isStateObservable(const ompl::base::State *state);
+    bool isStateObservable(const ompl::base::State *state)
+    {
+        return true;
+    }
 
   private:
 
-    ObservationType removeSpuriousObservations(const ObservationType& Zg);
-
     /** \brief Estimates the range and bearing from given state to landmark */
-    void calculateRangeBearingToLandmark(const ompl::base::State *state, const arma::colvec& landmark, double& range, double& bearing);
-
-    /** \brief Calculates the likelihood of an observation prediction */
-    double getDataAssociationLikelihood(const arma::colvec trueObs, const arma::colvec predictedObs);
-
-    /** \brief Given a landmark that the robot observes (id, range, bearing..) Find the corresponding landmark,returns the position in the landmark list  */
-    int findCorrespondingLandmark(const ompl::base::State *state, const arma::colvec &observedLandmark, arma::colvec &candidateObservation);
+    void calculateRangeToLandmark(const ompl::base::State *state, const arma::colvec& landmark, double& range);
 
     std::vector<arma::colvec> landmarks_;
 
@@ -129,8 +118,6 @@ class TwoDBeaconObservationModel : public ObservationModelMethod
 
     void loadParameters(const char *pathToSetupFile);
 
-    double cameraRange_;
-    double cameraHalfFov_;
 };
 
 #endif
