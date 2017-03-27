@@ -71,6 +71,16 @@ bool R2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxedC
 
 }
 
+ompl::base::State* R2BeliefSpace::allocState(void) const
+{
+
+    StateType *rstate = new StateType();
+
+    rstate->values = new double[dimension_];
+
+    return rstate;
+}
+
 void R2BeliefSpace::copyState(State *destination, const State *source) const
 {
     destination->as<StateType>()->setX(source->as<StateType>()->getX());

@@ -122,6 +122,13 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 setYaw(yaw);
             }
 
+            void setArmaData(const arma::colvec &x)
+            {
+                setX(x[0]);
+                setY(x[1]);
+                setYaw(x[2]);
+            }
+
             void setCovariance(arma::mat cov){
                 covariance_ = cov;
             }

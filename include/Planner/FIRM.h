@@ -59,6 +59,9 @@
 #include "Path/FeedbackPath.h"
 #include "ConnectionStrategy/FStrategy.h"
 #include "NBM3P.h"
+#include "Spaces/R2BeliefSpace.h"
+#include "Spaces/SE2BeliefSpace.h"
+
 /**
    @anchor FIRM
    @par Short description
@@ -84,6 +87,12 @@
 /** \brief Feedback Information RoadMap planner */
 class FIRM : public ompl::base::Planner
 {
+
+    /* Note: Set the statetype depending upon your problem.*/
+    
+    //typedef SE2BeliefSpace::StateType StateType;
+
+    typedef R2BeliefSpace::StateType StateType;
 
 public:
 

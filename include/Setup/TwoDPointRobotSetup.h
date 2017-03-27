@@ -75,18 +75,13 @@ public:
         StateType::normWeights_ = normWeights;
 
         // The bounds should be inferred from the geometry files,
-        // there is a function in Apputils to do this, so use that.
-        // set the bounds for the R^3 part of SE(3)
+        // there is a function in Apputils to do this, so use that.        
         ompl::base::RealVectorBounds bounds(2);
         
-        // set X bound
-        bounds.setLow(0,0.5);
-        bounds.setHigh(0,19.3);
-        
-        //set Y bound
-        bounds.setLow(1,0.5);
-        bounds.setHigh(1,19.3);
-        
+        // set X & Y bound
+        bounds.setLow(0.0);
+        bounds.setHigh(15.0);
+ 
         ss_->as<R2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space
@@ -133,7 +128,7 @@ public:
 
     }
 
-    void addGoalState(const double X, const double Y, const double Yaw)
+    void addGoalState(const double X, const double Y)
     {
         ompl::base::State *temp = siF_->allocState();
 
@@ -328,11 +323,10 @@ protected:
 
             itemElement->QueryDoubleAttribute("x", &goalX);
             itemElement->QueryDoubleAttribute("y", &goalY);
-            itemElement->QueryDoubleAttribute("theta", &goalTheta);
 
-            std::cout<<"Loaded Goal Pose X: "<<goalX<<" Y: "<<goalY<<" Theta: "<<goalTheta<<std::endl;
+            std::cout<<"Loaded Goal Pose X: "<<goalX<<" Y: "<<goalY<<std::endl;
 
-            addGoalState(goalX, goalY, goalTheta);
+            addGoalState(goalX, goalY);
 
         }
 

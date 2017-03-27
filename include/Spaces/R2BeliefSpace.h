@@ -98,6 +98,12 @@ class R2BeliefSpace : public ompl::base::RealVectorStateSpace
                 setY(y);
             }    
 
+            void setArmaData(const arma::colvec &x)
+            {
+                setX(x[0]);
+                setY(x[1]);
+            }
+
             void setCovariance(arma::mat cov){
                 covariance_ = cov;
             }
@@ -135,17 +141,7 @@ class R2BeliefSpace : public ompl::base::RealVectorStateSpace
         {
         }
 
-        /** \copydoc RealVectorStateSpace::setBounds() */
-        void setBounds(const RealVectorBounds &bounds)
-        {
-            this->setBounds(bounds);
-        }
-
-        /** \copydoc RealVectorStateSpace::getBounds() */
-        const RealVectorBounds& getBounds(void) const
-        {
-            return this->getBounds();
-        }
+        virtual State* allocState(void) const;
 
         virtual void copyState(State *destination,const State *source) const;
 

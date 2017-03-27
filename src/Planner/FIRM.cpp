@@ -382,7 +382,7 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                         stateStable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
                                 ls.getM() * ls.getR() * trans(ls.getM()), S );
 
-                        //workState->as<SE2BeliefSpace::StateType>()->setCovariance(S);
+                        //workState->as<FIRM::StateType>()->setCovariance(S);
                     }
                     catch(int e)
                     {
@@ -845,8 +845,8 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
         arma::mat stationaryCovariance = linearizedKF.computeStationaryCovariance(linearSystem);
 
         // set the covariance
-        node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
-        state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        node->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
+        state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
 
         // create a node controller
         std::vector<ompl::control::Control*> dummyControl;
@@ -864,8 +864,8 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
         arma::mat stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
 
         // set the covariance
-        node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
-        state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        node->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
+        state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
 
         // create a node controller
         std::vector<ompl::control::Control*> dummyControl;
@@ -1078,7 +1078,7 @@ void FIRM::executeFeedback(void)
 
     siF_->doVelocityLogging(true);
 
-    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
+    while(!goalState->as<FIRM::StateType>()->isReached(cstartState))
     {
 
         if(currentVertex==goal)
@@ -1218,7 +1218,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     Visualizer::doSaveVideo(doSaveVideo_);
 
-    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)/*currentVertex != goal*/)
+    while(!goalState->as<FIRM::StateType>()->isReached(cstartState)/*currentVertex != goal*/)
     {
 
         if(currentVertex==goal)
@@ -1386,7 +1386,7 @@ void FIRM::executeFeedbackWithRollout(void)
     nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
     // While the robot state hasn't reached the goal state, keep running
-    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState, true))
+    while(!goalState->as<FIRM::StateType>()->isReached(cstartState, true))
     {
 
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
@@ -1431,7 +1431,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
         // If the robot has already reached a FIRM node then take feedback edge
         // else do rollout
-        if(stateProperty_[boost::target(e,g_)]->as<SE2BeliefSpace::StateType>()->isReached(cendState, true))
+        if(stateProperty_[boost::target(e,g_)]->as<FIRM::StateType>()->isReached(cendState, true))
         {
             numberofNodesReached_++;
 
@@ -1643,9 +1643,9 @@ bool FIRM::detectKidnapping(ompl::base::State *previousState, ompl::base::State 
 
     using namespace arma;
 
-    mat previousCov = previousState->as<SE2BeliefSpace::StateType>()->getCovariance();
+    mat previousCov = previousState->as<FIRM::StateType>()->getCovariance();
 
-    mat newCov = newState->as<SE2BeliefSpace::StateType>()->getCovariance();
+    mat newCov = newState->as<FIRM::StateType>()->getCovariance();
 
     double innovSignal = (trace(newCov) - trace(previousCov)) / trace(previousCov);
 
@@ -1666,9 +1666,9 @@ void FIRM::savePlannerData()
     foreach(Vertex v, boost::vertices(g_))
     {
 
-        arma::colvec xVec = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getArmaData();
+        arma::colvec xVec = stateProperty_[v]->as<FIRM::StateType>()->getArmaData();
 
-        arma::mat cov = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getCovariance();
+        arma::mat cov = stateProperty_[v]->as<FIRM::StateType>()->getCovariance();
 
         std::pair<int,std::pair<arma::colvec,arma::mat> > nodeToWrite = std::make_pair(v, std::make_pair(xVec, cov)) ;
 
@@ -1715,8 +1715,8 @@ void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
             arma::colvec xVec = FIRMNodePosList[i].second;
             arma::mat     cov = FIRMNodeCovarianceList[i].second;
 
-            newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
-            newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
+            newState->as<FIRM::StateType>()->setArmaData(xVec);
+            newState->as<FIRM::StateType>()->setCovariance(cov);
 
             //Vertex v = addStateToGraph(siF_->cloneState(newState));
 
