@@ -19,6 +19,11 @@
 		sigma="0.1"
 	>
 	</TwoDBeaconObservationModel>
+	<HeadingBeaconObservationModel
+		sigma_heading="0.00001"
+		sigma_ss="0.1"
+	>
+	</TwoDBeaconObservationModel>
 </ObservationModels>
 <MotionModels>
 	<!--UnicycleMotionModel

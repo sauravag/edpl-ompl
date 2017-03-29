@@ -174,7 +174,7 @@ public:
             MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));
             siF_->setMotionModel(mm);
 
-            ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new UnicycleStatePropagator(siF_)));
+            ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new OmnidirectionalStatePropagator(siF_)));
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
             siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied

@@ -162,14 +162,15 @@ public:
             siF_->setStateValidityChecker(fclSVC);
 
             // provide the observation model to the space
-            ObservationModelMethod::ObservationModelPointer om(new TwoDBeaconObservationModel(siF_, pathToSetupFile_.c_str()));
+            ObservationModelMethod::ObservationModelPointer om(new HeadingBeaconObservationModel(siF_, pathToSetupFile_.c_str()));
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space
-            MotionModelMethod::MotionModelPointer mm(new TwoDPointMotionModel(siF_, pathToSetupFile_.c_str()));
+            // We use the omnidirectional model because collision checking requires SE2
+            MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));
             siF_->setMotionModel(mm);
 
-            ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new TwoDPointStatePropagator(siF_)));
+            ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new OmnidirectionalStatePropagator(siF_)));
             statePropagator_ = prop;
             siF_->setStatePropagator(statePropagator_);
             siF_->setPropagationStepSize(0.1); // this is the duration that a control is applied

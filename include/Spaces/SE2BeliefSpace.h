@@ -59,6 +59,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             {
               covariance_ = arma::zeros<arma::mat>(3,3);
               controllerID_ = -1;
+              setXYYaw(0.0,0.0,0.0);
 
             }
 

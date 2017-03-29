@@ -61,6 +61,7 @@
 #include "ObservationModels/ObservationModelMethod.h"
 #include "ObservationModels/CamAruco2DObservationModel.h"
 #include "ObservationModels/TwoDBeaconObservationModel.h"
+#include "ObservationModels/HeadingBeaconObservationModel.h"
 
 //Motion Models
 #include "MotionModels/MotionModelMethod.h"
@@ -71,6 +72,7 @@
 //State Propagators
 #include "MotionModels/UnicycleStatePropagator.h"
 #include "MotionModels/TwoDPointStatePropagator.h"
+#include "MotionModels/OmnidirectionalStatePropagator.h"
 
 //LinearSystem
 #include "LinearSystem/LinearSystem.h"
