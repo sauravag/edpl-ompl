@@ -34,7 +34,7 @@
 
 /* Authors: Saurav Agarwal  */
 
-#include "Spaces/R2BeliefSpace.h"
+#include "Spaces/SE2BeliefSpace.h"
 #include "ObservationModels/HeadingBeaconObservationModel.h"
 #include <tinyxml.h>
 #include "Visualization/Visualizer.h"
@@ -123,28 +123,31 @@ typename HeadingBeaconObservationModel::JacobianType HeadingBeaconObservationMod
 
 	using namespace arma;
 
-    unsigned int number_of_landmarks = z.n_rows / singleObservationDim ;
+    unsigned int number_of_landmarks = landmarks_.size();
 
-    colvec xVec = state->as<R2BeliefSpace::StateType>()->getArmaData();
+    colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
-    mat H(1+ (singleObservationDim)* number_of_landmarks, stateDim); // Since we are passing the common id list
+    mat H(1+ number_of_landmarks, 3); // Since we are passing the common id list
 
     // Jacobian of heading measurement w.r.t state
     H(0,0) = 0; H(0,1) = 0; H(0,2) = 1;
 
-    for(unsigned int i = 0; i < number_of_landmarks ; ++i)
+    for(unsigned int i = 0; i < number_of_landmarks ; i++)
     {
-        colvec candidate;
 
-        colvec diff =  xVec.subvec(0,1) - landmarks_[i].subvec(1,2);
+        colvec lmk = landmarks_[i];
 
-        double r = norm(diff,2);
+        double dx =  xVec[0] - lmk[1];
 
-        mat H_i(singleObservationDim,stateDim);
+        double dy = xVec[1] - lmk[2];
 
-        H_i << (-2/pow(r*r+1,2)) * diff(0) << (-2/pow(r*r+1,2)) * diff(1) << endr;
+        double r = sqrt(dx*dx + dy*dy);
 
-        H.submat(1 + singleObservationDim*i, 0, singleObservationDim*i, 1) = H_i;
+        mat H_i(1,3);
+
+        H_i << (-2/pow(r*r+1,2)) * dx << (-2/pow(r*r+1,2)) * dy << 0 << endr;
+
+        H.submat(1 + i, 0, 1 + i, 2) = H_i;
 
     }
 
@@ -156,7 +159,7 @@ typename HeadingBeaconObservationModel::JacobianType HeadingBeaconObservationMod
 
 	using namespace arma;
 
-    unsigned int number_of_landmarks = z.n_rows / singleObservationDim ;
+    unsigned int number_of_landmarks = landmarks_.size() ;
 
     mat M(1+number_of_landmarks,1+number_of_landmarks);
 
@@ -183,7 +186,7 @@ arma::mat HeadingBeaconObservationModel::getObservationNoiseCovariance(const omp
 {
 	using namespace arma;
 
-    unsigned int number_of_landmarks = z.n_rows / singleObservationDim ;
+    unsigned int number_of_landmarks = landmarks_.size();
 
     mat R(1+number_of_landmarks,1+number_of_landmarks);
 
@@ -192,7 +195,7 @@ arma::mat HeadingBeaconObservationModel::getObservationNoiseCovariance(const omp
     R = R*pow(this->sigma_(0),2);
 
     // heading obs error covariance needs to be set separately
-    R(0,0) = pow(sigmaHeading_(0),2);
+    R(0,0) = pow(sigmaHeading_[0],2);
 
     return R;
 }
@@ -202,11 +205,25 @@ void HeadingBeaconObservationModel::calculateRangeToLandmark(const ompl::base::S
 
 	using namespace arma;
 
-	colvec xVec = state->as<R2BeliefSpace::StateType>()->getArmaData();
+	colvec xVec = state->as<SE2BeliefSpace::StateType>()->getArmaData();
 
-	colvec diff = xVec - landmark.subvec(1,2);
+	colvec diff = xVec.subvec(0,1) - landmark.subvec(1,2);
 
 	range = norm(diff,2);
+}
+
+bool HeadingBeaconObservationModel::isStateObservable(const ompl::base::State *state)
+{
+
+  using namespace arma;
+
+  colvec obs = this->getObservation(state, false);
+
+  if(obs.n_rows > 2)
+      return true;
+
+  return false;
+
 }
 
 void HeadingBeaconObservationModel::loadLandmarks(const char *pathToSetupFile)

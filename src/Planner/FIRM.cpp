@@ -69,10 +69,10 @@ namespace ompl
         static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
 
         /** \brief The time in seconds for a single roadmap building operation */
-        static const double ROADMAP_BUILD_TIME = 60;        
+        static const double ROADMAP_BUILD_TIME = 60;  // 60 is a good number    
 
         /** \brief For a node that is not observable, use a fixed covariance */
-        static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1;
+        static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1; // 0.1 is a good number
 
         /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
         static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;

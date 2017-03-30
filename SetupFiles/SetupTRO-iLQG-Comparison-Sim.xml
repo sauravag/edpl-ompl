@@ -20,10 +20,10 @@
 	>
 	</TwoDBeaconObservationModel>
 	<HeadingBeaconObservationModel
-		sigma_heading="0.00001"
+		sigma_heading="0.0017"
 		sigma_ss="0.1"
 	>
-	</TwoDBeaconObservationModel>
+	</HeadingBeaconObservationModel>
 </ObservationModels>
 <MotionModels>
 	<!--UnicycleMotionModel
@@ -55,17 +55,17 @@
 		dt= 0.1
 	  /> <!--omega is in radians--> 
 	<OmnidirectionalMotionModel 
-		sigmaV="0.02"
-		etaV="0.01"
-        sigmaOmega="0.008"
-        etaOmega="0.005"
+		sigmaV="0.0"
+		etaV="0.0"
+        sigmaOmega="0.0"
+        etaOmega="0.0"
 		P_Wg_filename=""
-		wind_noise_pos="0.000001"
-		wind_noise_ang="0.00001" 
-		min_linear_velocity= 0.5
-		max_linear_velocity= 0.5
+		wind_noise_pos="0.028"
+		wind_noise_ang="0.0001" 
+		min_linear_velocity= 1.0
+		max_linear_velocity= 1.0
 		max_angular_velocity= 0.60
-		dt= 0.1
+		dt= 0.05
 	  /> <!--omega is in radians, wind_noise_ang is in degrees -->
 		<!--wind_noise_pos="1.000"
 		wind_noise_ang="7.0"-->
@@ -82,7 +82,7 @@
 	<DataLog save = "0" folder = "../TROSIMS/" />
 	<Roadmap save = "1" />
 	<MCParticles numparticles = "10" />
-	<DynamicObstacles dynobst = "1" /> <!-- Set mode to 1 in planning problem-->
+	<DynamicObstacles dynobst = "0" /> <!-- Set mode to 1 in planning problem-->
 </FIRM>
 <PlanningProblem>
 	<Mode
@@ -105,7 +105,7 @@
 		maxTime = "600"
 	/>
 	<FIRMNodes
-		minNodes = "105"
+		minNodes = "100"
 	/>
 	<KidnappedState
         x = 1.5 y = 19.5 

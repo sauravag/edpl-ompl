@@ -101,10 +101,7 @@ class HeadingBeaconObservationModel : public ObservationModelMethod
     /** \brief The sensor noise covariance */
     arma::mat getObservationNoiseCovariance(const ompl::base::State *state, const ObservationType& z);
 
-    bool isStateObservable(const ompl::base::State *state)
-    {
-        return true;
-    }
+    bool isStateObservable(const ompl::base::State *state);
 
   private:
 
@@ -118,7 +115,7 @@ class HeadingBeaconObservationModel : public ObservationModelMethod
 
     void loadParameters(const char *pathToSetupFile);
 
-    double sigmaHeading_;
+    arma::colvec sigmaHeading_;
 
 };
 

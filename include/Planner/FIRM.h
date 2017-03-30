@@ -90,9 +90,9 @@ class FIRM : public ompl::base::Planner
 
     /* Note: Set the statetype depending upon your problem.*/
     
-    //typedef SE2BeliefSpace::StateType StateType;
+    typedef SE2BeliefSpace::StateType StateType;
 
-    typedef R2BeliefSpace::StateType StateType;
+    //typedef R2BeliefSpace::StateType StateType;
 
 public:
 

@@ -85,7 +85,11 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxed
 ompl::base::State* SE2BeliefSpace::allocState(void) const
 {
     StateType *state = new StateType();
+    
     allocStateComponents(state);
+    
+    state->setYaw(0.0);
+    
     return state;
 }
 

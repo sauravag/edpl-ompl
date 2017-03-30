@@ -45,6 +45,12 @@ inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, 
 
 {
     using namespace arma;
+    using namespace std;
+
+    // cout<<"A: "<<_A<<endl;
+    // cout<<"B: "<<_B<<endl;
+    // cout<<"Q: "<<_Q<<endl;
+    // cout<<"R: "<<_R<<endl;
 
     int n = _A.n_rows, m = _B.n_cols;
     mat Z11(n,n);
@@ -97,10 +103,13 @@ inline bool dare(const arma::mat& _A, const arma::mat& _B, const arma::mat& _Q, 
         {
 
             if(tempZ.n_cols -1 < c1)
+            {
                 return false;
-
+            }
             else
+            {
                 tempZ.submat(span::all, span(c1,c1)) = VR.submat(span::all, span(i,i));
+            }
 
             c1++;
         }

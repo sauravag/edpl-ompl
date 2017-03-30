@@ -44,21 +44,21 @@
 #include "Visualization/Window.h"
 #include "Visualization/Visualizer.h"
 
-/** \brief Wrapper for ompl::app::RigidBodyPlanning that plans for rigid bodies in R2BeliefSpace using FIRM */
+/** \brief Wrapper for ompl::app::RigidBodyPlanning that plans for rigid bodies in SE2BeliefSpace for a point robot with known heading using FIRM */
 class TwoDPointRobotSetup : public ompl::app::RigidBodyGeometry
 {
 
-    typedef R2BeliefSpace::StateType StateType;
+    typedef SE2BeliefSpace::StateType StateType;
 
 public:
 
     TwoDPointRobotSetup() : ompl::app::RigidBodyGeometry(ompl::app::Motion_2D),
-    ss_(ompl::base::StateSpacePtr(new R2BeliefSpace()))
+    ss_(ompl::base::StateSpacePtr(new SE2BeliefSpace()))
     {
         // set static variables
         RHCICreate::setControlQueueSize(5);
         RHCICreate::setTurnOnlyDistance(0.01);
-        Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(0.1); // degrees
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(10); // degrees
         Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.01);// meters
         Controller<RHCICreate, ExtendedKF>::setMaxTries(120);
         Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(4.0); // meters
@@ -70,8 +70,9 @@ public:
 
         // set the state component norm weights
         arma::colvec normWeights(3);
-        normWeights(0) = 1.0/std::sqrt(2);
-        normWeights(1) = 1.0/std::sqrt(2);
+        normWeights(0) = 2.0/std::sqrt(9);
+        normWeights(1) = 2.0/std::sqrt(9);
+        normWeights(2) = 1.0/std::sqrt(9);
         StateType::normWeights_ = normWeights;
 
         // The bounds should be inferred from the geometry files,
@@ -82,10 +83,10 @@ public:
         bounds.setLow(0.0);
         bounds.setHigh(15.0);
  
-        ss_->as<R2BeliefSpace>()->setBounds(bounds);
+        ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space
-        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) );
+        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) );
 
         cs_ = controlspace;
 
@@ -155,7 +156,7 @@ public:
                 throw ompl::Exception("Robot/Environment mesh files not setup!");
             }
 
-            ss_->as<R2BeliefSpace>()->setBounds(inferEnvironmentBounds());
+            ss_->as<SE2BeliefSpace>()->setBounds(inferEnvironmentBounds());
 
             // Create an FCL state validity checker and assign to space information
             const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
@@ -467,7 +468,7 @@ protected:
 
         kidnappedState_ = siF_->allocState();
 
-        kidnappedState_->as<R2BeliefSpace::StateType>()->setXY(kX, kY);
+        kidnappedState_->as<SE2BeliefSpace::StateType>()->setXY(kX, kY);
 
         loadGoals();
 
