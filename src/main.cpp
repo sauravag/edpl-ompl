@@ -133,8 +133,9 @@ void plan(const std::string &setupFilePath)
         }
         else
         {
+            OMPL_INFORM("Unable to find Solution in given time. Either more nodes are needed, or DP could not converge.");
+            
             break;
-            //OMPL_INFORM("Unable to find Solution in given time, would you like to continue attempt. (1: yes, 0 :no) ? :");
 
             //std::cin>>keepTrying;
         }

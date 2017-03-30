@@ -66,7 +66,7 @@ namespace ompl
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
 
         /** \brief The time in seconds for a single roadmap building operation */
         static const double ROADMAP_BUILD_TIME = 60;  // 60 is a good number    
@@ -78,7 +78,7 @@ namespace ompl
         static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
 
         /** \brief Maximum allowed number of iterations to solve DP */
-        static const int DP_MAX_ITERATIONS = 20000;
+        static const int DP_MAX_ITERATIONS = 5000; // 20000 is a good number
 
         /** \brief Weighting factor for filtering cost */
         static const double INFORMATION_COST_WEIGHT = 0.9999 ;
@@ -90,16 +90,16 @@ namespace ompl
         static const double GOAL_COST_TO_GO = 0.0;
 
         /** \brief The initial cost to go from a non-goal node*/
-        static const double INIT_COST_TO_GO = 2.0;
+        static const double INIT_COST_TO_GO = 2.0; // 2 is a good number
 
         /** \brief The cost to traverse an obstacle*/
-        static const double OBSTACLE_COST_TO_GO = 200;
+        static const double OBSTACLE_COST_TO_GO = 200; // 200 is a good number
 
         /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
-        static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
+        static const double DP_CONVERGENCE_THRESHOLD = 1; // 1e-3 is a good number
 
         /** \brief Default neighborhood radius */
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is good
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 3.0; // 5.0 meters is good
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
@@ -434,27 +434,45 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
 
     OMPL_INFORM("%s: Number of current states = %u", getName().c_str(), boost::num_vertices(g_));
 
-    if(boost::num_vertices(g_) < minFIRMNodes_) return false;
+    if(boost::num_vertices(g_) < minFIRMNodes_)
+    {
+        OMPL_INFORM("FIRM: Do not yet have enough nodes (< %u).", minFIRMNodes_);
+        return false;
+    } 
 
     foreach (Vertex start, starts)
     {
         foreach (Vertex goal, goals)
         {
+
             graphMutex_.lock();
+
             bool same_component = sameComponent(start, goal);
+            
             graphMutex_.unlock();
 
-            if (same_component && g->isStartGoalPairValid(stateProperty_[goal], stateProperty_[start]))
+            if (same_component /*&& g->isStartGoalPairValid(stateProperty_[goal], stateProperty_[start])*/)
             {
+
                 boost::mutex::scoped_lock _(graphMutex_);
+                
                 solveDynamicProgram(goal);
+                
                 solution = constructFeedbackPath(start, goal);
+                
                 sendFeedbackEdgesToViz();
+                
                 return true; // return true if solution is found
+            }
+            else
+            {
+                OMPL_WARN("FIRM: start and goal nodes not in same connected component.");
+                return false;
             }
         }
     }
 
+    OMPL_INFORM("FIRM: DP could not converge.");
     return false;
 }
 
@@ -708,6 +726,7 @@ ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Verte
         if(counter > boost::num_vertices(g_))
         {
             OMPL_ERROR("There is no feedback to guide robot to goal. Maybe DP did not converge.");
+            break;
         }
 
     }
@@ -953,6 +972,10 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
         }
 
         convergenceCondition = (norm(MapToColvec(costToGo_)-MapToColvec(newCostToGo), "inf") <= ompl::magic::DP_CONVERGENCE_THRESHOLD);
+
+        std::cout<<"Ol dCost To Go: "<<MapToColvec(costToGo_)<<std::endl;
+        std::cout<<"New Cost to Go: "<<MapToColvec(newCostToGo)<<std::endl;
+        std::cin.get();
 
         costToGo_.swap(newCostToGo);   // Equivalent to costToGo_ = newCostToGo
 

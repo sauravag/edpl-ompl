@@ -46,13 +46,6 @@ TwoDPointStatePropagator::TwoDPointStatePropagator(const firm::SpaceInformation:
 void TwoDPointStatePropagator::propagate(const base::State *state, const control::Control* control, const double duration, base::State *result) const
 {
 
-    // set the time step
-    if(duration != 0.1)
-    {
-        std::cout<<"In state propagator, duration is: (Press Enter to Continue)"<<duration<<std::endl;
-        std::cin.get();
-    }
-
     ompl::base::State *to = si_->allocState();
 
     // use the motionmodel to apply the controls

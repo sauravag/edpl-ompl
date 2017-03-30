@@ -46,15 +46,6 @@ UnicycleStatePropagator::UnicycleStatePropagator(const firm::SpaceInformation::S
 void UnicycleStatePropagator::propagate(const base::State *state, const control::Control* control, const double duration, base::State *result) const
 {
 
-    // set the time step
-    if(duration != 0.1)
-    {
-        std::cout<<"In state propagator, duration is: (Press Enter to Continue)"<<duration<<std::endl;
-        std::cin.get();
-    }
-
-    //motionModel_->setTimeStep(duration);
-
     typedef SE2BeliefSpace::StateType StateType;
 
     ompl::base::State *to = si_->allocState();
