@@ -136,6 +136,7 @@ target_link_libraries (bsp-app-demo
 	bsp_lib
 	${OMPLAPP_LIBRARY}
 	${OMPLAPPBASE_LIBRARY}
+	/usr/local/lib/x86_64-linux-gnu/libfcl.so
 )
 
 

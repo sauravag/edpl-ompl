@@ -38,6 +38,7 @@
 #define TWODPOINTROBOT_SETUP_H
 
 #include <omplapp/geometry/RigidBodyGeometry.h>
+#include "omplapp/geometry/detail/FCLStateValidityChecker.h"
 #include <tinyxml.h>
 #include "Planner/FIRM.h"
 #include "edplompl.h"
@@ -52,7 +53,7 @@ class TwoDPointRobotSetup : public ompl::app::RigidBodyGeometry
 
 public:
 
-    TwoDPointRobotSetup() : ompl::app::RigidBodyGeometry(ompl::app::Motion_2D),
+    TwoDPointRobotSetup() : ompl::app::RigidBodyGeometry(ompl::app::Motion_2D, ompl::app::FCL),
     ss_(ompl::base::StateSpacePtr(new SE2BeliefSpace()))
     {
         // set static variables
@@ -81,7 +82,7 @@ public:
         
         // set X & Y bound
         bounds.setLow(0.0);
-        bounds.setHigh(15.0);
+        bounds.setHigh(20.0);
  
         ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
@@ -103,6 +104,8 @@ public:
         setup_ = false;
 
         dynamicObstacles_ = false;
+
+        plannerMethod_ = 0; // by default we use FIRM
     }
 
     virtual ~TwoDPointRobotSetup(void)
@@ -247,12 +250,13 @@ public:
 
     }
 
-    void  Run(int choice = 0)
+    void  Run()
     {
+        // Dynamic obstacles are added only during the run time
         if(dynamicObstacles_)
             addDynamicObstacles();
 
-        executeSolution(choice);
+        executeSolution(plannerMethod_);
 
         // Need a function to get terminated state
         if(goalList_.size() > 1)
@@ -265,7 +269,7 @@ public:
 
                 if(this->solve())
                 {
-                    executeSolution(choice);
+                    executeSolution(plannerMethod_);
                 }
 
             }
@@ -276,20 +280,21 @@ public:
 
     void addDynamicObstacles()
     {
-
-        std::string envMesh = "./Models/FIRMEnvExp1.obj";
-
-        if(!this->addEnvironmentMesh(envMesh))
-            OMPL_INFORM("Couldn't add mesh.");
-
-        Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(this), this->getGeometricStateExtractor());
-
-        const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, this->getGeometricStateExtractor(), false);
+        // iterate through list of dynamic obstacles and their meshes
+        for(int i = 0; i < dynObstList_.size(); i++)
+        {
+            if(!this->addEnvironmentMesh(dynObstList_[i]))
+                OMPL_ERROR("Couldn't add mesh with path: %s",dynObstList_[i]);
+        }
+             
+        const ompl::base::StateValidityCheckerPtr &fclSVC = std::make_shared<ompl::app::FCLStateValidityChecker<ompl::app::Motion_2D>>(siF_,  getGeometrySpecification(), getGeometricStateExtractor(), false);
+        
+        //validitySvc_.reset();
+        //const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
 
         siF_->setStateValidityChecker(fclSVC);
 
-        planner_->as<FIRM>()->updateSpaceInformation(siF_);
-        planner_->as<FIRM>()->setPolicyExecutionSpace(siF_);
+        planner_->as<FIRM>()->updateCollisionChecker(fclSVC);
 
     }
 
@@ -356,6 +361,53 @@ protected:
 
     }
 
+    void loadDynamicObstaclesList()
+    {
+
+        // Load XML containing dynamic obstacle model paths
+        TiXmlDocument doc(pathToSetupFile_);
+        bool loadOkay = doc.LoadFile();
+
+        if(!loadOkay)
+        {
+            printf( "Could not load setup file. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+            exit( 1 );
+        }
+
+        TiXmlNode* node = 0;
+        TiXmlElement* landmarkElement = 0;
+        TiXmlElement* itemElement = 0;
+
+        // Get the dynamic obstacle list node
+        node = doc.FirstChild( "DynamicObstacleList" );
+        assert( node );
+
+        landmarkElement = node->ToElement(); //convert node to element
+        assert( landmarkElement  );
+
+        TiXmlNode* child = 0;
+
+        //Iterate through all the obstacles and put them into a list
+        while( (child = landmarkElement ->IterateChildren(child)))
+        {
+            assert( child );
+            itemElement = child->ToElement();
+            assert( itemElement );
+
+            double id = 0;
+
+            string modelPath;
+
+            itemElement->QueryDoubleAttribute("id", &id);
+            itemElement->QueryStringAttribute("path", &modelPath);
+
+            std::cout<<"Loaded Dynamic Obstacle: "<<modelPath<<std::endl;
+
+            dynObstList_.push_back(modelPath);
+
+        }
+
+    }
     void loadParameters()
     {
         using namespace arma;
@@ -380,22 +432,29 @@ protected:
 
         TiXmlNode* child = 0;
 
-        // dynamic obstacles
-        child = node->FirstChild("DynamicObstacles");
+        // Planner Mode
+        child = node->FirstChild("PlannerMode");
         assert( child );
 
         itemElement = child->ToElement();
         assert( itemElement );
 
+        // planner method
+        int methodChoice = 0;
+        itemElement->QueryIntAttribute("method", &methodChoice);
+        plannerMethod_ = methodChoice;
+
+        //Dynamic Obstacles
         int dynobst = 0;
         itemElement->QueryIntAttribute("dynobst", &dynobst);
 
         if(dynobst == 1)
+        {
             dynamicObstacles_ = true;
+            loadDynamicObstaclesList();
+        }
         else
             dynamicObstacles_ = false;
-
-
 
         // Read the env mesh file
         child = node->FirstChild("Environment");
@@ -565,5 +624,9 @@ private:
 
     /** \brief Activate dynamic obstacles */
     bool dynamicObstacles_;
+
+    std::vector<string> dynObstList_;
+
+    int plannerMethod_;
 };
 #endif

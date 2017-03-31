@@ -68,39 +68,6 @@
 
 using namespace std;
 
-int methodSetup(const std::string &setupFilePath)
-{
-    TiXmlDocument doc(setupFilePath);
-
-    bool loadOkay = doc.LoadFile();
-
-    if ( !loadOkay )
-    {
-        OMPL_INFORM("Could not load XML.");
-        exit(0);
-    }
-
-    TiXmlNode* node = 0;
-
-    TiXmlElement* itemElement = 0;
-
-    node = doc.FirstChild( "PlanningProblem" );
-    assert( node );
-
-    TiXmlNode* child = 0;
-
-    child = node->FirstChild("Mode");
-    assert( child );
-
-    itemElement = child->ToElement();
-    assert( itemElement );
-
-    int m = 0;
-    itemElement->QueryIntAttribute("mode", &m);
-
-    return m;
-}
-
 void plan(const std::string &setupFilePath)
 {
     //FIRM2DSetup *mySetup(new FIRM2DSetup);
@@ -113,16 +80,13 @@ void plan(const std::string &setupFilePath)
     
     Visualizer::setMode(Visualizer::VZRDrawingMode::PRMViewMode);
 
-    int mode = methodSetup(setupFilePath.c_str());
-
     int keepTrying = 1;
 
     while(keepTrying)
     {
         if(mySetup->solve())
         {
-            //mySetup->executeSolution(mode);
-            mySetup->Run(mode);
+            mySetup->Run();
 
             OMPL_INFORM("Plan Executed.");
 
