@@ -50,6 +50,7 @@
 
 //Spaces
 #include "Spaces/SE2BeliefSpace.h"
+#include "Spaces/R2BeliefSpace.h"
 #include "SpaceInformation/SpaceInformation.h"
 
 #ifdef USE_ROS
@@ -59,14 +60,19 @@
 //Observation Models
 #include "ObservationModels/ObservationModelMethod.h"
 #include "ObservationModels/CamAruco2DObservationModel.h"
+#include "ObservationModels/TwoDBeaconObservationModel.h"
+#include "ObservationModels/HeadingBeaconObservationModel.h"
 
 //Motion Models
 #include "MotionModels/MotionModelMethod.h"
 #include "MotionModels/UnicycleMotionModel.h"
 #include "MotionModels/OmnidirectionalMotionModel.h"
+#include "MotionModels/TwoDPointMotionModel.h"
 
 //State Propagators
 #include "MotionModels/UnicycleStatePropagator.h"
+#include "MotionModels/TwoDPointStatePropagator.h"
+#include "MotionModels/OmnidirectionalStatePropagator.h"
 
 //LinearSystem
 #include "LinearSystem/LinearSystem.h"

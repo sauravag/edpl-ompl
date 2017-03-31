@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<LandmarkList>
+<landmark id = 1  x = 3.5	y = 1.8 />
+</LandmarkList>
+<ObservationModels>
+	<CamAruco2DObservationModel
+	    camera_range = "3.0"
+    	camera_half_fov = "180"  
+		sigma_range="0.04"
+		sigma_angle="1.00"
+		eta_rd="0.100"
+		eta_rphi = "0.01"
+		eta_thetad="0.01"
+		eta_thetaphi = "0.02"
+		camera_horizontal_fov = "45"
+	>
+	</CamAruco2DObservationModel>
+	<TwoDBeaconObservationModel
+		sigma="0.1"
+	>
+	</TwoDBeaconObservationModel>
+	<HeadingBeaconObservationModel
+		sigma_heading="0.00017"
+		sigma_ss="0.1"
+	>
+	</HeadingBeaconObservationModel>
+</ObservationModels>
+<MotionModels>
+	<!--UnicycleMotionModel
+		sigmaV="0.001"
+		etaV="0.001"
+    sigmaOmega="0.0001"
+    etaOmega="0.001"
+		P_Wg_filename=""
+		orbit_radius=5.0
+		wind_noise_pos="0.000001"
+		wind_noise_ang="0.000001" 
+		min_linear_velocity= 0.2
+		max_linear_velocity= 0.2
+		max_angular_velocity= 0.3
+		dt= 0.1
+	  /> <!--No Noise--> 
+	<UnicycleMotionModel
+		sigmaV="0.015"
+		etaV="0.05"
+        sigmaOmega="0.005"
+        etaOmega="0.03"
+		P_Wg_filename=""
+		orbit_radius=5.0
+		wind_noise_pos="0.000001"
+		wind_noise_ang="0.000001" 
+		min_linear_velocity= 0.75
+		max_linear_velocity= 0.75
+		max_angular_velocity= 0.60
+		dt= 0.1
+	  /> <!--omega is in radians--> 
+	<OmnidirectionalMotionModel 
+		sigmaV="0.0"
+		etaV="0.0"
+        sigmaOmega="0.0"
+        etaOmega="0.0"
+		P_Wg_filename=""
+		wind_noise_pos="0.028"
+		wind_noise_ang="0.00001" 
+		min_linear_velocity= 1.0
+		max_linear_velocity= 1.0
+		max_angular_velocity= 0.60
+		dt= 0.05
+	  /> <!--omega is in radians, wind_noise_ang is in degrees -->
+		<!--wind_noise_pos="1.000"
+		wind_noise_ang="7.0"-->
+	<TwoDPointMotionModel 
+		sigmaV="0.0"
+		etaV="0.0"
+		wind_noise_pos="0.028" 
+		max_linear_velocity= "1.0"
+		dt= "0.05"
+	  />
+</MotionModels>
+<FIRM>
+	<Video save = "0" />
+	<DataLog save = "0" folder = "../TROSIMS/" />
+	<Roadmap save = "0" />
+	<MCParticles numparticles = "10" />
+</FIRM>
+<PlanningProblem>
+	<Mode
+		mode = "0"
+	/><!-- mode is 0 for FIRM, 1 for rollout (can use dynamic obstacles) and 2 for Kidnapping Multimodal-->
+	<DynamicObstacles 
+		dynobst = "0" 
+	/> <!-- Set mode to 1 in planning problem-->
+	<RoadMap
+		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_MapB_iLQG_TRO_75.xml"
+		useRoadMap = "1"
+	/>
+	<Environment
+		environmentFile = "./Models/iLQG-TRO-MapB.obj"
+	/>		
+	<Robot
+		robotFile = "./Models/iRobot.obj"
+	/>
+	<StartPose
+		x = "0.6"	y = "5.5"
+	/>
+	<PlanningTime
+		maxTime = "600"
+	/>
+	<FIRMNodes
+		minNodes = "75"
+	/>
+	<KidnappedState
+        x = 1.5 y = 19.5 
+    />
+</PlanningProblem>
+<GoalList>
+	<GoalPose x = "13.0" y = "5.5" />
+</GoalList>

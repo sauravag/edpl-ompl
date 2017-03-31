@@ -34,52 +34,44 @@
 
 /* Authors: Saurav Agarwal */
 
-#ifndef SE2BELIEF_SPACE_H_
-#define SE2BELIEF_SPACE_H_
+#ifndef R2BELIEF_SPACE_H_
+#define R2BELIEF_SPACE_H_
 
 // OMPL includes
-#include "ompl/base/spaces/SE2StateSpace.h"
-#include "ompl/base/spaces/SE3StateSpace.h"
+#include "ompl/base/spaces/RealVectorStateSpace.h"
 
 //other includes
 #include <boost/math/constants/constants.hpp>
 #include <armadillo>
 
 using namespace ompl::base;
-class SE2BeliefSpace : public ompl::base::CompoundStateSpace
+class R2BeliefSpace : public ompl::base::RealVectorStateSpace
 {
 
     public:
 
-        /** \brief A belief in SE(2): (x, y, yaw, covariance) */
-        class StateType : public CompoundStateSpace::StateType
+        /** \brief A belief in R(2): (x, y, covariance) */
+        class StateType : public RealVectorStateSpace::StateType
         {
         public:
-            StateType(void) : CompoundStateSpace::StateType()
+            StateType(void) : RealVectorStateSpace::StateType()
             {
-              covariance_ = arma::zeros<arma::mat>(3,3);
+              covariance_ = arma::zeros<arma::mat>(2,2);
               controllerID_ = -1;
+
             }
 
             /** \brief Get the X component of the state */
             double getX(void) const
             {
-                return as<RealVectorStateSpace::StateType>(0)->values[0];
+                return this->values[0];
             }
 
             /** \brief Get the Y component of the state */
             double getY(void) const
             {
-                return as<RealVectorStateSpace::StateType>(0)->values[1];
-            }
-
-            /** \brief Get the yaw component of the state. This is
-                the rotation in plane, with respect to the Z
-                axis. */
-            double getYaw(void) const
-            {
-                return as<SO2StateSpace::StateType>(1)->value;
-            }
+                return this->values[1];
+            }           
 
             arma::mat getCovariance(void) const
             {
@@ -90,13 +82,13 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             /** \brief Set the X component of the state */
             void setX(double x)
             {
-                as<RealVectorStateSpace::StateType>(0)->values[0] = x;
+                this->values[0] = x;
             }
 
             /** \brief Set the Y component of the state */
             void setY(double y)
             {
-                as<RealVectorStateSpace::StateType>(0)->values[1] = y;
+                this->values[1] = y;
             }
 
             /** \brief Set the X and Y components of the state */
@@ -104,28 +96,12 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             {
                 setX(x);
                 setY(y);
-            }
-
-            /** \brief Set the yaw component of the state. This is
-                the rotation in plane, with respect to the Z
-                axis. */
-            void setYaw(double yaw)
-            {
-                as<SO2StateSpace::StateType>(1)->value = yaw;
-            }
-
-            void setXYYaw(double x, double y, double yaw)
-            {
-                setX(x);
-                setY(y);
-                setYaw(yaw);
-            }
+            }    
 
             void setArmaData(const arma::colvec &x)
             {
                 setX(x[0]);
                 setY(x[1]);
-                setYaw(x[2]);
             }
 
             void setCovariance(arma::mat cov){
@@ -134,11 +110,10 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
 
             arma::colvec getArmaData(void) const
             {
-                arma::colvec stateVec(3);
+                arma::colvec stateVec(2);
 
                 stateVec[0] = getX();
                 stateVec[1] = getY();
-                stateVec[2] = getYaw();
                 return stateVec;
             }
 
@@ -156,33 +131,20 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
         };
 
 
-        SE2BeliefSpace(void) : CompoundStateSpace()
+        R2BeliefSpace(void) : RealVectorStateSpace(2)
         {
-            setName("SE2_BELIEF" + getName());
-            type_ = STATE_SPACE_SE2;
-            addSubspace(StateSpacePtr(new RealVectorStateSpace(2)), 1.0);
-            addSubspace(StateSpacePtr(new SO2StateSpace()), 0.5);
-            lock();
+            setName("R2_BELIEF" + getName());
+            type_ = STATE_SPACE_REAL_VECTOR;
         }
 
-        virtual ~SE2BeliefSpace(void)
+        virtual ~R2BeliefSpace(void)
         {
-        }
-
-        /** \copydoc RealVectorStateSpace::setBounds() */
-        void setBounds(const RealVectorBounds &bounds)
-        {
-            as<RealVectorStateSpace>(0)->setBounds(bounds);
-        }
-
-        /** \copydoc RealVectorStateSpace::getBounds() */
-        const RealVectorBounds& getBounds(void) const
-        {
-            return as<RealVectorStateSpace>(0)->getBounds();
         }
 
         virtual State* allocState(void) const;
+
         virtual void copyState(State *destination,const State *source) const;
+
         virtual void freeState(State *state) const;
 
         //virtual void registerProjections(void);

@@ -66,19 +66,19 @@ namespace ompl
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
+        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
 
         /** \brief The time in seconds for a single roadmap building operation */
-        static const double ROADMAP_BUILD_TIME = 60;        
+        static const double ROADMAP_BUILD_TIME = 60;  // 60 is a good number    
 
         /** \brief For a node that is not observable, use a fixed covariance */
-        static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1;
+        static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1; // 0.1 is a good number
 
         /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
         static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
 
         /** \brief Maximum allowed number of iterations to solve DP */
-        static const int DP_MAX_ITERATIONS = 20000;
+        static const int DP_MAX_ITERATIONS = 20000; // 20000 is a good number
 
         /** \brief Weighting factor for filtering cost */
         static const double INFORMATION_COST_WEIGHT = 0.9999 ;
@@ -90,13 +90,13 @@ namespace ompl
         static const double GOAL_COST_TO_GO = 0.0;
 
         /** \brief The initial cost to go from a non-goal node*/
-        static const double INIT_COST_TO_GO = 2.0;
+        static const double INIT_COST_TO_GO = 2.0; // 2 is a good number
 
         /** \brief The cost to traverse an obstacle*/
-        static const double OBSTACLE_COST_TO_GO = 200;
+        static const double OBSTACLE_COST_TO_GO = 200; // 200 is a good number
 
         /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
-        static const double DP_CONVERGENCE_THRESHOLD = 1e-3;
+        static const double DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
 
         /** \brief Default neighborhood radius */
         static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is good
@@ -380,7 +380,7 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                         stateStable = dare (trans(ls.getA()),trans(ls.getH()),ls.getG() * ls.getQ() * trans(ls.getG()),
                                 ls.getM() * ls.getR() * trans(ls.getM()), S );
 
-                        //workState->as<SE2BeliefSpace::StateType>()->setCovariance(S);
+                        //workState->as<FIRM::StateType>()->setCovariance(S);
                     }
                     catch(int e)
                     {
@@ -432,27 +432,46 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
 
     OMPL_INFORM("%s: Number of current states = %u", getName().c_str(), boost::num_vertices(g_));
 
-    if(boost::num_vertices(g_) < minFIRMNodes_) return false;
+    if(boost::num_vertices(g_) < minFIRMNodes_)
+    {
+        OMPL_INFORM("FIRM: Do not yet have enough nodes (< %u).", minFIRMNodes_);
+        return false;
+    } 
 
     foreach (Vertex start, starts)
     {
         foreach (Vertex goal, goals)
         {
+
             graphMutex_.lock();
+
             bool same_component = sameComponent(start, goal);
+            
             graphMutex_.unlock();
 
-            if (same_component && g->isStartGoalPairValid(stateProperty_[goal], stateProperty_[start]))
+            if (same_component /*&& g->isStartGoalPairValid(stateProperty_[goal], stateProperty_[start])*/)
             {
+
                 boost::mutex::scoped_lock _(graphMutex_);
+                
                 solveDynamicProgram(goal);
-                solution = constructFeedbackPath(start, goal);
+                
+                if(!constructFeedbackPath(start, goal, solution))
+                    return false;
+                
                 sendFeedbackEdgesToViz();
+                
                 return true; // return true if solution is found
+            }
+            else
+            {
+                OMPL_WARN("FIRM: start and goal nodes not in same connected component.");
+                return false;
             }
         }
     }
 
+    OMPL_INFORM("FIRM: DP could not converge.");
     return false;
 }
 
@@ -670,7 +689,7 @@ bool FIRM::sameComponent(Vertex m1, Vertex m2)
     return boost::same_component(m1, m2, disjointSets_);
 }
 
-ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal)
+bool FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::base::PathPtr &solution)
 {
     sendFeedbackEdgesToViz();
 
@@ -706,11 +725,14 @@ ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Verte
         if(counter > boost::num_vertices(g_))
         {
             OMPL_ERROR("There is no feedback to guide robot to goal. Maybe DP did not converge.");
+            return false;
         }
 
     }
 
-    return ompl::base::PathPtr(p);
+    solution = ompl::base::PathPtr(p);
+
+    return true;
 }
 
 void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded)
@@ -843,8 +865,8 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
         arma::mat stationaryCovariance = linearizedKF.computeStationaryCovariance(linearSystem);
 
         // set the covariance
-        node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
-        state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        node->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
+        state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
 
         // create a node controller
         std::vector<ompl::control::Control*> dummyControl;
@@ -862,8 +884,8 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
         arma::mat stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
 
         // set the covariance
-        node->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
-        state->as<SE2BeliefSpace::StateType>()->setCovariance(stationaryCovariance);
+        node->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
+        state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
 
         // create a node controller
         std::vector<ompl::control::Control*> dummyControl;
@@ -1076,7 +1098,7 @@ void FIRM::executeFeedback(void)
 
     siF_->doVelocityLogging(true);
 
-    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState))
+    while(!goalState->as<FIRM::StateType>()->isReached(cstartState))
     {
 
         if(currentVertex==goal)
@@ -1216,7 +1238,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     Visualizer::doSaveVideo(doSaveVideo_);
 
-    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState)/*currentVertex != goal*/)
+    while(!goalState->as<FIRM::StateType>()->isReached(cstartState)/*currentVertex != goal*/)
     {
 
         if(currentVertex==goal)
@@ -1384,7 +1406,7 @@ void FIRM::executeFeedbackWithRollout(void)
     nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
     // While the robot state hasn't reached the goal state, keep running
-    while(!goalState->as<SE2BeliefSpace::StateType>()->isReached(cstartState, true))
+    while(!goalState->as<FIRM::StateType>()->isReached(cstartState, true))
     {
 
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
@@ -1429,7 +1451,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
         // If the robot has already reached a FIRM node then take feedback edge
         // else do rollout
-        if(stateProperty_[boost::target(e,g_)]->as<SE2BeliefSpace::StateType>()->isReached(cendState, true))
+        if(stateProperty_[boost::target(e,g_)]->as<FIRM::StateType>()->isReached(cendState, true))
         {
             numberofNodesReached_++;
 
@@ -1641,9 +1663,9 @@ bool FIRM::detectKidnapping(ompl::base::State *previousState, ompl::base::State 
 
     using namespace arma;
 
-    mat previousCov = previousState->as<SE2BeliefSpace::StateType>()->getCovariance();
+    mat previousCov = previousState->as<FIRM::StateType>()->getCovariance();
 
-    mat newCov = newState->as<SE2BeliefSpace::StateType>()->getCovariance();
+    mat newCov = newState->as<FIRM::StateType>()->getCovariance();
 
     double innovSignal = (trace(newCov) - trace(previousCov)) / trace(previousCov);
 
@@ -1664,9 +1686,9 @@ void FIRM::savePlannerData()
     foreach(Vertex v, boost::vertices(g_))
     {
 
-        arma::colvec xVec = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getArmaData();
+        arma::colvec xVec = stateProperty_[v]->as<FIRM::StateType>()->getArmaData();
 
-        arma::mat cov = stateProperty_[v]->as<SE2BeliefSpace::StateType>()->getCovariance();
+        arma::mat cov = stateProperty_[v]->as<FIRM::StateType>()->getCovariance();
 
         std::pair<int,std::pair<arma::colvec,arma::mat> > nodeToWrite = std::make_pair(v, std::make_pair(xVec, cov)) ;
 
@@ -1713,8 +1735,8 @@ void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
             arma::colvec xVec = FIRMNodePosList[i].second;
             arma::mat     cov = FIRMNodeCovarianceList[i].second;
 
-            newState->as<SE2BeliefSpace::StateType>()->setXYYaw(xVec(0),xVec(1),xVec(2));
-            newState->as<SE2BeliefSpace::StateType>()->setCovariance(cov);
+            newState->as<FIRM::StateType>()->setArmaData(xVec);
+            newState->as<FIRM::StateType>()->setCovariance(cov);
 
             //Vertex v = addStateToGraph(siF_->cloneState(newState));
 

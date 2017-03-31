@@ -34,29 +34,19 @@
 
 /* Authors: Saurav Agarwal */
 
-#include "Spaces/SE2BeliefSpace.h"
+#include "Spaces/R2BeliefSpace.h"
 
-double SE2BeliefSpace::StateType::meanNormWeight_  = -1;
-double SE2BeliefSpace::StateType::covNormWeight_   = -1;
-double SE2BeliefSpace::StateType::reachDist_   = -1;
-arma::colvec SE2BeliefSpace::StateType::normWeights_ = arma::zeros<arma::colvec>(3);
+double R2BeliefSpace::StateType::meanNormWeight_  = -1;
+double R2BeliefSpace::StateType::covNormWeight_   = -1;
+double R2BeliefSpace::StateType::reachDist_   = -1;
+arma::colvec R2BeliefSpace::StateType::normWeights_ = arma::zeros<arma::colvec>(3);
 
-bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxedConstraint) const
+bool R2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxedConstraint) const
 {
     // subtract the two beliefs and get the norm
-    arma::colvec stateDiff = this->getArmaData() - state->as<SE2BeliefSpace::StateType>()->getArmaData();
+    arma::colvec stateDiff = this->getArmaData() - state->as<R2BeliefSpace::StateType>()->getArmaData();
 
-    if(stateDiff[2] > boost::math::constants::pi<double>() )
-    {
-
-        stateDiff[2] =  (stateDiff[2] - 2*boost::math::constants::pi<double>()) ;
-    }
-    if( stateDiff[2] < -boost::math::constants::pi<double>() ){
-
-        stateDiff[2] =  stateDiff[2] + 2*boost::math::constants::pi<double>() ;
-    }
-
-    arma::mat covDiff = this->getCovariance() -  state->as<SE2BeliefSpace::StateType>()->getCovariance();
+    arma::mat covDiff = this->getCovariance() -  state->as<R2BeliefSpace::StateType>()->getCovariance();
 
     arma::colvec covDiffDiag = covDiff.diag();
 
@@ -81,69 +71,39 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxed
 
 }
 
-
-ompl::base::State* SE2BeliefSpace::allocState(void) const
+ompl::base::State* R2BeliefSpace::allocState(void) const
 {
-    StateType *state = new StateType();
-    
-    allocStateComponents(state);
-    
-    state->setYaw(0.0);
-    
-    return state;
+
+    StateType *rstate = new StateType();
+
+    rstate->values = new double[dimension_];
+
+    return rstate;
 }
 
-void SE2BeliefSpace::copyState(State *destination, const State *source) const
+void R2BeliefSpace::copyState(State *destination, const State *source) const
 {
     destination->as<StateType>()->setX(source->as<StateType>()->getX());
     destination->as<StateType>()->setY(source->as<StateType>()->getY());
-    destination->as<StateType>()->setYaw(source->as<StateType>()->getYaw());
     destination->as<StateType>()->setCovariance(source->as<StateType>()->getCovariance());
 }
 
-void SE2BeliefSpace::freeState(State *state) const
+void R2BeliefSpace::freeState(State *state) const
 {
-    CompoundStateSpace::freeState(state);
+    RealVectorStateSpace::freeState(state);
 }
 
-double SE2BeliefSpace::distance(const State* state1, const State *state2)
+double R2BeliefSpace::distance(const State* state1, const State *state2)
 {
     double dx = state1->as<StateType>()->getX() - state2->as<StateType>()->getX();
     double dy = state1->as<StateType>()->getY() - state2->as<StateType>()->getY();
 
     return pow(dx*dx+dy*dy, 0.5);
 }
-void SE2BeliefSpace::getRelativeState(const State *from, const State *to, State *state)
+void R2BeliefSpace::getRelativeState(const State *from, const State *to, State *state)
 {
 	state->as<StateType>()->setX(to->as<StateType>()->getX() - from->as<StateType>()->getX());
 	state->as<StateType>()->setY(to->as<StateType>()->getY() - from->as<StateType>()->getY());
-
-	/*
-    	Calculating relative angle is a bit tricky.
-    	Refer to "interpolate" function of SO2StateSpace at line 122 of SO2StateSpace.h  in OMPL lib
-        to see the original implementation in OMPL
-	*/
-
-	double diff = to->as<StateType>()->getYaw() - from->as<StateType>()->getYaw();
-	if (fabs(diff) <= boost::math::constants::pi<double>())
-        state->as<StateType>()->setYaw(diff);
-    else
-    {
-        double v;
-        if (diff > 0.0)
-            diff = 2.0 * boost::math::constants::pi<double>() - diff;
-        else
-            diff = -2.0 * boost::math::constants::pi<double>() - diff;
-
-        v = - diff ;
-        // input states are within bounds, so the following check is sufficient
-        if (v > boost::math::constants::pi<double>())
-            v -= 2.0 * boost::math::constants::pi<double>();
-        else
-            if (v < -boost::math::constants::pi<double>())
-                v += 2.0 * boost::math::constants::pi<double>();
-    	state->as<StateType>()->setYaw(v);
-    }
 
     arma::mat fcov = from->as<StateType>()->getCovariance();
     arma::mat tocov = to->as<StateType>()->getCovariance();
@@ -154,13 +114,12 @@ void SE2BeliefSpace::getRelativeState(const State *from, const State *to, State 
     }
 }
 
-void SE2BeliefSpace::printBeliefState(const State *state)
+void R2BeliefSpace::printBeliefState(const State *state)
 {
     std::cout<<"----Printing BeliefState----"<<std::endl;
     std::cout<<"State [X, Y, Yaw]: ";
-    std::cout<<"["<<state->as<SE2BeliefSpace::StateType>()->getX()<<", "<<state->as<SE2BeliefSpace::StateType>()->getY()
-        <<", "<<state->as<SE2BeliefSpace::StateType>()->getYaw()<<"]"<<std::endl;
+    std::cout<<"["<<state->as<R2BeliefSpace::StateType>()->getX()<<", "<<state->as<R2BeliefSpace::StateType>()->getY()<<"]"<<std::endl;
     std::cout<<"Covariance  is" <<std::endl;
-    std::cout<<state->as<SE2BeliefSpace::StateType>()->getCovariance()<<std::endl;
+    std::cout<<state->as<R2BeliefSpace::StateType>()->getCovariance()<<std::endl;
     std::cout<<"------End BeliefState-------"<<std::endl;
 }

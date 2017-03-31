@@ -33,32 +33,45 @@
 *********************************************************************/
 /* Author: Ali-akbar Agha-mohammadi, Saurav Agarwal */
 
-#include "MotionModels/UnicycleStatePropagator.h"
-#include "ompl/control/spaces/RealVectorControlSpace.h"
-#include "ompl/util/Exception.h"
-using namespace ompl;
+#ifndef TWODPOINT_STATE_PROPAGATOR_
+#define TWODPOINT_STATE_PROPAGATOR_
 
-UnicycleStatePropagator::UnicycleStatePropagator(const firm::SpaceInformation::SpaceInformationPtr &si) : StatePropagator(si), siF_(si)
+#include "SpaceInformation/SpaceInformation.h"
+#include "Spaces/R2BeliefSpace.h"
+#include "TwoDPointMotionModel.h"
+
+/** \brief State propagation for a 2D point motion model. */
+class TwoDPointStatePropagator : public ompl::control::StatePropagator
 {
-    motionModel_ = siF_->getMotionModel();
-}
+public:
 
-void UnicycleStatePropagator::propagate(const base::State *state, const control::Control* control, const double duration, base::State *result) const
-{
+    /** \brief Construct representation of a unicycle state propagator.
+    */
+    TwoDPointStatePropagator(const firm::SpaceInformation::SpaceInformationPtr &si);
 
-    typedef SE2BeliefSpace::StateType StateType;
+    virtual ~TwoDPointStatePropagator(void)
+    {
+    }
 
-    ompl::base::State *to = si_->allocState();
 
-    // use the motionmodel to apply the controls
-    motionModel_->Evolve(state, control, motionModel_->getZeroNoise(), to);
+    /** \brief Will always return false, as the simulation can only proceed forward in time */
+    virtual bool canPropagateBackward(void) const;
 
-    si_->copyState(result,to);
+    /** \brief Propagate from a state, under a given control, for some specified amount of time.
+        We use the motion model to do the actual number crunching.
 
-}
+    */
+    virtual void propagate(const ompl::base::State *state, const ompl::control::Control* control, const double duration, ompl::base::State *result) const;
 
-bool UnicycleStatePropagator::canPropagateBackward(void) const
-{
-    return false;
-}
+protected:
 
+    MotionModelMethod::MotionModelPointer motionModel_;
+
+    firm::SpaceInformation::SpaceInformationPtr siF_;
+    /**
+    You can add a simulated environment here where the controls can get applied, useful for
+    showing the graphics, very similar to the concept of ActuationSystem in PMPL.
+    */
+};
+
+#endif

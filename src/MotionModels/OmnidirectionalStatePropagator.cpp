@@ -33,17 +33,17 @@
 *********************************************************************/
 /* Author: Ali-akbar Agha-mohammadi, Saurav Agarwal */
 
-#include "MotionModels/UnicycleStatePropagator.h"
+#include "MotionModels/OmnidirectionalStatePropagator.h"
 #include "ompl/control/spaces/RealVectorControlSpace.h"
 #include "ompl/util/Exception.h"
 using namespace ompl;
 
-UnicycleStatePropagator::UnicycleStatePropagator(const firm::SpaceInformation::SpaceInformationPtr &si) : StatePropagator(si), siF_(si)
+OmnidirectionalStatePropagator::OmnidirectionalStatePropagator(const firm::SpaceInformation::SpaceInformationPtr &si) : StatePropagator(si), siF_(si)
 {
     motionModel_ = siF_->getMotionModel();
 }
 
-void UnicycleStatePropagator::propagate(const base::State *state, const control::Control* control, const double duration, base::State *result) const
+void OmnidirectionalStatePropagator::propagate(const base::State *state, const control::Control* control, const double duration, base::State *result) const
 {
 
     typedef SE2BeliefSpace::StateType StateType;
@@ -57,7 +57,7 @@ void UnicycleStatePropagator::propagate(const base::State *state, const control:
 
 }
 
-bool UnicycleStatePropagator::canPropagateBackward(void) const
+bool OmnidirectionalStatePropagator::canPropagateBackward(void) const
 {
     return false;
 }

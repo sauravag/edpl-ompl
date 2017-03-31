@@ -34,8 +34,8 @@
 
 /* Author: Saurav Agarwal */
 
-#ifndef FIRM_2D_SETUP_H
-#define FIRM_2D_SETUP_H
+#ifndef TWODPOINTROBOT_SETUP_H
+#define TWODPOINTROBOT_SETUP_H
 
 #include <omplapp/geometry/RigidBodyGeometry.h>
 #include <tinyxml.h>
@@ -44,23 +44,23 @@
 #include "Visualization/Window.h"
 #include "Visualization/Visualizer.h"
 
-/** \brief Wrapper for ompl::app::RigidBodyPlanning that plans for rigid bodies in SE2BeliefSpace using FIRM */
-class FIRM2DSetup : public ompl::app::RigidBodyGeometry
+/** \brief Wrapper for ompl::app::RigidBodyPlanning that plans for rigid bodies in SE2BeliefSpace for a point robot with known heading using FIRM */
+class TwoDPointRobotSetup : public ompl::app::RigidBodyGeometry
 {
 
     typedef SE2BeliefSpace::StateType StateType;
 
 public:
 
-    FIRM2DSetup() : ompl::app::RigidBodyGeometry(ompl::app::Motion_2D),
+    TwoDPointRobotSetup() : ompl::app::RigidBodyGeometry(ompl::app::Motion_2D),
     ss_(ompl::base::StateSpacePtr(new SE2BeliefSpace()))
     {
         // set static variables
         RHCICreate::setControlQueueSize(5);
         RHCICreate::setTurnOnlyDistance(0.01);
-        Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(0.1); // degrees
-        Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.01);// meters
-        Controller<RHCICreate, ExtendedKF>::setMaxTries(120);
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(10); // degrees
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.084);// meters
+        Controller<RHCICreate, ExtendedKF>::setMaxTries(60);
         Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(4.0); // meters
 
         // setting the mean and norm weights (used in reachability check)
@@ -76,20 +76,17 @@ public:
         StateType::normWeights_ = normWeights;
 
         // The bounds should be inferred from the geometry files,
-        // there is a function in Apputils to do this, so use that.
-        // set the bounds for the R^3 part of SE(3)
+        // there is a function in Apputils to do this, so use that.        
         ompl::base::RealVectorBounds bounds(2);
-        // set X bound
-        bounds.setLow(0,0.5);
-        bounds.setHigh(0,19.3);
-        //set Y bound
-        bounds.setLow(1,0.5);
-        bounds.setHigh(1,19.3);
+        
+        // set X & Y bound
+        bounds.setLow(0.0);
+        bounds.setHigh(15.0);
+ 
         ss_->as<SE2BeliefSpace>()->setBounds(bounds);
 
         //Construct the control space
-        //ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,2) ) ; // iCreate
-        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) ) ; // Omni
+        ompl::control::ControlSpacePtr controlspace( new ompl::control::RealVectorControlSpace(ss_,3) );
 
         cs_ = controlspace;
 
@@ -104,9 +101,11 @@ public:
         start_ = siF_->allocState();
 
         setup_ = false;
+
+        dynamicObstacles_ = false;
     }
 
-    virtual ~FIRM2DSetup(void)
+    virtual ~TwoDPointRobotSetup(void)
     {
     }
 
@@ -120,11 +119,11 @@ public:
         pathToSetupFile_  = path;       
     }
 
-    void setStartState(const double X, const double Y, const double Yaw)
+    void setStartState(const double X, const double Y)
     {
         ompl::base::State *temp = siF_->allocState();
 
-        temp->as<StateType>()->setXYYaw(X,Y,Yaw);
+        temp->as<StateType>()->setXY(X,Y);
 
         siF_->copyState(start_, temp);
 
@@ -132,11 +131,11 @@ public:
 
     }
 
-    void addGoalState(const double X, const double Y, const double Yaw)
+    void addGoalState(const double X, const double Y)
     {
         ompl::base::State *temp = siF_->allocState();
 
-        temp->as<StateType>()->setXYYaw(X,Y,Yaw);
+        temp->as<StateType>()->setXY(X,Y);
 
         goalList_.push_back(temp);
 
@@ -166,11 +165,11 @@ public:
             siF_->setStateValidityChecker(fclSVC);
 
             // provide the observation model to the space
-            ObservationModelMethod::ObservationModelPointer om(new CamAruco2DObservationModel(siF_, pathToSetupFile_.c_str()));
+            ObservationModelMethod::ObservationModelPointer om(new HeadingBeaconObservationModel(siF_, pathToSetupFile_.c_str()));
             siF_->setObservationModel(om);
 
             // Provide the motion model to the space
-            //MotionModelMethod::MotionModelPointer mm(new UnicycleMotionModel(siF_, pathToSetupFile_.c_str()));
+            // We use the omnidirectional model because collision checking requires SE2
             MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));
             siF_->setMotionModel(mm);
 
@@ -250,6 +249,8 @@ public:
 
     void  Run(int choice = 0)
     {
+        if(dynamicObstacles_)
+            addDynamicObstacles();
 
         executeSolution(choice);
 
@@ -273,10 +274,28 @@ public:
 
     }
 
+    void addDynamicObstacles()
+    {
+
+        std::string envMesh = "./Models/FIRMEnvExp1.obj";
+
+        if(!this->addEnvironmentMesh(envMesh))
+            OMPL_INFORM("Couldn't add mesh.");
+
+        Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(this), this->getGeometricStateExtractor());
+
+        const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, this->getGeometricStateExtractor(), false);
+
+        siF_->setStateValidityChecker(fclSVC);
+
+        planner_->as<FIRM>()->updateSpaceInformation(siF_);
+        planner_->as<FIRM>()->setPolicyExecutionSpace(siF_);
+
+    }
 
     ompl::app::GeometricStateExtractor getGeometricStateExtractor(void) const
     {
-        return boost::bind(&FIRM2DSetup::getGeometricComponentStateInternal, this, _1, _2);
+        return boost::bind(&TwoDPointRobotSetup::getGeometricComponentStateInternal, this, _1, _2);
     }
 
     void saveRoadmap()
@@ -328,11 +347,10 @@ protected:
 
             itemElement->QueryDoubleAttribute("x", &goalX);
             itemElement->QueryDoubleAttribute("y", &goalY);
-            itemElement->QueryDoubleAttribute("theta", &goalTheta);
 
-            std::cout<<"Loaded Goal Pose X: "<<goalX<<" Y: "<<goalY<<" Theta: "<<goalTheta<<std::endl;
+            std::cout<<"Loaded Goal Pose X: "<<goalX<<" Y: "<<goalY<<std::endl;
 
-            addGoalState(goalX, goalY, goalTheta);
+            addGoalState(goalX, goalY);
 
         }
 
@@ -362,6 +380,23 @@ protected:
 
         TiXmlNode* child = 0;
 
+        // dynamic obstacles
+        child = node->FirstChild("DynamicObstacles");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        int dynobst = 0;
+        itemElement->QueryIntAttribute("dynobst", &dynobst);
+
+        if(dynobst == 1)
+            dynamicObstacles_ = true;
+        else
+            dynamicObstacles_ = false;
+
+
+
         // Read the env mesh file
         child = node->FirstChild("Environment");
         assert( child );
@@ -372,7 +407,7 @@ protected:
         std::string environmentFilePath;
         itemElement->QueryStringAttribute("environmentFile", &environmentFilePath);
 
-        this->setEnvironmentMesh(environmentFilePath);
+        this->addEnvironmentMesh(environmentFilePath);
 
         // Read the robot mesh file
         child  = node->FirstChild("Robot");
@@ -407,13 +442,12 @@ protected:
         itemElement = child->ToElement();
         assert( itemElement );
 
-        double startX = 0,startY = 0, startTheta = 0;
+        double startX = 0,startY = 0;
 
         itemElement->QueryDoubleAttribute("x", &startX);
         itemElement->QueryDoubleAttribute("y", &startY);
-        itemElement->QueryDoubleAttribute("theta", &startTheta);
 
-        setStartState(startX, startY, startTheta);
+        setStartState(startX, startY);
 
         // Read the Goal Pose
         /*
@@ -466,15 +500,14 @@ protected:
         itemElement = child->ToElement();
         assert( itemElement );
 
-        double kX = 0 , kY = 0, kTheta = 0;
+        double kX = 0 , kY = 0;
 
         itemElement->QueryDoubleAttribute("x", &kX);
         itemElement->QueryDoubleAttribute("y", &kY);
-        itemElement->QueryDoubleAttribute("theta", &kTheta);
 
         kidnappedState_ = siF_->allocState();
 
-        kidnappedState_->as<SE2BeliefSpace::StateType>()->setXYYaw(kX, kY, kTheta);
+        kidnappedState_->as<SE2BeliefSpace::StateType>()->setXY(kX, kY);
 
         loadGoals();
 
@@ -486,13 +519,13 @@ protected:
 
         std::cout<<"Path to Roadmap File: "<<pathToRoadMapFile_<<std::endl;
 
-        std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<" Theta: "<<startTheta<<std::endl;
+        std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<std::endl;
 
         std::cout<<"Planning Time: "<<planningTime_<<" seconds"<<std::endl;
 
         std::cout<<"Min Nodes: "<<minNodes_<<std::endl;
 
-        std::cout<<"Kidnapped Pose x:"<<kX<<" y:"<<kY<<" theta:"<<kTheta<<std::endl;
+        std::cout<<"Kidnapped Pose x:"<<kX<<" y:"<<kY<<std::endl;
 
     }
 
@@ -529,5 +562,8 @@ private:
     unsigned int minNodes_;
 
     bool setup_;
+
+    /** \brief Activate dynamic obstacles */
+    bool dynamicObstacles_;
 };
 #endif

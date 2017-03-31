@@ -56,7 +56,8 @@
 #include <iostream>
 #include <istream>
 
-#include "Setup/FIRM2DSetup.h"
+//#include "Setup/FIRM2DSetup.h"
+#include "Setup/TwoDPointRobotSetup.h"
 
 #ifdef USE_ROS
     #include "Setup/FIRMAruco2DROSSetup.h"
@@ -102,7 +103,9 @@ int methodSetup(const std::string &setupFilePath)
 
 void plan(const std::string &setupFilePath)
 {
-    FIRM2DSetup *mySetup(new FIRM2DSetup);
+    //FIRM2DSetup *mySetup(new FIRM2DSetup);
+
+    TwoDPointRobotSetup *mySetup(new TwoDPointRobotSetup);
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
@@ -130,8 +133,9 @@ void plan(const std::string &setupFilePath)
         }
         else
         {
+            OMPL_INFORM("Unable to find Solution in given time. Either more nodes are needed, or DP could not converge.");
+            
             break;
-            //OMPL_INFORM("Unable to find Solution in given time, would you like to continue attempt. (1: yes, 0 :no) ? :");
 
             //std::cin>>keepTrying;
         }

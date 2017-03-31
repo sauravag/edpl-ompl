@@ -59,6 +59,9 @@
 #include "Path/FeedbackPath.h"
 #include "ConnectionStrategy/FStrategy.h"
 #include "NBM3P.h"
+#include "Spaces/R2BeliefSpace.h"
+#include "Spaces/SE2BeliefSpace.h"
+
 /**
    @anchor FIRM
    @par Short description
@@ -84,6 +87,12 @@
 /** \brief Feedback Information RoadMap planner */
 class FIRM : public ompl::base::Planner
 {
+
+    /* Note: Set the statetype depending upon your problem.*/
+    
+    typedef SE2BeliefSpace::StateType StateType;
+
+    //typedef R2BeliefSpace::StateType StateType;
 
 public:
 
@@ -278,6 +287,11 @@ public:
         policyExecutionSI_ = executionSI;
     }
 
+    void updateSpaceInformation(firm::SpaceInformation::SpaceInformationPtr si)
+    {
+       si_ =  ompl::base::SpaceInformationPtr(si);
+    }
+
 protected:
 
     /** \brief Free all the memory allocated by the planner */
@@ -318,7 +332,7 @@ protected:
     bool addedNewSolution(void) const;
 
     /** \brief Construct a feedback */
-    virtual ompl::base::PathPtr constructFeedbackPath(const Vertex &start, const Vertex &goal);
+    virtual bool constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::base::PathPtr &solution);
 
     /** \brief Add an edge from vertex a to b in graph */
     virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
@@ -499,6 +513,7 @@ private:
 
     /** \brief Flag to save video */
     bool doSaveVideo_;
+
 };
 
 
