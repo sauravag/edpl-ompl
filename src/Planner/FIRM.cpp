@@ -96,7 +96,7 @@ namespace ompl
         static const double OBSTACLE_COST_TO_GO = 200; // 200 is a good number
 
         /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
-        static const double DP_CONVERGENCE_THRESHOLD = 1e-1; // 1e-3 is a good number
+        static const double DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
 
         /** \brief Default neighborhood radius */
         static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is good
@@ -156,8 +156,6 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
     doSaveLogs_ = false;
 
     doSaveVideo_ = false;
-
-    dynamicObstacles_ = false;
 
 }
 
@@ -1957,21 +1955,6 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     int numP = 0;
     itemElement->QueryIntAttribute("numparticles", &numP);
     numMCParticles_ = numP;
-
-    // dynamic obstacles
-    child = node->FirstChild("DynamicObstacles");
-    assert( child );
-
-    itemElement = child->ToElement();
-    assert( itemElement );
-
-    int dynobst = 0;
-    itemElement->QueryIntAttribute("dynobst", &dynobst);
-
-    if(dynobst == 1)
-        dynamicObstacles_ = true;
-    else
-        dynamicObstacles_ = false;
 
 }
 

@@ -287,6 +287,11 @@ public:
         policyExecutionSI_ = executionSI;
     }
 
+    void updateSpaceInformation(firm::SpaceInformation::SpaceInformationPtr si)
+    {
+       si_ =  ompl::base::SpaceInformationPtr(si);
+    }
+
 protected:
 
     /** \brief Free all the memory allocated by the planner */
@@ -509,8 +514,6 @@ private:
     /** \brief Flag to save video */
     bool doSaveVideo_;
 
-    /** \brief Activate dynamic obstacles */
-    bool dynamicObstacles_;
 };
 
 

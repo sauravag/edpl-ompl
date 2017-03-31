@@ -363,14 +363,10 @@ void Visualizer::drawEnvironment()
 {
     if(renderGeom_)
     {
-        if(envIndx_ <= 0)
-        {
-            envIndx_ = renderGeom_->renderEnvironment();
-        }
-        else
-        {
-            glCallList(envIndx_);
-        }
+        
+        envIndx_ = renderGeom_->renderEnvironment();
+        
+        glCallList(envIndx_);
 
     }
 

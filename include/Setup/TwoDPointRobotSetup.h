@@ -101,6 +101,8 @@ public:
         start_ = siF_->allocState();
 
         setup_ = false;
+
+        dynamicObstacles_ = false;
     }
 
     virtual ~TwoDPointRobotSetup(void)
@@ -247,6 +249,8 @@ public:
 
     void  Run(int choice = 0)
     {
+        if(dynamicObstacles_)
+            addDynamicObstacles();
 
         executeSolution(choice);
 
@@ -270,6 +274,24 @@ public:
 
     }
 
+    void addDynamicObstacles()
+    {
+
+        std::string envMesh = "./Models/FIRMEnvExp1.obj";
+
+        if(!this->addEnvironmentMesh(envMesh))
+            OMPL_INFORM("Couldn't add mesh.");
+
+        Visualizer::updateRenderer(*dynamic_cast<const ompl::app::RigidBodyGeometry*>(this), this->getGeometricStateExtractor());
+
+        const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, this->getGeometricStateExtractor(), false);
+
+        siF_->setStateValidityChecker(fclSVC);
+
+        planner_->as<FIRM>()->updateSpaceInformation(siF_);
+        planner_->as<FIRM>()->setPolicyExecutionSpace(siF_);
+
+    }
 
     ompl::app::GeometricStateExtractor getGeometricStateExtractor(void) const
     {
@@ -358,6 +380,23 @@ protected:
 
         TiXmlNode* child = 0;
 
+        // dynamic obstacles
+        child = node->FirstChild("DynamicObstacles");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        int dynobst = 0;
+        itemElement->QueryIntAttribute("dynobst", &dynobst);
+
+        if(dynobst == 1)
+            dynamicObstacles_ = true;
+        else
+            dynamicObstacles_ = false;
+
+
+
         // Read the env mesh file
         child = node->FirstChild("Environment");
         assert( child );
@@ -368,7 +407,7 @@ protected:
         std::string environmentFilePath;
         itemElement->QueryStringAttribute("environmentFile", &environmentFilePath);
 
-        this->setEnvironmentMesh(environmentFilePath);
+        this->addEnvironmentMesh(environmentFilePath);
 
         // Read the robot mesh file
         child  = node->FirstChild("Robot");
@@ -523,5 +562,8 @@ private:
     unsigned int minNodes_;
 
     bool setup_;
+
+    /** \brief Activate dynamic obstacles */
+    bool dynamicObstacles_;
 };
 #endif
