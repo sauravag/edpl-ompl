@@ -78,7 +78,7 @@ namespace ompl
         static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
 
         /** \brief Maximum allowed number of iterations to solve DP */
-        static const int DP_MAX_ITERATIONS = 5000; // 20000 is a good number
+        static const int DP_MAX_ITERATIONS = 20000; // 20000 is a good number
 
         /** \brief Weighting factor for filtering cost */
         static const double INFORMATION_COST_WEIGHT = 0.9999 ;
@@ -96,10 +96,10 @@ namespace ompl
         static const double OBSTACLE_COST_TO_GO = 200; // 200 is a good number
 
         /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
-        static const double DP_CONVERGENCE_THRESHOLD = 1; // 1e-3 is a good number
+        static const double DP_CONVERGENCE_THRESHOLD = 1e-1; // 1e-3 is a good number
 
         /** \brief Default neighborhood radius */
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 3.0; // 5.0 meters is good
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is good
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
@@ -458,7 +458,8 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
                 
                 solveDynamicProgram(goal);
                 
-                solution = constructFeedbackPath(start, goal);
+                if(!constructFeedbackPath(start, goal, solution))
+                    return false;
                 
                 sendFeedbackEdgesToViz();
                 
@@ -690,7 +691,7 @@ bool FIRM::sameComponent(Vertex m1, Vertex m2)
     return boost::same_component(m1, m2, disjointSets_);
 }
 
-ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal)
+bool FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::base::PathPtr &solution)
 {
     sendFeedbackEdgesToViz();
 
@@ -726,12 +727,14 @@ ompl::base::PathPtr FIRM::constructFeedbackPath(const Vertex &start, const Verte
         if(counter > boost::num_vertices(g_))
         {
             OMPL_ERROR("There is no feedback to guide robot to goal. Maybe DP did not converge.");
-            break;
+            return false;
         }
 
     }
 
-    return ompl::base::PathPtr(p);
+    solution = ompl::base::PathPtr(p);
+
+    return true;
 }
 
 void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded)
@@ -972,10 +975,6 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
         }
 
         convergenceCondition = (norm(MapToColvec(costToGo_)-MapToColvec(newCostToGo), "inf") <= ompl::magic::DP_CONVERGENCE_THRESHOLD);
-
-        std::cout<<"Ol dCost To Go: "<<MapToColvec(costToGo_)<<std::endl;
-        std::cout<<"New Cost to Go: "<<MapToColvec(newCostToGo)<<std::endl;
-        std::cin.get();
 
         costToGo_.swap(newCostToGo);   // Equivalent to costToGo_ = newCostToGo
 

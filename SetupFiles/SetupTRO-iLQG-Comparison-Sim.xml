@@ -20,7 +20,7 @@
 	>
 	</TwoDBeaconObservationModel>
 	<HeadingBeaconObservationModel
-		sigma_heading="0.0017"
+		sigma_heading="0.00017"
 		sigma_ss="0.1"
 	>
 	</HeadingBeaconObservationModel>
@@ -61,7 +61,7 @@
         etaOmega="0.0"
 		P_Wg_filename=""
 		wind_noise_pos="0.028"
-		wind_noise_ang="0.0001" 
+		wind_noise_ang="0.00001" 
 		min_linear_velocity= 1.0
 		max_linear_velocity= 1.0
 		max_angular_velocity= 0.60
@@ -105,7 +105,7 @@
 		maxTime = "600"
 	/>
 	<FIRMNodes
-		minNodes = "100"
+		minNodes = "75"
 	/>
 	<KidnappedState
         x = 1.5 y = 19.5 

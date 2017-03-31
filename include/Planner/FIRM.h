@@ -327,7 +327,7 @@ protected:
     bool addedNewSolution(void) const;
 
     /** \brief Construct a feedback */
-    virtual ompl::base::PathPtr constructFeedbackPath(const Vertex &start, const Vertex &goal);
+    virtual bool constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::base::PathPtr &solution);
 
     /** \brief Add an edge from vertex a to b in graph */
     virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
