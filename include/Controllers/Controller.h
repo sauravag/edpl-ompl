@@ -112,7 +112,11 @@ class Controller
         ompl::base::State* getGoal() {return goal_; }
 
         /** \brief Set the space information of the planning problem */
-        void setSpaceInformation(SpaceInformationPtr si) { si_ = si; }
+        void setSpaceInformation(SpaceInformationPtr si)
+        { 
+          si_.reset();
+          si_ = si; 
+        }
 
         /** \brief Set the nodeReached angle.*/
         static void setNodeReachedAngle(double angle) {nodeReachedAngle_ = angle; }
@@ -142,7 +146,7 @@ class Controller
         SeparatedControllerType separatedController_;
 
         /** \brief  The filter used to estimate the robot belief. */
-    	FilterType filter_;
+    	  FilterType filter_;
 
         /** \brief  The target node to which the controller drives the robot.*/
         ompl::base::State *goal_;

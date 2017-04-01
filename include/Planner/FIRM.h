@@ -287,9 +287,11 @@ public:
         policyExecutionSI_ = executionSI;
     }
 
-    void updateSpaceInformation(firm::SpaceInformation::SpaceInformationPtr si)
+    void updateCollisionChecker(const ompl::base::StateValidityCheckerPtr &svc)
     {
-       si_ =  ompl::base::SpaceInformationPtr(si);
+        si_->setStateValidityChecker(svc);
+        siF_->setStateValidityChecker(svc);
+        policyExecutionSI_->setStateValidityChecker(svc);
     }
 
 protected:
@@ -434,7 +436,7 @@ protected:
     mutable boost::mutex                                   graphMutex_;
 
     /** \brief The base::SpaceInformation cast as firm::SpaceInformation, for convenience */
-    const firm::SpaceInformation::SpaceInformationPtr            siF_;
+    firm::SpaceInformation::SpaceInformationPtr            siF_;
 
     /** \brief This is the space in which the policy is executed. By default it is set to the same space that is passed to the constructer.
                 If this space is changed, the observations and controls are both in the context of this new space. Use the setPolicyExecutionSpace

@@ -231,9 +231,10 @@
 	<MCParticles numparticles = "10" />
 </FIRM>
 <PlanningProblem>
-	<Mode
-		mode = "0"
-	/><!-- mode is 0 for FIRM 1 for rollout and 2 for Kidnapping Multimodal-->
+	<PlannerMode
+		method = "0"
+		dynobst = "0" 
+	/><!--set dynobst to 1 to activate, method 0 for FIRM, 1 for Rollout, 2 for multimodal-->
 	<RoadMap
 		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_Env2_Omni_75.xml"
 		useRoadMap = "1"
