@@ -87,10 +87,11 @@
 	<MCParticles numparticles = "4" />
 </FIRM>
 <PlanningProblem>
+	<!--  method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
 	<PlannerMode
-		method = "0"
+		method = "1"
 		dynobst = "1" 
-	/><!--set dynobst to 1 to activate, method 0 for FIRM, 1 for Rollout, 2 for multimodal-->
+	/><!--set dynobst to 1 to activate-->
 	<RoadMap
 		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_MapB_iLQG_TRO_75.xml"
 		useRoadMap = "1"
