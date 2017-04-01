@@ -254,7 +254,7 @@ public:
     {
         // Dynamic obstacles are added only during the run time
         if(dynamicObstacles_)
-            addDynamicObstacles();
+            updateEnvironmentMesh();
 
         executeSolution(plannerMethod_);
 
@@ -278,23 +278,18 @@ public:
 
     }
 
-    void addDynamicObstacles()
+    void updateEnvironmentMesh(int obindx = 0)
     {
-        // iterate through list of dynamic obstacles and their meshes
-        for(int i = 0; i < dynObstList_.size(); i++)
-        {
-            if(!this->addEnvironmentMesh(dynObstList_[i]))
-                OMPL_ERROR("Couldn't add mesh with path: %s",dynObstList_[i]);
-        }
-             
-        const ompl::base::StateValidityCheckerPtr &fclSVC = std::make_shared<ompl::app::FCLStateValidityChecker<ompl::app::Motion_2D>>(siF_,  getGeometrySpecification(), getGeometricStateExtractor(), false);
         
-        //validitySvc_.reset();
-        //const ompl::base::StateValidityCheckerPtr &fclSVC = this->allocStateValidityChecker(siF_, getGeometricStateExtractor(), false);
+        // Set environment to new mesh with some dynamic / additional obstacles
+        if(!this->setEnvironmentMesh(dynObstList_[obindx]))
+            OMPL_ERROR("Couldn't set mesh with path: %s",dynObstList_[obindx]);
+        
+        const ompl::base::StateValidityCheckerPtr &svc = std::make_shared<ompl::app::FCLStateValidityChecker<ompl::app::Motion_2D>>(siF_,  getGeometrySpecification(), getGeometricStateExtractor(), false);
 
-        siF_->setStateValidityChecker(fclSVC);
+        siF_->setStateValidityChecker(svc);
 
-        planner_->as<FIRM>()->updateCollisionChecker(fclSVC);
+        planner_->as<FIRM>()->updateCollisionChecker(svc);
 
     }
 
@@ -307,6 +302,7 @@ public:
     {
         planner_->as<FIRM>()->savePlannerData();
     }
+
 protected:
 
     const ompl::base::State* getGeometricComponentStateInternal(const ompl::base::State *state, unsigned int /*index*/) const
@@ -465,7 +461,7 @@ protected:
 
         std::string environmentFilePath;
         itemElement->QueryStringAttribute("environmentFile", &environmentFilePath);
-
+        pathToEnvironmentMesh_ = environmentFilePath;
         this->addEnvironmentMesh(environmentFilePath);
 
         // Read the robot mesh file
@@ -613,6 +609,8 @@ private:
     std::string pathToSetupFile_;
 
     std::string pathToRoadMapFile_;
+
+    std::string pathToEnvironmentMesh_;
 
     int useSavedRoadMap_;
 

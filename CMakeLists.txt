@@ -132,11 +132,12 @@ target_link_libraries (bsp_lib
 # Add the main as executable
 add_executable (bsp-app-demo src/main.cpp)
 
+# make sure libfcl.so is in /usr/local/lib/
 target_link_libraries (bsp-app-demo
 	bsp_lib
 	${OMPLAPP_LIBRARY}
 	${OMPLAPPBASE_LIBRARY}
-	/usr/local/lib/x86_64-linux-gnu/libfcl.so
+	libfcl.so
 )
 
 
