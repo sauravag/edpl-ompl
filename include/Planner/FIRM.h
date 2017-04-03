@@ -355,7 +355,13 @@ protected:
     virtual void solveDynamicProgram(const Vertex goalVertex);
 
     /** \brief Generate the rollout policy */
-    virtual Edge generateRolloutPolicy(const Vertex currentVertex);
+    virtual Edge generateRolloutPolicy(const Vertex currentVertex, const FIRM::Vertex goal);
+
+    /** \brief Update the collision costs for edge along policy from currentVertex to goal*/
+    void updateEdgeCollisionCost(Vertex currentVertex, Vertex goalVertex);
+
+    /** \brief Check if policy from currentVertex to goal is collision free */
+    bool isFeedbackPolicyValid(Vertex currentVertex, Vertex goalVertex);
 
     void addStateToVisualization(const ompl::base::State *state) ;
 

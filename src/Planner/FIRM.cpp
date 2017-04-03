@@ -99,7 +99,7 @@ namespace ompl
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
 
         /** \brief Default neighborhood radius */
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is good
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 3.0; // 5.0 meters is good
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
@@ -1067,6 +1067,45 @@ double FIRM::evaluateSuccessProbability(const Edge currentEdge, const FIRM::Vert
     return successProb;
 }
 
+void FIRM::updateEdgeCollisionCost(FIRM::Vertex currentVertex, FIRM::Vertex goalVertex)
+{
+    // cycle through feedback, update edge costs for edges in collision
+    while(currentVertex != goalVertex)
+    {
+        Edge edge = feedback_[currentVertex]; // get the edge
+
+        Vertex target = boost::target(edge, g_); // get the target of this edge
+
+        // if edge is invalid, increase its cost
+        if(!si_->checkMotion(stateProperty_[currentVertex], stateProperty_[target]))
+        {
+            double pvc1 = weightProperty_[edge].getCost();
+    
+            weightProperty_[edge].setCost(pvc1 + ompl::magic::OBSTACLE_COST_TO_GO*10);
+
+            weightProperty_[edge].setSuccessProbability(0.0);
+
+            // Get outgoing edges of target
+            foreach(Edge e, boost::out_edges(target, g_))
+            {
+                // if any outgoing edge is in collision, update its cost
+                if(!si_->checkMotion(stateProperty_[target], stateProperty_[boost::target(e, g_)]))
+                {
+                    double pvc2 = weightProperty_[e].getCost();
+    
+                    weightProperty_[e].setCost(pvc2 + ompl::magic::OBSTACLE_COST_TO_GO*10);
+
+                    weightProperty_[e].setSuccessProbability(0.0);
+                }
+            }
+
+        }
+           
+        currentVertex =  target;
+
+    }
+
+}
 
 void FIRM::executeFeedback(void)
 {
@@ -1109,6 +1148,22 @@ void FIRM::executeFeedback(void)
         assert(currentVertex < boost::num_vertices(g_));
 
         OMPL_INFORM("FIRM: Moving from Vertex %u to %u", currentVertex, boost::target(e, g_));
+
+        // Check if feedback policy is valid 
+        while(!isFeedbackPolicyValid(currentVertex, goal))
+        {
+
+            OMPL_INFORM("FIRM: Invalid path detected from Vertex %u to %u", currentVertex, boost::target(e, g_));
+
+            updateEdgeCollisionCost(currentVertex, goal);
+
+            // resolve DP
+            solveDynamicProgram(goal);
+
+            e = feedback_[currentVertex];
+
+            OMPL_INFORM("FIRM: Updated path, moving from Vertex %u to %u", currentVertex, boost::target(e, g_));
+        }
 
         double succProb = evaluateSuccessProbability(e, currentVertex, goal);
 
@@ -1411,7 +1466,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
 
-        OMPL_INFORM("FIRM: Moving from Vertex %u to %u with TP = %f", tempVertex, boost::target(e, g_), succProb);
+        OMPL_INFORM("FIRM Rollout: Moving from Vertex %u to %u with TP = %f", tempVertex, boost::target(e, g_), succProb);
 
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
@@ -1453,6 +1508,8 @@ void FIRM::executeFeedbackWithRollout(void)
         // else do rollout
         if(stateProperty_[boost::target(e,g_)]->as<FIRM::StateType>()->isReached(cendState, true))
         {
+            OMPL_INFORM("FIRM Rollout: Reached FIRM Node: %u", boost::target(e,g_));
+
             numberofNodesReached_++;
 
             nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
@@ -1477,7 +1534,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
             siF_->setTrueState(tState);
 
-            e = generateRolloutPolicy(tempVertex);
+            e = generateRolloutPolicy(tempVertex, goal);
 
             // end profiling time to compute rollout
             auto end_time = std::chrono::high_resolution_clock::now();
@@ -1612,7 +1669,30 @@ void FIRM::sendMostLikelyPathToViz(const FIRM::Vertex start, const FIRM::Vertex 
     }
 }
 
-FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
+bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVertex)
+{
+    // cycle through feedback, if feedback edge is invalid, return false
+    while(currentVertex != goalVertex)
+    {
+        Edge edge = feedback_[currentVertex]; // get the edge
+
+        Vertex target = boost::target(edge, g_); // get the target of this edge
+
+        // if edge is invalid, increase its cost
+        if(!si_->checkMotion(stateProperty_[currentVertex], stateProperty_[target]))
+        {
+            return false;
+        }
+           
+        currentVertex =  target;
+
+    }
+
+    return true;
+
+}
+
+FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const FIRM::Vertex goal)
 {
     /**
         For the given node, find the out edges and see the total cost of taking that edge
@@ -1626,7 +1706,32 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex)
     {
 
         // Get the target node of the edge
-        Vertex targetNode = boost::target(e, g_);
+        Vertex targetNode = boost::target(e, g_);  
+
+        // The FIRM edge to take from the target node
+        Edge nextFIRMEdge = feedback_[targetNode];
+
+        // The node to which next firm edge goes
+        Vertex targetOfNextFIRMEdge = boost::target(nextFIRMEdge, g_);
+
+        // Check if edge from target to next node given by feedback is valid or not
+        while(!isFeedbackPolicyValid(targetNode, goal))
+        {
+
+            OMPL_INFORM("FIRM: Invalid path detected from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+
+            updateEdgeCollisionCost(targetNode, goal);
+
+            // resolve DP
+            solveDynamicProgram(goal);
+
+            targetOfNextFIRMEdge = boost::target(feedback_[targetNode], g_);  
+
+            OMPL_INFORM("FIRM: Updated path, next firm edge moving from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+
+            // if( !si_->isValid(stateProperty_[targetNode]) && !si_->isValid(stateProperty_[targetOfNextFIRMEdge]))
+            //     break;
+        }
 
         // The cost to go from the target node
         double nextNodeCostToGo = costToGo_[targetNode];
