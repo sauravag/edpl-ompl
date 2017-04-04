@@ -252,15 +252,15 @@ public:
 
     void  Run()
     {
-        // Dynamic obstacles are added only during the run time
-        if(dynamicObstacles_)
-            updateEnvironmentMesh();
 
         executeSolution(plannerMethod_);
 
         // Need a function to get terminated state
         if(goalList_.size() > 1)
         {
+
+            updateEnvironmentMesh();
+
             for(int i=0; i < goalList_.size()-1;i++)
             {
                 pdef_->setStartAndGoalStates(goalList_[i], goalList_[i+1], 1.0);
@@ -281,15 +281,18 @@ public:
     void updateEnvironmentMesh(int obindx = 0)
     {
         
-        // Set environment to new mesh with some dynamic / additional obstacles
-        if(!this->setEnvironmentMesh(dynObstList_[obindx]))
-            OMPL_ERROR("Couldn't set mesh with path: %s",dynObstList_[obindx]);
-        
-        const ompl::base::StateValidityCheckerPtr &svc = std::make_shared<ompl::app::FCLStateValidityChecker<ompl::app::Motion_2D>>(siF_,  getGeometrySpecification(), getGeometricStateExtractor(), false);
+        if(dynamicObstacles_)
+        {
+            // Set environment to new mesh with some dynamic / additional obstacles
+            if(!this->setEnvironmentMesh(dynObstList_[obindx]))
+                OMPL_ERROR("Couldn't set mesh with path: %s",dynObstList_[obindx]);
+            
+            const ompl::base::StateValidityCheckerPtr &svc = std::make_shared<ompl::app::FCLStateValidityChecker<ompl::app::Motion_2D>>(siF_,  getGeometrySpecification(), getGeometricStateExtractor(), false);
 
-        siF_->setStateValidityChecker(svc);
+            siF_->setStateValidityChecker(svc);
 
-        planner_->as<FIRM>()->updateCollisionChecker(svc);
+            planner_->as<FIRM>()->updateCollisionChecker(svc);
+        }
 
     }
 

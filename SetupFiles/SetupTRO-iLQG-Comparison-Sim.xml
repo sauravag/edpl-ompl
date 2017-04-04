@@ -89,7 +89,7 @@
 <PlanningProblem>
 	<!--  method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
 	<PlannerMode
-		method = "1"
+		method = "0"
 		dynobst = "1" 
 	/><!--set dynobst to 1 to activate-->
 	<RoadMap
@@ -103,7 +103,7 @@
 		robotFile = "./Models/iRobot.obj"
 	/>
 	<StartPose
-		x = "0.6"	y = "5.5"
+		x = "2.5"	y = "5.5"
 	/>
 	<PlanningTime
 		maxTime = "600"
@@ -116,5 +116,6 @@
     />
 </PlanningProblem>
 <GoalList>
-	<GoalPose x = "14.0" y = "5.5" />
+	<GoalPose x = "7.5" y = "5.5" />
+	<GoalPose x = "13.5" y = "5.5" />
 </GoalList>

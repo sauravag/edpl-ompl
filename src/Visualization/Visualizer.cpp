@@ -192,7 +192,9 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
     if(trace(covariance) != 0 && stateType == VZRStateType::BeliefState)
     {
-        double chi2 = 9.21034;
+        //see http://www.visiondummy.com/2014/04/draw-error-ellipse-representing-covariance-matrix/
+        // https://people.richland.edu/james/lecture/m170/tbl-chi.html
+        double chi2 = 5.991; // 95% -> chi2 = 5.991, 99% -> chi2 = 9.210
         double magnify = 1.0; // scaled up for viewing
         mat pos;
         for(double th = 0; th < 2*boost::math::constants::pi<double>(); th += 0.05*boost::math::constants::pi<double>())

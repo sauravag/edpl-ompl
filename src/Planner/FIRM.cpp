@@ -99,7 +99,7 @@ namespace ompl
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
 
         /** \brief Default neighborhood radius */
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 3.0; // 5.0 meters is good
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is good
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
@@ -1714,11 +1714,11 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
         // The node to which next firm edge goes
         Vertex targetOfNextFIRMEdge = boost::target(nextFIRMEdge, g_);
 
-        // Check if edge from target to next node given by feedback is valid or not
-        while(!isFeedbackPolicyValid(targetNode, goal))
+        // Check if feedback from target to goal is valid or not
+        if(!isFeedbackPolicyValid(targetNode, goal))
         {
 
-            OMPL_INFORM("FIRM: Invalid path detected from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+            OMPL_INFORM("Rollout: Invalid path detected from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
 
             updateEdgeCollisionCost(targetNode, goal);
 
@@ -1727,10 +1727,8 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
 
             targetOfNextFIRMEdge = boost::target(feedback_[targetNode], g_);  
 
-            OMPL_INFORM("FIRM: Updated path, next firm edge moving from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+            OMPL_INFORM("Rollout: Updated path, next firm edge moving from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
 
-            // if( !si_->isValid(stateProperty_[targetNode]) && !si_->isValid(stateProperty_[targetOfNextFIRMEdge]))
-            //     break;
         }
 
         // The cost to go from the target node
