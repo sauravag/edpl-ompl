@@ -251,7 +251,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     //HOW TO SET INITAL VALUE OF COST
     //cost = 1 ,for time based only if time per execution is "1"
     //cost = 0.01 , for covariance based
-    double cost = 0.01;
+    double cost = 0.0;
 
 //    float totalCollisionCheckComputeTime = 0;
 //    int totalNumCollisionChecks = 0;
@@ -376,7 +376,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     //HOW TO SET INITAL VALUE OF COST
     //cost = 1 ,for time based only if time per execution is "1"
     //cost = 0.01 , for covariance based
-    double cost = 0.01;
+    double cost = 0.0;
 
     ompl::base::State *internalState = si_->allocState();
     si_->copyState(internalState, startState);
