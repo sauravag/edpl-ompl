@@ -93,7 +93,7 @@
 		dynobst = "1" 
 	/><!--set dynobst to 1 to activate-->
 	<RoadMap
-		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_MapB_iLQG_TRO_75.xml"
+		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_MapB_iLQG_TRO_84.xml"
 		useRoadMap = "1"
 	/>
 	<Environment
