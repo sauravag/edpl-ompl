@@ -88,10 +88,8 @@
 class FIRM : public ompl::base::Planner
 {
 
-    /* Note: Set the statetype depending upon your problem.*/
-    
+    /* Note: Set the statetype depending upon your problem.*/  
     typedef SE2BeliefSpace::StateType StateType;
-
     //typedef R2BeliefSpace::StateType StateType;
 
 public:
@@ -146,9 +144,11 @@ public:
      */
     typedef std::function<std::vector<Vertex>&(const Vertex)> ConnectionStrategy;
 
-    /** Defining the edge and node controller types*/
+    /** Defining the edge and node controller types depending on your problem*/
     typedef Controller<RHCICreate, ExtendedKF> EdgeControllerType;
     typedef Controller<RHCICreate, LinearizedKF> NodeControllerType;
+
+    
 
     /** \brief Constructor */
     FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode=false);
@@ -377,7 +377,7 @@ protected:
     void recoverLostRobot(ompl::base::State *recoveredState);
 
     /** \brief Calculates the new cost to go from a node*/
-    std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(const Vertex node);
+    std::pair<typename FIRM::Edge,double> getUpdatedNodeCostToGo(const Vertex node, const Vertex goal);
 
     /** \brief Flag indicating whether the default connection strategy is the Star strategy */
     bool                                                   starStrategy_;

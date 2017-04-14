@@ -81,10 +81,13 @@ namespace ompl
         static const int DP_MAX_ITERATIONS = 20000; // 20000 is a good number
 
         /** \brief Weighting factor for filtering cost */
-        static const double INFORMATION_COST_WEIGHT = 0.9999 ;
+        static const double INFORMATION_COST_WEIGHT = 1.0;
+
+        /** \brief Weighting factor for distance based cost */
+        static const double DISTANCE_TO_GOAL_COST_WEIGHT = 0.1; 
 
         /** \brief Weighting factor for edge execution time cost */
-        static const double TIME_TO_STOP_COST_WEIGHT = 0.0001;
+        static const double TIME_TO_STOP_COST_WEIGHT = 0.001;
 
         /** \brief The cost to go from goal. */
         static const double GOAL_COST_TO_GO = 0.0;
@@ -99,7 +102,7 @@ namespace ompl
         static const double DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
 
         /** \brief Default neighborhood radius */
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is good
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is goods
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
@@ -110,6 +113,8 @@ namespace ompl
         static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 10;
 
         static const int STEPS_TO_ROLLOUT = 30;
+
+        static const double EDGE_COST_BIAS = 0.01; // In controller.h all edge costs are added up from 0.01 as the starting cost, this helps DP converge
     }
 }
 
@@ -962,7 +967,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
             }
 
             // Update the costToGo of vertex
-            std::pair<Edge,double> candidate = getUpdatedNodeCostToGo(v);
+            std::pair<Edge,double> candidate = getUpdatedNodeCostToGo(v, goalVertex);
 
             feedback_[v] = candidate.first;
 
@@ -1011,7 +1016,7 @@ struct DoubleValueComp
 };
 
 
-std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::Vertex node)
+std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::Vertex node, const FIRM::Vertex goal)
 {
 
     std::map<Edge,double > candidateCostToGo;
@@ -1027,7 +1032,11 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
         const double transitionProbability  = edgeWeight.getSuccessProbability();
 
-        double singleCostToGo = ( transitionProbability*nextNodeCostToGo + (1-transitionProbability)*ompl::magic::OBSTACLE_COST_TO_GO) + edgeWeight.getCost();
+        arma::colvec targetToGoalVec = stateProperty_[goal]->as<FIRM::StateType>()->getArmaData() - stateProperty_[targetNode]->as<FIRM::StateType>()->getArmaData();
+
+        double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
+
+        double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*ompl::magic::OBSTACLE_COST_TO_GO + edgeWeight.getCost()) + ompl::magic::DISTANCE_TO_GOAL_COST_WEIGHT*distToGoalFromTarget;
 
         candidateCostToGo[e] =  singleCostToGo ;
 
@@ -1183,7 +1192,7 @@ void FIRM::executeFeedback(void)
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
-        executionCost_ += cost.value();
+        executionCost_ += cost.value() - ompl::magic::EDGE_COST_BIAS;
 
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,executionCost_));
 
@@ -1319,7 +1328,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
-        executionCost_ += cost.value();
+        executionCost_ += cost.value() - ompl::magic::EDGE_COST_BIAS;
 
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,executionCost_));
 
@@ -1488,7 +1497,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
         controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT, cstartState, cendState, cost, stepsExecuted, false);
 
-        executionCost_ += cost.value();
+        executionCost_ += cost.value() - ompl::magic::EDGE_COST_BIAS;
 
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_, executionCost_));
 
@@ -1738,10 +1747,14 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
         FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, e);
 
         // The transition prob of the edge
-        double transitionProbability  = edgeWeight.getSuccessProbability();
+        double transitionProbability = edgeWeight.getSuccessProbability();        
+        
+        // compute distance from goal to target
+        //arma::colvec targetToGoalVec = stateProperty_[goal]->as<FIRM::StateType>()->getArmaData() - stateProperty_[targetNode]->as<FIRM::StateType>()->getArmaData();
+        //double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
 
         // the cost of taking the edge
-        double edgeCostToGo = (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*ompl::magic::OBSTACLE_COST_TO_GO) + edgeWeight.getCost();
+        double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*ompl::magic::OBSTACLE_COST_TO_GO + edgeWeight.getCost();
 
         if(edgeCostToGo < minCost)
         {

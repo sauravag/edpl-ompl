@@ -60,6 +60,34 @@ void OmnidirectionalMotionModel::Evolve(const ompl::base::State *state, const om
     colvec Un2(3);
     Un2 << Un[0] << Un[1] << Un[2] << endr;
 
+    if(u[0] < minLinearVelocity_)
+    {
+        u[0] = minLinearVelocity_;
+    }
+    else if(u[0] > maxLinearVelocity_)
+    {
+        u[0] = maxLinearVelocity_;
+    }
+
+    if(u[1] < minLinearVelocity_)
+    {
+        u[1] = minLinearVelocity_;
+    }
+    else if(u[1] > maxLinearVelocity_)
+    {
+        u[1] = maxLinearVelocity_;
+    }
+
+    if(u[2] < -maxAngularVelocity_)
+    {
+        u[2] = -maxAngularVelocity_;
+    }
+    else if(u[2] > maxAngularVelocity_)
+    {
+        u[2] = maxAngularVelocity_;
+    }
+
+
     x += (u*this->dt_) + (Un2*sqrt(this->dt_)) + (Wg*sqrt(this->dt_));
 
     FIRMUtils::normalizeAngleToPiRange(x[2]);
@@ -111,7 +139,9 @@ void OmnidirectionalMotionModel::generateOpenLoopControls(const ompl::base::Stat
     //count translation steps
     delta_disp = sqrt( pow(y_c[1]-y_c[0], 2) + pow(x_c[1]-x_c[0], 2) );
 
-    translation_steps = ceil(fabs(delta_disp/(maxLinearVelocity_*this->dt_)));
+    double olVel =  maxLinearVelocity_ / 4.0;
+
+    translation_steps = ceil(fabs(delta_disp/(olVel*this->dt_)));
 
     // If finite number of translation steps required
     if(translation_steps > 0)
@@ -124,8 +154,8 @@ void OmnidirectionalMotionModel::generateOpenLoopControls(const ompl::base::Stat
         //assert(abs(omega) < maxAngularVelocity_);
 
         colvec u_const_rot;
-        u_const_rot << maxLinearVelocity_*cos(theta_p) << endr
-                    << maxLinearVelocity_*sin(theta_p) << endr
+        u_const_rot << olVel*cos(theta_p) << endr
+                    << olVel*sin(theta_p) << endr
                     << omega << endr;
 
         for(int i=0; i<translation_steps; i++)

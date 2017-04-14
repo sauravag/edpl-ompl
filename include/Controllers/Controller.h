@@ -157,7 +157,7 @@ class Controller
         /** \brief If the robot's heading is deviated from the target heading by less
             than the nodeReachedAngle_ then the robot is assumed to have alligned with the target heading. Used
             for node reachability checking. */
-    	static double nodeReachedAngle_;
+    	  static double nodeReachedAngle_;
 
         /** \brief The distance at which we assume the robot has reached a target node (i.e. b \in B). Reaching the exact node
             location is almost impractical for stochastic systems. We assume the robot has reached if it is within
@@ -251,7 +251,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     //HOW TO SET INITAL VALUE OF COST
     //cost = 1 ,for time based only if time per execution is "1"
     //cost = 0.01 , for covariance based
-    double cost = 0.0;
+    double cost = 0.001;
 
 //    float totalCollisionCheckComputeTime = 0;
 //    int totalNumCollisionChecks = 0;
@@ -317,7 +317,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         k++;
 
         //Increment cost by: 0.01 for time based, trace(Covariance) for FIRM
-        cost += arma::trace(internalState->as<StateType>()->getCovariance());
+        arma::mat tempCovMat = internalState->as<StateType>()->getCovariance();
+        cost += arma::trace(tempCovMat);
 
         if(!constructionMode)
         {
@@ -376,7 +377,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     //HOW TO SET INITAL VALUE OF COST
     //cost = 1 ,for time based only if time per execution is "1"
     //cost = 0.01 , for covariance based
-    double cost = 0.0;
+    double cost = 0.001;
 
     ompl::base::State *internalState = si_->allocState();
     si_->copyState(internalState, startState);
@@ -413,7 +414,8 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     //Increment cost by:
     //-> 0.01 for time based
     //-> trace(Covariance) for FIRM
-    cost += arma::trace(endState->as<StateType>()->getCovariance());
+    arma::mat tempCovMat = endState->as<StateType>()->getCovariance();
+    cost += arma::trace(tempCovMat);
 
     if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
@@ -525,7 +527,7 @@ void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
 
     int stepsTaken = 0;
 
-    double cost = 0;
+    double cost = 0.0;
 
     ompl::base::State *tempState1 = si_->allocState();
     ompl::base::State *tempState2 = si_->allocState();
@@ -540,7 +542,8 @@ void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
 
         stepsTaken++;
 
-        cost += arma::trace(tempState2->as<StateType>()->getCovariance());
+        arma::mat tempCovMat = tempState2->as<StateType>()->getCovariance();
+        cost += arma::trace(tempCovMat); 
 
         si_->copyState(tempState1, tempState2) ;
 
