@@ -58,9 +58,9 @@ public:
     {
         // set static variables
         Controller<FiniteTimeLQR, ExtendedKF>::setNodeReachedAngle(10); // degrees
-        Controller<FiniteTimeLQR, ExtendedKF>::setNodeReachedDistance(0.05);// meters
+        Controller<FiniteTimeLQR, ExtendedKF>::setNodeReachedDistance(0.15);// meters
         Controller<FiniteTimeLQR, ExtendedKF>::setMaxTries(30);
-        Controller<FiniteTimeLQR, ExtendedKF>::setMaxTrajectoryDeviation(4.0); // meters
+        Controller<FiniteTimeLQR, ExtendedKF>::setMaxTrajectoryDeviation(0.5); // meters
 
         // setting the mean and norm weights (used in reachability check)
         StateType::covNormWeight_  =  1.0;
@@ -171,7 +171,7 @@ public:
 
             // Provide the motion model to the space
             // We use the omnidirectional model because collision checking requires SE2
-            MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));
+            MotionModelMethod::MotionModelPointer mm(new OmnidirectionalMotionModel(siF_, pathToSetupFile_.c_str()));            
             siF_->setMotionModel(mm);
 
             ompl::control::StatePropagatorPtr prop(ompl::control::StatePropagatorPtr(new OmnidirectionalStatePropagator(siF_)));
