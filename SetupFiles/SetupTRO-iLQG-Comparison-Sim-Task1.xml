@@ -61,11 +61,11 @@
 <PlanningProblem>
 	<!--  method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
 	<PlannerMode
-		method = "1"
+		method = "0"
 		dynobst = "0" 
 	/><!--set dynobst to 1 to activate-->
 	<RoadMap
-		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_MapB_iLQG_TRO_116.xml"
+		roadmapFile = "./FIRMRoadMap-test.xml"
 		useRoadMap = "1"
 	/>
 	<Environment
@@ -81,13 +81,13 @@
 		maxTime = "600"
 	/>
 	<FIRMNodes
-		minNodes = "95"
+		minNodes = "50"
 	/>
 	<KidnappedState
         x = 1.5 y = 19.5 
     />
 </PlanningProblem>
 <GoalList>
-	<GoalPose x = "7.4" y = "5.2" />
 	<GoalPose x = "13.5" y = "5.5" />
 </GoalList>
+<!--GoalPose x = "7.4" y = "5.2" /-->

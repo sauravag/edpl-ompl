@@ -84,7 +84,7 @@ namespace ompl
         static const double INFORMATION_COST_WEIGHT = 1.0;
 
         /** \brief Weighting factor for distance based cost */
-        static const double DISTANCE_TO_GOAL_COST_WEIGHT = 0.1; 
+        static const double DISTANCE_TO_GOAL_COST_WEIGHT = 0.01; 
 
         /** \brief Weighting factor for edge execution time cost */
         static const double TIME_TO_STOP_COST_WEIGHT = 0.001;
@@ -698,7 +698,7 @@ bool FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::
 {
     sendFeedbackEdgesToViz();
 
-    FeedbackPath *p = new FeedbackPath(siF_);
+    FeedbackPath<SeparatedControllerType, FilterType> *p = new FeedbackPath<SeparatedControllerType, FilterType>(siF_);
 
     std::cout<<"The start vertex is: "<<start<<std::endl;
     std::cout<<"The goal vertex is: "<<goal<<std::endl;
@@ -858,6 +858,8 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
     ompl::base::State *node = si_->allocState();
     siF_->copyState(node, state);
 
+    arma::mat stationaryCovariance; 
+
    if(siF_->getObservationModel()->isStateObservable(node))
    {
         // Contruct a linear kalman filter
@@ -867,39 +869,29 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
         LinearSystem linearSystem(siF_, node, siF_->getMotionModel()->getZeroControl(),siF_->getObservationModel()->getObservation(state, false), siF_->getMotionModel(), siF_->getObservationModel());
 
         // Compute the stationary cov at node state using LKF
-        arma::mat stationaryCovariance = linearizedKF.computeStationaryCovariance(linearSystem);
-
-        // set the covariance
-        node->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
-        state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
-
-        // create a node controller
-        std::vector<ompl::control::Control*> dummyControl;
-        std::vector<ompl::base::State*> dummyStates;
-        NodeControllerType ctrlr(node, dummyStates, dummyControl, siF_);
-
-        // assign the node controller
-        nodeController = ctrlr;
+        stationaryCovariance = linearizedKF.computeStationaryCovariance(linearSystem);
     }
-
     else
     {
-        // set a high stationary cov at node state
+        // set a default stationary cov at node state
         int stateDim = si_->getStateDimension();
-        arma::mat stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
 
-        // set the covariance
-        node->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
-        state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
-
-        // create a node controller
-        std::vector<ompl::control::Control*> dummyControl;
-        std::vector<ompl::base::State*> dummyStates;
-        NodeControllerType ctrlr(node, dummyStates, dummyControl, siF_);
-
-        // assign the node controller
-        nodeController = ctrlr;
+        stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
     }
+
+    // set the covariance
+    node->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
+    state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
+
+    // create a node controller with node as the state and zero control as nominal control
+    std::vector<ompl::control::Control*> zeroControl; zeroControl.push_back(siF_->getMotionModel()->getZeroControl());
+
+    std::vector<ompl::base::State*> nodeState; nodeState.push_back(node);
+
+    NodeControllerType ctrlr(node, nodeState, zeroControl, siF_);
+
+    // assign the node controller
+    nodeController = ctrlr;
 
 }
 

@@ -253,8 +253,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     //cost = 0.01 , for covariance based
     double cost = 0.001;
 
-//    float totalCollisionCheckComputeTime = 0;
-//    int totalNumCollisionChecks = 0;
+    //float totalCollisionCheckComputeTime = 0;
+    //int totalNumCollisionChecks = 0;
 
     ompl::base::State *internalState = si_->allocState();
 
@@ -279,16 +279,16 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         */
         if(constructionMode)
         {
-//            totalNumCollisionChecks++;
+            //totalNumCollisionChecks++;
 
             // start profiling time to compute rollout
-//            auto start_time = std::chrono::high_resolution_clock::now();
+            //auto start_time = std::chrono::high_resolution_clock::now();
 
             bool isThisStateValid = si_->checkTrueStateValidity();
 
-//            auto end_time = std::chrono::high_resolution_clock::now();
+            //auto end_time = std::chrono::high_resolution_clock::now();
 
-//            totalCollisionCheckComputeTime += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+            //totalCollisionCheckComputeTime += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
 
             if(!isThisStateValid)
             {
@@ -322,7 +322,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
         if(!constructionMode)
         {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+          boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     }
 
@@ -345,10 +345,12 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
     ompl::base::State *stabilizedState = si_->allocState();
 
-    this->Stabilize(internalState, stabilizedState, stabilizationFilteringCost, stepsToStabilize, constructionMode) ;
+    //this->Stabilize(internalState, stabilizedState, stabilizationFilteringCost, stepsToStabilize, constructionMode) ;
 
-    si_->copyState(endState, stabilizedState);
+    //si_->copyState(endState, stabilizedState);
 
+    si_->copyState(endState, internalState);
+    
     //filteringCost.v = cost + stabilizationFilteringCost.v;
     filteringCost = ompl::base::Cost(cost + stabilizationFilteringCost.value());
 
@@ -476,7 +478,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
 template <class SeparatedControllerType, class FilterType>
 void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
 {
-    ompl::control::Control* control = separatedController_.generateFeedbackControl(state);
+    ompl::control::Control* control = separatedController_.generateFeedbackControl(state, t);
 
     si_->applyControl(control);
 

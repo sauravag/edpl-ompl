@@ -33,61 +33,73 @@
 *********************************************************************/
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
+#include "SeparatedControllers/StationaryLQR.h"
+#include "Filters/dare.h"
 
-#ifndef SEPARATED_CONTROLLER_METHOD_
-#define SEPARATED_CONTROLLER_METHOD_
-
-
-#include "MotionModels/MotionModelMethod.h"
-#include "LinearSystem/LinearSystem.h"
-#include "ompl/control/Control.h"
-
-class SeparatedControllerMethod
+StationaryLQR::StationaryLQR(ompl::base::State *goal,
+        const std::vector<ompl::base::State*> &nominalXs,
+        const std::vector<ompl::control::Control*> &nominalUs,
+        const std::vector<LinearSystem>& linearSystems,  // Linear systems are not used in this class but it is here to unify the interface
+        const MotionModelPointer mm) :
+        SeparatedControllerMethod(goal, nominalXs, nominalUs, linearSystems, mm)
 {
 
-  public:
-    typedef MotionModelMethod::SpaceType SpaceType;
-    typedef MotionModelMethod::StateType StateType;
-    typedef typename MotionModelMethod::ControlType   ControlType;
-    typedef typename ObservationModelMethod::ObservationType ObservationType;
-    typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
-    typedef typename arma::mat CostType;
-    typedef typename arma::mat GainType;
+    arma::mat II(3,3); II.eye(); // 3x3 identity matrix
 
-    SeparatedControllerMethod() {} //: MPBaseObject<MPTraits>() {}
+    // set the weighting matrices
+    Wxf_ = 20.0*II;
 
-    SeparatedControllerMethod(ompl::base::State *goal,
-        const std::vector<ompl::base::State*>& nominalXs,
-        const std::vector<ompl::control::Control*>& nominalUs,
-        const std::vector<LinearSystem>& linearSystems,
-        const MotionModelPointer mm) :
-        goal_(goal),
-        nominalXs_(nominalXs),
-        nominalUs_(nominalUs),
-        linearSystems_(linearSystems),
-        motionModel_(mm) {}
+    Wx_ = 10.0*II;
 
-    ~SeparatedControllerMethod() {}
+    Wu_ = II;
 
-    virtual ompl::control::Control* generateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) = 0;
+    // store nominal values
+    nominalUs_ = nominalUs;
 
-    //void SetReachedFlag(bool _flag){m_reachedFlag = _flag;}
+    nominalXs_ = nominalXs;
 
-  protected:
+    linearSystems_ = linearSystems;
 
-    ompl::base::State *goal_;
+    this->generateFeedbackGain();
 
-    /** \brief The vector containing sequence of nominal states*/
-    std::vector<ompl::base::State*> nominalXs_;
-    
-    /** \brief The vector of nomnial controls */
-    std::vector<ompl::control::Control*> nominalUs_;
-    
-    /** \brief The vector of linear systems constructed at nominal states */
-    std::vector< LinearSystem > linearSystems_;
-    
-    MotionModelPointer motionModel_;
-    
-};
+}
 
-#endif
+ompl::control::Control* StationaryLQR::generateFeedbackControl(const ompl::base::State *state, const size_t& Ts)
+{
+
+    using namespace arma;
+
+    SpaceType *space; space =  new SpaceType();
+
+    ompl::base::State *relativeState = space->allocState();
+
+    space->getRelativeState(goal_, state, relativeState);
+
+    colvec relativeCfg =  relativeState->as<StateType>()->getArmaData();
+
+    // nominal control vec
+    colvec nomU = motionModel_->OMPL2ARMA(motionModel_->getZeroControl());
+
+    colvec dU = -1.0 * feedbackGain_*relativeCfg;
+
+    ompl::control::Control* newcontrol  = motionModel_->ARMA2OMPL(nomU + dU);// control is nomU + dU
+
+    return newcontrol;
+}
+
+void StationaryLQR::generateFeedbackGain()
+{
+  
+    using namespace arma;
+
+    mat S;
+
+    mat A = linearSystems_[0].getA();
+
+    mat B = linearSystems_[0].getB();
+
+    dare(A, B, Wxf_, Wu_, S);
+
+    feedbackGain_ = solve(B.t()*S*B + Wu_, B.t()*S*A );
+
+}

@@ -102,6 +102,8 @@ add_library (bsp_lib
 	src/Samplers/GaussianValidBeliefSampler.cpp
 	src/Samplers/UniformValidBeliefSampler.cpp
 	src/SeparatedControllers/RHCICreate.cpp
+	src/SeparatedControllers/FiniteTimeLQR.cpp
+	src/SeparatedControllers/StationaryLQR.cpp
 	#src/SpaceInformation/ROSSpaceInformation.cpp
 	src/SpaceInformation/SpaceInformation.cpp
 	src/Spaces/SE2BeliefSpace.cpp

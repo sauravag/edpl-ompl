@@ -34,60 +34,54 @@
 
 /* Authors: Saurav Agarwal, Ali-akbar Agha-mohammadi */
 
-#ifndef SEPARATED_CONTROLLER_METHOD_
-#define SEPARATED_CONTROLLER_METHOD_
+#ifndef FINITE_TIME_LQR_
+#define FINITE_TIME_LQR_
 
+#include "SeparatedControllerMethod.h"
+#include "StationaryLQR.h"
 
-#include "MotionModels/MotionModelMethod.h"
-#include "LinearSystem/LinearSystem.h"
-#include "ompl/control/Control.h"
-
-class SeparatedControllerMethod
+/** \brief  Finite time LQR controller */
+class FiniteTimeLQR : public SeparatedControllerMethod
 {
 
   public:
-    typedef MotionModelMethod::SpaceType SpaceType;
-    typedef MotionModelMethod::StateType StateType;
-    typedef typename MotionModelMethod::ControlType   ControlType;
-    typedef typename ObservationModelMethod::ObservationType ObservationType;
+    typedef typename SeparatedControllerMethod::ControlType   ControlType;
     typedef typename MotionModelMethod::MotionModelPointer MotionModelPointer;
-    typedef typename arma::mat CostType;
-    typedef typename arma::mat GainType;
+    //typedef typename MPTraits::LinearSystem   LinearSystem;
 
-    SeparatedControllerMethod() {} //: MPBaseObject<MPTraits>() {}
+    FiniteTimeLQR(){}
 
-    SeparatedControllerMethod(ompl::base::State *goal,
-        const std::vector<ompl::base::State*>& nominalXs,
-        const std::vector<ompl::control::Control*>& nominalUs,
+    FiniteTimeLQR(ompl::base::State *goal,
+        const std::vector<ompl::base::State*> &nominalXs,
+        const std::vector<ompl::control::Control*> &nominalUs,
         const std::vector<LinearSystem>& linearSystems,
-        const MotionModelPointer mm) :
-        goal_(goal),
-        nominalXs_(nominalXs),
-        nominalUs_(nominalUs),
-        linearSystems_(linearSystems),
-        motionModel_(mm) {}
+        const MotionModelPointer mm);
 
-    ~SeparatedControllerMethod() {}
+    ~FiniteTimeLQR() {}
 
-    virtual ompl::control::Control* generateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) = 0;
+  ompl::control::Control* generateFeedbackControl(const ompl::base::State *state, const size_t& Ts = 0) ;
+  
+  private:
 
-    //void SetReachedFlag(bool _flag){m_reachedFlag = _flag;}
+    /** \brief Generate the set of feedback gains by solving ricatti equation backwards*/
+    void generateFeedbackGains();
 
-  protected:
+    /** \brief The sequence of gains*/
+    std::vector<arma::mat> feedbackGains_;
 
-    ompl::base::State *goal_;
+    /** \brief The cost weight matrix for terminal error, i.e., final state cost */
+    arma::mat Wxf_;
 
-    /** \brief The vector containing sequence of nominal states*/
-    std::vector<ompl::base::State*> nominalXs_;
-    
-    /** \brief The vector of nomnial controls */
-    std::vector<ompl::control::Control*> nominalUs_;
-    
-    /** \brief The vector of linear systems constructed at nominal states */
-    std::vector< LinearSystem > linearSystems_;
-    
-    MotionModelPointer motionModel_;
-    
+    /** \brief intermediate state cost weight*/
+    arma::mat Wx_;
+
+    /** \brief Control cost weight matrix */
+    arma::mat Wu_;
+
+    /** \brief The number of nominal states or time steps*/
+    unsigned int numT_;
+
+    StationaryLQR stabilizer_;
+
 };
-
 #endif

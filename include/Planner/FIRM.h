@@ -54,6 +54,7 @@
 #include "Weight/FIRMWeight.h"
 #include "Controllers/Controller.h"
 #include "SeparatedControllers/RHCICreate.h"
+#include "SeparatedControllers/FiniteTimeLQR.h"
 #include "Filters/ExtendedKF.h"
 #include "Filters/LinearizedKF.h"
 #include "Path/FeedbackPath.h"
@@ -90,6 +91,13 @@ class FIRM : public ompl::base::Planner
 
     /* Note: Set the statetype depending upon your problem.*/  
     typedef SE2BeliefSpace::StateType StateType;
+
+    /** Defining the separated controller types depending on your problem*/
+    typedef FiniteTimeLQR SeparatedControllerType;
+    
+    /** Defining the filter type depending on your problem*/
+    typedef ExtendedKF FilterType;
+
     //typedef R2BeliefSpace::StateType StateType;
 
 public:
@@ -144,11 +152,10 @@ public:
      */
     typedef std::function<std::vector<Vertex>&(const Vertex)> ConnectionStrategy;
 
-    /** Defining the edge and node controller types depending on your problem*/
-    typedef Controller<RHCICreate, ExtendedKF> EdgeControllerType;
-    typedef Controller<RHCICreate, LinearizedKF> NodeControllerType;
-
     
+    typedef Controller<SeparatedControllerType, FilterType> EdgeControllerType;
+    
+    typedef Controller<SeparatedControllerType, LinearizedKF> NodeControllerType;
 
     /** \brief Constructor */
     FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode=false);

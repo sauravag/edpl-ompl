@@ -85,7 +85,8 @@
 //Separated Controllers
 #include "SeparatedControllers/SeparatedControllerMethod.h"
 #include "SeparatedControllers/RHCICreate.h"
-
+#include "SeparatedControllers/FiniteTimeLQR.h"
+#include "SeparatedControllers/StationaryLQR.h"
 
 //Controllers
 #include "Controllers/Controller.h"

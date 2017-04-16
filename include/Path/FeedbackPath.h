@@ -40,8 +40,10 @@
 #include "SpaceInformation/SpaceInformation.h"
 #include "Controllers/Controller.h"
 #include "SeparatedControllers/RHCICreate.h"
+#include "SeparatedControllers/FiniteTimeLQR.h"
 #include "Filters/ExtendedKF.h"
 
+template <class SeparatedControllerType, class FilterType>
 class FeedbackPath : public ompl::base::Path
 {
     public:
@@ -63,7 +65,7 @@ class FeedbackPath : public ompl::base::Path
         }
 
         /** \brief Append a controller and its goal node to the path*/
-        void append(const ompl::base::State *state, Controller<RHCICreate, ExtendedKF> controller)
+        void append(const ompl::base::State *state, Controller<SeparatedControllerType, FilterType> controller)
         {
             ompl::base::State *temp = si_->allocState();
             si_->copyState(temp, state);
@@ -79,7 +81,7 @@ class FeedbackPath : public ompl::base::Path
         }
 
         /** \brief Returns the sequence of controllers to follow in the path */
-        std::vector< Controller<RHCICreate, ExtendedKF> > getControllers(void)
+        std::vector< Controller<SeparatedControllerType, FilterType> > getControllers(void)
         {
             return feedbackControllers_;
         }
@@ -121,7 +123,7 @@ class FeedbackPath : public ompl::base::Path
     protected:
 
         /** \brief A vector containing the feedback controllers, which define the path in belief space */
-        std::vector<Controller<RHCICreate, ExtendedKF> > feedbackControllers_;
+        std::vector<Controller<SeparatedControllerType, FilterType> > feedbackControllers_;
 
         /** \brief The sequence of nodes to visit */
         std::vector<ompl::base::State*> nodesToVisit_;

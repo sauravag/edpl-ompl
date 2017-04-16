@@ -100,9 +100,8 @@ class MotionModelMethod
 		/** \brief Generate noise according to specified state and control input. */
 		virtual NoiseType generateNoise(const ompl::base::State *state, const ompl::control::Control* control) = 0;
 
-		/** \brief Calculate the state transition Jacobian i.e. df/dx where f is the transition function and x is the state. */
-		virtual JacobianType
-		getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
+		/** \brief Calculate the state transition Jacobian i.e. df/dx where f is the transition function and x is the state.*/
+		virtual JacobianType getStateJacobian(const ompl::base::State *state, const ompl::control::Control* control, const NoiseType& w) = 0;
 
         /** \brief Calculate the control transition Jacobian i.e. df/du where f is the transition function and u is the control. */
 		virtual JacobianType
@@ -137,7 +136,7 @@ class MotionModelMethod
 
             arma::colvec u(controlDim_);
 
-            if(!control) control = si_->allocControl();
+            assert(control && "To convert control from OMPL to ARMA, it must not be null pointer");
 
             const double *conVals = control->as<ompl::control::RealVectorControlSpace::ControlType>()->values;
 
@@ -158,6 +157,18 @@ class MotionModelMethod
             {
                 control->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = u[i];
             }
+        }
+
+        ompl::control::Control* ARMA2OMPL(arma::colvec u)
+        {
+            ompl::control::Control *control = si_->allocControl();
+
+            for (unsigned int i = 0; i < controlDim_; i++)
+            {
+                control->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = u[i];
+            }
+
+            return control;
         }
 
 	protected:
