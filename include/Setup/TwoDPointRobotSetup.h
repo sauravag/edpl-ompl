@@ -58,9 +58,16 @@ public:
     {
         // set static variables
         Controller<FiniteTimeLQR, ExtendedKF>::setNodeReachedAngle(10); // degrees
-        Controller<FiniteTimeLQR, ExtendedKF>::setNodeReachedDistance(0.15);// meters
+        Controller<FiniteTimeLQR, ExtendedKF>::setNodeReachedDistance(0.1);// meters
         Controller<FiniteTimeLQR, ExtendedKF>::setMaxTries(30);
         Controller<FiniteTimeLQR, ExtendedKF>::setMaxTrajectoryDeviation(0.5); // meters
+
+        RHCICreate::setControlQueueSize(5);
+        RHCICreate::setTurnOnlyDistance(0.01);
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(10.0); // degrees
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.1);// meters
+        Controller<RHCICreate, ExtendedKF>::setMaxTries(30);
+        Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(0.5); // meters
 
         // setting the mean and norm weights (used in reachability check)
         StateType::covNormWeight_  =  1.0;
