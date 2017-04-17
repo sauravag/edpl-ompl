@@ -139,7 +139,7 @@ void OmnidirectionalMotionModel::generateOpenLoopControls(const ompl::base::Stat
     //count translation steps
     delta_disp = sqrt( pow(y_c[1]-y_c[0], 2) + pow(x_c[1]-x_c[0], 2) );
 
-    double olVel =  maxLinearVelocity_ / 4.0;
+    double olVel =  maxLinearVelocity_ ;
 
     translation_steps = ceil(fabs(delta_disp/(olVel*this->dt_)));
 

@@ -8,34 +8,21 @@
 <ObservationModels>
 	<HeadingBeaconObservationModel
 		sigma_heading="0.000017"
-		sigma_ss="0.002"
+		sigma_ss="0.005"
 	>
 	</HeadingBeaconObservationModel>
 </ObservationModels>
 <MotionModels>
-	<UnicycleMotionModel 
-		sigmaV="0.0"
-		etaV="0.0"
-        sigmaOmega="0.0"
-        etaOmega="0.0"
-		P_Wg_filename=""
-		wind_noise_pos="0.11"
-		wind_noise_ang="0.000001" 
-		min_linear_velocity= "-4.0"
-		max_linear_velocity= "4.0"
-		max_angular_velocity= "0.60"
-		dt= "0.1"
-	  />
 	<OmnidirectionalMotionModel 
 		sigmaV="0.0"
 		etaV="0.0"
         sigmaOmega="0.0"
         etaOmega="0.0"
 		P_Wg_filename=""
-		wind_noise_pos="0.11"
+		wind_noise_pos="0.10"
 		wind_noise_ang="0.000001" 
-		min_linear_velocity= "-4.0"
-		max_linear_velocity= "4.0"
+		min_linear_velocity= "-1.0"
+		max_linear_velocity= "1.0"
 		max_angular_velocity= "0.60"
 		dt= "0.1"
 	  /> <!--omega is in radians, wind_noise_ang is in degrees -->
@@ -97,5 +84,5 @@
 </PlanningProblem>
 <GoalList>
 	<GoalPose x = "7.2" y = "5.5" />
-	<GoalPose x = "11.0" y = "5.5" />
+	<GoalPose x = "12.0" y = "5.5" />
 </GoalList>
