@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
-	<landmark id = 1  x = 3.5	y = 1.8 />
+	<landmark id = 1  x = 4.0	y = 1.8 />
 </LandmarkList>
 <DynamicObstacleList>
 	<obstacle id = "1" path="./Models/iLQG-TRO-Task2-DynObs.obj" />
@@ -8,7 +8,7 @@
 <ObservationModels>
 	<HeadingBeaconObservationModel
 		sigma_heading="0.000017"
-		sigma_ss="0.0001"
+		sigma_ss="0.002"
 	>
 	</HeadingBeaconObservationModel>
 </ObservationModels>
@@ -19,7 +19,7 @@
         sigmaOmega="0.0"
         etaOmega="0.0"
 		P_Wg_filename=""
-		wind_noise_pos="0.10"
+		wind_noise_pos="0.11"
 		wind_noise_ang="0.000001" 
 		min_linear_velocity= "-4.0"
 		max_linear_velocity= "4.0"
@@ -32,7 +32,7 @@
         sigmaOmega="0.0"
         etaOmega="0.0"
 		P_Wg_filename=""
-		wind_noise_pos="0.10"
+		wind_noise_pos="0.11"
 		wind_noise_ang="0.000001" 
 		min_linear_velocity= "-4.0"
 		max_linear_velocity= "4.0"
@@ -59,9 +59,9 @@
 	<NumNN numnn = "5" />
 	<DPDiscountFactor discountfac = "1.0" />
 	<InfCostWeight infcostw = "1.0"/>
-	<DistCostWeight distcostw = "0.2"/>
+	<DistCostWeight distcostw = "0.1"/>
 	<GoalCostToGo goalctg = "0.0"/>
-	<ObstCostToGo obsctg = "200.0" />
+	<ObstCostToGo obsctg = "2000.0" />
 	<InitCostToGo initctg = "2.0" />
 	<MaxDPIter dpiter = "20000" />
 	<DPConvergenceThreshold dpconvthresh = "0.001" />
@@ -97,5 +97,5 @@
 </PlanningProblem>
 <GoalList>
 	<GoalPose x = "7.2" y = "5.5" />
-	<GoalPose x = "10.7" y = "5.5" />
+	<GoalPose x = "11.0" y = "5.5" />
 </GoalList>
