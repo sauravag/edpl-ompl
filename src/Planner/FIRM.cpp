@@ -66,7 +66,7 @@ namespace ompl
 
         /** \brief The number of nearest neighbors to consider by
             default in the construction of the PRM roadmap */
-        static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
+        static const int DEFAULT_NEAREST_NEIGHBORS = 5;
 
         /** \brief The time in seconds for a single roadmap building operation */
         static const double ROADMAP_BUILD_TIME = 60;  // 60 is a good number    
@@ -164,6 +164,8 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     NNRadius_ = ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS;
 
+    numNearestNeighbors_ = ompl::magic::DEFAULT_NEAREST_NEIGHBORS;
+
     rolloutSteps_ = ompl::magic::DEFAULT_STEPS_TO_ROLLOUT ;
 
     discountFactorDP_  = ompl::magic::DEFAULT_DP_DISCOUNT_FACTOR; 
@@ -202,7 +204,7 @@ void FIRM::setup(void)
     {
         //connectionStrategy_ = ompl::geometric::KStarStrategy<Vertex>(boost::bind(&FIRM::milestoneCount, this), nn_, si_->getStateDimension());
         connectionStrategy_ = FStrategy<Vertex>(NNRadius_, nn_);
-        //connectionStrategy_ = ompl::geometric::KBoundedStrategy<Vertex>(ompl::magic::DEFAULT_NEAREST_NEIGHBORS, NNRadius_, nn_);
+        // connectionStrategy_ = ompl::geometric::KBoundedStrategy<Vertex>(numNearestNeighbors_, NNRadius_, nn_);
     }
 
 }
@@ -650,9 +652,42 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     nn_->add(m);
 
     // Which milestones will we attempt to connect to?
-    const std::vector<Vertex>& neighbors = connectionStrategy_(m);
+    std::vector<Vertex> neighbors = connectionStrategy_(m);
 
-    std::vector<boost::thread> monteCarloThreads;
+    // If reverse edge not required, that means this is a virtual state added in rollout
+    // We will sort by cost and use N lowest cost to go neighbors
+    if(!addReverseEdge && !neighbors.empty())
+    {
+        std::vector<std::pair<double,Vertex>> tempItems;
+
+        foreach (Vertex n, neighbors)
+        {
+            if(n != m)
+                tempItems.push_back(std::make_pair(costToGo_[n], n));
+        }
+
+        std::sort(tempItems.begin(), tempItems.end());
+
+        neighbors.clear();
+
+        int nti = tempItems.size();
+
+        // Now we add those neighbors with lowest cost and such that the robot can move to them, i.e. path is valid
+        int t_countNN = 0;
+
+        for(int i = 0; i < nti; i++)
+        {
+            if(si_->checkMotion(stateProperty_[m], stateProperty_[tempItems[i].second]))
+            {
+                neighbors.push_back(tempItems[i].second);
+                t_countNN++;
+            }
+
+            if(t_countNN >= numNearestNeighbors_)
+                break;            
+        }
+
+    }
 
     foreach (Vertex n, neighbors)
     {
@@ -1465,7 +1500,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     Edge e = feedback_[currentVertex];
 
-    Vertex tempVertex;
+    Vertex tempVertex = currentVertex;
 
     OMPL_INFORM("Goal State is: \n");
 
@@ -1476,8 +1511,6 @@ void FIRM::executeFeedbackWithRollout(void)
     int numberOfRollouts = 0;
 
     Visualizer::doSaveVideo(doSaveVideo_);
-
-    connectionStrategy_ = FStrategy<Vertex>(1.2*NNRadius_, nn_);
 
     nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
@@ -1564,7 +1597,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
             numberOfRollouts++;
 
-            int numNN = connectionStrategy_(tempVertex).size();
+            int numNN = numNearestNeighbors_;
 
             double timeToDoRollout = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
@@ -1719,7 +1752,7 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
         For the given node, find the out edges and see the total cost of taking that edge
         The cost of taking the edge is cost to go from the target of the edge + the cost of the edge itself
     */
-    double minCost = 1e10;
+    double minCost = std::numeric_limits<double>::max();
     Edge edgeToTake;
 
     // Iterate over the out edges
@@ -2108,6 +2141,17 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
         double NNRadius = 0.0;
         itemElement->QueryDoubleAttribute("nnradius", &NNRadius);
         NNRadius_ = NNRadius;
+
+        // Nearest neighbors num
+        child = node->FirstChild("NumNN");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        int numnn = 0;
+        itemElement->QueryIntAttribute("numnn", &numnn);
+        numNearestNeighbors_ = numnn;
 
         // DP params
         double discountFactorDP = 0.0, informationCostWeight = 0.0, distanceCostWeight = 0.0, goalCostToGo = 0.0, obstacleCostToGo = 0.0, initalCostToGo = 0.0, convergenceThresholdDP = 0.0;

@@ -533,6 +533,8 @@ private:
 
     double NNRadius_;
 
+    int numNearestNeighbors_;
+
     int rolloutSteps_;
 
     double discountFactorDP_;

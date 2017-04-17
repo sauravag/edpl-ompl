@@ -8,7 +8,7 @@
 <ObservationModels>
 	<HeadingBeaconObservationModel
 		sigma_heading="0.000017"
-		sigma_ss="0.005"
+		sigma_ss="0.0001"
 	>
 	</HeadingBeaconObservationModel>
 </ObservationModels>
@@ -19,7 +19,7 @@
         sigmaOmega="0.0"
         etaOmega="0.0"
 		P_Wg_filename=""
-		wind_noise_pos="0.15"
+		wind_noise_pos="0.10"
 		wind_noise_ang="0.000001" 
 		min_linear_velocity= "-4.0"
 		max_linear_velocity= "4.0"
@@ -32,7 +32,7 @@
         sigmaOmega="0.0"
         etaOmega="0.0"
 		P_Wg_filename=""
-		wind_noise_pos="0.1"
+		wind_noise_pos="0.10"
 		wind_noise_ang="0.000001" 
 		min_linear_velocity= "-4.0"
 		max_linear_velocity= "4.0"
@@ -54,11 +54,12 @@
 	<DataLog save = "0" folder = "../TROSIMS/DynamicObstacle/" />
 	<Roadmap save = "0" />
 	<MCParticles numparticles = "5" />
-	<RolloutSteps rolloutsteps = "2" />
-	<NNRadius nnradius = "4.0" />
+	<RolloutSteps rolloutsteps = "1" />
+	<NNRadius nnradius = "5.0" />
+	<NumNN numnn = "5" />
 	<DPDiscountFactor discountfac = "1.0" />
 	<InfCostWeight infcostw = "1.0"/>
-	<DistCostWeight distcostw = "0.02"/>
+	<DistCostWeight distcostw = "0.2"/>
 	<GoalCostToGo goalctg = "0.0"/>
 	<ObstCostToGo obsctg = "200.0" />
 	<InitCostToGo initctg = "2.0" />
@@ -72,7 +73,7 @@
 		dynobst = "1" 
 	/><!--set dynobst to 1 to activate-->
 	<RoadMap
-		roadmapFile = "./FIRMRoadMap-TEST.xml"
+		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task2.xml"
 		useRoadMap = "1"
 	/>
 	<Environment
@@ -82,7 +83,7 @@
 		robotFile = "./Models/iRobot.obj"
 	/>
 	<StartPose
-		x = "7.8"	y = "0.75"
+		x = "2.5"	y = "5.5"
 	/>
 	<PlanningTime
 		maxTime = "700"
@@ -95,7 +96,6 @@
     />
 </PlanningProblem>
 <GoalList>
-	<GoalPose x = "8.8" y = "0.75" />
+	<GoalPose x = "7.2" y = "5.5" />
+	<GoalPose x = "10.7" y = "5.5" />
 </GoalList>
-<!--GoalPose x = "7.2" y = "5.2" /-->
-<!--GoalPose x = "13.5" y = "5.5" /-->

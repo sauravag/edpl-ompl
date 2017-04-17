@@ -65,7 +65,7 @@ public:
         RHCICreate::setControlQueueSize(5);
         RHCICreate::setTurnOnlyDistance(0.01);
         Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(10.0); // degrees
-        Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.1);// meters
+        Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.2);// meters
         Controller<RHCICreate, ExtendedKF>::setMaxTries(30);
         Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(0.5); // meters
 
