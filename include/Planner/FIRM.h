@@ -94,6 +94,8 @@ class FIRM : public ompl::base::Planner
 
     /** Defining the separated controller types depending on your problem*/
     typedef FiniteTimeLQR SeparatedControllerType;
+
+    typedef StationaryLQR NodeSeparatedControllerType;
     
     /** Defining the filter type depending on your problem*/
     typedef ExtendedKF FilterType;
@@ -155,7 +157,7 @@ public:
     
     typedef Controller<SeparatedControllerType, FilterType> EdgeControllerType;
     
-    typedef Controller<SeparatedControllerType, LinearizedKF> NodeControllerType;
+    typedef Controller<NodeSeparatedControllerType, LinearizedKF> NodeControllerType;
 
     /** \brief Constructor */
     FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode=false);
@@ -528,6 +530,26 @@ private:
 
     /** \brief Flag to save video */
     bool doSaveVideo_;
+
+    double NNRadius_;
+
+    int rolloutSteps_;
+
+    double discountFactorDP_;
+
+    double informationCostWeight_;
+
+    double distanceCostWeight_;
+
+    double goalCostToGo_;
+
+    double obstacleCostToGo_;
+
+    double initalCostToGo_;
+
+    int maxDPIterations_;
+
+    double convergenceThresholdDP_;
 
 };
 

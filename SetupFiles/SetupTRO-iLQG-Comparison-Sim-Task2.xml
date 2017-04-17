@@ -1,34 +1,32 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
 	<landmark id = 1  x = 4.5	y = 1.25 />
+	<landmark id = 2  x = 12.5	y = 5.25 />
 </LandmarkList>
 <DynamicObstacleList>
 	<obstacle id = "1" path="./Models/iLQG-TRO-MapB-DynObs.obj" />
 </DynamicObstacleList>
 <ObservationModels>
-	<CamAruco2DObservationModel
-	    camera_range = "3.0"
-    	camera_half_fov = "180"  
-		sigma_range="0.04"
-		sigma_angle="1.00"
-		eta_rd="0.100"
-		eta_rphi = "0.01"
-		eta_thetad="0.01"
-		eta_thetaphi = "0.02"
-		camera_horizontal_fov = "45"
-	>
-	</CamAruco2DObservationModel>
-	<TwoDBeaconObservationModel
-		sigma="0.1"
-	>
-	</TwoDBeaconObservationModel>
 	<HeadingBeaconObservationModel
-		sigma_heading="0.00017"
-		sigma_ss="0.1"
+		sigma_heading="0.000017"
+		sigma_ss="0.01"
 	>
 	</HeadingBeaconObservationModel>
 </ObservationModels>
 <MotionModels>
+	<UnicycleMotionModel 
+		sigmaV="0.0"
+		etaV="0.0"
+        sigmaOmega="0.0"
+        etaOmega="0.0"
+		P_Wg_filename=""
+		wind_noise_pos="0.015"
+		wind_noise_ang="0.000001" 
+		min_linear_velocity= "-4.0"
+		max_linear_velocity= "4.0"
+		max_angular_velocity= "0.60"
+		dt= "0.1"
+	  />
 	<OmnidirectionalMotionModel 
 		sigmaV="0.0"
 		etaV="0.0"
@@ -57,15 +55,25 @@
 	<DataLog save = "0" folder = "../TROSIMS/DynamicObstacle/" />
 	<Roadmap save = "0" />
 	<MCParticles numparticles = "10" />
-</FIRM>
+	<RolloutSteps rolloutsteps = "10" />
+	<NNRadius nnradius = "5.0" />
+	<DPDiscountFactor discountfac = "1.0" />
+	<InfCostWeight infcostw = "1.0"/>
+	<DistCostWeight distcostw = "0.1"/>
+	<GoalCostToGo goalctg = "0.0"/>
+	<ObstCostToGo obsctg = "200.0" />
+	<InitCostToGo initctg = "2.0" />
+	<MaxDPIter dpiter = "20000" />
+	<DPConvergenceThreshold dpconvthresh = "0.001" />
+</FIRM> 
 <PlanningProblem>
 	<!--  method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
 	<PlannerMode
-		method = "0"
-		dynobst = "0" 
+		method = "1"
+		dynobst = "1" 
 	/><!--set dynobst to 1 to activate-->
 	<RoadMap
-		roadmapFile = "./FIRMRoadMap-test.xml"
+		roadmapFile = "./FIRMRoadMap-TEST.xml"
 		useRoadMap = "1"
 	/>
 	<Environment
@@ -81,13 +89,14 @@
 		maxTime = "600"
 	/>
 	<FIRMNodes
-		minNodes = "50"
+		minNodes = "100"
 	/>
 	<KidnappedState
         x = 1.5 y = 19.5 
     />
 </PlanningProblem>
 <GoalList>
+	<GoalPose x = "7.2" y = "5.2" />
 	<GoalPose x = "13.5" y = "5.5" />
 </GoalList>
 <!--GoalPose x = "7.4" y = "5.2" /-->

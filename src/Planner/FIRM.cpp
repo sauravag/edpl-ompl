@@ -75,31 +75,31 @@ namespace ompl
         static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1; // 0.1 is a good number
 
         /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
-        static const float DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR = 1.0;
+        static const float DEFAULT_DP_DISCOUNT_FACTOR = 1.0;
 
         /** \brief Maximum allowed number of iterations to solve DP */
-        static const int DP_MAX_ITERATIONS = 20000; // 20000 is a good number
+        static const int DEFAULT_DP_MAX_ITERATIONS = 20000; // 20000 is a good number
 
         /** \brief Weighting factor for filtering cost */
-        static const double INFORMATION_COST_WEIGHT = 1.0;
+        static const double DEFAULT_INFORMATION_COST_WEIGHT = 1.0;
 
         /** \brief Weighting factor for distance based cost */
-        static const double DISTANCE_TO_GOAL_COST_WEIGHT = 0.01; 
+        static const double DEFAULT_DISTANCE_TO_GOAL_COST_WEIGHT = 0.01; 
 
         /** \brief Weighting factor for edge execution time cost */
         static const double TIME_TO_STOP_COST_WEIGHT = 0.001;
 
         /** \brief The cost to go from goal. */
-        static const double GOAL_COST_TO_GO = 0.0;
+        static const double DEFAULT_GOAL_COST_TO_GO = 0.0;
 
         /** \brief The initial cost to go from a non-goal node*/
-        static const double INIT_COST_TO_GO = 2.0; // 2 is a good number
+        static const double DEFAULT_INIT_COST_TO_GO = 2.0; // 2 is a good number
 
         /** \brief The cost to traverse an obstacle*/
-        static const double OBSTACLE_COST_TO_GO = 200; // 200 is a good number
+        static const double DEFAULT_OBSTACLE_COST_TO_GO = 200; // 200 is a good number
 
         /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
-        static const double DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
+        static const double DEFAULT_DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
 
         /** \brief Default neighborhood radius */
         static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is goods
@@ -112,7 +112,7 @@ namespace ompl
 
         static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 10;
 
-        static const int STEPS_TO_ROLLOUT = 30;
+        static const int DEFAULT_STEPS_TO_ROLLOUT = 10;
 
         static const double EDGE_COST_BIAS = 0.01; // In controller.h all edge costs are added up from 0.01 as the starting cost, this helps DP converge
     }
@@ -162,6 +162,26 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     doSaveVideo_ = false;
 
+    NNRadius_ = ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS;
+
+    rolloutSteps_ = ompl::magic::DEFAULT_STEPS_TO_ROLLOUT ;
+
+    discountFactorDP_  = ompl::magic::DEFAULT_DP_DISCOUNT_FACTOR; 
+
+    informationCostWeight_ = ompl::magic::DEFAULT_INFORMATION_COST_WEIGHT;
+
+    distanceCostWeight_ = ompl::magic::DEFAULT_DISTANCE_TO_GOAL_COST_WEIGHT;
+
+    goalCostToGo_ = ompl::magic::DEFAULT_GOAL_COST_TO_GO;
+
+    obstacleCostToGo_ = ompl::magic::DEFAULT_OBSTACLE_COST_TO_GO;
+
+    initalCostToGo_ = ompl::magic::DEFAULT_INIT_COST_TO_GO;
+
+    maxDPIterations_ = ompl::magic::DEFAULT_DP_MAX_ITERATIONS;
+    
+    convergenceThresholdDP_ = ompl::magic::DEFAULT_DP_CONVERGENCE_THRESHOLD;
+
 }
 
 FIRM::~FIRM(void)
@@ -181,8 +201,8 @@ void FIRM::setup(void)
     if (!connectionStrategy_)
     {
         //connectionStrategy_ = ompl::geometric::KStarStrategy<Vertex>(boost::bind(&FIRM::milestoneCount, this), nn_, si_->getStateDimension());
-        connectionStrategy_ = FStrategy<Vertex>(ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
-        //connectionStrategy_ = ompl::geometric::KBoundedStrategy<Vertex>(ompl::magic::DEFAULT_NEAREST_NEIGHBORS, ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
+        connectionStrategy_ = FStrategy<Vertex>(NNRadius_, nn_);
+        //connectionStrategy_ = ompl::geometric::KBoundedStrategy<Vertex>(ompl::magic::DEFAULT_NEAREST_NEIGHBORS, NNRadius_, nn_);
     }
 
 }
@@ -805,7 +825,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
             //edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
-            edgeCost = ompl::base::Cost(edgeCost.value() + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);
+            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);
         }
     }
 
@@ -914,7 +934,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
     using namespace arma;
 
-    float discountFactor = ompl::magic::DYNAMIC_PROGRAMMING_DISCOUNT_FACTOR;
+    float discountFactor = discountFactorDP_;
 
     std::map<Vertex, double> newCostToGo;
 
@@ -930,13 +950,13 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
     {
         if(v == goalVertex)
         {
-            costToGo_[v] = ompl::magic::GOAL_COST_TO_GO;
-            newCostToGo[v] = ompl::magic::GOAL_COST_TO_GO;
+            costToGo_[v] = goalCostToGo_;
+            newCostToGo[v] = goalCostToGo_;
         }
         else
         {
-            costToGo_[v] = ompl::magic::INIT_COST_TO_GO;
-            newCostToGo[v] = ompl::magic::INIT_COST_TO_GO;
+            costToGo_[v] = initalCostToGo_;
+            newCostToGo[v] = initalCostToGo_;
         }
     }
 
@@ -945,7 +965,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
     bool convergenceCondition = false;
 
     int nIter=0;
-    while(!convergenceCondition && nIter < ompl::magic::DP_MAX_ITERATIONS)
+    while(!convergenceCondition && nIter < maxDPIterations_)
     {
         nIter++;
 
@@ -969,7 +989,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
         }
 
-        convergenceCondition = (norm(MapToColvec(costToGo_)-MapToColvec(newCostToGo), "inf") <= ompl::magic::DP_CONVERGENCE_THRESHOLD);
+        convergenceCondition = (norm(MapToColvec(costToGo_)-MapToColvec(newCostToGo), "inf") <= convergenceThresholdDP_);
 
         costToGo_.swap(newCostToGo);   // Equivalent to costToGo_ = newCostToGo
 
@@ -1028,7 +1048,7 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
         double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
 
-        double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*ompl::magic::OBSTACLE_COST_TO_GO + edgeWeight.getCost()) + ompl::magic::DISTANCE_TO_GOAL_COST_WEIGHT*distToGoalFromTarget;
+        double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost()) + distanceCostWeight_*distToGoalFromTarget;
 
         candidateCostToGo[e] =  singleCostToGo ;
 
@@ -1082,7 +1102,7 @@ void FIRM::updateEdgeCollisionCost(FIRM::Vertex currentVertex, FIRM::Vertex goal
         {
             double pvc1 = weightProperty_[edge].getCost();
     
-            weightProperty_[edge].setCost(pvc1 + ompl::magic::OBSTACLE_COST_TO_GO*10);
+            weightProperty_[edge].setCost(pvc1 + obstacleCostToGo_*10);
 
             weightProperty_[edge].setSuccessProbability(0.0);
 
@@ -1094,7 +1114,7 @@ void FIRM::updateEdgeCollisionCost(FIRM::Vertex currentVertex, FIRM::Vertex goal
                 {
                     double pvc2 = weightProperty_[e].getCost();
     
-                    weightProperty_[e].setCost(pvc2 + ompl::magic::OBSTACLE_COST_TO_GO*10);
+                    weightProperty_[e].setCost(pvc2 + obstacleCostToGo_*10);
 
                     weightProperty_[e].setSuccessProbability(0.0);
                 }
@@ -1457,7 +1477,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     Visualizer::doSaveVideo(doSaveVideo_);
 
-    connectionStrategy_ = FStrategy<Vertex>(1.2*ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS, nn_);
+    connectionStrategy_ = FStrategy<Vertex>(1.2*NNRadius_, nn_);
 
     nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
@@ -1487,7 +1507,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
         controller.setSpaceInformation(policyExecutionSI_);
 
-        controller.executeUpto(ompl::magic::STEPS_TO_ROLLOUT, cstartState, cendState, cost, stepsExecuted, false);
+        controller.executeUpto(rolloutSteps_, cstartState, cendState, cost, stepsExecuted, false);
 
         executionCost_ += cost.value() - ompl::magic::EDGE_COST_BIAS;
 
@@ -1552,7 +1572,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
             if(doSaveLogs_)
             {
-                outfile<<numberOfRollouts<<","<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<","
+                outfile<<numberOfRollouts<<","<<NNRadius_<<","
                    <<numNN<<","<<numMCParticles_<<","<<timeToDoRollout / (1000*numNN)<<","<<timeToDoRollout/1000<<std::endl;
             }
 
@@ -1581,7 +1601,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     averageTimeForRolloutComputation = averageTimeForRolloutComputation / (1000*numberOfRollouts);
 
-    std::cout<<"Nearest Neighbor Radius: "<<ompl::magic::DEFAULT_NEAREST_NEIGHBOUR_RADIUS<<", Monte Carlo Particles: "<<numMCParticles_<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;    
+    std::cout<<"Nearest Neighbor Radius: "<<NNRadius_<<", Monte Carlo Particles: "<<numMCParticles_<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;    
 
     if(doSaveLogs_)
     {
@@ -1746,7 +1766,7 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
         //double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
 
         // the cost of taking the edge
-        double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*ompl::magic::OBSTACLE_COST_TO_GO + edgeWeight.getCost();
+        double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
 
         if(edgeCostToGo < minCost)
         {
@@ -2063,6 +2083,97 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     int numP = 0;
     itemElement->QueryIntAttribute("numparticles", &numP);
     numMCParticles_ = numP;
+
+    try
+    {
+
+        // Rollout steps
+        child = node->FirstChild("RolloutSteps");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        int rolloutSteps = 0;
+        itemElement->QueryIntAttribute("rolloutsteps", &rolloutSteps);
+        rolloutSteps_ = rolloutSteps;
+
+        // Nearest neighbor radius
+        child = node->FirstChild("NNRadius");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        double NNRadius = 0.0;
+        itemElement->QueryDoubleAttribute("nnradius", &NNRadius);
+        NNRadius_ = NNRadius;
+
+        // DP params
+        double discountFactorDP = 0.0, informationCostWeight = 0.0, distanceCostWeight = 0.0, goalCostToGo = 0.0, obstacleCostToGo = 0.0, initalCostToGo = 0.0, convergenceThresholdDP = 0.0;
+        int maxDPIterations = 0;
+
+        child = node->FirstChild("DPDiscountFactor");
+        assert( child );
+        itemElement = child->ToElement();
+        assert( itemElement );
+        itemElement->QueryDoubleAttribute("discountfac", &discountFactorDP);
+        discountFactorDP_ = discountFactorDP;
+
+        child = node->FirstChild("InfCostWeight");
+        assert( child );
+        itemElement = child->ToElement();
+        assert( itemElement );
+        itemElement->QueryDoubleAttribute("infcostw", &informationCostWeight);
+        informationCostWeight_ = informationCostWeight;
+
+        child = node->FirstChild("DistCostWeight");
+        assert( child );
+        itemElement = child->ToElement();
+        assert( itemElement );
+        itemElement->QueryDoubleAttribute("distcostw", &distanceCostWeight);
+        distanceCostWeight_ = distanceCostWeight;
+
+        child = node->FirstChild("GoalCostToGo");
+        assert( child );
+        itemElement = child->ToElement();
+        assert( itemElement );
+        itemElement->QueryDoubleAttribute("goalctg", &goalCostToGo);
+        goalCostToGo_ = goalCostToGo;
+
+        child = node->FirstChild("ObstCostToGo");
+        assert( child );
+        itemElement = child->ToElement();
+        assert( itemElement );
+        itemElement->QueryDoubleAttribute("obsctg", &obstacleCostToGo);
+        obstacleCostToGo_ = obstacleCostToGo;
+
+        child = node->FirstChild("InitCostToGo");
+        assert( child );
+        itemElement = child->ToElement();
+        assert( itemElement );
+        itemElement->QueryDoubleAttribute("initctg", &initalCostToGo);
+        initalCostToGo_ = initalCostToGo;
+
+        child = node->FirstChild("DPConvergenceThreshold");
+        assert( child );
+        itemElement = child->ToElement();
+        assert( itemElement );
+        itemElement->QueryDoubleAttribute("dpconvthresh", &convergenceThresholdDP);
+        convergenceThresholdDP_ = convergenceThresholdDP;
+
+        child = node->FirstChild("MaxDPIter");
+        assert( child );
+        itemElement = child->ToElement();
+        assert( itemElement );
+        itemElement->QueryIntAttribute("dpiter", &maxDPIterations);
+        maxDPIterations_ = maxDPIterations;
+
+    }
+    catch (const std::exception& e)
+    {
+        OMPL_ERROR("Did not find some FIRM params, will use default in OMPL::MAGIC, \n ==> Recommended to add custom param values to your XML file <==");
+    }
 
 }
 

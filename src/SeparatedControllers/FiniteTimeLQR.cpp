@@ -43,14 +43,12 @@ FiniteTimeLQR::FiniteTimeLQR(ompl::base::State *goal,
         SeparatedControllerMethod(goal, nominalXs, nominalUs, linearSystems, mm)
 {
 
-    arma::mat II(3,3); II.eye(); // 3x3 identity matrix
-
     // set the weighting matrices
-    Wxf_ = 20.0*II;
+    Wxf_ = mm->getTerminalStateCost();
 
-    Wx_ = 10.0*II;
+    Wx_ = mm->getStateCost();
 
-    Wu_ = II;
+    Wu_ = mm->getStateCost();
 
     // store nominal values
     nominalUs_ = nominalUs;
@@ -61,9 +59,9 @@ FiniteTimeLQR::FiniteTimeLQR(ompl::base::State *goal,
 
     numT_ = linearSystems_.size();
 
-    arma::mat ZZ(3,3); ZZ.zeros(); // 3x3 zero matrix
+    arma::mat ZZ(Wu_.n_rows, Wx_.n_cols); ZZ.zeros(); // 3x3 zero matrix
 
-    feedbackGains_.resize(numT_,ZZ);
+    feedbackGains_.resize(numT_, ZZ);
 
     assert(numT_ > 0 && "Cannot pass in empty linear system vector to FinitetimeLQR");
 

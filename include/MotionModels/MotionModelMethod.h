@@ -76,6 +76,16 @@ class MotionModelMethod
                 zeroControl_->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i] = 0;
             }
 
+            arma::mat II_x(stateDim_,stateDim_); II_x.eye(); // identity matrix
+
+            arma::mat II_u(controlDim_,controlDim_); II_u.eye(); // identity matrix
+
+            Wxf_ = 20.0*II_x;
+
+            Wx_ = 10.0*II_x;
+            
+            Wu_ = II_u;            
+
         }
 
         /** \brief Set the timestep for motion. */
@@ -114,6 +124,15 @@ class MotionModelMethod
         /** \brief Calculate the process noise covariance. */
 		virtual arma::mat
 		processNoiseCovariance(const ompl::base::State *state, const ompl::control::Control* control) = 0;
+
+        /** \brief Return state cost */
+        arma::mat getStateCost() { return Wx_;}
+
+        /** \brief Return control cost */
+        virtual arma::mat getControlCost() {return Wu_;} 
+
+        /** \brief Return terminal cost */
+        virtual arma::mat getTerminalStateCost() { return Wxf_;}
 
         /** \brief Get zero control which produces no change in the robot state. */
 		virtual ompl::control::Control* getZeroControl() { return zeroControl_; }
@@ -190,6 +209,15 @@ class MotionModelMethod
 
         /** \brief Zero noise. */
 		NoiseType zeroNoise_;
+
+        /** \brief The cost weight matrix for terminal error, i.e., final state cost */
+        arma::mat Wxf_;
+
+        /** \brief intermediate state cost weight*/
+        arma::mat Wx_;
+
+        /** \brief Control cost weight matrix */
+        arma::mat Wu_;
 
 		/** \brief timestep size, used to generate the next state by applying a control for this period of time. */
 		double dt_;
