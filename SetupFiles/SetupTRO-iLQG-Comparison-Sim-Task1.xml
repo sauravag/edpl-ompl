@@ -1,48 +1,35 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
-	<landmark id = 1  x = 4.5	y = 1.25 />
-	<landmark id = 2  x = 12.5	y = 5.25 />
+	<landmark id = 1  x = 13.5	y = 1.0 />
 </LandmarkList>
 <ObservationModels>
 	<HeadingBeaconObservationModel
 		sigma_heading="0.000017"
-		sigma_ss="0.01"
+		sigma_ss="0.005"
 	>
 	</HeadingBeaconObservationModel>
 </ObservationModels>
 <MotionModels>
-	<UnicycleMotionModel 
-		sigmaV="0.0"
-		etaV="0.0"
-        sigmaOmega="0.0"
-        etaOmega="0.0"
-		P_Wg_filename=""
-		wind_noise_pos="0.015"
-		wind_noise_ang="0.000001" 
-		min_linear_velocity= "-4.0"
-		max_linear_velocity= "4.0"
-		max_angular_velocity= "0.60"
-		dt= "0.1"
-	  />
 	<OmnidirectionalMotionModel 
 		sigmaV="0.0"
 		etaV="0.0"
         sigmaOmega="0.0"
         etaOmega="0.0"
 		P_Wg_filename=""
-		wind_noise_pos="0.15"
+		wind_noise_pos = "0.07"
 		wind_noise_ang="0.000001" 
-		min_linear_velocity= "-4.0"
-		max_linear_velocity= "4.0"
+		min_linear_velocity= "-1.0"
+		max_linear_velocity= "1.0"
 		max_angular_velocity= "0.60"
 		dt= "0.1"
-	  /> <!--omega is in radians, wind_noise_ang is in degrees -->
-		<!--wind_noise_pos="1.000"
-		wind_noise_ang="7.0"-->
+	  /> 
+	  <!--omega is in radians, wind_noise_ang is in degrees -->
+	  <!--wind_noise_pos="1.000"
+		  wind_noise_ang="7.0"-->
 	<TwoDPointMotionModel 
 		sigmaV="0.0"
 		etaV="0.0"
-		wind_noise_pos="0.15" 
+		wind_noise_pos="0.1" 
 		max_linear_velocity= "4.0"
 		dt= "0.1"
 	  />
@@ -51,14 +38,15 @@
 	<Video save = "0" />
 	<DataLog save = "0" folder = "../TROSIMS/DynamicObstacle/" />
 	<Roadmap save = "1" />
-	<MCParticles numparticles = "10" />
-	<RolloutSteps rolloutsteps = "10" />
-	<NNRadius nnradius = "5.0" />
+	<MCParticles numparticles = "100" />
+	<RolloutSteps rolloutsteps = "1" />
+	<NNRadius nnradius = "3.0" />
+	<NumNN numnn = "8" />
 	<DPDiscountFactor discountfac = "1.0" />
 	<InfCostWeight infcostw = "1.0"/>
 	<DistCostWeight distcostw = "0.1"/>
 	<GoalCostToGo goalctg = "0.0"/>
-	<ObstCostToGo obsctg = "200.0" />
+	<ObstCostToGo obsctg = "20000.0" />
 	<InitCostToGo initctg = "2.0" />
 	<MaxDPIter dpiter = "20000" />
 	<DPConvergenceThreshold dpconvthresh = "0.001" />
@@ -66,11 +54,11 @@
 <PlanningProblem>
 	<!--  method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
 	<PlannerMode
-		method = "0"
+		method = "1"
 		dynobst = "0" 
 	/><!--set dynobst to 1 to activate-->
 	<RoadMap
-		roadmapFile = "./FIRMRoadMap-TEST.xml"
+		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task1.xml"
 		useRoadMap = "0"
 	/>
 	<Environment
@@ -80,20 +68,18 @@
 		robotFile = "./Models/iRobot.obj"
 	/>
 	<StartPose
-		x = "2.5"	y = "5.5"
+		x = "1.5"	y = "6.0"
 	/>
 	<PlanningTime
-		maxTime = "600"
+		maxTime = "700"
 	/>
 	<FIRMNodes
-		minNodes = "100"
+		minNodes = "150"
 	/>
 	<KidnappedState
         x = 1.5 y = 19.5 
     />
 </PlanningProblem>
 <GoalList>
-	<GoalPose x = "7.2" y = "5.2" />
-	<GoalPose x = "13.5" y = "5.5" />
+	<GoalPose x = "13.1" y = "8.5" />
 </GoalList>
-<!--GoalPose x = "7.4" y = "5.2" /-->

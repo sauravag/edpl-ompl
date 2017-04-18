@@ -102,7 +102,7 @@ namespace ompl
         static const double DEFAULT_DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
 
         /** \brief Default neighborhood radius */
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is goods
+        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is good
 
         static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
 
@@ -637,7 +637,8 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     m = boost::add_vertex(g_);
 
-    addStateToVisualization(state);
+    if(addReverseEdge)
+        addStateToVisualization(state);
 
     stateProperty_[m] = state;
 
@@ -1080,6 +1081,10 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
         const double transitionProbability  = edgeWeight.getSuccessProbability();
 
         arma::colvec targetToGoalVec = stateProperty_[goal]->as<FIRM::StateType>()->getArmaData() - stateProperty_[targetNode]->as<FIRM::StateType>()->getArmaData();
+
+        //arma::colvec nodeToTargetVec = stateProperty_[targetNode]->as<FIRM::StateType>()->getArmaData() - stateProperty_[node]->as<FIRM::StateType>()->getArmaData();
+
+        //double edgeLength =arma::norm(nodeToTargetVec.subvec(0,1),2); 
 
         double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
 
@@ -2117,108 +2122,101 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     itemElement->QueryIntAttribute("numparticles", &numP);
     numMCParticles_ = numP;
 
-    try
-    {
+   
+    // Rollout steps
+    child = node->FirstChild("RolloutSteps");
+    assert( child );
 
-        // Rollout steps
-        child = node->FirstChild("RolloutSteps");
-        assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
 
-        itemElement = child->ToElement();
-        assert( itemElement );
+    int rolloutSteps = 0;
+    itemElement->QueryIntAttribute("rolloutsteps", &rolloutSteps);
+    rolloutSteps_ = rolloutSteps;
 
-        int rolloutSteps = 0;
-        itemElement->QueryIntAttribute("rolloutsteps", &rolloutSteps);
-        rolloutSteps_ = rolloutSteps;
+    // Nearest neighbor radius
+    child = node->FirstChild("NNRadius");
+    assert( child );
 
-        // Nearest neighbor radius
-        child = node->FirstChild("NNRadius");
-        assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
 
-        itemElement = child->ToElement();
-        assert( itemElement );
+    double nnradius = 0.0;
+    itemElement->QueryDoubleAttribute("nnradius", &nnradius);
+    NNRadius_ = nnradius;
 
-        double NNRadius = 0.0;
-        itemElement->QueryDoubleAttribute("nnradius", &NNRadius);
-        NNRadius_ = NNRadius;
+    // Nearest neighbors num
+    child = node->FirstChild("NumNN");
+    assert( child );
 
-        // Nearest neighbors num
-        child = node->FirstChild("NumNN");
-        assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
 
-        itemElement = child->ToElement();
-        assert( itemElement );
+    int numnn = 0;
+    itemElement->QueryIntAttribute("numnn", &numnn);
+    numNearestNeighbors_ = numnn;
 
-        int numnn = 0;
-        itemElement->QueryIntAttribute("numnn", &numnn);
-        numNearestNeighbors_ = numnn;
+    // DP params
+    double discountFactorDP = 0.0, informationCostWeight = 0.0, distanceCostWeight = 0.0, goalCostToGo = 0.0, obstacleCostToGo = 0.0, initalCostToGo = 0.0, convergenceThresholdDP = 0.0;
+    int maxDPIterations = 0;
 
-        // DP params
-        double discountFactorDP = 0.0, informationCostWeight = 0.0, distanceCostWeight = 0.0, goalCostToGo = 0.0, obstacleCostToGo = 0.0, initalCostToGo = 0.0, convergenceThresholdDP = 0.0;
-        int maxDPIterations = 0;
+    child = node->FirstChild("DPDiscountFactor");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("discountfac", &discountFactorDP);
+    discountFactorDP_ = discountFactorDP;
 
-        child = node->FirstChild("DPDiscountFactor");
-        assert( child );
-        itemElement = child->ToElement();
-        assert( itemElement );
-        itemElement->QueryDoubleAttribute("discountfac", &discountFactorDP);
-        discountFactorDP_ = discountFactorDP;
+    child = node->FirstChild("InfCostWeight");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("infcostw", &informationCostWeight);
+    informationCostWeight_ = informationCostWeight;
 
-        child = node->FirstChild("InfCostWeight");
-        assert( child );
-        itemElement = child->ToElement();
-        assert( itemElement );
-        itemElement->QueryDoubleAttribute("infcostw", &informationCostWeight);
-        informationCostWeight_ = informationCostWeight;
+    child = node->FirstChild("DistCostWeight");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("distcostw", &distanceCostWeight);
+    distanceCostWeight_ = distanceCostWeight;
 
-        child = node->FirstChild("DistCostWeight");
-        assert( child );
-        itemElement = child->ToElement();
-        assert( itemElement );
-        itemElement->QueryDoubleAttribute("distcostw", &distanceCostWeight);
-        distanceCostWeight_ = distanceCostWeight;
+    child = node->FirstChild("GoalCostToGo");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("goalctg", &goalCostToGo);
+    goalCostToGo_ = goalCostToGo;
 
-        child = node->FirstChild("GoalCostToGo");
-        assert( child );
-        itemElement = child->ToElement();
-        assert( itemElement );
-        itemElement->QueryDoubleAttribute("goalctg", &goalCostToGo);
-        goalCostToGo_ = goalCostToGo;
+    child = node->FirstChild("ObstCostToGo");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("obsctg", &obstacleCostToGo);
+    obstacleCostToGo_ = obstacleCostToGo;
 
-        child = node->FirstChild("ObstCostToGo");
-        assert( child );
-        itemElement = child->ToElement();
-        assert( itemElement );
-        itemElement->QueryDoubleAttribute("obsctg", &obstacleCostToGo);
-        obstacleCostToGo_ = obstacleCostToGo;
+    child = node->FirstChild("InitCostToGo");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("initctg", &initalCostToGo);
+    initalCostToGo_ = initalCostToGo;
 
-        child = node->FirstChild("InitCostToGo");
-        assert( child );
-        itemElement = child->ToElement();
-        assert( itemElement );
-        itemElement->QueryDoubleAttribute("initctg", &initalCostToGo);
-        initalCostToGo_ = initalCostToGo;
+    child = node->FirstChild("DPConvergenceThreshold");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("dpconvthresh", &convergenceThresholdDP);
+    convergenceThresholdDP_ = convergenceThresholdDP;
 
-        child = node->FirstChild("DPConvergenceThreshold");
-        assert( child );
-        itemElement = child->ToElement();
-        assert( itemElement );
-        itemElement->QueryDoubleAttribute("dpconvthresh", &convergenceThresholdDP);
-        convergenceThresholdDP_ = convergenceThresholdDP;
+    child = node->FirstChild("MaxDPIter");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryIntAttribute("dpiter", &maxDPIterations);
+    maxDPIterations_ = maxDPIterations;
 
-        child = node->FirstChild("MaxDPIter");
-        assert( child );
-        itemElement = child->ToElement();
-        assert( itemElement );
-        itemElement->QueryIntAttribute("dpiter", &maxDPIterations);
-        maxDPIterations_ = maxDPIterations;
-
-    }
-    catch (const std::exception& e)
-    {
-        OMPL_ERROR("Did not find some FIRM params, will use default in OMPL::MAGIC, \n ==> Recommended to add custom param values to your XML file <==");
-    }
-
+    OMPL_INFORM("FIRM: NNRadius = %f", NNRadius_);
 }
 
 bool FIRM::isStartVertex(const Vertex v)
