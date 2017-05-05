@@ -1,11 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <LandmarkList>
 	<landmark id = 1  x = 13.5	y = 1.0 />
+	<landmark id = 2  x = 4.5	y = 7.0 />
 </LandmarkList>
 <ObservationModels>
 	<HeadingBeaconObservationModel
-		sigma_heading="0.000017"
-		sigma_ss="0.005"
+		sigma_heading = "0.000001"
+		sigma_ss = "0.005"
 	>
 	</HeadingBeaconObservationModel>
 </ObservationModels>
@@ -38,7 +39,7 @@
 	<Video save = "0" />
 	<DataLog save = "0" folder = "../TROSIMS/DynamicObstacle/" />
 	<Roadmap save = "0" />
-	<MCParticles numparticles = "60" />
+	<MCParticles numparticles = "30" />
 	<RolloutSteps rolloutsteps = "1" />
 	<NNRadius nnradius = "3.0" />
 	<NumNN numnn = "8" />
