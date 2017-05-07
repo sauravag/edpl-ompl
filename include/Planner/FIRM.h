@@ -93,7 +93,7 @@ class FIRM : public ompl::base::Planner
     typedef SE2BeliefSpace::StateType StateType;
 
     /** Defining the separated controller types depending on your problem*/
-    typedef FiniteTimeLQR SeparatedControllerType;
+    typedef RHCICreate SeparatedControllerType;
 
     typedef StationaryLQR NodeSeparatedControllerType;
     

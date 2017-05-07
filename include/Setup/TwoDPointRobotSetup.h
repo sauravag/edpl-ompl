@@ -38,6 +38,8 @@
 #define TWODPOINTROBOT_SETUP_H
 
 #include <omplapp/geometry/RigidBodyGeometry.h>
+#include <ompl/base/samplers/MaximizeClearanceValidStateSampler.h>
+#include <ompl/base/samplers/MinimumClearanceValidStateSampler.h>
 #include "omplapp/geometry/detail/FCLStateValidityChecker.h"
 #include <tinyxml.h>
 #include "Planner/FIRM.h"
@@ -99,6 +101,8 @@ public:
         // construct an instance of space information from this state space
         firm::SpaceInformation::SpaceInformationPtr si(new firm::SpaceInformation(ss_, cs_));
         siF_ = si;
+
+        siF_->setValidStateSamplerAllocator(TwoDPointRobotSetup::allocMaxClearanceValidStateSampler);
 
         ompl::base::ProblemDefinitionPtr prblm(new ompl::base::ProblemDefinition(siF_));
 
@@ -205,9 +209,9 @@ public:
 
             planner_->as<FIRM>()->setKidnappedState(kidnappedState_);
 
-            planner_->setup();
-
             planner_->as<FIRM>()->loadParametersFromFile(pathToSetupFile_.c_str());
+            
+            planner_->setup();            
 
             // Setup visualizer because it is needed while loading roadmap and visualizing it
             Visualizer::updateSpaceInformation(this->getSpaceInformation());
@@ -312,6 +316,17 @@ public:
     }
 
 protected:
+
+    static ompl::base::ValidStateSamplerPtr allocMaxClearanceValidStateSampler(const ompl::base::SpaceInformation *si)
+    {
+        // we can perform any additional setup / configuration of a sampler here,
+        // but there is nothing to tweak in case of the ObstacleBasedValidStateSampler.
+        std::shared_ptr<ompl::base::MinimumClearanceValidStateSampler> ss = std::make_shared<ompl::base::MinimumClearanceValidStateSampler>(si);
+        
+        ss->setMinimumObstacleClearance(0.25);
+
+        return ss;
+    }
 
     const ompl::base::State* getGeometricComponentStateInternal(const ompl::base::State *state, unsigned int /*index*/) const
     {
