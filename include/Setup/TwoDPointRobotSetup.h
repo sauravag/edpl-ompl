@@ -102,7 +102,7 @@ public:
         firm::SpaceInformation::SpaceInformationPtr si(new firm::SpaceInformation(ss_, cs_));
         siF_ = si;
 
-        siF_->setValidStateSamplerAllocator(TwoDPointRobotSetup::allocMaxClearanceValidStateSampler);
+        //siF_->setValidStateSamplerAllocator(TwoDPointRobotSetup::allocMaxClearanceValidStateSampler);
 
         ompl::base::ProblemDefinitionPtr prblm(new ompl::base::ProblemDefinition(siF_));
 
@@ -323,7 +323,7 @@ protected:
         // but there is nothing to tweak in case of the ObstacleBasedValidStateSampler.
         std::shared_ptr<ompl::base::MinimumClearanceValidStateSampler> ss = std::make_shared<ompl::base::MinimumClearanceValidStateSampler>(si);
         
-        ss->setMinimumObstacleClearance(0.25);
+        ss->setMinimumObstacleClearance(0.365);
 
         return ss;
     }

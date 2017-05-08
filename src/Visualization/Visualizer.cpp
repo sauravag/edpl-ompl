@@ -123,6 +123,9 @@ void Visualizer::drawRobot(const ompl::base::State *state)
 
 void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateType)
 {
+    if(!state)
+        return;
+
     using namespace arma;
 
     double outerDiskRadius, z;
@@ -248,6 +251,7 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
 void Visualizer::refresh()
 {
+        
     boost::mutex::scoped_lock sl(drawMutex_);
 
     glPushMatrix();
