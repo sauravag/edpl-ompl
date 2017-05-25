@@ -324,6 +324,8 @@ class Visualizer
             saveVideo_ = flag;
         }
 
+        static void printRobotPathToFile(std::string path);
+
 
     private:
 

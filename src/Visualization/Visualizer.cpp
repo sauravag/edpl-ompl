@@ -219,7 +219,10 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
         glLineWidth(2.0);
 
-        if(cholSucceeded)
+        // std::ofstream outfile; // remove
+        // outfile.open("RobotCovarianceEllipse.csv",std::ios::app);//remove
+
+       if(cholSucceeded)
         {
             mat K = trans(cholDecomp);
 
@@ -236,12 +239,15 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
             for(unsigned int i = 0; i < transformed.n_cols; ++i)
             {
                 glVertex2f(transformed(0,i), transformed(1,i));
+                // outfile<<transformed(0,i)<<","<<transformed(1,i)<<std::endl; // remove
             }
 
             glEnd();
 
             glPopMatrix();
         }
+
+         // outfile.close();//remove
 
         glLineWidth(1.0);
 
@@ -525,3 +531,20 @@ void Visualizer::drawOpenLoopRRTPaths()
     }
 }
 
+void Visualizer::printRobotPathToFile(std::string path)
+{
+
+    std::ofstream outfile;
+    outfile.open(path+"RobotPath.csv",std::ios::app);
+            
+    for(int i=0; i<robotPath_.size()-1;i++)
+    {
+
+        arma::colvec::fixed<2> x = robotPath_[i]->as<SE2BeliefSpace::StateType>()->getArmaData().subvec(0,1);
+
+        outfile<<x[0]<<","<<x[1]<<std::endl;
+
+    }
+
+    outfile.close();
+}

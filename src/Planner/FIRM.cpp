@@ -188,6 +188,9 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
 FIRM::~FIRM(void)
 {
+    if(doSaveLogs_)
+        Visualizer::printRobotPathToFile(logFilePath_);
+
     freeMemory();
     delete policyGenerator_;
 }
@@ -204,7 +207,7 @@ void FIRM::setup(void)
     {
         //connectionStrategy_ = ompl::geometric::KStarStrategy<Vertex>(boost::bind(&FIRM::milestoneCount, this), nn_, si_->getStateDimension());
         connectionStrategy_ = FStrategy<Vertex>(NNRadius_, nn_);
-        // connectionStrategy_ = ompl::geometric::KBoundedStrategy<Vertex>(numNearestNeighbors_, NNRadius_, nn_);
+        //connectionStrategy_ = ompl::geometric::KBoundedStrategy<Vertex>(numNearestNeighbors_, NNRadius_, nn_);
     }
 
 }
@@ -522,7 +525,24 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
 
     // Add the valid start states as milestones
     while (const ompl::base::State *st = pis_.nextStart())
+    {
+        auto start_time = std::chrono::high_resolution_clock::now();
+        
         startM_.push_back(addStateToGraph(si_->cloneState(st)));
+
+        auto end_time = std::chrono::high_resolution_clock::now();
+
+        double time2addstartstate = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+        if(doSaveLogs_)
+        {
+            std::ofstream outfile;
+            outfile.open(logFilePath_+"StartStateAddTime.txt",std::ios::app);
+            outfile<<"Time: "<<time2addstartstate<<" ms"<<std::endl;
+            outfile.close();
+        }
+
+    }
 
     if (startM_.size() == 0)
     {
@@ -654,6 +674,8 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     // Which milestones will we attempt to connect to?
     std::vector<Vertex> neighbors = connectionStrategy_(m);
+
+    OMPL_INFORM("Adding State, Number of Nearest Neighbors = %u", neighbors.size());
 
     // If reverse edge not required, that means this is a virtual state added in rollout
     // We will sort by cost and use N lowest cost to go neighbors
@@ -1490,6 +1512,19 @@ void FIRM::executeFeedbackWithRollout(void)
     sendMostLikelyPathToViz(start, goal) ;
 
     ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
+
+    //===== SET A Custom Init Covariance=====================
+    // using namespace arma;
+
+    // mat tempCC(3,3);
+
+    // tempCC<< 0.1 << 0.0 << 0.0 << endr
+    //         << 0.0 << 0.1 << 0.0 << endr
+    //         << 0.0 << 0.0 << 0.0000001<<endr;
+
+    // stateProperty_[start]->as<StateType>()->setCovariance(tempCC);
+    // Visualizer::updateCurrentBelief(stateProperty_[start]);
+    //================================
 
     siF_->setTrueState(stateProperty_[start]);
     siF_->setBelief(stateProperty_[start]);
