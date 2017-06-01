@@ -15,6 +15,13 @@ Brief:
 ----------------------------------------
 This application is an implementation of Feedback Information Road Maps (FIRM) and the Node-Based Multi-Modal Motion Planner (NBM3P) planners with OMPL. FIRM is a multi-query approach for planning under uncertainty which is a belief-space variant of probabilistic roadmap. FIRM relies on a Gaussian representation of the belief state. We also provide a new planner NBM3P, that enables planning in Non-Gaussian belief spaces. Such a planner is particularly useful if your system has a multi-modal hypothesis about its state. Such a situation could arise from ambigious data-association where the robot sees some information which makes it believe that it could be in one of multiple places (ex. A laser scanner can get confused by geometrically identical rooms in a building).
 
+---------------------------------------
+Tested Configuration
+---------------------------------------
+Ubuntu 16.04.2
+Boost: 1.58
+OMPL 1.2.1
+
 ----------------------------------------
 Compiling & Running
 ----------------------------------------
