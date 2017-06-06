@@ -37,7 +37,8 @@
 </MotionModels>
 <FIRM>
 	<Video save = "1" />
-	<DataLog save = "1" folder = "../TROSIMS/Task3/S1/" />
+<!-- 	<DataLog save = "1" folder = "../TROSIMS/Task3/S1/" /> -->
+	<DataLog save = "0"/>
 	<Roadmap save = "1" />
 	<MCParticles numparticles = "10" />
 	<RolloutSteps rolloutsteps = "1" />
@@ -59,28 +60,67 @@
 		dynobst = "0" 
 	/><!--set dynobst to 1 to activate-->
 	<RoadMap
-		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml"
-		useRoadMap = "1"
+		roadmapFile = ""
+		useRoadMap = "0"
 	/>
-	<Environment
-		environmentFile = "./Models/iLQG-TRO-Task1.obj"
-	/>		
+<!-- 	<RoadMap -->
+<!-- 		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml" -->
+<!-- 		useRoadMap = "1" -->
+<!-- 	/> -->
+<!-- 	<RoadMap -->
+<!-- 		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2.xml" -->
+<!-- 		useRoadMap = "1" -->
+<!-- 	/> -->
+<!-- 	<RoadMap -->
+<!-- 		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2_thin.xml" -->
+<!-- 		useRoadMap = "1" -->
+<!-- 	/> -->
+<!-- 	<Environment -->
+<!-- 		environmentFile = "./Models/iLQG&#45;TRO&#45;Task1.obj" -->
+<!-- 	/>		 -->
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole0x0.obj" /> -->
+	<Environment environmentFile = "./Models/iLQG-TRO-Task1-Pole1x1.obj" />
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole3x3.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole5x5.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9x2.obj" /> -->
+<!-- 	<Robot -->
+<!-- 		robotFile = "./Models/iRobot_fat.obj" -->
+<!-- 	/> -->
+<!-- 	<Robot -->
+<!-- 		robotFile = "./Models/iRobot.obj" -->
+<!-- 	/> -->
 	<Robot
-		robotFile = "./Models/iRobot_fat.obj"
+		robotFile = "./Models/iRobot_thin.obj"
 	/>
-	<StartPose
-		x = "1.725"	y = "1.725"
-	/>
+<!-- 	<StartPose -->
+<!-- 		x = "1.725"	y = "1.725" -->
+<!-- 	/> -->
+<!-- 	<StartPose x = "0.325"	y = "0.325" /> -->
+	<StartPose x = "1.725"	y = "2.925" />
+<!-- 	<StartPose x = "4.325"	y = "4.325" /> -->
+<!-- 	<StartPose x = "1.725"	y = "1.725" /> -->
+<!-- 	<StartPose x = "2.725"	y = "2.725" /> -->
+<!-- 	<StartPose x = "17"	y = "17.75" /> -->
 	<PlanningTime
 		maxTime = "800"
 	/>
+<!-- 	<FIRMNodes -->
+<!-- 		minNodes = "400" -->
+<!-- 	/> -->
 	<FIRMNodes
-		minNodes = "400"
+		minNodes = "300"
 	/>
 	<KidnappedState
         x = 1.5 y = 19.5 
     />
 </PlanningProblem>
+<!-- <GoalList> -->
+<!-- 	<GoalPose x = "17.0" y = "17.75" /> -->
+<!-- </GoalList> -->
+<!-- <GoalList> -->
+<!-- 	<GoalPose x = "3.0" y = "4.0" /> -->
+<!-- </GoalList> -->
 <GoalList>
-	<GoalPose x = "17.0" y = "17.75" />
+	<GoalPose x = "16.50" y = "17.50" />
 </GoalList>

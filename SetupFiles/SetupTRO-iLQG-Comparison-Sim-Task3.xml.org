@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<LandmarkList>
+	<landmark id = 1  x = 1		y = 18.0 />
+	<landmark id = 2  x = 17	y = 1.0 />
+</LandmarkList>
+<ObservationModels>
+	<HeadingBeaconObservationModel
+		sigma_heading = "0.000001"
+		sigma_ss = "0.005"
+	>
+	</HeadingBeaconObservationModel>
+</ObservationModels>
+<MotionModels>
+	<OmnidirectionalMotionModel 
+		sigmaV="0.0"
+		etaV="0.0"
+        sigmaOmega="0.0"
+        etaOmega="0.0"
+		P_Wg_filename=""
+		wind_noise_pos = "0.001"
+		wind_noise_ang="0.000001" 
+		min_linear_velocity= "-1.0"
+		max_linear_velocity= "1.0"
+		max_angular_velocity= "0.60"
+		dt= "0.1"
+	  /> 
+	  <!--omega is in radians, wind_noise_ang is in degrees -->
+	  <!--wind_noise_pos="1.000"
+		  wind_noise_ang="7.0"-->
+	<TwoDPointMotionModel 
+		sigmaV="0.0"
+		etaV="0.0"
+		wind_noise_pos="0.1" 
+		max_linear_velocity= "4.0"
+		dt= "0.1"
+	  />
+</MotionModels>
+<FIRM>
+	<Video save = "1" />
+	<DataLog save = "1" folder = "../TROSIMS/Task3/S1/" />
+	<Roadmap save = "1" />
+	<MCParticles numparticles = "10" />
+	<RolloutSteps rolloutsteps = "1" />
+	<NNRadius nnradius = "2.0" />
+	<NumNN numnn = "10" />
+	<DPDiscountFactor discountfac = "1.0" />
+	<InfCostWeight infcostw = "1.0"/>
+	<DistCostWeight distcostw = "0.1"/>
+	<GoalCostToGo goalctg = "0.0"/>
+	<ObstCostToGo obsctg = "20000.0" />
+	<InitCostToGo initctg = "2.0" />
+	<MaxDPIter dpiter = "20000" />
+	<DPConvergenceThreshold dpconvthresh = "0.001" />
+</FIRM> 
+<PlanningProblem>
+	<!--  method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
+	<PlannerMode
+		method = "0"
+		dynobst = "0" 
+	/><!--set dynobst to 1 to activate-->
+	<RoadMap
+		roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml"
+		useRoadMap = "1"
+	/>
+	<Environment
+		environmentFile = "./Models/iLQG-TRO-Task1.obj"
+	/>		
+	<Robot
+		robotFile = "./Models/iRobot_fat.obj"
+	/>
+	<StartPose
+		x = "1.725"	y = "1.725"
+	/>
+	<PlanningTime
+		maxTime = "800"
+	/>
+	<FIRMNodes
+		minNodes = "400"
+	/>
+	<KidnappedState
+        x = 1.5 y = 19.5 
+    />
+</PlanningProblem>
+<GoalList>
+	<GoalPose x = "17.0" y = "17.75" />
+</GoalList>

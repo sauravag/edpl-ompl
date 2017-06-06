@@ -13,6 +13,7 @@ bsp-app-demo
 *.csv~
 *.txt~
 *.bkp
+.*.swp
 PlannerDataLog/
 report/
 VideoFrames/
