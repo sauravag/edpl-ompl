@@ -43,9 +43,9 @@
 	<MCParticles numparticles = "10" />
 	<RolloutSteps rolloutsteps = "1" />
 <!-- 	<NNRadius nnradius = "2.0" /> -->
-<!-- 	<NNRadius nnradius = "2.25" /> -->
+	<NNRadius nnradius = "2.25" />
 <!-- 	<NNRadius nnradius = "5.0" /> -->
-	<NNRadius nnradius = "10.0" />
+<!-- 	<NNRadius nnradius = "10.0" /> -->
 	<NumNN numnn = "10" />
 	<DPDiscountFactor discountfac = "1.0" />
 	<InfCostWeight infcostw = "1.0"/>
@@ -64,7 +64,16 @@
 	/><!--set dynobst to 1 to activate-->
 
 <!-- 	<RoadMap roadmapFile = "" useRoadMap = "0" /> -->
-	<RoadMap roadmapFile = "FIRMRoadMap-20170606T173738.xml" useRoadMap = "1" />
+
+<!-- minNodes="0" -->
+	<RoadMap roadmapFile = "FIRMRoadMap-20170607T144354.xml" useRoadMap = "1" />
+<!-- minNodes="300" -->
+<!-- 	<RoadMap roadmapFile = "FIRMRoadMap&#45;20170607T144759.xml" useRoadMap = "1" /> -->
+<!-- minNodes="400" -->
+<!-- 	<RoadMap roadmapFile = "FIRMRoadMap&#45;20170607T145420.xml" useRoadMap = "1" /> -->
+<!-- minNodes="500" -->
+<!-- 	<RoadMap roadmapFile = "FIRMRoadMap&#45;20170607T145732.xml" useRoadMap = "1" /> -->
+
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml" useRoadMap = "1" /> -->
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2.xml" useRoadMap = "1" /> -->
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2_thin.xml" useRoadMap = "1" /> -->
@@ -88,9 +97,11 @@
 		maxTime = "800"
 	/>
 
-<!-- 	<FIRMNodes minNodes = "0" /> -->
-	<FIRMNodes minNodes = "50" />
-<!-- 	<FIRMNodes minNodes = "300" /> -->
+	<FIRMNodes minNodes = "0" />
+<!-- 	<FIRMNodes minNodes = "50" /> -->
+<!-- 	<FIRMNodes minNodes = "265" /> -->
+<!-- 	<FIRMNodes minNodes = "400" /> -->
+<!-- 	<FIRMNodes minNodes = "500" /> -->
 
 	<KidnappedState
         x = 1.5 y = 19.5 
