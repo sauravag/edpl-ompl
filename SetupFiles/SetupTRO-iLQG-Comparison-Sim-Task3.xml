@@ -58,21 +58,18 @@
 </FIRM> 
 <PlanningProblem>
 	<!--  method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
+	<!--set dynobst to 1 to activate-->
+<!-- 	<PlannerMode -->
+<!-- 		method = "0" -->
+<!-- 		dynobst = "0"  -->
+<!-- 	/> -->
 	<PlannerMode
-		method = "0"
+		method = "1"
 		dynobst = "0" 
-	/><!--set dynobst to 1 to activate-->
+	/>
 
-<!-- 	<RoadMap roadmapFile = "" useRoadMap = "0" /> -->
-
-<!-- minNodes="0" -->
-	<RoadMap roadmapFile = "FIRMRoadMap-20170607T144354.xml" useRoadMap = "1" />
-<!-- minNodes="300" -->
-<!-- 	<RoadMap roadmapFile = "FIRMRoadMap&#45;20170607T144759.xml" useRoadMap = "1" /> -->
-<!-- minNodes="400" -->
-<!-- 	<RoadMap roadmapFile = "FIRMRoadMap&#45;20170607T145420.xml" useRoadMap = "1" /> -->
-<!-- minNodes="500" -->
-<!-- 	<RoadMap roadmapFile = "FIRMRoadMap&#45;20170607T145732.xml" useRoadMap = "1" /> -->
+	<RoadMap roadmapFile = "" useRoadMap = "0" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;20170612T095143.xml" useRoadMap = "1" /> -->
 
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml" useRoadMap = "1" /> -->
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2.xml" useRoadMap = "1" /> -->
@@ -97,11 +94,18 @@
 		maxTime = "800"
 	/>
 
-	<FIRMNodes minNodes = "0" />
-<!-- 	<FIRMNodes minNodes = "50" /> -->
-<!-- 	<FIRMNodes minNodes = "265" /> -->
-<!-- 	<FIRMNodes minNodes = "400" /> -->
-<!-- 	<FIRMNodes minNodes = "500" /> -->
+<!-- 	<FIRMNodes minNodes = "20" /> -->
+<!-- <!&#45;&#45; 	<FIRMNodes minNodes = "50" /> &#45;&#45;> -->
+<!-- <!&#45;&#45; 	<FIRMNodes minNodes = "265" /> &#45;&#45;> -->
+<!-- <!&#45;&#45; 	<FIRMNodes minNodes = "400" /> &#45;&#45;> -->
+<!-- <!&#45;&#45; 	<FIRMNodes minNodes = "500" /> &#45;&#45;> -->
+<!--  -->
+<!-- 	<FIRMNodes maxNodes = "20" /> -->
+
+	<FIRMNodes
+		minNodes = "300"
+		maxNodes = "300"
+	/>
 
 	<KidnappedState
         x = 1.5 y = 19.5 

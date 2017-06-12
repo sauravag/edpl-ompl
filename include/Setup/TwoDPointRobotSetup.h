@@ -207,6 +207,8 @@ public:
 
             planner_->as<FIRM>()->setMinFIRMNodes(minNodes_);
 
+            planner_->as<FIRM>()->setMaxFIRMNodes(maxNodes_);
+
             planner_->as<FIRM>()->setKidnappedState(kidnappedState_);
 
             planner_->as<FIRM>()->loadParametersFromFile(pathToSetupFile_.c_str());
@@ -564,11 +566,13 @@ protected:
         itemElement = child->ToElement();
         assert( itemElement );
 
-        int nodeNum = 0;
+        int minNodeNum = 0;
+        itemElement->QueryIntAttribute("minNodes", &minNodeNum) ;
+        minNodes_ = minNodeNum;
 
-        itemElement->QueryIntAttribute("minNodes", &nodeNum) ;
-
-        minNodes_ = nodeNum;
+        int maxNodeNum = 0;
+        itemElement->QueryIntAttribute("maxNodes", &maxNodeNum) ;
+        maxNodes_ = maxNodeNum;
 
         // Read Kidnapped State
         // Read the Goal Pose
@@ -602,6 +606,8 @@ protected:
         std::cout<<"Planning Time: "<<planningTime_<<" seconds"<<std::endl;
 
         std::cout<<"Min Nodes: "<<minNodes_<<std::endl;
+
+        std::cout<<"Max Nodes: "<<maxNodes_<<std::endl;
 
         std::cout<<"Kidnapped Pose x:"<<kX<<" y:"<<kY<<std::endl;
 
@@ -640,6 +646,7 @@ private:
     double planningTime_;
 
     unsigned int minNodes_;
+    unsigned int maxNodes_;
 
     bool setup_;
 

@@ -90,8 +90,9 @@ QSize GLWidget::sizeHint() const
 
 void GLWidget::resetCam()
 {
-    m_camPos[0] = 7.5;
+//     m_camPos[0] = 7.5;
 //     m_camPos[1] = 7.5;
+    m_camPos[0] = 10.0;
     m_camPos[1] = 10.0;
     m_camPos[2] = -250.0;
     m_camAt[0] = 0.0;

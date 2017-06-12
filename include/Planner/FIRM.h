@@ -193,7 +193,7 @@ public:
 
     /** \brief While the termination condition allows, this function will construct the roadmap (using growRoadmap() and expandRoadmap(),
         maintaining a 2:1 ratio for growing/expansion of roadmap) */
-    virtual void constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
+    virtual void constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::PathPtr &solution);
 
     /** \brief If the user desires, the roadmap can be
         improved for the given time (seconds). The solve()
@@ -274,6 +274,12 @@ public:
     void setMinFIRMNodes(const unsigned int numNodes)
     {
         minFIRMNodes_ = numNodes ;
+    }
+
+    /** \brief Set the maximum number of FIRM nodes */
+    void setMaxFIRMNodes(const unsigned int numNodes)
+    {
+        maxFIRMNodes_ = numNodes ;
     }
 
     /** \brief Saves the roadmap to an XML */
@@ -474,6 +480,9 @@ protected:
 
     /** \brief The minimum number of nodes that should be sampled. */
     unsigned int minFIRMNodes_;
+
+    /** \brief The maximum number of nodes that should be sampled. */
+    unsigned int maxFIRMNodes_;
 
     NBM3P *policyGenerator_;
 

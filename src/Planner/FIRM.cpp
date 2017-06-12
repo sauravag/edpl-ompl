@@ -137,6 +137,7 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
     specs_.optimizingPaths = true;
 
     minFIRMNodes_ = 25;
+    maxFIRMNodes_ = 100;
 
     currentTimeStep_ = 0;
 
@@ -411,6 +412,13 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                                 ls.getM() * ls.getR() * trans(ls.getM()), S );
 
                         //workState->as<FIRM::StateType>()->setCovariance(S);
+
+                        // If the number of nodes is greater than or equal to max required by setup, then stop building roadmap and try to find a solution
+                        if(boost::num_vertices(g_) >= maxFIRMNodes_)
+                        {
+                            break;
+                        }
+
                     }
                     catch(int e)
                     {
@@ -418,6 +426,13 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                     }
 
                 }
+
+                // If the number of nodes is greater than or equal to max required by setup, then stop building roadmap and try to find a solution
+                if(boost::num_vertices(g_) >= maxFIRMNodes_)
+                {
+                    break;
+                }
+
                 attempts++;
             } while (attempts < ompl::magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found && !stateStable);
         }
@@ -521,6 +536,13 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         return ompl::base::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
     }
 
+    // If the number of nodes in the loaded roadmap is greater than max required by setup, abort the process
+    if(loadedRoadmapFromFile_ && boost::num_vertices(g_) > maxFIRMNodes_)
+    {
+        OMPL_ERROR("%s: The number of nodes in the loaded roadmap is greater than maxNodes! Increase the value of maxNodes or set useRoadMap to 0...", getName().c_str());
+        return ompl::base::PlannerStatus::ABORT;
+    }
+
     OMPL_INFORM("%s: Adding start state to roadmap.", getName().c_str());
 
     // Add the valid start states as milestones
@@ -591,9 +613,16 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         ompl::base::plannerOrTerminationCondition(ptc, ompl::base::PlannerTerminationCondition(boost::bind(&FIRM::addedNewSolution, this)));
 
     // If no roadmap was loaded or the number of loaded is less than min required by setup, then build roadmap
+    // FIXME a roadmap with nodes more than minNodes does not guantee the start and goal states to be in a connected component (there might be no solution yet)!
     if(!loadedRoadmapFromFile_ || boost::num_vertices(g_) < minFIRMNodes_)
     {
-        constructRoadmap(ptcOrSolutionFound);
+        OMPL_INFORM("%s: No roadmap was loaded or the number of nodes in the roadmap is less than minNodes! More samples will be added to the roadmap...", getName().c_str());
+        constructRoadmap(ptcOrSolutionFound, boost::ref(sol));
+
+        if (!addedSolution_)
+        {
+            OMPL_ERROR("FIRM: No Solution was found within this roadmap. Try to increase the value of maxNodes...");
+        }
     }
 
     if(doSavePlannerData_)
@@ -617,9 +646,9 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     return sol ? (addedNewSolution() ? ompl::base::PlannerStatus::EXACT_SOLUTION : ompl::base::PlannerStatus::APPROXIMATE_SOLUTION) : ompl::base::PlannerStatus::TIMEOUT;
 }
 
-void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
+void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
+                                            ompl::base::PathPtr &solution)
 {
-
     std::vector<ompl::base::State*> xstates(ompl::magic::MAX_RANDOM_BOUNCE_STEPS);
     si_->allocStates(xstates);
     bool grow = true;
@@ -629,11 +658,24 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
         // In FIRM, we maintain a 2:1 ratio for growth to expansion
         if(grow)
         {
-            growRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(2*ompl::magic::ROADMAP_BUILD_TIME)), xstates[0]);
+//             growRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(2*ompl::magic::ROADMAP_BUILD_TIME)), xstates[0]);
+            growRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(0.1)), xstates[0]);     // HACK arbitrarily selected short time step
         }
         else
         {
-            expandRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(ompl::magic::ROADMAP_BUILD_TIME)), xstates);
+            // REVIEW is this helpful?
+//             expandRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(ompl::magic::ROADMAP_BUILD_TIME)), xstates);
+        }
+
+        // If the number of nodes is greater than or equal to max required by setup, then stop building roadmap and try to find a solution
+        if(boost::num_vertices(g_) >= maxFIRMNodes_)
+        {
+            OMPL_INFORM("FIRM: Now have enough nodes (>= %u).", maxFIRMNodes_);
+            OMPL_INFORM("FIRM: Checking for Solution.");
+
+            addedSolution_ = existsPolicy(startM_, goalM_, solution);
+
+            break;
         }
 
         grow = !grow;
