@@ -189,7 +189,7 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
 FIRM::~FIRM(void)
 {
-    if(doSaveLogs_)
+    if(doSaveLogs_ && addedSolution_)
         Visualizer::printRobotPathToFile(logFilePath_);
 
     freeMemory();
@@ -607,7 +607,8 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         simpleSampler_ = si_->allocStateSampler();
 
     ompl::base::PathPtr sol;
-    boost::thread slnThread(boost::bind(&FIRM::checkForSolution, this, ptc, boost::ref(sol)));
+    // NOTE disabled this to prevent duplicate call of existsPolicy() initiated by constructRoadmap() after hitting maxNodes
+//     boost::thread slnThread(boost::bind(&FIRM::checkForSolution, this, ptc, boost::ref(sol)));
 
     ompl::base::PlannerTerminationCondition ptcOrSolutionFound =
         ompl::base::plannerOrTerminationCondition(ptc, ompl::base::PlannerTerminationCondition(boost::bind(&FIRM::addedNewSolution, this)));
@@ -630,7 +631,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         this->savePlannerData();
     }
 
-    slnThread.join();
+//     slnThread.join();
 
     OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_) - nrStartStates);
 
@@ -672,6 +673,9 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
         {
             OMPL_INFORM("FIRM: Now have enough nodes (>= %u).", maxFIRMNodes_);
             OMPL_INFORM("FIRM: Checking for Solution.");
+
+            // HACK to make a beep sound (linux only)
+            system("sh -c \"echo '\a'> $(tty)\" 2>/dev/null");
 
             addedSolution_ = existsPolicy(startM_, goalM_, solution);
 
@@ -2132,7 +2136,8 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
 
     int saveVideo = 0;
     itemElement->QueryIntAttribute("save", &saveVideo);
-    if(saveVideo == 1) doSaveLogs_ = true;
+//     if(saveVideo == 1) doSaveLogs_ = true;
+    if(saveVideo == 1) doSaveVideo_ = true;     // TODO something is not working with saving videos
 
     // Logging
     child = node->FirstChild("DataLog");

@@ -14,7 +14,7 @@ bsp-app-demo
 *.txt~
 *.bkp
 .*.swp
-PlannerDataLog/
+DataLog/
 report/
 VideoFrames/
 Videos/

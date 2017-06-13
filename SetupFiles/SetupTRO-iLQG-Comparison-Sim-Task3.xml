@@ -36,9 +36,10 @@
 	  />
 </MotionModels>
 <FIRM>
-	<Video save = "1" />
-<!-- 	<DataLog save = "1" folder = "../TROSIMS/Task3/S1/" /> -->
-	<DataLog save = "0"/>
+	<Video save = "0" />
+<!-- 	<DataLog save = "0"/> -->
+<!-- 	<DataLog save = "1" folder = "./DataLog/" /> -->
+	<DataLog save = "1" folder = "./" />
 	<Roadmap save = "1" />
 	<MCParticles numparticles = "10" />
 	<RolloutSteps rolloutsteps = "1" />
@@ -68,8 +69,8 @@
 		dynobst = "0" 
 	/>
 
-	<RoadMap roadmapFile = "" useRoadMap = "0" />
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;20170612T095143.xml" useRoadMap = "1" /> -->
+<!-- 	<RoadMap roadmapFile = "" useRoadMap = "0" /> -->
+    <RoadMap roadmapFile = "./FIRMRoadMap-Oscillation.xml" useRoadMap = "1" />
 
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml" useRoadMap = "1" /> -->
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2.xml" useRoadMap = "1" /> -->
@@ -79,9 +80,9 @@
 
 <!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole0x0.obj" /> -->
 <!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole1x1.obj" /> -->
-<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole3x3.obj" /> -->
+	<Environment environmentFile = "./Models/iLQG-TRO-Task1-Pole3x3.obj" />
 <!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole5x5.obj" /> -->
-	<Environment environmentFile = "./Models/iLQG-TRO-Task1-Pole9x9.obj" />
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9.obj" /> -->
 <!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9x2.obj" /> -->
 
 	<Robot robotFile = "./Models/iRobot_thin.obj" />
@@ -103,8 +104,8 @@
 <!-- 	<FIRMNodes maxNodes = "20" /> -->
 
 	<FIRMNodes
-		minNodes = "300"
-		maxNodes = "300"
+		minNodes = "220"
+		maxNodes = "220"
 	/>
 
 	<KidnappedState
