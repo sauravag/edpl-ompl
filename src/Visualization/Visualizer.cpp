@@ -134,7 +134,8 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
     {
         case TrueState:
             glColor3d(0,0,1); // blue
-            outerDiskRadius = 0.45;
+            //outerDiskRadius = 0.45;
+            outerDiskRadius = 0.375;    // iRobot_thin
             z = -0.1;
             break;
 
@@ -217,7 +218,8 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
 
         bool cholSucceeded = chol(cholDecomp, covariance.submat(0,0,1,1));
 
-        glLineWidth(2.0);
+        glLineWidth(4.0);
+        glColor3d(0,1,0); // green
 
         // std::ofstream outfile; // remove
         // outfile.open("RobotCovarianceEllipse.csv",std::ios::app);//remove
@@ -310,7 +312,7 @@ void Visualizer::refresh()
             if(chosenRolloutConnection_)
             {
                 glColor3d(1.0 , 0.0 , 0.0);
-                glLineWidth(3.0);
+                glLineWidth(4.0);
                     drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
                 glLineWidth(1.0);
             }
@@ -440,7 +442,7 @@ void Visualizer::drawRolloutConnections()
     for(int i=0; i<rolloutConnections_.size();i++)
     {
         glColor3d(1.0,0.0,0);
-        glLineWidth(3.0);
+        glLineWidth(2.0);
         drawEdge(rolloutConnections_[i].first,rolloutConnections_[i].second);
         glLineWidth(1.0);
 

@@ -43,6 +43,7 @@
 	<Roadmap save = "1" />
 	<MCParticles numparticles = "10" />
 	<RolloutSteps rolloutsteps = "1" />
+<!-- 	<RolloutSteps rolloutsteps = "3" /> -->
 <!-- 	<NNRadius nnradius = "2.0" /> -->
 	<NNRadius nnradius = "2.25" />
 <!-- 	<NNRadius nnradius = "5.0" /> -->
@@ -70,7 +71,8 @@
 	/>
 
 <!-- 	<RoadMap roadmapFile = "" useRoadMap = "0" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-Oscillation.xml" useRoadMap = "1" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Oscillation.xml" useRoadMap = "1" /> -->
+    <RoadMap roadmapFile = "./FIRMRoadMap-Oscillation200.xml" useRoadMap = "1" />
 
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml" useRoadMap = "1" /> -->
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2.xml" useRoadMap = "1" /> -->
@@ -103,9 +105,13 @@
 <!--  -->
 <!-- 	<FIRMNodes maxNodes = "20" /> -->
 
+<!-- 	<FIRMNodes -->
+<!-- 		minNodes = "210" -->
+<!-- 		maxNodes = "210" -->
+<!-- 	/> -->
 	<FIRMNodes
-		minNodes = "220"
-		maxNodes = "220"
+		minNodes = "210"
+		maxNodes = "310"
 	/>
 
 	<KidnappedState

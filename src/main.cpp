@@ -86,6 +86,12 @@ void plan(const std::string &setupFilePath)
     {
         if(mySetup->solve())
         {
+
+#ifdef __linux__
+            // HACK to make a beep sound (linux only)
+            system("sh -c \"echo '\a'> $(tty)\" 2>/dev/null");
+#endif
+
             mySetup->Run();
 
             OMPL_INFORM("Plan Executed.");

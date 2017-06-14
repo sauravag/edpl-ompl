@@ -607,7 +607,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         simpleSampler_ = si_->allocStateSampler();
 
     ompl::base::PathPtr sol;
-    // NOTE disabled this to prevent duplicate call of existsPolicy() initiated by constructRoadmap() after hitting maxNodes
+    // NOTE disabled periodic solution checking
 //     boost::thread slnThread(boost::bind(&FIRM::checkForSolution, this, ptc, boost::ref(sol)));
 
     ompl::base::PlannerTerminationCondition ptcOrSolutionFound =
@@ -618,12 +618,15 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     if(!loadedRoadmapFromFile_ || boost::num_vertices(g_) < minFIRMNodes_)
     {
         OMPL_INFORM("%s: No roadmap was loaded or the number of nodes in the roadmap is less than minNodes! More samples will be added to the roadmap...", getName().c_str());
-        constructRoadmap(ptcOrSolutionFound, boost::ref(sol));
+        constructRoadmap(ptcOrSolutionFound);
+    }
 
-        if (!addedSolution_)
-        {
-            OMPL_ERROR("FIRM: No Solution was found within this roadmap. Try to increase the value of maxNodes...");
-        }
+    // NOTE Now manually check for solution
+    OMPL_INFORM("FIRM: Checking for Solution.");
+    addedSolution_ = existsPolicy(startM_, goalM_, boost::ref(sol));
+    if (!addedSolution_)
+    {
+        OMPL_ERROR("FIRM: No Solution was found within this roadmap. Try to increase the value of maxNodes...");
     }
 
     if(doSavePlannerData_)
@@ -631,6 +634,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         this->savePlannerData();
     }
 
+    // NOTE disabled periodic solution checking
 //     slnThread.join();
 
     OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_) - nrStartStates);
@@ -647,8 +651,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     return sol ? (addedNewSolution() ? ompl::base::PlannerStatus::EXACT_SOLUTION : ompl::base::PlannerStatus::APPROXIMATE_SOLUTION) : ompl::base::PlannerStatus::TIMEOUT;
 }
 
-void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
-                                            ompl::base::PathPtr &solution)
+void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
 {
     std::vector<ompl::base::State*> xstates(ompl::magic::MAX_RANDOM_BOUNCE_STEPS);
     si_->allocStates(xstates);
@@ -672,13 +675,6 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
         if(boost::num_vertices(g_) >= maxFIRMNodes_)
         {
             OMPL_INFORM("FIRM: Now have enough nodes (>= %u).", maxFIRMNodes_);
-            OMPL_INFORM("FIRM: Checking for Solution.");
-
-            // HACK to make a beep sound (linux only)
-            system("sh -c \"echo '\a'> $(tty)\" 2>/dev/null");
-
-            addedSolution_ = existsPolicy(startM_, goalM_, solution);
-
             break;
         }
 
@@ -1662,7 +1658,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
         else
         {
-	    
+
             siF_->doVelocityLogging(false);
 
             Visualizer::doSaveVideo(false);
@@ -1695,7 +1691,7 @@ void FIRM::executeFeedbackWithRollout(void)
                    <<numNN<<","<<numMCParticles_<<","<<timeToDoRollout / (1000*numNN)<<","<<timeToDoRollout/1000<<std::endl;
             }
 
-            std::cout << "Time to execute rollout : "<<timeToDoRollout << " milli seconds."<<std::endl;
+            //std::cout << "Time to execute rollout : "<<timeToDoRollout << " milli seconds."<<std::endl;
 
             showRolloutConnections(tempVertex);
 
@@ -1841,6 +1837,9 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
     double minCost = std::numeric_limits<double>::max();
     Edge edgeToTake;
 
+    // for debug
+    FIRM::Vertex minCostVertCurrent, minCostVertNext, minCostVertNextNext;
+
     // Iterate over the out edges
     foreach(Edge e, boost::out_edges(currentVertex, g_))
     {
@@ -1887,15 +1886,25 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
         // the cost of taking the edge
         double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
 
+
+        // for debug
+        std::cout << "COST[" << currentVertex << "->" << targetNode << "->" << targetOfNextFIRMEdge << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
+
+
         if(edgeCostToGo < minCost)
         {
             minCost  = edgeCostToGo;
             edgeToTake = e;
 
+            // for debug
+            minCostVertCurrent = currentVertex;
+            minCostVertNext = targetNode;
+            minCostVertNextNext = targetOfNextFIRMEdge;
         }
-
-
     }
+
+    // for debug
+    std::cout << "minC[" << minCostVertCurrent << "->" << minCostVertNext << "->" << minCostVertNextNext << "->G] " << minCost << std::endl;
 
     return edgeToTake;
 }

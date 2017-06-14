@@ -193,7 +193,7 @@ public:
 
     /** \brief While the termination condition allows, this function will construct the roadmap (using growRoadmap() and expandRoadmap(),
         maintaining a 2:1 ratio for growing/expansion of roadmap) */
-    virtual void constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc, ompl::base::PathPtr &solution);
+    virtual void constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc);
 
     /** \brief If the user desires, the roadmap can be
         improved for the given time (seconds). The solve()
