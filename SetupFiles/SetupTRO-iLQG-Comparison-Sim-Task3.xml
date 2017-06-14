@@ -27,10 +27,17 @@
 	  <!--omega is in radians, wind_noise_ang is in degrees -->
 	  <!--wind_noise_pos="1.000"
 		  wind_noise_ang="7.0"-->
+<!-- 	<TwoDPointMotionModel  -->
+<!-- 		sigmaV="0.0" -->
+<!-- 		etaV="0.0" -->
+<!-- 		wind_noise_pos="0.1"  -->
+<!-- 		max_linear_velocity= "4.0" -->
+<!-- 		dt= "0.1" -->
+<!-- 	  /> -->
 	<TwoDPointMotionModel 
 		sigmaV="0.0"
 		etaV="0.0"
-		wind_noise_pos="0.1" 
+		wind_noise_pos="0.0" 
 		max_linear_velocity= "4.0"
 		dt= "0.1"
 	  />

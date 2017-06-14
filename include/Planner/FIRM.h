@@ -152,7 +152,8 @@ public:
     /** @brief A function returning the milestones that should be
      *         attempted to connect to
      */
-    typedef std::function<std::vector<Vertex>&(const Vertex)> ConnectionStrategy;
+//     typedef std::function<std::vector<Vertex>&(const Vertex)> ConnectionStrategy;
+    typedef std::function<std::vector<Vertex>&(const Vertex, double r)> ConnectionStrategy;
 
     
     typedef Controller<SeparatedControllerType, FilterType> EdgeControllerType;

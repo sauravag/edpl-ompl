@@ -56,12 +56,24 @@ public:
         nn_ = nn;
     }
 
+    /** \brief Set the radius for nearest neighbors datastructure */
+    void setNearestNeighborRadius(const double r)
+    {
+        radius_ = r;
+    }
+
     /** \brief Given a milestone \e m, find the number of nearest
         neighbors connection attempts that should be made from it,
         according to the connection strategy */
-    std::vector<Milestone>& operator()(const Milestone& m)
+//     std::vector<Milestone>& operator()(const Milestone& m)
+//     {
+//         nn_->nearestR(m, radius_, neighbors_);
+//         return neighbors_;
+//     }
+    std::vector<Milestone>& operator()(const Milestone& m, double r)
     {
-        nn_->nearestR(m, radius_, neighbors_);
+//         nn_->nearestR(m, radius_, neighbors_);
+        nn_->nearestR(m, r, neighbors_);
         return neighbors_;
     }
 

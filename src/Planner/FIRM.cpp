@@ -714,8 +714,23 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     nn_->add(m);
 
+
+    // NOTE use longer nearest neighbor to avoid oscillating behavior of rollout policy by allowing connection to farther FIRM nodes
+    // WARN only closer numNearestNeighbors_ will be used, so a farther FIRM node may still not be connected...
+//     connectionStrategy_.setNearestNeighborRadius(1.5*NNRadius_);    // HACK hard-coded factor
+//     connectionStrategy_.radius_ = 1.5 * NNRadius_;
+
+
     // Which milestones will we attempt to connect to?
-    std::vector<Vertex> neighbors = connectionStrategy_(m);
+//     std::vector<Vertex> neighbors = connectionStrategy_(m);
+    std::vector<Vertex> neighbors;
+    if(addReverseEdge)
+        neighbors = connectionStrategy_(m, NNRadius_);
+    else
+//         neighbors = connectionStrategy_(m, 1.5*NNRadius_);   // isValidXXX is not working for this
+        neighbors = connectionStrategy_(m, 1.2*NNRadius_);
+//         neighbors = connectionStrategy_(m, 1.1*NNRadius_);
+//         neighbors = connectionStrategy_(m, 1.0*NNRadius_);
 
     OMPL_INFORM("Adding State, Number of Nearest Neighbors = %u", neighbors.size());
 
@@ -1582,6 +1597,9 @@ void FIRM::executeFeedbackWithRollout(void)
 
     Edge e = feedback_[currentVertex];
 
+    // for debug
+    Vertex nextFIRMVertex = boost::target(e, g_);
+
     Vertex tempVertex = currentVertex;
 
     OMPL_INFORM("Goal State is: \n");
@@ -1654,6 +1672,8 @@ void FIRM::executeFeedbackWithRollout(void)
 
             e = feedback_[tempVertex];
 
+            // for debug
+            nextFIRMVertex = boost::target(e, g_);
         }
 
         else
@@ -1671,6 +1691,33 @@ void FIRM::executeFeedbackWithRollout(void)
             siF_->setTrueState(tState);
 
             e = generateRolloutPolicy(tempVertex, goal);
+
+//             // for debug
+//             // FIXME nextFIRMVertex is not updated properly
+//             Vertex targetOfNextFIRMEdge = boost::target(feedback_[nextFIRMVertex], g_);  
+//             double transitionProbability = 1.0;
+//             double nextNodeCostToGo = costToGo_[nextFIRMVertex];
+//             bool forwardEdgeAdded = true;
+//             bool alreadyConnected = boost::edge(tempVertex, nextFIRMVertex, g_).second;
+//             if(!alreadyConnected)
+//                 addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
+//             if(alreadyConnected || forwardEdgeAdded)
+//             {
+//                 Edge tempEdge = boost::edge(tempVertex, nextFIRMVertex, g_).first;
+//                 FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, tempEdge);
+//                 if(!alreadyConnected)
+//                 {
+//                     maxEdgeID_--;
+//                     edgeControllers_.erase(tempEdge);
+//                     boost::remove_edge(tempVertex, nextFIRMVertex, g_);
+//                 }
+//                 double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
+//                 std::cout << "nexC[" << tempVertex << "->" << nextFIRMVertex << "->" << targetOfNextFIRMEdge << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
+//             }
+//             if(!alreadyConnected)
+//                 OMPL_WARN("[%d] was not connected to [%d]!", tempVertex, nextFIRMVertex); 
+//             if(!forwardEdgeAdded)
+//                 OMPL_WARN("[%d] could not be connected to [%d]!", tempVertex, nextFIRMVertex); 
 
             // end profiling time to compute rollout
             auto end_time = std::chrono::high_resolution_clock::now();
@@ -1751,7 +1798,8 @@ void FIRM::showRolloutConnections(const FIRM::Vertex v)
 {
     Visualizer::clearRolloutConnections();
 
-    const std::vector<Vertex>& neighbors = connectionStrategy_(v);
+//     const std::vector<Vertex>& neighbors = connectionStrategy_(v);
+    const std::vector<Vertex>& neighbors = connectionStrategy_(v, NNRadius_);
 
     foreach (Vertex n, neighbors)
     {
