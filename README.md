@@ -2,8 +2,9 @@
 Belief Space Planning Using Open Motion Planning Library
 
 Authors:
-Saurav Agarwal (sauravag@tamu.edu)
-Ali-akbar Agha-mohammadi (aliagha@mit.edu)
+
+1. Saurav Agarwal (sauravag@tamu.edu)
+2. Ali-akbar Agha-mohammadi (aliagha@mit.edu)
 
 Estimation, Decision and Planning Lab
 Texas A&M University
@@ -56,7 +57,9 @@ Build:
 3. $cmake ..
 4. $make -j4
 
-Run: In project directory do $./bsp-app-demo
+Run: 
+
+In project directory do $./bsp-app-demo "PATH TO XML SETUP FILE"
 
 ----------------------------------------
 FAQs, Tips, How To etc. 
