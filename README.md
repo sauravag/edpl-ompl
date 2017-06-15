@@ -18,9 +18,9 @@ This application is an implementation of Feedback Information Road Maps (FIRM) a
 ---------------------------------------
 Tested Configuration
 ---------------------------------------
-Ubuntu 16.04.2
-Boost: 1.58
-OMPL 1.2.1
+1. Ubuntu 16.04.2
+2. Boost: 1.58
+3. OMPL 1.2.1
 
 ----------------------------------------
 Compiling & Running
