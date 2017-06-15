@@ -206,9 +206,12 @@ void FIRM::setup(void)
     }
     if (!connectionStrategy_)
     {
+        connectionStrategy_ = VStrategy<Vertex>(NNRadius_, nn_);
+
+        // NOTE if you want to switch to other strategies, you should change the definition of ConnectionStrategy in FIRM.h
         //connectionStrategy_ = ompl::geometric::KStarStrategy<Vertex>(boost::bind(&FIRM::milestoneCount, this), nn_, si_->getStateDimension());
-        connectionStrategy_ = FStrategy<Vertex>(NNRadius_, nn_);
         //connectionStrategy_ = ompl::geometric::KBoundedStrategy<Vertex>(numNearestNeighbors_, NNRadius_, nn_);
+        //connectionStrategy_ = FStrategy<Vertex>(NNRadius_, nn_);
     }
 
 }
@@ -712,22 +715,18 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     // Initialize to its own (dis)connected component.
     disjointSets_.make_set(m);
 
-    nn_->add(m);
-
-
-    // NOTE use longer nearest neighbor to avoid oscillating behavior of rollout policy by allowing connection to farther FIRM nodes
-    // WARN only closer numNearestNeighbors_ will be used, so a farther FIRM node may still not be connected...
-//     connectionStrategy_.setNearestNeighborRadius(1.5*NNRadius_);    // HACK hard-coded factor
-//     connectionStrategy_.radius_ = 1.5 * NNRadius_;
+    nn_->add(m);    // REVIEW no need to remove the temporary node after generating a rollout policy?
 
 
     // Which milestones will we attempt to connect to?
-//     std::vector<Vertex> neighbors = connectionStrategy_(m);
+    //std::vector<Vertex> neighbors = connectionStrategy_(m);
+
+    // NOTE use longer nearest neighbor to avoid oscillating behavior of rollout policy by allowing connection to farther FIRM nodes
     std::vector<Vertex> neighbors;
     if(addReverseEdge)
         neighbors = connectionStrategy_(m, NNRadius_);
     else
-//         neighbors = connectionStrategy_(m, 1.5*NNRadius_);   // isValidXXX is not working for this
+//         neighbors = connectionStrategy_(m, 1.5*NNRadius_);   // si_->checkMotion() is not working for this
         neighbors = connectionStrategy_(m, 1.2*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.1*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.0*NNRadius_);
@@ -736,6 +735,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     // If reverse edge not required, that means this is a virtual state added in rollout
     // We will sort by cost and use N lowest cost to go neighbors
+    // WARN only closer numNearestNeighbors_ will be used, so a farther FIRM node may still not be connected...
     if(!addReverseEdge && !neighbors.empty())
     {
         std::vector<std::pair<double,Vertex>> tempItems;
@@ -1799,7 +1799,7 @@ void FIRM::showRolloutConnections(const FIRM::Vertex v)
     Visualizer::clearRolloutConnections();
 
 //     const std::vector<Vertex>& neighbors = connectionStrategy_(v);
-    const std::vector<Vertex>& neighbors = connectionStrategy_(v, NNRadius_);
+    const std::vector<Vertex>& neighbors = connectionStrategy_(v, NNRadius_);     // NOTE to allow a variable (bounding) radius to neighbors
 
     foreach (Vertex n, neighbors)
     {

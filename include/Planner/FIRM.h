@@ -59,6 +59,7 @@
 #include "Filters/LinearizedKF.h"
 #include "Path/FeedbackPath.h"
 #include "ConnectionStrategy/FStrategy.h"
+#include "ConnectionStrategy/VStrategy.h"
 #include "NBM3P.h"
 #include "Spaces/R2BeliefSpace.h"
 #include "Spaces/SE2BeliefSpace.h"
@@ -153,9 +154,8 @@ public:
      *         attempted to connect to
      */
 //     typedef std::function<std::vector<Vertex>&(const Vertex)> ConnectionStrategy;
-    typedef std::function<std::vector<Vertex>&(const Vertex, double r)> ConnectionStrategy;
+    typedef std::function<std::vector<Vertex>&(const Vertex, double radius)> ConnectionStrategy;     // NOTE to allow a variable (bounding) radius to neighbors
 
-    
     typedef Controller<SeparatedControllerType, FilterType> EdgeControllerType;
     
     typedef Controller<NodeSeparatedControllerType, LinearizedKF> NodeControllerType;

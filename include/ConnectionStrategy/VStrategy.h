@@ -32,21 +32,21 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef FStrategy_H_
-#define FStrategy_H_
+#ifndef VStrategy_H_
+#define VStrategy_H_
 
 
 template <class Milestone>
-class FStrategy
+class VStrategy
 {
 public:
 
     /** \brief Constructor takes the maximum number of nearest neighbors to return (\e k) and the
         nearest neighbors datastruture to use (\e nn) */
-    FStrategy(double r, const std::shared_ptr< ompl::NearestNeighbors<Milestone> > &nn) :
+    VStrategy(double r, const std::shared_ptr< ompl::NearestNeighbors<Milestone> > &nn) :
         radius_(r), nn_(nn){}
 
-    virtual ~FStrategy(void)
+    virtual ~VStrategy(void)
     {
     }
 
@@ -56,25 +56,32 @@ public:
         nn_ = nn;
     }
 
+    /** \brief Set the radius for nearest neighbors datastructure */
+    void setNearestNeighborRadius(const double r)
+    {
+        radius_ = r;
+    }
+
     /** \brief Given a milestone \e m, find the number of nearest
         neighbors connection attempts that should be made from it,
         according to the connection strategy */
-    std::vector<Milestone>& operator()(const Milestone& m)
+    std::vector<Milestone>& operator()(const Milestone& m, double r)
     {
-        nn_->nearestR(m, radius_, neighbors_);
+        //nn_->nearestR(m, radius_, neighbors_);
+        nn_->nearestR(m, r, neighbors_);
         return neighbors_;
     }
 
 protected:
 
     /** \brief Maximum distance to nearest neighbors to attempt to connect new milestones to */
-    double                                     radius_;
+    double radius_;
 
     /** \brief Nearest neighbors data structure */
     std::shared_ptr< ompl::NearestNeighbors<Milestone> > nn_;
 
     /** \brief Scratch space for storing k-nearest neighbors */
-    std::vector<Milestone>                           neighbors_;
+    std::vector<Milestone> neighbors_;
 };
 
 #endif
