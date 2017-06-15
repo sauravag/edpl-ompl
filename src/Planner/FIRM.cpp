@@ -727,6 +727,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
         neighbors = connectionStrategy_(m, NNRadius_);
     else
 //         neighbors = connectionStrategy_(m, 1.5*NNRadius_);   // si_->checkMotion() is not working for this
+//         neighbors = connectionStrategy_(m, 1.3*NNRadius_);
         neighbors = connectionStrategy_(m, 1.2*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.1*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.0*NNRadius_);
@@ -1084,6 +1085,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
     {
         nIter++;
 
+        // REVIEW this seems to be pretty inefficient... switch to Dijkstra search?
         foreach(Vertex v, boost::vertices(g_))
         {
 
@@ -1109,6 +1111,8 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
         costToGo_.swap(newCostToGo);   // Equivalent to costToGo_ = newCostToGo
 
     }
+    if (nIter >= maxDPIterations_)
+        OMPL_ERROR("Hit the maximum number of iterations before convergence! DP solution may not be valid...");
 
     auto end_time = std::chrono::high_resolution_clock::now();
 
@@ -1855,6 +1859,9 @@ void FIRM::sendMostLikelyPathToViz(const FIRM::Vertex start, const FIRM::Vertex 
 
 bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVertex)
 {
+    // for debug
+    std::cout << "[PATH] " << currentVertex;
+
     // cycle through feedback, if feedback edge is invalid, return false
     while(currentVertex != goalVertex)
     {
@@ -1870,7 +1877,13 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
            
         currentVertex =  target;
 
+        // for debug
+        std::cout << "->" << target;
+
     }
+
+    // for debug
+    std::cout << std::endl;
 
     return true;
 

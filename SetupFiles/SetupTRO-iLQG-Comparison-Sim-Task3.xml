@@ -63,6 +63,7 @@
 	<ObstCostToGo obsctg = "20000.0" />
 	<InitCostToGo initctg = "2.0" />
 	<MaxDPIter dpiter = "20000" />
+<!-- 	<MaxDPIter dpiter = "200000" />	<!&#45;&#45; DP still does not converge for 220 nodes &#45;&#45;> -->
 	<DPConvergenceThreshold dpconvthresh = "0.001" />
 </FIRM> 
 <PlanningProblem>
