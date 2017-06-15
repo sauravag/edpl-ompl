@@ -74,7 +74,8 @@ public:
         // setting the mean and norm weights (used in reachability check)
         StateType::covNormWeight_  =  1.0;
         StateType::meanNormWeight_ =  2.0;
-        StateType::reachDist_ =  0.009;
+//         StateType::reachDist_ =  0.009;
+        StateType::reachDist_ =  0.015;     // inflated for a specific run  // TODO set this value from a setup file
 
         // set the state component norm weights
         arma::colvec normWeights(3);

@@ -1293,6 +1293,9 @@ void FIRM::executeFeedback(void)
 
         OMPL_INFORM("FIRM: Moving from Vertex %u to %u", currentVertex, boost::target(e, g_));
 
+        // for debug
+        std::cout << "PATH[" << currentVertex;
+
         // Check if feedback policy is valid 
         while(!isFeedbackPolicyValid(currentVertex, goal))
         {
@@ -1716,7 +1719,7 @@ void FIRM::executeFeedbackWithRollout(void)
 //                     boost::remove_edge(tempVertex, nextFIRMVertex, g_);
 //                 }
 //                 double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
-//                 std::cout << "nexC[" << tempVertex << "->" << nextFIRMVertex << "->" << targetOfNextFIRMEdge << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
+//                 std::cout << "nexC[" << tempVertex << "->" << nextFIRMVertex << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
 //             }
 //             if(!alreadyConnected)
 //                 OMPL_WARN("[%d] was not connected to [%d]!", tempVertex, nextFIRMVertex); 
@@ -1860,7 +1863,7 @@ void FIRM::sendMostLikelyPathToViz(const FIRM::Vertex start, const FIRM::Vertex 
 bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVertex)
 {
     // for debug
-    std::cout << "[PATH] " << currentVertex;
+    std::cout << "->" << currentVertex;
 
     // cycle through feedback, if feedback edge is invalid, return false
     while(currentVertex != goalVertex)
@@ -1883,7 +1886,7 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
     }
 
     // for debug
-    std::cout << std::endl;
+    std::cout << "]" << std::endl;
 
     return true;
 
@@ -1913,6 +1916,9 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
 
         // The node to which next firm edge goes
         Vertex targetOfNextFIRMEdge = boost::target(nextFIRMEdge, g_);
+
+        // for debug
+        std::cout << "PATH[" << currentVertex;
 
         // Check if feedback from target to goal is valid or not
         if(!isFeedbackPolicyValid(targetNode, goal))
@@ -1949,7 +1955,7 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
 
 
         // for debug
-        std::cout << "COST[" << currentVertex << "->" << targetNode << "->" << targetOfNextFIRMEdge << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
+        std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
 
 
         if(edgeCostToGo < minCost)
@@ -1965,7 +1971,7 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
     }
 
     // for debug
-    std::cout << "minC[" << minCostVertCurrent << "->" << minCostVertNext << "->" << minCostVertNextNext << "->G] " << minCost << std::endl;
+    std::cout << "minC[" << minCostVertCurrent << "->" << minCostVertNext << "->G] " << minCost << std::endl;
 
     return edgeToTake;
 }
