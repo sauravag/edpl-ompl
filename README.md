@@ -1,4 +1,4 @@
-========================================
+----------------------------------------
 Belief Space Planning Using Open Motion Planning Library
 
 Authors:
@@ -8,7 +8,7 @@ Ali-akbar Agha-mohammadi (aliagha@mit.edu)
 Estimation, Decision and Planning Lab
 Texas A&M University
 Copyright 2014
-========================================
+----------------------------------------
 
 ----------------------------------------
 Brief: 
