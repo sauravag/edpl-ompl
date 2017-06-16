@@ -72,10 +72,10 @@ public:
         Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(0.5); // meters
 
         // setting the mean and norm weights (used in reachability check)
+        // NOTE these values will be overwritten by loadParameters()
         StateType::covNormWeight_  =  1.0;
         StateType::meanNormWeight_ =  2.0;
-//         StateType::reachDist_ =  0.009;
-        StateType::reachDist_ =  0.015;     // inflated for a specific run  // TODO set this value from a setup file
+        StateType::reachDist_ =  0.009;    // 0.015
 
         // set the state component norm weights
         arma::colvec normWeights(3);
@@ -595,22 +595,52 @@ protected:
         loadGoals();
 
         OMPL_INFORM("Problem configuration is");
-
         std::cout<<"Path to environment mesh: "<<environmentFilePath<<std::endl;
-
         std::cout<<"Path to robot mesh: "<<robotFilePath<<std::endl;
-
         std::cout<<"Path to Roadmap File: "<<pathToRoadMapFile_<<std::endl;
-
         std::cout<<"Start Pose X: "<<startX<<" Y: "<<startY<<std::endl;
-
         std::cout<<"Planning Time: "<<planningTime_<<" seconds"<<std::endl;
-
         std::cout<<"Min Nodes: "<<minNodes_<<std::endl;
-
         std::cout<<"Max Nodes: "<<maxNodes_<<std::endl;
-
         std::cout<<"Kidnapped Pose x:"<<kX<<" y:"<<kY<<std::endl;
+
+
+        // Goal Constraints
+        node = doc.FirstChild( "GoalConstraints" );
+        assert( node );
+
+        // Weights
+        child = 0;
+        child = node->FirstChild("Weights");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        double meanNormWeight = 0.0;
+        itemElement->QueryDoubleAttribute("meanNormWeight", &meanNormWeight);
+        StateType::meanNormWeight_ = meanNormWeight;
+
+        double covNormWeight = 0.0;
+        itemElement->QueryDoubleAttribute("covNormWeight", &covNormWeight);
+        StateType::covNormWeight_ = covNormWeight;
+
+        // Threshold
+        child = 0;
+        child = node->FirstChild("Threshold");
+        assert( child );
+
+        itemElement = child->ToElement();
+        assert( itemElement );
+
+        double reachDist = 0.0;
+        itemElement->QueryDoubleAttribute("reachDist", &reachDist);
+        StateType::reachDist_ = reachDist;
+
+        OMPL_INFORM("Goal Constraints are");
+        std::cout<<"meanNormWeight: "<<StateType::meanNormWeight_<<std::endl;
+        std::cout<<"covNormWeight: "<<StateType::covNormWeight_<<std::endl;
+        std::cout<<"reachDist: "<<StateType::reachDist_<<std::endl;
 
     }
 

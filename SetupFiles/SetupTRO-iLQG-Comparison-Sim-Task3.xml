@@ -131,3 +131,8 @@
 	<GoalPose x = "17.875" y = "17.875" />
 </GoalList>
 
+<GoalConstraints>
+	<Weights meanNormWeight = "2.0" covNormWeight = "1.0" />
+	<Threshold reachDist = "0.015" />
+</GoalConstraints>
+
