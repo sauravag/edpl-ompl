@@ -47,7 +47,9 @@
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
 #include <tinyxml.h>
-#include <queue>
+// #include <queue>
+// #include <boost/heap/priority_queue.hpp>
+#include <boost/heap/fibonacci_heap.hpp>
 #include "Visualization/Visualizer.h"
 #include "Utils/FIRMUtils.h"
 #include "Planner/FIRM.h"
@@ -734,7 +736,8 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     if(addReverseEdge)
         neighbors = connectionStrategy_(m, NNRadius_);
     else
-//         neighbors = connectionStrategy_(m, 1.5*NNRadius_);   // si_->checkMotion() is not working for this
+//         neighbors = connectionStrategy_(m, 1.8*NNRadius_);
+//         neighbors = connectionStrategy_(m, 1.5*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.3*NNRadius_);
         neighbors = connectionStrategy_(m, 1.2*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.1*NNRadius_);
@@ -1178,8 +1181,9 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
         double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
 
-        // REVIEW why adding distToGoalFromTarget to the (default) edgeCostToGo metric?
+        // REVIEW why adding distToGoalFromTarget to the (default) edgeCostToGo metric? to improve the DP solution quality while it can corrupt the distance metric?
         double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost()) + distanceCostWeight_*distToGoalFromTarget;
+//         double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost()); // in this case, DP immediately returns a incomplete solution (possibly with loops)
 
         candidateCostToGo[e] =  singleCostToGo ;
 
@@ -1211,12 +1215,16 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
 
 
     // create a min heap with a user-defined comparator
-//     auto compareCostToGoFunc = [](const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo) { return (currentVertexCostToGo.second > otherVertexCostToGo.second); };
-    std::function<bool(const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo)> compareCostToGoFunc = std::bind(&FIRM::compareCostToGo, this, std::placeholders::_1, std::placeholders::_2);
-    std::priority_queue <std::pair<Vertex, double>, std::vector<std::pair<Vertex, double>>, decltype(compareCostToGoFunc)> heapCostToGo(compareCostToGoFunc);
+    auto compareCostToGoFunc = [](const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo) { return (currentVertexCostToGo.second > otherVertexCostToGo.second); };
+//     std::function<bool(const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo)> compareCostToGoFunc = std::bind(&FIRM::compareCostToGo, this, std::placeholders::_1, std::placeholders::_2);
+
+//     std::priority_queue<std::pair<Vertex, double>, std::vector<std::pair<Vertex, double>>, decltype(compareCostToGoFunc)> heapCostToGo(compareCostToGoFunc);
+    boost::heap::fibonacci_heap<std::pair<Vertex, double>, boost::heap::compare<decltype(compareCostToGoFunc)>> heapCostToGo(compareCostToGoFunc);
+
+    std::map<Vertex, boost::heap::fibonacci_heap<std::pair<Vertex, double>, boost::heap::compare<decltype(compareCostToGoFunc)>>::handle_type> handleCostToGo;
 
 
-    // initialize the heap
+    // initialize the heap and a temporary cost-to-go container
     foreach (Vertex v, boost::vertices(g_))
     {
         if (v == goalVertex)
@@ -1228,11 +1236,13 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
             newCostToGo[v] = infiniteCostToGo_;
         }
 
-        heapCostToGo.push(std::pair<Vertex, double>(v, newCostToGo[v]));
+        handleCostToGo[v] = heapCostToGo.push(std::pair<Vertex, double>(v, newCostToGo[v]));
     }
     feedback_.clear();
 
+
     // do Dijkstra search (starting from the goal)
+    int cnt=0;
     while (!heapCostToGo.empty())
     {
         // the node with the mininum cost-to-go for next expansion
@@ -1259,12 +1269,18 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
             {
                 newCostToGo[parentVertex] = newParentCostToGo;
                 bestChildVertexToGoal[parentVertex] = childVertex;
+                feedback_[parentVertex] = edge;
 
-                // TODO update the min heap
-                // not currently implemented in std::priority_queue...
+                // update the min heap
+                heapCostToGo.decrease( handleCostToGo[parentVertex], std::pair<Vertex, double>(parentVertex, newParentCostToGo) );
             }
         }
+        std::cout << cnt++ << "..";
     }
+    std::cout << std::endl;
+
+    costToGo_.swap(newCostToGo);                            // costToGo_ = newCostToGo
+    bestChildVertexToGoal_.swap(bestChildVertexToGoal);     // bestChildVertexToGoal_ = bestChildVertexToGoal
 
 
     auto end_time = std::chrono::high_resolution_clock::now();
