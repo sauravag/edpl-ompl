@@ -191,7 +191,7 @@ void GLWidget::ChangeMode(int mode)
     Visualizer::setMode((Visualizer::VZRDrawingMode)mode);
 }
 
-//initalize GL defaults and construct the simulator
+//initialize GL defaults and construct the simulator
 void GLWidget::initializeGL()
 {
     glEnable(GL_LIGHTING);

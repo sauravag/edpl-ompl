@@ -262,6 +262,12 @@ public:
         return nn_;
     }
 
+    /** \brief Return true if the cost-to-go of the current vertex is greater than that of the other vertex (this is a compare function for the min heap for Dijkstra search) */
+    inline bool compareCostToGo(const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo);
+
+    /** \brief Get a new cost-to-go of the parent node via this child node */
+    double getNewCostToGoViaChild(const Vertex parentVertex, const Vertex childVertex, const double childCostToGo, const Edge edge);
+
      /** \brief Executes the generated policy on the system */
     void executeFeedback(void);
 
@@ -370,6 +376,9 @@ protected:
     /** \brief Solves the dynamic program to return a feedback policy */
     virtual void solveDynamicProgram(const Vertex goalVertex);
 
+    /** \brief Solves for a (shortest) feedback path tree using Dijkstra search */
+    virtual void solveDijkstraSearch(const Vertex goalVertex);
+
     /** \brief Generate the rollout policy */
     virtual Edge generateRolloutPolicy(const Vertex currentVertex, const FIRM::Vertex goal);
 
@@ -471,7 +480,11 @@ protected:
     /** \brief A table that stores the node controllers according to the node (vertex) ids */
     std::map <Vertex, NodeControllerType > nodeControllers_;
 
+    /** \brief A table that stores the cost-to-go according to the node (vertex) ids */
     std::map <Vertex, double> costToGo_;
+
+    /** \brief A table that stores the best child node (along the shortest path to the goal) according to the node (vertex) ids */
+    std::map<Vertex, Vertex> bestChildVertexToGoal_;
 
     // This feedback will eventually be in a feedbackpath class
     std::map <Vertex, Edge> feedback_;
@@ -557,7 +570,9 @@ private:
 
     double obstacleCostToGo_;
 
-    double initalCostToGo_;
+    double initialCostToGo_;
+
+    double infiniteCostToGo_;
 
     int maxDPIterations_;
 

@@ -47,6 +47,7 @@
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
 #include <tinyxml.h>
+#include <queue>
 #include "Visualization/Visualizer.h"
 #include "Utils/FIRMUtils.h"
 #include "Planner/FIRM.h"
@@ -94,6 +95,9 @@ namespace ompl
 
         /** \brief The initial cost to go from a non-goal node*/
         static const double DEFAULT_INIT_COST_TO_GO = 2.0; // 2 is a good number
+
+        /** \brief The infinite cost to go from a non-goal node*/
+        static const double DEFAULT_INF_COST_TO_GO = 1000000000.0; // 1000000000 is a good number
 
         /** \brief The cost to traverse an obstacle*/
         static const double DEFAULT_OBSTACLE_COST_TO_GO = 200; // 200 is a good number
@@ -179,7 +183,9 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     obstacleCostToGo_ = ompl::magic::DEFAULT_OBSTACLE_COST_TO_GO;
 
-    initalCostToGo_ = ompl::magic::DEFAULT_INIT_COST_TO_GO;
+    initialCostToGo_ = ompl::magic::DEFAULT_INIT_COST_TO_GO;
+
+    infiniteCostToGo_ = ompl::magic::DEFAULT_INF_COST_TO_GO;
 
     maxDPIterations_ = ompl::magic::DEFAULT_DP_MAX_ITERATIONS;
     
@@ -502,7 +508,9 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
 
                 boost::mutex::scoped_lock _(graphMutex_);
                 
-                solveDynamicProgram(goal);
+                // TODO add an option in the setup file to select one method
+//                 solveDynamicProgram(goal);
+                solveDijkstraSearch(goal);
                 
                 if(!constructFeedbackPath(start, goal, solution))
                     return false;
@@ -519,7 +527,7 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
         }
     }
 
-    OMPL_INFORM("FIRM: DP could not converge.");
+    OMPL_INFORM("FIRM: DP/Dijkstra could not converge.");
     return false;
 }
 
@@ -1071,8 +1079,8 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
         }
         else
         {
-            costToGo_[v] = initalCostToGo_;
-            newCostToGo[v] = initalCostToGo_;
+            costToGo_[v] = initialCostToGo_;
+            newCostToGo[v] = initialCostToGo_;
         }
     }
 
@@ -1136,7 +1144,6 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
 }
 
-
 struct DoubleValueComp
 {
   template<typename KVP1, typename KVP2>
@@ -1171,6 +1178,7 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
         double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
 
+        // REVIEW why adding distToGoalFromTarget to the (default) edgeCostToGo metric?
         double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost()) + distanceCostWeight_*distToGoalFromTarget;
 
         candidateCostToGo[e] =  singleCostToGo ;
@@ -1182,6 +1190,119 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
     return bestCandidate;
 
+}
+
+void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
+{
+    OMPL_INFORM("FIRM: Solving Dijkstra search");
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+
+    Visualizer::clearMostLikelyPath();
+
+    using namespace arma;
+
+    float discountFactor = discountFactorDP_;
+
+    std::map<Vertex, double> newCostToGo;
+    std::map<Vertex, Vertex> bestChildVertexToGoal;
+
+    costToGo_ = std::map<Vertex, double>();
+
+
+    // create a min heap with a user-defined comparator
+//     auto compareCostToGoFunc = [](const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo) { return (currentVertexCostToGo.second > otherVertexCostToGo.second); };
+    std::function<bool(const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo)> compareCostToGoFunc = std::bind(&FIRM::compareCostToGo, this, std::placeholders::_1, std::placeholders::_2);
+    std::priority_queue <std::pair<Vertex, double>, std::vector<std::pair<Vertex, double>>, decltype(compareCostToGoFunc)> heapCostToGo(compareCostToGoFunc);
+
+
+    // initialize the heap
+    foreach (Vertex v, boost::vertices(g_))
+    {
+        if (v == goalVertex)
+        {
+            newCostToGo[v] = goalCostToGo_;
+        }
+        else
+        {
+            newCostToGo[v] = infiniteCostToGo_;
+        }
+
+        heapCostToGo.push(std::pair<Vertex, double>(v, newCostToGo[v]));
+    }
+    feedback_.clear();
+
+    // do Dijkstra search (starting from the goal)
+    while (!heapCostToGo.empty())
+    {
+        // the node with the mininum cost-to-go for next expansion
+        std::pair<Vertex, double> vertexCostToGo = heapCostToGo.top();
+        const Vertex childVertex = vertexCostToGo.first;
+        const double childCostToGo = vertexCostToGo.second;    // already closed (optimized)
+        heapCostToGo.pop();
+
+        // relax the costs of edges coming toward the node
+        foreach(Edge edge, boost::in_edges(childVertex, g_))
+        {
+            const Vertex parentVertex = boost::source(edge, g_);
+            const double parentCostToGo = newCostToGo[parentVertex];
+
+            // skip if this parent node is already closed (optimized)
+            if (parentCostToGo <= childCostToGo)
+                continue;
+
+            // update the edge cost
+            double newParentCostToGo = getNewCostToGoViaChild(parentVertex, childVertex, childCostToGo, edge);
+
+            // update the minimum cost-to-go and the best child on the shortest path to the goal (so far)
+            if (newParentCostToGo < parentCostToGo)
+            {
+                newCostToGo[parentVertex] = newParentCostToGo;
+                bestChildVertexToGoal[parentVertex] = childVertex;
+
+                // TODO update the min heap
+                // not currently implemented in std::priority_queue...
+            }
+        }
+    }
+
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    double timeDijkstra = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+    OMPL_INFORM("FIRM: Dijkstra Solve Time: %2.3f seconds<----", timeDijkstra/1000.0);
+
+    OMPL_INFORM("FIRM: Solved Dijkstra search");
+
+    if(doSaveLogs_)
+    {
+        std::ofstream outfile;
+        outfile.open(logFilePath_+"DijkstraSolveTime.txt",std::ios::app);
+        outfile<<"Time: "<<timeDijkstra<<" ms"<<std::endl;
+        outfile.close();
+    }
+
+    sendFeedbackEdgesToViz();
+
+    Visualizer::setMode(Visualizer::VZRDrawingMode::FeedbackViewMode);
+}
+
+inline bool FIRM::compareCostToGo(const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo)
+{
+    double currentCostToGo = currentVertexCostToGo.second;
+    double otherCostToGo = otherVertexCostToGo.second;
+
+    return (currentCostToGo > otherCostToGo);
+}
+
+double FIRM::getNewCostToGoViaChild(const Vertex parentVertex, const Vertex childVertex, const double childCostToGo, const Edge edge)
+{
+    const FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, edge);
+    const double transitionProbability  = edgeWeight.getSuccessProbability();
+
+    double newCostToGoViaChild = transitionProbability*childCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
+    return newCostToGoViaChild;
 }
 
 double FIRM::evaluateSuccessProbability(const Edge currentEdge, const FIRM::Vertex start, const FIRM::Vertex goal)
@@ -2315,7 +2436,7 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     numNearestNeighbors_ = numnn;
 
     // DP params
-    double discountFactorDP = 0.0, informationCostWeight = 0.0, distanceCostWeight = 0.0, goalCostToGo = 0.0, obstacleCostToGo = 0.0, initalCostToGo = 0.0, convergenceThresholdDP = 0.0;
+    double discountFactorDP = 0.0, informationCostWeight = 0.0, distanceCostWeight = 0.0, goalCostToGo = 0.0, obstacleCostToGo = 0.0, initialCostToGo = 0.0, convergenceThresholdDP = 0.0;
     int maxDPIterations = 0;
 
     child = node->FirstChild("DPDiscountFactor");
@@ -2357,8 +2478,8 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     assert( child );
     itemElement = child->ToElement();
     assert( itemElement );
-    itemElement->QueryDoubleAttribute("initctg", &initalCostToGo);
-    initalCostToGo_ = initalCostToGo;
+    itemElement->QueryDoubleAttribute("initctg", &initialCostToGo);
+    initialCostToGo_ = initialCostToGo;
 
     child = node->FirstChild("DPConvergenceThreshold");
     assert( child );
