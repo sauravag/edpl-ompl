@@ -266,6 +266,9 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
     si_->copyState(tempEndState, startState);
 
+    // for debug
+    std::cout << "filteringCost: " << cost;
+
     while(!this->isTerminated(tempEndState, k))
     {
 
@@ -320,11 +323,16 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         arma::mat tempCovMat = internalState->as<StateType>()->getCovariance();
         cost += arma::trace(tempCovMat);
 
+        // for debug
+        std::cout << " -> " << cost;
+
         if(!constructionMode)
         {
           boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     }
+    // for debug
+    std::cout << std::endl;
 
 //    if(constructionMode)
 //    {

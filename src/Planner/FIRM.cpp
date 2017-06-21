@@ -684,6 +684,7 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
 //             expandRoadmap(ompl::base::plannerOrTerminationCondition(ptc, ompl::base::timedPlannerTerminationCondition(ompl::magic::ROADMAP_BUILD_TIME)), xstates);
         }
 
+        // TODO terminate constructRoadmap() if enough number of nodes are generated or [a solution is found]
         // If the number of nodes is greater than or equal to max required by setup, then stop building roadmap and try to find a solution
         if(boost::num_vertices(g_) >= maxFIRMNodes_)
         {
@@ -739,9 +740,9 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 //         neighbors = connectionStrategy_(m, 1.8*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.5*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.3*NNRadius_);
-        neighbors = connectionStrategy_(m, 1.2*NNRadius_);
+//         neighbors = connectionStrategy_(m, 1.2*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.1*NNRadius_);
-//         neighbors = connectionStrategy_(m, 1.0*NNRadius_);
+        neighbors = connectionStrategy_(m, 1.0*NNRadius_);
 
     OMPL_INFORM("Adding State, Number of Nearest Neighbors = %u", neighbors.size());
 
@@ -950,16 +951,28 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
         {
             successCount++;
 
+            // for debug
+            ompl::base::Cost edgeCostPrev = ompl::base::Cost(edgeCost.value());
+
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
             //edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
-            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);
+//             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);
+            edgeCost = ompl::base::Cost(edgeCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);   // XXX just for test
+
+            // for debug
+            std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = ( " << edgeCostPrev.value() << " + " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
         }
     }
+    // for debug
+    ompl::base::Cost edgeCostSum = ompl::base::Cost(edgeCost.value());
 
     siF_->showRobotVisualization(true);
 
     //edgeCost.v = edgeCost.v / successCount ;
     edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
+
+    // for debug
+    std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = ( " << edgeCostSum.value() << " ) / " << successCount << std::endl;
 
     double transitionProbability = successCount / numMCParticles_ ;
 
@@ -1275,9 +1288,7 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
                 heapCostToGo.decrease( handleCostToGo[parentVertex], std::pair<Vertex, double>(parentVertex, newParentCostToGo) );
             }
         }
-        std::cout << cnt++ << "..";
     }
-    std::cout << std::endl;
 
     costToGo_.swap(newCostToGo);                            // costToGo_ = newCostToGo
     bestChildVertexToGoal_.swap(bestChildVertexToGoal);     // bestChildVertexToGoal_ = bestChildVertexToGoal
