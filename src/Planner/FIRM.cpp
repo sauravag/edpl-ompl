@@ -511,8 +511,8 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
                 boost::mutex::scoped_lock _(graphMutex_);
                 
                 // TODO add an option in the setup file to select one method
-//                 solveDynamicProgram(goal);
-                solveDijkstraSearch(goal);
+                solveDynamicProgram(goal);
+//                 solveDijkstraSearch(goal);
                 
                 if(!constructFeedbackPath(start, goal, solution))
                     return false;
@@ -956,7 +956,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
             //edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
-//             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);
+//             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);    // CHECK this penalizes an edge with high covariance, which may cause oscillation that repeatedly rejects to move toward
             edgeCost = ompl::base::Cost(edgeCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);   // XXX just for test
 
             // for debug
@@ -1842,6 +1842,12 @@ void FIRM::executeFeedbackWithRollout(void)
             auto start_time = std::chrono::high_resolution_clock::now();
 
             tempVertex = addStateToGraph(cendState, false);
+
+
+            // forcefully include the next FIRM node in the candidate (nearest neighbor) list for rollout policy
+            bool forwardEdgeAdded;
+            addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
+
 
             siF_->setTrueState(tState);
 
