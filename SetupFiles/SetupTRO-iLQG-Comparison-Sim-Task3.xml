@@ -55,7 +55,8 @@
 	<NNRadius nnradius = "2.25" />
 <!-- 	<NNRadius nnradius = "5.0" /> -->
 <!-- 	<NNRadius nnradius = "10.0" /> -->
-	<NumNN numnn = "10" />
+<!-- 	<NumNN numnn = "10" /> -->
+	<NumNN numnn = "50" />
 	<DPDiscountFactor discountfac = "1.0" />
 	<InfCostWeight infcostw = "1.0"/>
 	<DistCostWeight distcostw = "0.1"/>
@@ -82,8 +83,8 @@
 
 <!-- 	<RoadMap roadmapFile = "" useRoadMap = "0" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Oscillation.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Oscillation200.xml" useRoadMap = "1" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-Dijkstra.xml" useRoadMap = "1" />
+    <RoadMap roadmapFile = "./FIRMRoadMap-Oscillation200.xml" useRoadMap = "1" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Dijkstra.xml" useRoadMap = "1" /> -->
 
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml" useRoadMap = "1" /> -->
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2.xml" useRoadMap = "1" /> -->

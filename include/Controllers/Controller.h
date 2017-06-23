@@ -251,7 +251,10 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     //HOW TO SET INITAL VALUE OF COST
     //cost = 1 ,for time based only if time per execution is "1"
     //cost = 0.01 , for covariance based
+
+    // CHECK what about 0?
     double cost = 0.001;
+//     double cost = 0.000;    // this should be fine for Dijkstra search, but in the rollout phase osciallation appears more frequently...
 
     //float totalCollisionCheckComputeTime = 0;
     //int totalNumCollisionChecks = 0;
@@ -267,7 +270,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     si_->copyState(tempEndState, startState);
 
     // for debug
-    std::cout << "filteringCost: " << cost;
+//     std::cout << "filteringCost: " << cost;
 
     while(!this->isTerminated(tempEndState, k))
     {
@@ -321,18 +324,29 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
         //Increment cost by: 0.01 for time based, trace(Covariance) for FIRM
         arma::mat tempCovMat = internalState->as<StateType>()->getCovariance();
-        cost += arma::trace(tempCovMat);
+
+        // NOTE how to penalize uncertainty (covariance) in the cost
+        // 1) cost = sum(trace(cov_k)) where k=1,...,K
+        // 2) cost = trace(cov_f)
+        // 3) cost = mean(trace(cov_k)) = sum(trace(cov_k))/K
+
+//         cost += arma::trace(tempCovMat);   // 1) cost for the sum of trace(cov); double penalty to longer edges in addition to time (number of steps); may cause oscillation
+        cost = arma::trace(tempCovMat);    // 2) cost only for the final trace(cov); less oscillation and more adaptive behavior
+//         cost += arma::trace(tempCovMat);   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
 
         // for debug
-        std::cout << " -> " << cost;
+//         std::cout << " -> " << cost;
 
         if(!constructionMode)
         {
           boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     }
+//     if(k!=0) {cost /= k;}   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
+
     // for debug
-    std::cout << std::endl;
+//     std::cout << std::endl;
+
 
 //    if(constructionMode)
 //    {
