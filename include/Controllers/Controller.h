@@ -331,8 +331,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         // 3) cost = mean(trace(cov_k)) = sum(trace(cov_k))/K
 
 //         cost += arma::trace(tempCovMat);   // 1) cost for the sum of trace(cov); double penalty to longer edges in addition to time (number of steps); may cause oscillation
-        cost = arma::trace(tempCovMat);    // 2) cost only for the final trace(cov); less oscillation and more adaptive behavior
-//         cost += arma::trace(tempCovMat);   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
+//         cost = arma::trace(tempCovMat);    // 2) cost only for the final trace(cov); less oscillation and more adaptive behavior
+        cost += arma::trace(tempCovMat);   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
 
         // for debug
 //         std::cout << " -> " << cost;
@@ -342,7 +342,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
           boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     }
-//     if(k!=0) {cost /= k;}   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
+    if(k!=0) {cost /= k;}   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
 
     // for debug
 //     std::cout << std::endl;

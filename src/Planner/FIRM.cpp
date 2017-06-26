@@ -510,10 +510,17 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
 
                 boost::mutex::scoped_lock _(graphMutex_);
                 
-                // TODO add an option in the setup file to select one method
-//                 solveDynamicProgram(goal);
+
+                // solve the POMDP with sampling by Monte Carlo simulation
+
+                // TODO use Dijkstra search's approximate solution as an initial guess for Dynamic Programming for Value Iteration
+                // if all the transitionProbability is equal to 1, Dijkstra search solution is optimal; otherwise, pass the result to Dynamic Programming
+                // with Dijkstra search's result for initialization, Dynamic Programming may not need the weird term 'distToGoalFromTarget' for convergence
+
                 solveDijkstraSearch(goal);
-                
+//                 solveDynamicProgram(goal);
+
+
                 if(!constructFeedbackPath(start, goal, solution))
                     return false;
                 
@@ -956,11 +963,10 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
             //edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
-            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);    // CHECK this penalizes an edge with high covariance, which may cause oscillation that repeatedly rejects to move toward
-//             edgeCost = ompl::base::Cost(edgeCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);   // XXX just for test
+            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);
 
             // for debug
-            std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = ( " << edgeCostPrev.value() << " + " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
+            std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
         }
     }
     // for debug
@@ -1196,6 +1202,8 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
         // REVIEW why adding distToGoalFromTarget to the (default) edgeCostToGo metric? to improve the DP solution quality while it can corrupt the distance metric?
         double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost()) + distanceCostWeight_*distToGoalFromTarget;
+//         // for debug
+//         std::cout << "singleCostToGo[" << node << "->" << targetNode << "] " << singleCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << " + " << distanceCostWeight_ << "*" << distToGoalFromTarget << std::endl;
 //         double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost()); // in this case, DP immediately returns a incomplete solution (possibly with loops)
 
         candidateCostToGo[e] =  singleCostToGo ;

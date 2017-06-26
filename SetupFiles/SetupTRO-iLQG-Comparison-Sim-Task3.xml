@@ -68,6 +68,7 @@
 <!-- 	<MaxDPIter dpiter = "2000000" /> <!&#45;&#45; DP takes 1 hour but still does not converge for 220 nodes &#45;&#45;> -->
 <!-- 	<DPConvergenceThreshold dpconvthresh = "0.001" /> -->
 	<DPConvergenceThreshold dpconvthresh = "1" />
+<!-- 	<DPConvergenceThreshold dpconvthresh = "0.0001" /> -->
 </FIRM> 
 <PlanningProblem>
 	<!--  method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
@@ -83,8 +84,9 @@
 
 <!-- 	<RoadMap roadmapFile = "" useRoadMap = "0" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Oscillation.xml" useRoadMap = "1" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-Oscillation200.xml" useRoadMap = "1" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Oscillation200.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Dijkstra.xml" useRoadMap = "1" /> -->
+    <RoadMap roadmapFile = "./FIRMRoadMap-AvgCovCost.xml" useRoadMap = "1" />
 
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml" useRoadMap = "1" /> -->
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2.xml" useRoadMap = "1" /> -->
