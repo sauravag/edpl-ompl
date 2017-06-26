@@ -60,6 +60,7 @@
 #include "Path/FeedbackPath.h"
 #include "ConnectionStrategy/FStrategy.h"
 #include "ConnectionStrategy/VStrategy.h"
+#include "ConnectionStrategy/KStrategy.h"
 #include "NBM3P.h"
 #include "Spaces/R2BeliefSpace.h"
 #include "Spaces/SE2BeliefSpace.h"
@@ -156,6 +157,12 @@ public:
 //     typedef std::function<std::vector<Vertex>&(const Vertex)> ConnectionStrategy;
     typedef std::function<std::vector<Vertex>&(const Vertex, double radius)> ConnectionStrategy;     // NOTE to allow a variable (bounding) radius to neighbors
 
+    // XXX
+    /** @brief A function returning the milestones that should be
+     *         attempted to connect to
+     */
+    typedef std::function<std::vector<Vertex>&(const Vertex, std::size_t k)> KConnectionStrategy;
+
     typedef Controller<SeparatedControllerType, FilterType> EdgeControllerType;
     
     typedef Controller<NodeSeparatedControllerType, LinearizedKF> NodeControllerType;
@@ -164,8 +171,6 @@ public:
     FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode=false);
 
     virtual ~FIRM(void);
-
-    virtual void setProblemDefinition(const ompl::base::ProblemDefinitionPtr &pdef);
 
     /** \brief Set the connection strategy function that specifies the
      milestones that connection attempts will be made to for a
@@ -180,14 +185,17 @@ public:
      attempt must be made. The default connection strategy is to connect
      a milestone's 10 closest neighbors.
      */
+    virtual void setProblemDefinition(const ompl::base::ProblemDefinitionPtr &pdef);
+
+    /** \brief Convenience function that sets the connection strategy to the
+     default one with k nearest neighbors.
+     */
     void setConnectionStrategy(const ConnectionStrategy& connectionStrategy)
     {
         connectionStrategy_ = connectionStrategy;
         userSetConnectionStrategy_ = true;
     }
-    /** \brief Convenience function that sets the connection strategy to the
-     default one with k nearest neighbors.
-     */
+
     void setMaxNearestNeighbors(unsigned int k);
 
     //virtual void getPlannerData(ompl::base::PlannerData &data) const;
@@ -416,6 +424,9 @@ protected:
     /** \brief Nearest neighbors data structure */
     RoadmapNeighbors                                       nn_;
 
+    /** \brief Additional k-nearest neighbors data structure for robust connectivity to FIRM nodes during rollout*/
+    RoadmapNeighbors                                       knn_;
+
     /** \brief Connectivity graph */
     Graph                                                  g_;
 
@@ -453,6 +464,9 @@ protected:
 
     /** \brief Function that returns the milestones to attempt connections with */
     ConnectionStrategy                                     connectionStrategy_;
+
+    /** \brief Another function that returns the k-nearest neighbor milestones to attempt connections with */
+    KConnectionStrategy                                     kConnectionStrategy_;
 
     /** \brief Flag indicating whether the employed connection strategy was set by the user (or defaults are assumed) */
     bool                                                   userSetConnectionStrategy_;

@@ -222,6 +222,16 @@ void FIRM::setup(void)
         //connectionStrategy_ = FStrategy<Vertex>(NNRadius_, nn_);
     }
 
+    // CHECK no need for knn_, just utilize nn_
+    if (!knn_)
+    {
+        knn_.reset(ompl::tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
+        knn_->setDistanceFunction(boost::bind(&FIRM::distanceFunction, this, _1, _2));
+    }
+    if (!kConnectionStrategy_)
+    {
+        kConnectionStrategy_ = KStrategy<Vertex>(numNearestNeighbors_, knn_);
+    }
 }
 
 void FIRM::setMaxNearestNeighbors(unsigned int k)
@@ -261,6 +271,8 @@ void FIRM::clear(void)
     freeMemory();
     if (nn_)
         nn_->clear();
+    if (knn_)
+        knn_->clear();
     clearQuery();
     maxEdgeID_ = 0;
 }
@@ -341,6 +353,7 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
 
                 // add the vertex to the nearest neighbors data structure
                 nn_->add(m);
+                knn_->add(m);
 
                 v  =  m;
 
@@ -734,6 +747,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     disjointSets_.make_set(m);
 
     nn_->add(m);    // REVIEW no need to remove the temporary node after generating a rollout policy?
+    knn_->add(m);
 
 
     // Which milestones will we attempt to connect to?
@@ -741,15 +755,27 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     // NOTE use longer nearest neighbor to avoid oscillating behavior of rollout policy by allowing connection to farther FIRM nodes
     std::vector<Vertex> neighbors;
+    std::vector<Vertex> kneighbors;
     if(addReverseEdge)
+    {
+        // graph construction phase
         neighbors = connectionStrategy_(m, NNRadius_);
+    }
     else
+    {
+        // rollout phase
 //         neighbors = connectionStrategy_(m, 1.8*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.5*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.3*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.2*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.1*NNRadius_);
         neighbors = connectionStrategy_(m, 1.0*NNRadius_);
+
+        // 3) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list for rollout policy
+//         kneighbors = kConnectionStrategy_(m, numNearestNeighbors_);
+        kneighbors = kConnectionStrategy_(m, 10);
+        neighbors.insert(neighbors.end(), kneighbors.begin(), kneighbors.end());
+    }
 
     OMPL_INFORM("Adding State, Number of Nearest Neighbors = %u", neighbors.size());
 
@@ -1852,9 +1878,20 @@ void FIRM::executeFeedbackWithRollout(void)
             tempVertex = addStateToGraph(cendState, false);
 
 
-            // forcefully include the next FIRM node in the candidate (nearest neighbor) list for rollout policy
-            bool forwardEdgeAdded;
-            addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
+            // NOTE robust connection to a desirable FIRM nodes during rollout
+
+            // 1) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
+//             bool forwardEdgeAdded;
+//             addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
+
+            // 2) forcefully include the next FIRM nodes of the multiple previously reached FIRM nodes in the candidate (nearest neighbor) list for rollout policy
+
+            // 3) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list for rollout policy
+//             bool forwardEdgeAdded;
+//             foreach (neighbor, kConnectionStrategy_(tempVertex, numNearestNeighbors_))
+//             {
+//                 addEdgeToGraph(tempVertex, neighbor, forwardEdgeAdded);
+//             }
 
 
             siF_->setTrueState(tState);
@@ -1967,10 +2004,18 @@ void FIRM::showRolloutConnections(const FIRM::Vertex v)
 {
     Visualizer::clearRolloutConnections();
 
+    // FIXME redundant call of nearest neighbor search just for visualization!
+
 //     const std::vector<Vertex>& neighbors = connectionStrategy_(v);
     const std::vector<Vertex>& neighbors = connectionStrategy_(v, NNRadius_);     // NOTE to allow a variable (bounding) radius to neighbors
-
     foreach (Vertex n, neighbors)
+    {
+        Visualizer::addRolloutConnection(stateProperty_[v], stateProperty_[n]);
+    }
+
+//     const std::vector<Vertex>& kneighbors = kConnectionStrategy_(v, numNearestNeighbors_);
+    const std::vector<Vertex>& kneighbors = kConnectionStrategy_(v, 10);
+    foreach (Vertex n, kneighbors)
     {
         Visualizer::addRolloutConnection(stateProperty_[v], stateProperty_[n]);
     }
@@ -2241,6 +2286,7 @@ void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
             disjointSets_.make_set(m);
 
             nn_->add(m);
+            knn_->add(m);
 
             policyGenerator_->addFIRMNodeToObservationGraph(newState);
 
