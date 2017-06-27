@@ -424,9 +424,6 @@ protected:
     /** \brief Nearest neighbors data structure */
     RoadmapNeighbors                                       nn_;
 
-    /** \brief Additional k-nearest neighbors data structure for robust connectivity to FIRM nodes during rollout*/
-    RoadmapNeighbors                                       knn_;
-
     /** \brief Connectivity graph */
     Graph                                                  g_;
 

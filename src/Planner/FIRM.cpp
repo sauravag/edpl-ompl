@@ -222,15 +222,10 @@ void FIRM::setup(void)
         //connectionStrategy_ = FStrategy<Vertex>(NNRadius_, nn_);
     }
 
-    // CHECK no need for knn_, just utilize nn_
-    if (!knn_)
-    {
-        knn_.reset(ompl::tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
-        knn_->setDistanceFunction(boost::bind(&FIRM::distanceFunction, this, _1, _2));
-    }
+    // additional k-nearest neighbor connection strategy for rollout
     if (!kConnectionStrategy_)
     {
-        kConnectionStrategy_ = KStrategy<Vertex>(numNearestNeighbors_, knn_);
+        kConnectionStrategy_ = KStrategy<Vertex>(numNearestNeighbors_, nn_);
     }
 }
 
@@ -271,8 +266,6 @@ void FIRM::clear(void)
     freeMemory();
     if (nn_)
         nn_->clear();
-    if (knn_)
-        knn_->clear();
     clearQuery();
     maxEdgeID_ = 0;
 }
@@ -353,7 +346,6 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
 
                 // add the vertex to the nearest neighbors data structure
                 nn_->add(m);
-                knn_->add(m);
 
                 v  =  m;
 
@@ -746,8 +738,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     // Initialize to its own (dis)connected component.
     disjointSets_.make_set(m);
 
-    nn_->add(m);    // REVIEW no need to remove the temporary node after generating a rollout policy?
-    knn_->add(m);
+    nn_->add(m);
 
 
     // Which milestones will we attempt to connect to?
@@ -756,32 +747,47 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     // NOTE use longer nearest neighbor to avoid oscillating behavior of rollout policy by allowing connection to farther FIRM nodes
     std::vector<Vertex> neighbors;
     std::vector<Vertex> kneighbors;
-    if(addReverseEdge)
+    if(addReverseEdge)  // graph construction phase
     {
-        // graph construction phase
         neighbors = connectionStrategy_(m, NNRadius_);
     }
-    else
+    else  // rollout phase
     {
-        // rollout phase
-//         neighbors = connectionStrategy_(m, 1.8*NNRadius_);
-//         neighbors = connectionStrategy_(m, 1.5*NNRadius_);
-//         neighbors = connectionStrategy_(m, 1.3*NNRadius_);
-//         neighbors = connectionStrategy_(m, 1.2*NNRadius_);
-//         neighbors = connectionStrategy_(m, 1.1*NNRadius_);
-        neighbors = connectionStrategy_(m, 1.0*NNRadius_);
+        // NOTE robust connection to a desirable (but far) FIRM nodes during rollout
 
-        // 3) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list for rollout policy
+        // 1) allow longer edge length for connection to FIRM nodes during rollout
+//         neighbors = connectionStrategy_(m, 1.5*NNRadius_);
+//         neighbors = connectionStrategy_(m, 1.2*NNRadius_);
+//         neighbors = connectionStrategy_(m, 1.0*NNRadius_);
+
+        // 2) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list
+        // implemented in FIRM::executeFeedbackWithRollout() to access nextFIRMVertex information
+//         neighbors = connectionStrategy_(m, NNRadius_);
+
+        // 3) forcefully include the next FIRM nodes of the multiple previously reached FIRM nodes in the candidate (nearest neighbor) list
+        // not yet implemented
+//         neighbors = connectionStrategy_(m, NNRadius_);
+
+        // 4) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list; this may be considered as a change of the graph connection property
 //         kneighbors = kConnectionStrategy_(m, numNearestNeighbors_);
-        kneighbors = kConnectionStrategy_(m, 10);
-        neighbors.insert(neighbors.end(), kneighbors.begin(), kneighbors.end());
+//         // remove duplicate entities from kneighbors
+//         std::vector<Vertex>::iterator diff;
+//         diff = std::set_difference(kneighbors.begin(), kneighbors.end(), neighbors.begin(), neighbors.end(), kneighbors.begin());
+//         kneighbors.erase(diff, kneighbors.end());   // {kneighbors} = {kneighbors} - {neighbors}
+//         // concantenate kneighbors to neighbors
+//         neighbors.insert(neighbors.end(), kneighbors.begin(), kneighbors.end());
+
+        // 5) instead of bounded nearest neighbors, use k-nearest neighbors during rollout; this may be considered as a change of the graph connection property
+        neighbors = kConnectionStrategy_(m, numNearestNeighbors_);
     }
 
     OMPL_INFORM("Adding State, Number of Nearest Neighbors = %u", neighbors.size());
 
+
+    // NOTE commented this to allow connection to farther but better FIRM node
+/*
     // If reverse edge not required, that means this is a virtual state added in rollout
     // We will sort by cost and use N lowest cost to go neighbors
-    // WARN only closer numNearestNeighbors_ will be used, so a farther FIRM node may still not be connected...
     if(!addReverseEdge && !neighbors.empty())
     {
         std::vector<std::pair<double,Vertex>> tempItems;
@@ -812,8 +818,8 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
             if(t_countNN >= numNearestNeighbors_)
                 break;            
         }
-
     }
+*/
 
     foreach (Vertex n, neighbors)
     {
@@ -858,6 +864,19 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
                 }
             }
         }
+    }
+
+    // for rollout edge visualization
+    if(!addReverseEdge)
+    {
+        foreach(Vertex n, neighbors)
+        {
+            if(boost::edge(m, n, g_).second)
+            {
+                Visualizer::addRolloutConnection(stateProperty_[m], stateProperty_[n]);
+            }
+        }
+        //boost::this_thread::sleep(boost::posix_time::milliseconds(50));  // moved to FIRM::executeFeedbackWithRollout() for more accurate time computation
     }
 
     policyGenerator_->addFIRMNodeToObservationGraph(state);
@@ -985,18 +1004,18 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
             successCount++;
 
             // for debug
-            ompl::base::Cost edgeCostPrev = ompl::base::Cost(edgeCost.value());
+            //ompl::base::Cost edgeCostPrev = ompl::base::Cost(edgeCost.value());
 
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
             //edgeCost.v = edgeCost.v + ompl::magic::INFORMATION_COST_WEIGHT*filteringCost.v + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop;
             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);
 
             // for debug
-            std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
+            //std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
         }
     }
     // for debug
-    ompl::base::Cost edgeCostSum = ompl::base::Cost(edgeCost.value());
+    //ompl::base::Cost edgeCostSum = ompl::base::Cost(edgeCost.value());
 
     siF_->showRobotVisualization(true);
 
@@ -1004,7 +1023,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
     edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
 
     // for debug
-    std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = ( " << edgeCostSum.value() << " ) / " << successCount << std::endl;
+    //std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = ( " << edgeCostSum.value() << " ) / " << successCount << std::endl;
 
     double transitionProbability = successCount / numMCParticles_ ;
 
@@ -1263,11 +1282,8 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
 
     // create a min heap with a user-defined comparator
     auto compareCostToGoFunc = [](const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo) { return (currentVertexCostToGo.second > otherVertexCostToGo.second); };
-//     std::function<bool(const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo)> compareCostToGoFunc = std::bind(&FIRM::compareCostToGo, this, std::placeholders::_1, std::placeholders::_2);
 
-//     std::priority_queue<std::pair<Vertex, double>, std::vector<std::pair<Vertex, double>>, decltype(compareCostToGoFunc)> heapCostToGo(compareCostToGoFunc);
     boost::heap::fibonacci_heap<std::pair<Vertex, double>, boost::heap::compare<decltype(compareCostToGoFunc)>> heapCostToGo(compareCostToGoFunc);
-
     std::map<Vertex, boost::heap::fibonacci_heap<std::pair<Vertex, double>, boost::heap::compare<decltype(compareCostToGoFunc)>>::handle_type> handleCostToGo;
 
 
@@ -1878,52 +1894,29 @@ void FIRM::executeFeedbackWithRollout(void)
             tempVertex = addStateToGraph(cendState, false);
 
 
-            // NOTE robust connection to a desirable FIRM nodes during rollout
+            // NOTE robust connection to a desirable (but far) FIRM nodes during rollout
 
-            // 1) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
-//             bool forwardEdgeAdded;
-//             addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
+            // 1) allow longer edge length for connection to FIRM nodes during rollout
+            // implemented in FIRM::addStateToGraph()
 
-            // 2) forcefully include the next FIRM nodes of the multiple previously reached FIRM nodes in the candidate (nearest neighbor) list for rollout policy
+            // 2) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
+            // bool forwardEdgeAdded;
+            // addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
 
-            // 3) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list for rollout policy
-//             bool forwardEdgeAdded;
-//             foreach (neighbor, kConnectionStrategy_(tempVertex, numNearestNeighbors_))
-//             {
-//                 addEdgeToGraph(tempVertex, neighbor, forwardEdgeAdded);
-//             }
+            // 3) forcefully include the next FIRM nodes of the multiple previously reached FIRM nodes in the candidate (nearest neighbor) list for rollout policy
+            // not yet implemented
+
+            // 4) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list for rollout policy
+            // implemented in FIRM::addStateToGraph() for si_->checkMotion() validation
+
+            // 5) instead of bounded nearest neighbors, use k-nearest neighbors during rollout; this may be considered as a change of the graph connection property
+            // implemented in FIRM::addStateToGraph() for si_->checkMotion() validation
 
 
             siF_->setTrueState(tState);
 
             e = generateRolloutPolicy(tempVertex, goal);
 
-//             // for debug
-//             // FIXME nextFIRMVertex is not updated properly
-//             Vertex targetOfNextFIRMEdge = boost::target(feedback_[nextFIRMVertex], g_);  
-//             double transitionProbability = 1.0;
-//             double nextNodeCostToGo = costToGo_[nextFIRMVertex];
-//             bool forwardEdgeAdded = true;
-//             bool alreadyConnected = boost::edge(tempVertex, nextFIRMVertex, g_).second;
-//             if(!alreadyConnected)
-//                 addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
-//             if(alreadyConnected || forwardEdgeAdded)
-//             {
-//                 Edge tempEdge = boost::edge(tempVertex, nextFIRMVertex, g_).first;
-//                 FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, tempEdge);
-//                 if(!alreadyConnected)
-//                 {
-//                     maxEdgeID_--;
-//                     edgeControllers_.erase(tempEdge);
-//                     boost::remove_edge(tempVertex, nextFIRMVertex, g_);
-//                 }
-//                 double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
-//                 std::cout << "nexC[" << tempVertex << "->" << nextFIRMVertex << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
-//             }
-//             if(!alreadyConnected)
-//                 OMPL_WARN("[%d] was not connected to [%d]!", tempVertex, nextFIRMVertex); 
-//             if(!forwardEdgeAdded)
-//                 OMPL_WARN("[%d] could not be connected to [%d]!", tempVertex, nextFIRMVertex); 
 
             // end profiling time to compute rollout
             auto end_time = std::chrono::high_resolution_clock::now();
@@ -1946,14 +1939,21 @@ void FIRM::executeFeedbackWithRollout(void)
 
             //std::cout << "Time to execute rollout : "<<timeToDoRollout << " milli seconds."<<std::endl;
 
-            showRolloutConnections(tempVertex);
+
+            // NOTE commented to prevent redundant call of nearest neighbor search just for visualization! moved to FIRM::addStateToGraph()
+            //showRolloutConnections(tempVertex);
+
+            // for rollout edge visualization
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(50));  // doesn't seem to be necessary
+
 
             // clear the rollout candidate connection drawings and show the selected edge
             Visualizer::clearRolloutConnections();
-
             Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[boost::target(e,g_)]);
 
+            // remove the temporary node after generating a rollout policy
             boost::remove_vertex(tempVertex, g_);
+            nn_->remove(tempVertex);
 
         }
 
@@ -2004,17 +2004,16 @@ void FIRM::showRolloutConnections(const FIRM::Vertex v)
 {
     Visualizer::clearRolloutConnections();
 
-    // FIXME redundant call of nearest neighbor search just for visualization!
+    // NOTE redundant call of nearest neighbor search just for visualization!
 
-//     const std::vector<Vertex>& neighbors = connectionStrategy_(v);
+    //const std::vector<Vertex>& neighbors = connectionStrategy_(v);
     const std::vector<Vertex>& neighbors = connectionStrategy_(v, NNRadius_);     // NOTE to allow a variable (bounding) radius to neighbors
     foreach (Vertex n, neighbors)
     {
         Visualizer::addRolloutConnection(stateProperty_[v], stateProperty_[n]);
     }
 
-//     const std::vector<Vertex>& kneighbors = kConnectionStrategy_(v, numNearestNeighbors_);
-    const std::vector<Vertex>& kneighbors = kConnectionStrategy_(v, 10);
+    const std::vector<Vertex>& kneighbors = kConnectionStrategy_(v, numNearestNeighbors_);
     foreach (Vertex n, kneighbors)
     {
         Visualizer::addRolloutConnection(stateProperty_[v], stateProperty_[n]);
@@ -2286,7 +2285,6 @@ void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
             disjointSets_.make_set(m);
 
             nn_->add(m);
-            knn_->add(m);
 
             policyGenerator_->addFIRMNodeToObservationGraph(newState);
 
