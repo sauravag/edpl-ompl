@@ -518,12 +518,14 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
 
                 // solve the POMDP with sampling by Monte Carlo simulation
 
-                // TODO use Dijkstra search's approximate solution as an initial guess for Dynamic Programming for Value Iteration
+                // NOTE use Dijkstra search's approximate solution as an initial guess for Dynamic Programming for Value Iteration
                 // if all the transitionProbability is equal to 1, Dijkstra search solution is optimal; otherwise, pass the result to Dynamic Programming
                 // with Dijkstra search's result for initialization, Dynamic Programming may not need the weird term 'distToGoalFromTarget' for convergence
 
                 solveDijkstraSearch(goal);
-//                 solveDynamicProgram(goal);
+
+                bool reinit = false;
+                solveDynamicProgram(goal, reinit);
 
 
                 if(!constructFeedbackPath(start, goal, solution))
@@ -750,6 +752,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     if(addReverseEdge)  // graph construction phase
     {
         neighbors = connectionStrategy_(m, NNRadius_);
+        //neighbors = kConnectionStrategy_(m, numNearestNeighbors_);    // NOTE this makes sense only if all the points are sampled first and then connected to each other
     }
     else  // rollout phase
     {
@@ -1115,7 +1118,7 @@ arma::colvec MapToColvec(const Map& _m) {
   return mapData;
 }
 
-void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
+void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex, const bool reinit)
 {
     OMPL_INFORM("FIRM: Solving DP");
 
@@ -1129,33 +1132,42 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
     std::map<Vertex, double> newCostToGo;
 
-    costToGo_ = std::map<Vertex, double>();
-
-    /**
-    --NOTES--
-    Assign a high cost to go initially for all nodes that are not in the goal connected component.
-    For nodes that are in the goal cc, we assign goal cost to go for the goal and init cost to go
-    for all other nodes.
-    */
-    foreach (Vertex v, boost::vertices(g_))
+    if (reinit)    // do this only if costToGo_ and feedback_ are not initialized by Dijkstra search
     {
-        if(v == goalVertex)
+        costToGo_ = std::map<Vertex, double>();
+        feedback_.clear();
+
+        /**
+          --NOTES--
+          Assign a high cost to go initially for all nodes that are not in the goal connected component.
+          For nodes that are in the goal cc, we assign goal cost to go for the goal and init cost to go
+          for all other nodes.
+          */
+        foreach (Vertex v, boost::vertices(g_))
         {
-            costToGo_[v] = goalCostToGo_;
-            newCostToGo[v] = goalCostToGo_;
-        }
-        else
-        {
-            costToGo_[v] = initialCostToGo_;
-            newCostToGo[v] = initialCostToGo_;
+            if(v == goalVertex)
+            {
+                newCostToGo[v] = goalCostToGo_;
+            }
+            else
+            {
+                newCostToGo[v] = initialCostToGo_;
+            }
         }
     }
-
-    feedback_.clear();
+    else
+    {
+        // initialize newCostToGo with the approximate solution obtained from Dijkstra search
+        foreach (Vertex v, boost::vertices(g_))
+        {
+            newCostToGo[v] = costToGo_[v];
+        }
+    }
 
     bool convergenceCondition = false;
 
     int nIter=0;
+    double diffCostToGo;
     while(!convergenceCondition && nIter < maxDPIterations_)
     {
         nIter++;
@@ -1170,6 +1182,18 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
                 continue;
             }
 
+
+            // to not update this node if it is not connected to the goal even after solving Dijkstra search
+            // NOTE this is to ignore disconnected components during rollout (which may lead to an infinite loop while checkMotion())
+            if (!reinit)
+            {
+                if (newCostToGo[v] >= infiniteCostToGo_)    // infiniteCostToGo_ implicitly means that this node is not connected to the goal
+                {
+                    continue;
+                }
+            }
+
+
             // Update the costToGo of vertex
             std::pair<Edge,double> candidate = getUpdatedNodeCostToGo(v, goalVertex);
 
@@ -1181,7 +1205,8 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
         }
 
-        convergenceCondition = (norm(MapToColvec(costToGo_)-MapToColvec(newCostToGo), "inf") <= convergenceThresholdDP_);
+        diffCostToGo = norm(MapToColvec(costToGo_)-MapToColvec(newCostToGo), "inf");
+        convergenceCondition = ( diffCostToGo <= convergenceThresholdDP_);
 
         costToGo_.swap(newCostToGo);   // Equivalent to costToGo_ = newCostToGo
 
@@ -1193,7 +1218,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
 
     double timeDP = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
-    OMPL_INFORM("FIRM: DP Solve Time: %2.3f seconds<----", timeDP/1000.0);
+    OMPL_INFORM("FIRM: DP Solve Time: %2.3f seconds for %d iterations (diff: %2.3f < %2.3f)<----", timeDP/1000.0, nIter, diffCostToGo, convergenceThresholdDP_);
 
     OMPL_INFORM("FIRM: Solved DP");
 
@@ -1208,7 +1233,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex)
     sendFeedbackEdgesToViz();
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::FeedbackViewMode);
-
+    sleep(2);   // for visualization
 }
 
 struct DoubleValueComp
@@ -1245,11 +1270,13 @@ std::pair<typename FIRM::Edge,double> FIRM::getUpdatedNodeCostToGo(const FIRM::V
 
         double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
 
-        // REVIEW why adding distToGoalFromTarget to the (default) edgeCostToGo metric? to improve the DP solution quality while it can corrupt the distance metric?
-        double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost()) + distanceCostWeight_*distToGoalFromTarget;
+        // REVIEW why adding distToGoalFromTarget to the (default) edgeCostToGo metric?
+        // NOTE without this term, DP immediately returns a incomplete solution, while this term ruins the distance metric
+//         double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost()) + distanceCostWeight_*distToGoalFromTarget;
 //         // for debug
 //         std::cout << "singleCostToGo[" << node << "->" << targetNode << "] " << singleCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << " + " << distanceCostWeight_ << "*" << distToGoalFromTarget << std::endl;
-//         double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost()); // in this case, DP immediately returns a incomplete solution (possibly with loops)
+        // NOTE use this (correct) metric if costToGo_ is initialized by Dijkstra search beforehand
+        double singleCostToGo =  (transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost());
 
         candidateCostToGo[e] =  singleCostToGo ;
 
@@ -1363,6 +1390,7 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
     sendFeedbackEdgesToViz();
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::FeedbackViewMode);
+    sleep(2);   // for visualization
 }
 
 inline bool FIRM::compareCostToGo(const std::pair<Vertex, double>& currentVertexCostToGo, const std::pair<Vertex, double>& otherVertexCostToGo)
@@ -1503,7 +1531,7 @@ void FIRM::executeFeedback(void)
             updateEdgeCollisionCost(currentVertex, goal);
 
             // resolve DP
-            solveDynamicProgram(goal);
+            solveDynamicProgram(goal, false);
 
             e = feedback_[currentVertex];
 
@@ -1569,7 +1597,7 @@ void FIRM::executeFeedback(void)
             // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
-            solveDynamicProgram(goal);
+            solveDynamicProgram(goal, false);
 
             Visualizer::doSaveVideo(doSaveVideo_);
             siF_->doVelocityLogging(true);
@@ -1695,7 +1723,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
             // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
-            solveDynamicProgram(goal);
+            solveDynamicProgram(goal, false);
 
             Visualizer::doSaveVideo(doSaveVideo_);
 
@@ -1738,7 +1766,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
             siF_->freeState(tempTrueStateCopy);
 
-            solveDynamicProgram(goal);
+            solveDynamicProgram(goal, false);
 
             sendMostLikelyPathToViz(currentVertex, goal);
 
@@ -2078,6 +2106,15 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
 
         Vertex target = boost::target(edge, g_); // get the target of this edge
 
+
+        // to avoid infinite loop of checkMotion() and effectively ignore disconnected node from rollout candidates
+        if (costToGo_[currentVertex] >= infiniteCostToGo_)
+        {
+            OMPL_WARN("Reached a node that is NOT connected to the goal! Quit isFeedbackPolicyValid() process!");
+            return true;    // not returning false to avoid calling solveDijkstraSearch()/solveDynamicProgram() again!
+        }
+
+
         // if edge is invalid, increase its cost
         if(!si_->checkMotion(stateProperty_[currentVertex], stateProperty_[target]))
         {
@@ -2134,8 +2171,9 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
 
             updateEdgeCollisionCost(targetNode, goal);
 
-            // resolve DP
-            solveDynamicProgram(goal);
+            // resolve Dijkstra/DP
+            solveDijkstraSearch(goal);
+            solveDynamicProgram(goal, false);
 
             targetOfNextFIRMEdge = boost::target(feedback_[targetNode], g_);  
 

@@ -382,7 +382,7 @@ protected:
     virtual void generateNodeController(ompl::base::State *state, NodeControllerType &nodeController);
 
     /** \brief Solves the dynamic program to return a feedback policy */
-    virtual void solveDynamicProgram(const Vertex goalVertex);
+    virtual void solveDynamicProgram(const Vertex goalVertex, const bool reinit);
 
     /** \brief Solves for a (shortest) feedback path tree using Dijkstra search */
     virtual void solveDijkstraSearch(const Vertex goalVertex);

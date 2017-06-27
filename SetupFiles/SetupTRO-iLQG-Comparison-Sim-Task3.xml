@@ -55,7 +55,8 @@
 	<NNRadius nnradius = "2.25" />
 <!-- 	<NNRadius nnradius = "5.0" /> -->
 <!-- 	<NNRadius nnradius = "10.0" /> -->
-	<NumNN numnn = "10" />	<!-- NOTE this will be used for additional connection to k-nearest neighbors during rollout -->
+<!-- 	<NumNN numnn = "10" />	<!&#45;&#45; NOTE this will be used for additional connection to k&#45;nearest neighbors during rollout &#45;&#45;> -->
+	<NumNN numnn = "15" />
 <!-- 	<NumNN numnn = "50" /> -->
 	<DPDiscountFactor discountfac = "1.0" />
 	<InfCostWeight infcostw = "1.0"/>
@@ -63,11 +64,14 @@
 	<GoalCostToGo goalctg = "0.0"/>
 	<ObstCostToGo obsctg = "20000.0" />
 	<InitCostToGo initctg = "2.0" />
-	<MaxDPIter dpiter = "20000" />
+	<MaxDPIter dpiter = "1000" />
+<!-- 	<MaxDPIter dpiter = "20000" /> -->
 <!-- 	<MaxDPIter dpiter = "200000" /> <!&#45;&#45; DP still does not converge for 220 nodes &#45;&#45;> -->
 <!-- 	<MaxDPIter dpiter = "2000000" /> <!&#45;&#45; DP takes 1 hour but still does not converge for 220 nodes &#45;&#45;> -->
+<!-- 	<DPConvergenceThreshold dpconvthresh = "1" /> -->
+	<DPConvergenceThreshold dpconvthresh = "0.1" />
+<!-- 	<DPConvergenceThreshold dpconvthresh = "0.01" /> -->
 <!-- 	<DPConvergenceThreshold dpconvthresh = "0.001" /> -->
-	<DPConvergenceThreshold dpconvthresh = "1" />
 <!-- 	<DPConvergenceThreshold dpconvthresh = "0.0001" /> -->
 </FIRM> 
 <PlanningProblem>
@@ -82,12 +86,13 @@
 		dynobst = "0" 
 	/>
 
-<!-- 	<RoadMap roadmapFile = "" useRoadMap = "0" /> -->
+    <RoadMap roadmapFile = "" useRoadMap = "0" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Oscillation.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Oscillation200.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Dijkstra.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;AvgCovCost210.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;AvgCovCost310.xml" useRoadMap = "1" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-AvgCovCost210.xml" useRoadMap = "1" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;AvgCovCost400.xml" useRoadMap = "1" /> -->
 
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml" useRoadMap = "1" /> -->
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2.xml" useRoadMap = "1" /> -->
@@ -97,9 +102,9 @@
 
 <!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole0x0.obj" /> -->
 <!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole1x1.obj" /> -->
-	<Environment environmentFile = "./Models/iLQG-TRO-Task1-Pole3x3.obj" />
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole3x3.obj" /> -->
 <!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole5x5.obj" /> -->
-<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9.obj" /> -->
+	<Environment environmentFile = "./Models/iLQG-TRO-Task1-Pole9x9.obj" />
 <!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9x2.obj" /> -->
 
 	<Robot robotFile = "./Models/iRobot_thin.obj" />
@@ -120,14 +125,18 @@
 <!--  -->
 <!-- 	<FIRMNodes maxNodes = "20" /> -->
 
-	<FIRMNodes
-		minNodes = "210"
-		maxNodes = "210"
-	/>
+<!-- 	<FIRMNodes -->
+<!-- 		minNodes = "210" -->
+<!-- 		maxNodes = "210" -->
+<!-- 	/> -->
 <!-- 	<FIRMNodes -->
 <!-- 		minNodes = "210" -->
 <!-- 		maxNodes = "310" -->
 <!-- 	/> -->
+	<FIRMNodes
+		minNodes = "400"
+		maxNodes = "400"
+	/>
 
 	<KidnappedState
         x = 1.5 y = 19.5 
