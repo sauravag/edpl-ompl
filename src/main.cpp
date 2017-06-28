@@ -86,6 +86,7 @@ void plan(const std::string &setupFilePath)
     {
         if(mySetup->solve())
         {
+
 #ifdef __linux__
             // HACK to make a beep sound (linux only)
             system("sh -c \"echo '\a'> $(tty)\" 2>/dev/null");
@@ -93,13 +94,12 @@ void plan(const std::string &setupFilePath)
 
             mySetup->Run();
             OMPL_INFORM("Plan Executed.");
+            Visualizer::doSaveVideo(true);  // true: save the final trajectory executed by the robot
+
 #ifdef __linux__
             // HACK to make a beep sound (linux only)
             system("sh -c \"echo '\a'> $(tty)\" 2>/dev/null");
 #endif
-
-//             Visualizer::doSaveVideo(false);
-            Visualizer::doSaveVideo(true);
 
             keepTrying = 0;
 
