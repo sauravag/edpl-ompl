@@ -90,7 +90,8 @@ namespace ompl
         static const double DEFAULT_DISTANCE_TO_GOAL_COST_WEIGHT = 0.01; 
 
         /** \brief Weighting factor for edge execution time cost */
-        static const double TIME_TO_STOP_COST_WEIGHT = 0.001;
+//         static const double TIME_TO_STOP_COST_WEIGHT = 0.001;
+        static const double TIME_TO_STOP_COST_WEIGHT = 0.01;
 
         /** \brief The cost to go from goal. */
         static const double DEFAULT_GOAL_COST_TO_GO = 0.0;
@@ -1147,10 +1148,12 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex, const bool reinit)
         {
             if(v == goalVertex)
             {
+                costToGo_[v] = goalCostToGo_;
                 newCostToGo[v] = goalCostToGo_;
             }
             else
             {
+                costToGo_[v] = initialCostToGo_;
                 newCostToGo[v] = initialCostToGo_;
             }
         }
@@ -1164,17 +1167,32 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex, const bool reinit)
         }
     }
 
+    // sort vertices according to costToGo for efficient and proper value iteration if initialized by Dijkstra search
+    std::vector<std::pair<double, Vertex>> sortedCostToGoVertex;
+    foreach (Vertex n, boost::vertices(g_))
+    {
+        sortedCostToGoVertex.push_back(std::make_pair(newCostToGo[n], n));
+    }
+    if (!reinit)  // if initialized by Dijkstra search
+    {
+        std::sort(sortedCostToGoVertex.begin(), sortedCostToGoVertex.end());
+    }
+
     bool convergenceCondition = false;
 
     int nIter=0;
     double diffCostToGo;
     while(!convergenceCondition && nIter < maxDPIterations_)
+//     while(nIter < maxDPIterations_)
     {
         nIter++;
 
         // REVIEW this seems to be pretty inefficient... switch to Dijkstra search?
-        foreach(Vertex v, boost::vertices(g_))
+//         foreach(Vertex v, boost::vertices(g_))
+//         {
+        for(int i=0; i<sortedCostToGoVertex.size(); i++)
         {
+            Vertex v = sortedCostToGoVertex[i].second;
 
             //value for goal node stays the same or if has no out edges then ignore it
             if( v == goalVertex || boost::out_degree(v,g_) == 0 )
@@ -1197,9 +1215,29 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex, const bool reinit)
             // Update the costToGo of vertex
             std::pair<Edge,double> candidate = getUpdatedNodeCostToGo(v, goalVertex);
 
-            feedback_[v] = candidate.first;
 
-            newCostToGo[v] = candidate.second * discountFactor;
+            // for debug
+            if (!reinit)
+            {
+                // for debug
+                if (feedback_[v] != candidate.first)
+                {
+                    std::cout << "ORGINAL: costToGo[" << v << "]: " << newCostToGo[v] << "\t feedback_[" << v << "]: " << feedback_[v] << std::endl;
+                    std::cout << "UPDATED: costToGo[" << v << "]: " << candidate.second << "\t feedback_[" << v << "]: " << candidate.first << std::endl;
+                }
+
+                // update costToGo and feedback_ only if costToGo is not the same with the previous value
+                // NOTE this is to prevent Dynamic Programming's naive behavior to cut off the connection obtained from Dijkstra search and just locally connect to a duplicate (or nearby) nodes, which may lead to disconnection to the goal
+                if (candidate.second != newCostToGo[v])
+                {
+                    feedback_[v] = candidate.first;
+                    newCostToGo[v] = candidate.second * discountFactor;
+                    std::cout << "Change to UPDATED!!!" << std::endl;
+                }
+            }
+
+//             feedback_[v] = candidate.first;
+//             newCostToGo[v] = candidate.second * discountFactor;
 
             //assert(costToGo_.size()==newCostToGo.size());
 
@@ -1233,7 +1271,7 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex, const bool reinit)
     sendFeedbackEdgesToViz();
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::FeedbackViewMode);
-    sleep(2);   // for visualization
+    sleep(3);   // for visualization
 }
 
 struct DoubleValueComp
@@ -1299,7 +1337,7 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
 
     using namespace arma;
 
-    float discountFactor = discountFactorDP_;
+    float discountFactor = discountFactorDP_;   // NOTE assumed to be 1.0
 
     std::map<Vertex, double> newCostToGo;
     std::map<Vertex, Vertex> bestChildVertexToGoal;
@@ -1403,8 +1441,8 @@ inline bool FIRM::compareCostToGo(const std::pair<Vertex, double>& currentVertex
 
 double FIRM::getNewCostToGoViaChild(const Vertex parentVertex, const Vertex childVertex, const double childCostToGo, const Edge edge)
 {
-    const FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, edge);
-    const double transitionProbability  = edgeWeight.getSuccessProbability();
+    const FIRMWeight edgeWeight = boost::get(boost::edge_weight, g_, edge);
+    const double transitionProbability = edgeWeight.getSuccessProbability();
 
     double newCostToGoViaChild = transitionProbability*childCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
     return newCostToGoViaChild;

@@ -253,8 +253,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     //cost = 0.01 , for covariance based
 
     // CHECK what about 0?
-    double cost = 0.001;
-//     double cost = 0.000;    // this should be fine for Dijkstra search, but in the rollout phase osciallation appears more frequently...
+//     double cost = 0.001;
+    double cost = 0.000;    // this should be fine for Dijkstra search, but in the rollout phase osciallation appears more frequently...
 
     //float totalCollisionCheckComputeTime = 0;
     //int totalNumCollisionChecks = 0;

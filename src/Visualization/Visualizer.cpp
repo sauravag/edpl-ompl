@@ -302,6 +302,8 @@ void Visualizer::refresh()
 
         case RolloutMode:
 
+            if(feedbackEdges_.size()>0) drawFeedbackEdges();    // XXX
+
             drawGraphBeliefNodes();
 
             drawRolloutConnections();
@@ -459,7 +461,8 @@ void Visualizer::drawFeedbackEdges()
         maxCost = std::max(maxCost, i->cost);
     }
 
-    glLineWidth(4.0);
+//     glLineWidth(4.0);
+    glLineWidth(1.0);
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
         std::pair<const ompl::base::State*, const ompl::base::State*> vertexPair = std::make_pair(i->source, i->target);
@@ -470,7 +473,8 @@ void Visualizer::drawFeedbackEdges()
         if( it == mostLikelyPath_.end())
         {
             double costFactor = sqrt(i->cost/maxCost);
-            glColor3d(0,0.9,0);
+//             glColor3d(0,0.9,0);
+            glColor3d(0.9,0.9,1.0);
 
             drawEdge(i->source, i->target);
 
