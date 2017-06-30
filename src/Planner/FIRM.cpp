@@ -102,7 +102,8 @@ namespace ompl
         static const double DEFAULT_INF_COST_TO_GO = 1000000000.0; // 1000000000 is a good number
 
         /** \brief The cost to traverse an obstacle*/
-        static const double DEFAULT_OBSTACLE_COST_TO_GO = 200; // 200 is a good number
+//         static const double DEFAULT_OBSTACLE_COST_TO_GO = 200; // 200 is a good number? collision happens... need a higher penalty!
+        static const double DEFAULT_OBSTACLE_COST_TO_GO = 2000;
 
         /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
         static const double DEFAULT_DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
@@ -1032,6 +1033,9 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
             // for debug
             //std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
         }
+
+        // free the memory
+        siF_->freeState(endBelief);
     }
     // for debug
     //ompl::base::Cost edgeCostSum = ompl::base::Cost(edgeCost.value());
@@ -1678,6 +1682,9 @@ void FIRM::executeFeedback(void)
 
     Visualizer::doSaveVideo(false);
 
+    // free the memory
+    si_->freeState(cstartState);
+    si_->freeState(cendState);
 }
 
 void FIRM::executeFeedbackWithKidnapping(void)
@@ -1823,6 +1830,9 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     Visualizer::doSaveVideo(false);
 
+    // free the memory
+    si_->freeState(cstartState);
+    si_->freeState(cendState);
 }
 
 // Experimental
@@ -2144,7 +2154,9 @@ void FIRM::executeFeedbackWithRollout(void)
 
     Visualizer::doSaveVideo(false);
 
-
+    // free the memory
+    si_->freeState(cstartState);
+    si_->freeState(cendState);
 }
 
 void FIRM::showRolloutConnections(const FIRM::Vertex v)

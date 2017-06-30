@@ -540,6 +540,8 @@ void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::S
 
     si_->setBelief(nextBelief);
 
+    // free the memory
+    si_->freeState(nextBelief);
 }
 
 
