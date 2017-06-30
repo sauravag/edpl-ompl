@@ -51,12 +51,15 @@
 	<MCParticles numparticles = "10" />
 	<RolloutSteps rolloutsteps = "1" />
 <!-- 	<RolloutSteps rolloutsteps = "3" /> -->
+<!-- 	<RolloutSteps rolloutsteps = "5" /> -->
+<!-- 	<RolloutSteps rolloutsteps = "10" /> -->
+<!-- 	<RolloutSteps rolloutsteps = "20" /> -->
 <!-- 	<NNRadius nnradius = "2.0" /> -->
 	<NNRadius nnradius = "2.25" />
 <!-- 	<NNRadius nnradius = "5.0" /> -->
 <!-- 	<NNRadius nnradius = "10.0" /> -->
-<!-- 	<NumNN numnn = "10" />	<!&#45;&#45; NOTE this will be used for additional connection to k&#45;nearest neighbors during rollout &#45;&#45;> -->
-	<NumNN numnn = "15" />
+	<NumNN numnn = "10" />	<!-- NOTE this will be used for additional connection to k-nearest neighbors during rollout -->
+<!-- 	<NumNN numnn = "15" /> -->
 <!-- 	<NumNN numnn = "50" /> -->
 	<DPDiscountFactor discountfac = "1.0" />
 	<InfCostWeight infcostw = "1.0"/>

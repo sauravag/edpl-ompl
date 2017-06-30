@@ -589,6 +589,9 @@ private:
 
     double convergenceThresholdDP_;
 
+    int numberOfTargetsInHistory_;
+
+    int numberOfFeedbackLookAhead_;
 };
 
 

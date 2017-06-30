@@ -47,9 +47,8 @@
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
 #include <tinyxml.h>
-// #include <queue>
-// #include <boost/heap/priority_queue.hpp>
 #include <boost/heap/fibonacci_heap.hpp>
+#include <boost/circular_buffer.hpp>
 #include "Visualization/Visualizer.h"
 #include "Utils/FIRMUtils.h"
 #include "Planner/FIRM.h"
@@ -122,6 +121,19 @@ namespace ompl
         static const int DEFAULT_STEPS_TO_ROLLOUT = 10;
 
         static const double EDGE_COST_BIAS = 0.01; // In controller.h all edge costs are added up from 0.01 as the starting cost, this helps DP converge
+
+        static const int DEFAULT_NUM_OF_TARGETS_IN_HISTORY = 3;
+
+        static const int DEFAULT_NUM_OF_FEEDBACK_LOOK_AHEAD = 3;
+
+//         static const bool PRINT_FEEDBACK_PATH = true;
+        static const bool PRINT_FEEDBACK_PATH = false;
+
+//         static const bool PRINT_COST_TO_GO = true;
+        static const bool PRINT_COST_TO_GO = false;
+
+        static const bool PRINT_FUTURE_NODES = true;
+//         static const bool PRINT_FUTURE_NODES = false;
     }
 }
 
@@ -194,6 +206,9 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
     
     convergenceThresholdDP_ = ompl::magic::DEFAULT_DP_CONVERGENCE_THRESHOLD;
 
+    numberOfTargetsInHistory_ = ompl::magic::DEFAULT_NUM_OF_TARGETS_IN_HISTORY;
+
+    numberOfFeedbackLookAhead_ = ompl::magic::DEFAULT_NUM_OF_FEEDBACK_LOOK_AHEAD;
 }
 
 FIRM::~FIRM(void)
@@ -764,15 +779,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 //         neighbors = connectionStrategy_(m, 1.2*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.0*NNRadius_);
 
-        // 2) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list
-        // implemented in FIRM::executeFeedbackWithRollout() to access nextFIRMVertex information
-//         neighbors = connectionStrategy_(m, NNRadius_);
-
-        // 3) forcefully include the next FIRM nodes of the multiple previously reached FIRM nodes in the candidate (nearest neighbor) list
-        // not yet implemented
-//         neighbors = connectionStrategy_(m, NNRadius_);
-
-        // 4) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list; this may be considered as a change of the graph connection property
+        // 2) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list; this may be considered as a change of the graph connection property
 //         kneighbors = kConnectionStrategy_(m, numNearestNeighbors_);
 //         // remove duplicate entities from kneighbors
 //         std::vector<Vertex>::iterator diff;
@@ -781,8 +788,16 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 //         // concantenate kneighbors to neighbors
 //         neighbors.insert(neighbors.end(), kneighbors.begin(), kneighbors.end());
 
-        // 5) instead of bounded nearest neighbors, use k-nearest neighbors during rollout; this may be considered as a change of the graph connection property
-        neighbors = kConnectionStrategy_(m, numNearestNeighbors_);
+        // 3) instead of bounded nearest neighbors, use k-nearest neighbors during rollout; this may be considered as a change of the graph connection property
+//         neighbors = kConnectionStrategy_(m, numNearestNeighbors_);
+
+        // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list
+        // implemented in FIRM::executeFeedbackWithRollout() to access nextFIRMVertex information
+//         neighbors = connectionStrategy_(m, NNRadius_);
+
+        // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
+        // implemented in FIRM::executeFeedbackWithRollout() to access nextFIRMVertex information
+        neighbors = connectionStrategy_(m, NNRadius_);
     }
 
     OMPL_INFORM("Adding State, Number of Nearest Neighbors = %u", neighbors.size());
@@ -913,7 +928,7 @@ bool FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::
 
     while(currentVertex!=goal)
     {
-        Edge edge = feedback_[currentVertex]; // get the edge
+        Edge edge = feedback_.at(currentVertex); // get the edge
 
         Vertex target = boost::target(edge, g_); // get the target of this edge
 
@@ -1217,8 +1232,12 @@ void FIRM::solveDynamicProgram(const FIRM::Vertex goalVertex, const bool reinit)
             // NOTE this is to prevent Dynamic Programming's naive behavior to cut off the connection obtained from Dijkstra search and just locally connect to a duplicate (or nearby) nodes, which may lead to disconnection to the goal
             if (candidate.second != newCostToGo[v])
             {
-                feedback_[v] = candidate.first;
-                newCostToGo[v] = candidate.second * discountFactor;
+                // do not create invalid feedback_[goalVertex]
+                if (v != goalVertex)
+                {
+                    feedback_[v] = candidate.first;
+                    newCostToGo[v] = candidate.second * discountFactor;
+                }
             }
         }
 
@@ -1375,9 +1394,15 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
             // update the minimum cost-to-go and the best child on the shortest path to the goal (so far)
             if (newParentCostToGo < parentCostToGo)
             {
-                newCostToGo[parentVertex] = newParentCostToGo;
-                bestChildVertexToGoal[parentVertex] = childVertex;
-                feedback_[parentVertex] = edge;
+                // do not create invalid feedback_[goalVertex] and bestChildVertexToGoal_[goalVertex]
+                if (parentVertex != goalVertex)
+                {
+                    newCostToGo[parentVertex] = newParentCostToGo;
+                    bestChildVertexToGoal[parentVertex] = childVertex;
+                    feedback_[parentVertex] = edge;
+                    // for debug
+                    //std::cout << "feedback_[" << parentVertex << "]: " << edge << std::endl;
+                }
 
                 // update the min heap
                 heapCostToGo.decrease( handleCostToGo[parentVertex], std::pair<Vertex, double>(parentVertex, newParentCostToGo) );
@@ -1438,7 +1463,7 @@ double FIRM::evaluateSuccessProbability(const Edge currentEdge, const FIRM::Vert
 
     while(v != goal)
     {
-        Edge edge = feedback_[v];
+        Edge edge = feedback_.at(v);
 
         const FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, edge);
 
@@ -1460,7 +1485,7 @@ void FIRM::updateEdgeCollisionCost(FIRM::Vertex currentVertex, FIRM::Vertex goal
     // cycle through feedback, update edge costs for edges in collision
     while(currentVertex != goalVertex)
     {
-        Edge edge = feedback_[currentVertex]; // get the edge
+        Edge edge = feedback_.at(currentVertex); // get the edge
 
         Vertex target = boost::target(edge, g_); // get the target of this edge
 
@@ -1531,14 +1556,15 @@ void FIRM::executeFeedback(void)
         if(currentVertex==goal)
             break;
 
-        Edge e = feedback_[currentVertex];
+        Edge e = feedback_.at(currentVertex);
 
         assert(currentVertex < boost::num_vertices(g_));
 
         OMPL_INFORM("FIRM: Moving from Vertex %u to %u", currentVertex, boost::target(e, g_));
 
         // for debug
-        std::cout << "PATH[" << currentVertex;
+        if(ompl::magic::PRINT_FEEDBACK_PATH)
+            std::cout << "PATH[" << currentVertex;
 
         // Check if feedback policy is valid 
         while(!isFeedbackPolicyValid(currentVertex, goal))
@@ -1551,7 +1577,7 @@ void FIRM::executeFeedback(void)
             // resolve DP
             solveDynamicProgram(goal, false);
 
-            e = feedback_[currentVertex];
+            e = feedback_.at(currentVertex);
 
             OMPL_INFORM("FIRM: Updated path, moving from Vertex %u to %u", currentVertex, boost::target(e, g_));
         }
@@ -1690,7 +1716,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
         if(currentVertex==goal)
             break;
 
-        Edge e = feedback_[currentVertex];
+        Edge e = feedback_.at(currentVertex);
 
         double succProb = evaluateSuccessProbability(e, currentVertex, goal);
 
@@ -1846,10 +1872,18 @@ void FIRM::executeFeedbackWithRollout(void)
 
     OMPL_INFORM("FIRM: Running policy execution");
 
-    Edge e = feedback_[currentVertex];
+    Edge e = feedback_.at(currentVertex);
 
-    // for debug
+
+    // local variables for robust connection to a desirable (but far) FIRM nodes during rollout
+
+    // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
     Vertex nextFIRMVertex = boost::target(e, g_);
+
+    // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
+    // initialize a container of FIRM nodes on feedback path
+    boost::circular_buffer<Vertex> futureFIRMNodes(numberOfTargetsInHistory_ * numberOfFeedbackLookAhead_);  // it is like a size-limited queue or buffer
+
 
     Vertex tempVertex = currentVertex;
 
@@ -1872,6 +1906,38 @@ void FIRM::executeFeedbackWithRollout(void)
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
 
         OMPL_INFORM("FIRM Rollout: Moving from Vertex %u to %u with TP = %f", tempVertex, boost::target(e, g_), succProb);
+
+        // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
+        // update the future feedback node at every iteration
+        Vertex futureVertex = boost::target(e, g_);
+
+        for(int i=0; i<numberOfFeedbackLookAhead_; i++)
+        {
+            futureFIRMNodes.push_back(futureVertex);
+
+            if(feedback_.find(futureVertex) != feedback_.end())    // there exists a valid feedback edge for this vertex
+            {
+                futureVertex = boost::target(feedback_.at(futureVertex), g_);
+            }
+            else    // there is no feedback edge coming from this vertex
+            {
+                // fill the rest of the buffer with the last valid vertex; redundant vertices will be ignored for rollout check
+                for(int j=i+1; j<numberOfFeedbackLookAhead_; j++)
+                {
+                    futureFIRMNodes.push_back(futureVertex);
+                }
+                break;
+            }
+        }
+        // for debug
+        if(ompl::magic::PRINT_FUTURE_NODES)
+        {
+            std::cout << "futureFIRMNodes: { ";
+            foreach(futureVertex, futureFIRMNodes)
+                std::cout << futureVertex << " ";
+            std::cout << "}" << std::endl;
+        }
+
 
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
@@ -1921,10 +1987,14 @@ void FIRM::executeFeedbackWithRollout(void)
 
             tempVertex = boost::target(e,g_);
 
-            e = feedback_[tempVertex];
+            // if the reached node is not the goal
+            if(tempVertex != goal)
+            {
+                e = feedback_.at(tempVertex);
 
-            // for debug
-            nextFIRMVertex = boost::target(e, g_);
+                // for debug
+                nextFIRMVertex = boost::target(e, g_);
+            }
         }
 
         else
@@ -1945,18 +2015,49 @@ void FIRM::executeFeedbackWithRollout(void)
             // 1) allow longer edge length for connection to FIRM nodes during rollout
             // implemented in FIRM::addStateToGraph()
 
-            // 2) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
-            // bool forwardEdgeAdded;
-            // addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
-
-            // 3) forcefully include the next FIRM nodes of the multiple previously reached FIRM nodes in the candidate (nearest neighbor) list for rollout policy
-            // not yet implemented
-
-            // 4) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list for rollout policy
+            // 2) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list for rollout policy
             // implemented in FIRM::addStateToGraph() for si_->checkMotion() validation
 
-            // 5) instead of bounded nearest neighbors, use k-nearest neighbors during rollout; this may be considered as a change of the graph connection property
+            // 3) instead of bounded nearest neighbors, use k-nearest neighbors during rollout; this may be considered as a change of the graph connection property
             // implemented in FIRM::addStateToGraph() for si_->checkMotion() validation
+
+            // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
+//             bool forwardEdgeAdded;
+//             if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[nextFIRMVertex]))
+//             {
+//                 addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
+//             }
+
+            // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
+            Vertex futureVertex;
+            bool forwardEdgeAdded;
+            // for debug
+            if(ompl::magic::PRINT_FUTURE_NODES)
+                std::cout << "uniqueFIRMNodes: { ";
+            for(int i=0; i<futureFIRMNodes.size(); i++)
+            {
+                futureVertex = futureFIRMNodes[i];
+                // check if not duplicate with the previous nodes
+                bool unique = false;
+                if(std::find(futureFIRMNodes.begin(), futureFIRMNodes.begin()+i-0, futureVertex) == futureFIRMNodes.begin()+i-0)
+                {
+                    unique = true;
+                }
+                // check for motion validity and add to the graph
+                if(unique)
+                {
+                    if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[futureVertex]))
+                    {
+                        addEdgeToGraph(tempVertex, futureVertex, forwardEdgeAdded);
+                    }
+                    // for debug
+                    if(ompl::magic::PRINT_FUTURE_NODES)
+                        std::cout << futureVertex << " ";
+                }
+            }
+            // for debug
+            if(ompl::magic::PRINT_FUTURE_NODES)
+                std::cout << "}" << std::endl;
 
 
             siF_->setTrueState(tState);
@@ -2100,7 +2201,7 @@ void FIRM::sendMostLikelyPathToViz(const FIRM::Vertex start, const FIRM::Vertex 
     {
         Vertex targetVertex;
 
-        Edge edge = feedback_[v];
+        Edge edge = feedback_.at(v);
 
         targetVertex = boost::target(edge, g_);
 
@@ -2115,23 +2216,30 @@ void FIRM::sendMostLikelyPathToViz(const FIRM::Vertex start, const FIRM::Vertex 
 bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVertex)
 {
     // for debug
-    std::cout << "->" << currentVertex;
+    if(ompl::magic::PRINT_FEEDBACK_PATH)
+        std::cout << "->" << currentVertex;
 
     // cycle through feedback, if feedback edge is invalid, return false
     while(currentVertex != goalVertex)
     {
-        Edge edge = feedback_[currentVertex]; // get the edge
-
-        Vertex target = boost::target(edge, g_); // get the target of this edge
-
+        // to avoid illegal access to non-existing element in feedback_
+        if (feedback_.find(currentVertex) == feedback_.end())    // there is no feedback edge coming from this vertex
+        {
+            OMPL_WARN("Reached a node that is NOT connected to the goal! Quit isFeedbackPolicyValid()!");
+            return true;    // not returning false to avoid calling solveDijkstraSearch()/solveDynamicProgram() again!
+        }
 
         // to avoid infinite loop of checkMotion() and effectively ignore disconnected node from rollout candidates
         if (costToGo_[currentVertex] >= infiniteCostToGo_)
         {
-            OMPL_WARN("Reached a node that is NOT connected to the goal! Quit isFeedbackPolicyValid() process!");
+            OMPL_WARN("Reached a node that is NOT connected to the goal! Quit isFeedbackPolicyValid()!");
             return true;    // not returning false to avoid calling solveDijkstraSearch()/solveDynamicProgram() again!
         }
 
+
+        Edge edge = feedback_.at(currentVertex); // get the edge
+
+        Vertex target = boost::target(edge, g_); // get the target of this edge
 
         // if edge is invalid, increase its cost
         if(!si_->checkMotion(stateProperty_[currentVertex], stateProperty_[target]))
@@ -2142,12 +2250,14 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
         currentVertex =  target;
 
         // for debug
-        std::cout << "->" << target;
+        if(ompl::magic::PRINT_FEEDBACK_PATH)
+            std::cout << "->" << target;
 
     }
 
     // for debug
-    std::cout << "]" << std::endl;
+    if(ompl::magic::PRINT_FEEDBACK_PATH)
+        std::cout << "]" << std::endl;
 
     return true;
 
@@ -2173,19 +2283,20 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
         Vertex targetNode = boost::target(e, g_);  
 
         // The FIRM edge to take from the target node
-        Edge nextFIRMEdge = feedback_[targetNode];
+        //Edge nextFIRMEdge = feedback_.at(targetNode);
 
         // The node to which next firm edge goes
-        Vertex targetOfNextFIRMEdge = boost::target(nextFIRMEdge, g_);
+        //Vertex targetOfNextFIRMEdge = boost::target(nextFIRMEdge, g_);
 
         // for debug
-        std::cout << "PATH[" << currentVertex;
+        if(ompl::magic::PRINT_FEEDBACK_PATH)
+            std::cout << "PATH[" << currentVertex;
 
         // Check if feedback from target to goal is valid or not
         if(!isFeedbackPolicyValid(targetNode, goal))
         {
 
-            OMPL_INFORM("Rollout: Invalid path detected from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+            //OMPL_INFORM("Rollout: Invalid path detected from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
 
             updateEdgeCollisionCost(targetNode, goal);
 
@@ -2193,9 +2304,8 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
             solveDijkstraSearch(goal);
             solveDynamicProgram(goal, false);
 
-            targetOfNextFIRMEdge = boost::target(feedback_[targetNode], g_);  
-
-            OMPL_INFORM("Rollout: Updated path, next firm edge moving from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+            //targetOfNextFIRMEdge = boost::target(feedback_.at(targetNode), g_);  
+            //OMPL_INFORM("Rollout: Updated path, next firm edge moving from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
 
         }
 
@@ -2217,7 +2327,8 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
 
 
         // for debug
-        std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
+        if(ompl::magic::PRINT_COST_TO_GO)
+            std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
 
 
         if(edgeCostToGo < minCost)
@@ -2228,12 +2339,13 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
             // for debug
             minCostVertCurrent = currentVertex;
             minCostVertNext = targetNode;
-            minCostVertNextNext = targetOfNextFIRMEdge;
+            //minCostVertNextNext = targetOfNextFIRMEdge;
         }
     }
 
     // for debug
-    std::cout << "minC[" << minCostVertCurrent << "->" << minCostVertNext << "->G] " << minCost << std::endl;
+    if(ompl::magic::PRINT_COST_TO_GO)
+        std::cout << "minC[" << minCostVertCurrent << "->" << minCostVertNext << "->G] " << minCost << std::endl;
 
     return edgeToTake;
 }
