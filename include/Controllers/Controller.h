@@ -252,9 +252,9 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     //cost = 1 ,for time based only if time per execution is "1"
     //cost = 0.01 , for covariance based
 
-    // CHECK what about 0?
+    // REVIEW artificial manipulation of cost for faster convergence of Dynamic Programming... can we get rid of this?
 //     double cost = 0.001;
-    double cost = 0.000;    // this should be fine for Dijkstra search, but in the rollout phase osciallation appears more frequently...
+    double cost = 0.000;    // this should be fine for Dijkstra search
 
     //float totalCollisionCheckComputeTime = 0;
     //int totalNumCollisionChecks = 0;
@@ -272,7 +272,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     // for debug
 //     std::cout << "filteringCost: " << cost;
 
-    while(!this->isTerminated(tempEndState, k))
+    // NOTE replaced while(){}; to do{}while(); in order to prevent zero cost with no evolution toward the end state when the start state is within nodeReachedDistance_ from the end state
+    do
     {
 
         this->Evolve(internalState, k, tempEndState) ;
@@ -341,7 +342,9 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         {
           boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
-    }
+    } // do
+    while(!this->isTerminated(tempEndState, k));
+
     if(k!=0) {cost /= k;}   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
 
     // for debug

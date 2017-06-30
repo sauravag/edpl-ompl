@@ -302,9 +302,9 @@ void Visualizer::refresh()
 
         case RolloutMode:
 
-            if(feedbackEdges_.size()>0) drawFeedbackEdges();    // optional
-
             drawGraphBeliefNodes();
+
+            if(feedbackEdges_.size()>0) drawFeedbackEdges();    // optional
 
             drawRolloutConnections();
 

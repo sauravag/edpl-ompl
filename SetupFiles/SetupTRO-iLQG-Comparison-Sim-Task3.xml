@@ -27,20 +27,20 @@
 	  <!--omega is in radians, wind_noise_ang is in degrees -->
 	  <!--wind_noise_pos="1.000"
 		  wind_noise_ang="7.0"-->
-<!-- 	<TwoDPointMotionModel  -->
-<!-- 		sigmaV="0.0" -->
-<!-- 		etaV="0.0" -->
-<!-- 		wind_noise_pos="0.1"  -->
-<!-- 		max_linear_velocity= "4.0" -->
-<!-- 		dt= "0.1" -->
-<!-- 	  /> -->
 	<TwoDPointMotionModel 
 		sigmaV="0.0"
 		etaV="0.0"
-		wind_noise_pos="0.0" 
+		wind_noise_pos="0.1"
 		max_linear_velocity= "4.0"
 		dt= "0.1"
 	  />
+<!-- 	<TwoDPointMotionModel  -->
+<!-- 		sigmaV="0.0" -->
+<!-- 		etaV="0.0" -->
+<!-- 		wind_noise_pos="0.0"  -->
+<!-- 		max_linear_velocity= "4.0" -->
+<!-- 		dt= "0.1" -->
+<!-- 	  /> -->
 </MotionModels>
 <FIRM>
 	<Video save = "0" />
@@ -89,7 +89,7 @@
 		dynobst = "0" 
 	/>
 
-<!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
+    <RoadMap roadmapFile = "" useRoadMap = "0" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Oscillation.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Oscillation200.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;Dijkstra.xml" useRoadMap = "1" /> -->
@@ -97,7 +97,7 @@
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;AvgCovCost310.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;AvgCovCost400.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;AvgCovCost400b.xml" useRoadMap = "1" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-DijkstraDP.xml" useRoadMap = "1" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DijkstraDP.xml" useRoadMap = "1" /> -->
 
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3.xml" useRoadMap = "1" /> -->
 <!-- 	<RoadMap roadmapFile = "./SavedRoadMaps/FIRMRoadMap_iLQG_TRO_Task3_Pole9x9x2.xml" useRoadMap = "1" /> -->
