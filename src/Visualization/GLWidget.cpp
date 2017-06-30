@@ -52,6 +52,9 @@ using namespace std;
 
 #include "Visualization/GLWidget.h"
 
+// HACK just for density analysis setup
+#include "boost/date_time/posix_time/posix_time.hpp"
+
 GLWidget::GLWidget(QWidget *parent)
   : QGLWidget(QGLFormat(QGL::SampleBuffers), parent),
     m_drawAxes(false),
@@ -160,24 +163,55 @@ void GLWidget::saveSnapshot()
     ++snapshotNum;
 }
 
+
+// HACK just for density analysis setup
+namespace ompl
+{
+    namespace magic
+    {
+        static const bool DENSITY_ANALYSIS = true;    // HACK defined again in addition to Planner/FIRM.cpp
+    }
+}
+
+
 void GLWidget::saveFrame()
 {
-  static unsigned int frameNum = 0;
+    static unsigned int frameNum = 0;
 
-   //the first time, make a good snapshot directory
-    if(m_framePath == "")
+    // HACK just for density analysis setup
+    if (ompl::magic::DENSITY_ANALYSIS)
     {
-        QString dateTime = QDateTime::currentDateTime().toString("MMM.dd.yyyy_hh.mmap");
+        m_framePath = QString("./");
+    }
+    else
+    {
+        //the first time, make a good snapshot directory
+        if(m_framePath == "")
+        {
+            QString dateTime = QDateTime::currentDateTime().toString("MMM.dd.yyyy_hh.mmap");
 
-        QDir currPath(QDir::currentPath());
-        currPath.mkpath(tr("VideoFrames/") + dateTime);
-        m_framePath = QDir::currentPath() + QString("/VideoFrames/") + dateTime + QString("/");
+            QDir currPath(QDir::currentPath());
+            currPath.mkpath(tr("VideoFrames/") + dateTime);
+            m_framePath = QDir::currentPath() + QString("/VideoFrames/") + dateTime + QString("/");
+        }
     }
 
     char number[8];
     sprintf(number, "%07u", frameNum);
     ostringstream oss;
-    oss << m_framePath.toStdString() << "Frame" << "_" << number << ".png";
+
+    // HACK just for density analysis setup
+    if (ompl::magic::DENSITY_ANALYSIS)
+    {
+        namespace pt = boost::posix_time;
+        pt::ptime now = pt::second_clock::local_time();
+        std::string timeStamp(pt::to_iso_string(now)) ;
+        oss << m_framePath.toStdString() << "Frame" << "_" << timeStamp << ".png";
+    }
+    else
+    {
+        oss << m_framePath.toStdString() << "Frame" << "_" << number << ".png";
+    }
 
     QString fileName(oss.str().c_str());
     saveImage(fileName);

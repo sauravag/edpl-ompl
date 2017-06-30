@@ -121,7 +121,8 @@ namespace ompl
 
         static const int DEFAULT_STEPS_TO_ROLLOUT = 10;
 
-        static const double EDGE_COST_BIAS = 0.01; // In controller.h all edge costs are added up from 0.01 as the starting cost, this helps DP converge
+//         static const double EDGE_COST_BIAS = 0.01; // In controller.h all edge costs are added up from 0.01 as the starting cost, this helps DP converge
+        static const double EDGE_COST_BIAS = 0.0; // NOTE this bias is set to 0.0 for density analysis in include/Controllers/Controller.h
 
         static const int DEFAULT_NUM_OF_TARGETS_IN_HISTORY = 3;
 
@@ -135,6 +136,11 @@ namespace ompl
 
         static const bool PRINT_FUTURE_NODES = true;
 //         static const bool PRINT_FUTURE_NODES = false;
+
+        // HACK just for density analysis setup
+        // 1) if a roadmap is loaded, do not add duplicate start and goal states again (assuming start/goal are not changed)
+        // 2) save VideoFrames in the working directory (~/edpl_ompl/.)  // hard-coded in Visualization/GLWidget.cpp
+        static const bool DENSITY_ANALYSIS = true;
     }
 }
 
@@ -592,6 +598,17 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     // Add the valid start states as milestones
     while (const ompl::base::State *st = pis_.nextStart())
     {
+        // HACK just for density analysis setup
+        if (ompl::magic::DENSITY_ANALYSIS)
+        {
+            if (loadedRoadmapFromFile_)
+            {
+                Vertex start_loaded = 0;    // HACK
+                startM_.push_back(start_loaded);
+                break;
+            }
+        }
+
         auto start_time = std::chrono::high_resolution_clock::now();
         
         startM_.push_back(addStateToGraph(si_->cloneState(st)));
@@ -616,10 +633,22 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
         return ompl::base::PlannerStatus::INVALID_START;
     }
 
+
     if (!goal->couldSample())
     {
         OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
         return ompl::base::PlannerStatus::INVALID_GOAL;
+    }
+
+    // HACK just for density analysis setup
+    if (ompl::magic::DENSITY_ANALYSIS)
+    {
+        if (loadedRoadmapFromFile_)
+        {
+            OMPL_INFORM("%s: Adding goal state to roadmap.", getName().c_str());
+            Vertex goal_loaded = 1;    // HACK
+            goalM_.push_back(goal_loaded);
+        }
     }
 
     // Ensure there is at least one valid goal state
@@ -801,7 +830,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
         neighbors = connectionStrategy_(m, NNRadius_);
     }
 
-    OMPL_INFORM("Adding State, Number of Nearest Neighbors = %u", neighbors.size());
+    OMPL_INFORM("Adding a state: %u nearest neighbors from %u nodes in the graph", neighbors.size(), boost::num_vertices(g_));
 
 
     // NOTE commented this to allow connection to farther but better FIRM node
@@ -1527,6 +1556,9 @@ void FIRM::updateEdgeCollisionCost(FIRM::Vertex currentVertex, FIRM::Vertex goal
 void FIRM::executeFeedback(void)
 {
 
+    Visualizer::setMode(Visualizer::VZRDrawingMode::FIRMMode);
+    Visualizer::clearRobotPath();
+
     Vertex start = startM_[0];
     Vertex goal  = goalM_[0] ;
 
@@ -1604,6 +1636,8 @@ void FIRM::executeFeedback(void)
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
+        currentTimeStep_ += stepsExecuted;
+
         executionCost_ += cost.value() - ompl::magic::EDGE_COST_BIAS;
 
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,executionCost_));
@@ -1619,8 +1653,6 @@ void FIRM::executeFeedback(void)
 
            return;
         }
-
-        currentTimeStep_ += stepsExecuted;
 
         if(controllerStatus)
         {
@@ -1658,6 +1690,13 @@ void FIRM::executeFeedback(void)
 
 
     }
+
+
+    // for analysis
+    // this data is also saved in run-(TIMESTAMP)/StandardFIRMCostHistory.csv
+    std::cout << "Execution time steps: " << currentTimeStep_ << std::endl;
+    std::cout << "Execution cost: " << executionCost_ << std::endl;
+
 
     if(doSaveLogs_)
     {
@@ -1743,6 +1782,8 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         bool controllerStatus = controller.Execute(cstartState, cendState, cost, stepsExecuted, stepsToStop, false);
 
+        currentTimeStep_ += stepsExecuted;
+
         executionCost_ += cost.value() - ompl::magic::EDGE_COST_BIAS;
 
         costToGoHistory_.push_back(std::make_pair(currentTimeStep_,executionCost_));
@@ -1757,8 +1798,6 @@ void FIRM::executeFeedbackWithKidnapping(void)
             OMPL_INFORM("Robot Collided :(");
             return;
         }
-
-        currentTimeStep_ += stepsExecuted;
 
         if(controllerStatus)
         {
@@ -2122,11 +2161,18 @@ void FIRM::executeFeedbackWithRollout(void)
 
     nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
-    OMPL_INFORM("FIRM: Number of nodes reached with Rollout: %u", numberofNodesReached_);
+//     OMPL_INFORM("FIRM: Number of nodes reached with Rollout: %u", numberofNodesReached_);
 
     averageTimeForRolloutComputation = averageTimeForRolloutComputation / (1000*numberOfRollouts);
 
-    std::cout<<"Nearest Neighbor Radius: "<<NNRadius_<<", Monte Carlo Particles: "<<numMCParticles_<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;    
+//     std::cout<<"Nearest Neighbor Radius: "<<NNRadius_<<", Monte Carlo Particles: "<<numMCParticles_<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;    
+
+
+    // for analysis
+    // this data is also saved in run-(TIMESTAMP)/RolloutFIRMCostHistory.csv
+    std::cout << "Execution time steps: " << currentTimeStep_ << std::endl;
+    std::cout << "Execution cost: " << executionCost_ << std::endl;
+
 
     if(doSaveLogs_)
     {

@@ -74,6 +74,7 @@ class Visualizer
             NodeViewMode,
             FeedbackViewMode,
             PRMViewMode,
+            FIRMMode,
             RolloutMode,
             MultiModalMode
         };

@@ -300,6 +300,18 @@ void Visualizer::refresh()
 
             break;
 
+        case FIRMMode:
+
+            drawGraphBeliefNodes();
+
+            if(feedbackEdges_.size()>0) drawFeedbackEdges();
+
+            drawMostLikelyPath();
+
+            robotPath_.push_back(si_->cloneState(trueState_));
+
+            break;
+
         case RolloutMode:
 
             drawGraphBeliefNodes();
@@ -544,9 +556,11 @@ void Visualizer::printRobotPathToFile(std::string path)
     for(int i=0; i<robotPath_.size()-1;i++)
     {
 
-        arma::colvec::fixed<2> x = robotPath_[i]->as<SE2BeliefSpace::StateType>()->getArmaData().subvec(0,1);
+//         arma::colvec::fixed<2> x = robotPath_[i]->as<SE2BeliefSpace::StateType>()->getArmaData().subvec(0,1);
+//         outfile<<x[0]<<","<<x[1]<<std::endl;
 
-        outfile<<x[0]<<","<<x[1]<<std::endl;
+        arma::colvec::fixed<3> x = robotPath_[i]->as<SE2BeliefSpace::StateType>()->getArmaData().subvec(0,2);
+        outfile<<x[0]<<","<<x[1]<<","<<x[2]<<std::endl;
 
     }
 
