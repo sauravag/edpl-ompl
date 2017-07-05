@@ -441,6 +441,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     //Increment cost by:
     //-> 0.01 for time based
     //-> trace(Covariance) for FIRM
+    // NOTE for 3) cost for the sum of trace(cov); less oscillation and less jiggling motion, divide this actual cost by the number of steps at the end!
     arma::mat tempCovMat = endState->as<StateType>()->getCovariance();
     cost += arma::trace(tempCovMat);
 

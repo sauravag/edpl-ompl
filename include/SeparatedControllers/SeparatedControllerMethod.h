@@ -67,7 +67,14 @@ class SeparatedControllerMethod
         linearSystems_(linearSystems),
         motionModel_(mm) {}
 
-    ~SeparatedControllerMethod() {}
+//     ~SeparatedControllerMethod() {}
+    ~SeparatedControllerMethod()
+    {
+        for(const auto state : nominalXs_)
+            motionModel_->freeState(state);
+        for(const auto control : nominalUs_)
+            motionModel_->freeControl(control);
+    }
 
     virtual ompl::control::Control* generateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) = 0;
 

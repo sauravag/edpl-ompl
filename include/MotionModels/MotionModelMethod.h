@@ -143,6 +143,20 @@ class MotionModelMethod
             return zeroNoise_;
         }
 
+        /** \brief Free the memory for state. */
+        virtual void freeState(ompl::base::State* state)
+        {
+            if(!state)
+                si_->freeState(state);
+        }
+
+        /** \brief Free the memory for open loop control. */
+        virtual void freeControl(ompl::control::Control* control)
+        {
+            if(!control)
+                si_->freeControl(control);
+        }
+
         /** \brief Get the control dimension. */
         virtual const size_t controlDim()           { return controlDim_; }
 

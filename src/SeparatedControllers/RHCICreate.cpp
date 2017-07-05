@@ -45,6 +45,10 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
 
   using namespace arma;
 
+  // FIXME reason to regenerate open loop controls instead of using nominalUs_ that was given from construction?
+  if(nominalUs_.size() != 0)
+    openLoopControls_ = std::deque<ompl::control::Control*>(nominalUs_.begin(), nominalUs_.end());
+
   //if no more controls left, regenerate controls
   if(openLoopControls_.size() == 0) {
 

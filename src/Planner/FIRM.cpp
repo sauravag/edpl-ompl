@@ -102,8 +102,7 @@ namespace ompl
         static const double DEFAULT_INF_COST_TO_GO = 1000000000.0; // 1000000000 is a good number
 
         /** \brief The cost to traverse an obstacle*/
-//         static const double DEFAULT_OBSTACLE_COST_TO_GO = 200; // 200 is a good number? collision happens... need a higher penalty!
-        static const double DEFAULT_OBSTACLE_COST_TO_GO = 2000;
+        static const double DEFAULT_OBSTACLE_COST_TO_GO = 200; // 200 is a good number
 
         /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
         static const double DEFAULT_DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
@@ -131,8 +130,8 @@ namespace ompl
 //         static const bool PRINT_FEEDBACK_PATH = true;
         static const bool PRINT_FEEDBACK_PATH = false;
 
-//         static const bool PRINT_COST_TO_GO = true;
-        static const bool PRINT_COST_TO_GO = false;
+        static const bool PRINT_COST_TO_GO = true;
+//         static const bool PRINT_COST_TO_GO = false;
 
         static const bool PRINT_FUTURE_NODES = true;
 //         static const bool PRINT_FUTURE_NODES = false;
@@ -2151,6 +2150,12 @@ void FIRM::executeFeedbackWithRollout(void)
             boost::remove_vertex(tempVertex, g_);
             nn_->remove(tempVertex);
 
+            // free the memory for open loop control for this temporary node
+            foreach(Edge edge, boost::out_edges(tempVertex, g_))
+            {
+                if(edge != e)
+                    edgeControllers_.erase(edge);   // will deallocate nominalXs_ and nominalUs_ of Controller.separatedController_
+            }
         }
 
         si_->freeState(tState);
