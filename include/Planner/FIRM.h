@@ -537,7 +537,8 @@ private:
 
     ompl::base::State *kidnappedState_;
 
-    std::vector<std::pair<int, float> > costToGoHistory_;
+//     std::vector<std::pair<int, float> > costToGoHistory_;
+    std::vector<std::tuple<int, float, float> > costHistory_;   // (number of time steps, covariance penalty without weight multiplication, cost as a weighted sum of number of time steps and covariance penalty)
 
     std::vector<std::pair<int, double> > successProbabilityHistory_;
 
@@ -549,9 +550,11 @@ private:
 
     int currentTimeStep_;
 
-    int numberofNodesReached_;
+    double executionCostCov_;
 
     double executionCost_;
+
+    int numberofNodesReached_;
 
     /** \brief Path to where log files will be stored. */
     std::string logFilePath_;

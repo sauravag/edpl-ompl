@@ -269,8 +269,6 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
     si_->copyState(tempEndState, startState);
 
-    // for debug
-//     std::cout << "filteringCost: " << cost;
 
     // NOTE replaced while(){}; to do{}while(); in order to prevent zero cost with no evolution toward the end state when the start state is within nodeReachedDistance_ from the end state
     do
@@ -299,6 +297,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
             if(!isThisStateValid)
             {
+                OMPL_ERROR("Failed in checkTrueStateValidity() test!");
                 si_->copyState(endState, internalState);
 
                 return false;
@@ -314,8 +313,22 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         arma::colvec endStateVec =  internalState->as<StateType>()->getArmaData();
         arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
 
-        if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_ || !si_->checkTrueStateValidity())
+//         if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_ || !si_->checkTrueStateValidity())
+//         {
+//             si_->copyState(endState, internalState);
+//
+//             return false;
+//         }
+        if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
         {
+            OMPL_ERROR("Too much of deviation larger than nominalTrajDeviationThreshold_ (%2.3f)!", nominalTrajDeviationThreshold_);
+            si_->copyState(endState, internalState);
+
+            return false;
+        }
+        else if(!si_->isValid(tempEndState))
+        {
+            OMPL_ERROR("Failed in isValid(tempEndState) test!");
             si_->copyState(endState, internalState);
 
             return false;
@@ -326,17 +339,18 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         //Increment cost by: 0.01 for time based, trace(Covariance) for FIRM
         arma::mat tempCovMat = internalState->as<StateType>()->getCovariance();
 
-        // NOTE how to penalize uncertainty (covariance) in the cost
-        // 1) cost = sum(trace(cov_k)) where k=1,...,K
-        // 2) cost = trace(cov_f)
-        // 3) cost = mean(trace(cov_k)) = sum(trace(cov_k))/K
 
-//         cost += arma::trace(tempCovMat);   // 1) cost for the sum of trace(cov); double penalty to longer edges in addition to time (number of steps); may cause oscillation
+        // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+        //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+        // 2) cost = wc * trace(cov_f)       + wt * K
+        // 3) cost = wc * mean(trace(cov_k)) + wt * K
+        // 4) cost = wc * sum(trace(cov_k))
+
+        cost += arma::trace(tempCovMat);   // 1) cost for the sum of trace(cov); double penalty to longer edges in addition to time (number of steps); may cause oscillation
 //         cost = arma::trace(tempCovMat);    // 2) cost only for the final trace(cov); less oscillation and more adaptive behavior
-        cost += arma::trace(tempCovMat);   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
+//         cost += arma::trace(tempCovMat);   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
+//         cost += arma::trace(tempCovMat);   // 4) cost for the sum of trace(cov) but without penalty for stepsToStop
 
-        // for debug
-//         std::cout << " -> " << cost;
 
         if(!constructionMode)
         {
@@ -345,10 +359,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     } // do
     while(!this->isTerminated(tempEndState, k));
 
-    if(k!=0) {cost /= k;}   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
-
-    // for debug
-//     std::cout << std::endl;
+//     if(k!=0) {cost /= k;}   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
 
 
 //    if(constructionMode)
@@ -404,7 +415,10 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     //HOW TO SET INITAL VALUE OF COST
     //cost = 1 ,for time based only if time per execution is "1"
     //cost = 0.01 , for covariance based
-    double cost = 0.001;
+
+    // REVIEW artificial manipulation of cost for faster convergence of Dynamic Programming... can we get rid of this?
+//     double cost = 0.001;
+    double cost = 0.000;    // this should be fine for Dijkstra search
 
     ompl::base::State *internalState = si_->allocState();
     si_->copyState(internalState, startState);
@@ -438,12 +452,17 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
       return false;
     }
 
-    //Increment cost by:
-    //-> 0.01 for time based
-    //-> trace(Covariance) for FIRM
-    // NOTE for 3) cost for the sum of trace(cov); less oscillation and less jiggling motion, divide this actual cost by the number of steps at the end!
+
+    // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+    //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+    // 2) cost = wc * trace(cov_f)       + wt * K
+    // 3) cost = wc * mean(trace(cov_k)) + wt * K
+    // 4) cost = wc * sum(trace(cov_k))
+
+    // actual execution cost but only for covariance penalty (even without weight multiplication)
     arma::mat tempCovMat = endState->as<StateType>()->getCovariance();
-    cost += arma::trace(tempCovMat);
+    cost += arma::trace(tempCovMat);       // 1,4)
+//     cost += arma::trace(tempCovMat);    // 3) with division by the total number of time steps at the end
 
     if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 

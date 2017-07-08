@@ -1,7 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- <LandmarkList> -->
+<!-- 	<landmark id = 1  x = 1		y = 18.0 /> -->
+<!-- 	<landmark id = 2  x = 17	y = 1.0 /> -->
+<!-- </LandmarkList> -->
 <LandmarkList>
-	<landmark id = 1  x = 1		y = 18.0 />
-	<landmark id = 2  x = 17	y = 1.0 />
+	<landmark id = 1  x = 1		y = 17.875 />
+	<landmark id = 2  x = 2.125	y = 19.0 />
 </LandmarkList>
 <ObservationModels>
 	<HeadingBeaconObservationModel
@@ -24,20 +28,33 @@
 		max_angular_velocity= "0.60"
 		dt= "0.1"
 	  /> 
-<!-- 	<TwoDPointMotionModel  -->
-<!-- 		sigmaV="0.0" -->
-<!-- 		etaV="0.0" -->
-<!-- 		wind_noise_pos="0.1" -->
-<!-- 		max_linear_velocity= "4.0" -->
-<!-- 		dt= "0.1" -->
-<!-- 	  /> -->
 	<TwoDPointMotionModel 
 		sigmaV="0.0"
 		etaV="0.0"
-		wind_noise_pos="0.0"
+		wind_noise_pos="0.1"
 		max_linear_velocity= "4.0"
 		dt= "0.1"
 	  />
+<!-- 	<OmnidirectionalMotionModel  -->
+<!-- 		sigmaV="0.0" -->
+<!-- 		etaV="0.0" -->
+<!--         sigmaOmega="0.0" -->
+<!--         etaOmega="0.0" -->
+<!-- 		P_Wg_filename="" -->
+<!-- 		wind_noise_pos = "0.000" -->
+<!-- 		wind_noise_ang="0.000000"  -->
+<!-- 		min_linear_velocity= "&#45;1.0" -->
+<!-- 		max_linear_velocity= "1.0" -->
+<!-- 		max_angular_velocity= "0.60" -->
+<!-- 		dt= "0.1" -->
+<!-- 	  />  -->
+<!-- 	<TwoDPointMotionModel  -->
+<!-- 		sigmaV="0.0" -->
+<!-- 		etaV="0.0" -->
+<!-- 		wind_noise_pos="0.0" -->
+<!-- 		max_linear_velocity= "4.0" -->
+<!-- 		dt= "0.1" -->
+<!-- 	  /> -->
 </MotionModels>
 <FIRM>
 	<Video save = "0" />
@@ -77,18 +94,14 @@
 	<PlannerMode  method = "1"  dynobst = "0" />
 
 	<!-- [OPTION2] FIRM Node Density -->
-	<FIRMNodes  minNodes = "400"  maxNodes = "400" />
-
-<!-- 	<FIRMNodes  minNodes = "350"  maxNodes = "350" /> -->
+	<FIRMNodes  minNodes = "350"  maxNodes = "350" />
 <!-- 	<FIRMNodes  minNodes = "450"  maxNodes = "450" /> -->
 <!-- 	<FIRMNodes  minNodes = "550"  maxNodes = "550" /> -->
 <!-- 	<FIRMNodes  minNodes = "650"  maxNodes = "650" /> -->
 <!-- 	<FIRMNodes  minNodes = "750"  maxNodes = "750" /> -->
 
 	<!-- [OPTION3] Roadmap -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-DijkstraDP.xml" useRoadMap = "1" />
-
-<!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
+    <RoadMap roadmapFile = "" useRoadMap = "0" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;450.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;550.xml" useRoadMap = "1" /> -->
