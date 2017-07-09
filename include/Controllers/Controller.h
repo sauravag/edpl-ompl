@@ -260,13 +260,11 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     //int totalNumCollisionChecks = 0;
 
     ompl::base::State *internalState = si_->allocState();
-
     si_->copyState(internalState, startState);
 
     ompl::base::State  *nominalX_K ;
 
     ompl::base::State *tempEndState = si_->allocState();
-
     si_->copyState(tempEndState, startState);
 
 
@@ -275,8 +273,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     {
 
         this->Evolve(internalState, k, tempEndState) ;
-
         si_->copyState(internalState, tempEndState);
+
 
         /** Check if the controller is in construction mode,
         If true, that means we are doing monte carlo sims,
@@ -288,57 +286,46 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
             // start profiling time to compute rollout
             //auto start_time = std::chrono::high_resolution_clock::now();
-
-            bool isThisStateValid = si_->checkTrueStateValidity();
-
             //auto end_time = std::chrono::high_resolution_clock::now();
-
             //totalCollisionCheckComputeTime += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
 
-            if(!isThisStateValid)
+            if(!si_->checkTrueStateValidity())
             {
                 OMPL_ERROR("Failed in checkTrueStateValidity() test!");
                 si_->copyState(endState, internalState);
                 return false;
             }
+            else if(!si_->isValid(internalState))
+            {
+                OMPL_ERROR("Failed in isValid(internalState) test!");
+                si_->copyState(endState, internalState);
+                return false;
+            }
         }
 
-        if(k<lss_.size())
-          nominalX_K = lss_[k].getX();
 
-        else nominalX_K = lss_[lss_.size()-1].getX();
+        // check for deviation from the control target
+        if(k<lss_.size())
+            nominalX_K = lss_[k].getX();
+        else
+            nominalX_K = lss_[lss_.size()-1].getX();
 
         arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
-        arma::colvec endStateVec =  internalState->as<StateType>()->getArmaData();
+        arma::colvec endStateVec = internalState->as<StateType>()->getArmaData();
         arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
 
-//         if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_ || !si_->checkTrueStateValidity())
-//         {
-//             si_->copyState(endState, internalState);
-//             return false;
-//         }
-        // for debug
-        auto val1 = norm(deviation,2);
-        auto val2 = abs(norm(deviation,2));
-        if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
-        {
-            OMPL_ERROR("Too much of deviation larger than nominalTrajDeviationThreshold_ (%2.3f)!", nominalTrajDeviationThreshold_);
-            si_->copyState(endState, internalState);
-            return false;
-        }
-        // TODO check the validity of the belief state when constructing a graph by simulation, but not when actually executing)
-        else if(!si_->isValid(tempEndState))
-        {
-            OMPL_ERROR("Failed in isValid(endState) test! But this is only for the belief state, not the true state");
-//             OMPL_ERROR("Failed in isValid(tempEndState) test!");
-            si_->copyState(endState, internalState);
-            return false;
-        }
+        auto deviationNorm = abs(norm(deviation,2));
 
-        k++;
-
-        //Increment cost by: 0.01 for time based, trace(Covariance) for FIRM
-        arma::mat tempCovMat = internalState->as<StateType>()->getCovariance();
+        if(deviationNorm > nominalTrajDeviationThreshold_)    // this threshold is defined in include/Setup/TwoDPointRobotSetup.h
+        {
+            std::cout << "Too much of deviation larger than a threshold (" << nominalTrajDeviationThreshold_ << ")!" << std::endl;
+            // quit control in construction mode, but continue in execution mode
+            if(constructionMode)
+            {
+                si_->copyState(endState, internalState);
+                return false;
+            }
+        }
 
 
         // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
@@ -347,6 +334,9 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         // 3) cost = wc * mean(trace(cov_k)) + wt * K
         // 4) cost = wc * sum(trace(cov_k))
 
+        // cost only for covariance penalty (even without weight multiplication)
+        arma::mat tempCovMat = internalState->as<StateType>()->getCovariance();
+
         cost += arma::trace(tempCovMat);   // 1) cost for the sum of trace(cov); double penalty to longer edges in addition to time (number of steps); may cause oscillation
 //         cost = arma::trace(tempCovMat);    // 2) cost only for the final trace(cov); less oscillation and more adaptive behavior
 //         cost += arma::trace(tempCovMat);   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
@@ -354,12 +344,13 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
 
         if(!constructionMode)
-        {
-          boost::this_thread::sleep(boost::posix_time::milliseconds(20));
-        }
+            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+
+        k++;
+
     } // do
-    while(!this->isTerminated(tempEndState, k));
-//     while(!goal_->as<StateType>()->isReached(tempEndState));    // CHECK only for NodeController?
+    while(!this->isTerminated(internalState, k));
+//     while(!goal_->as<StateType>()->isReached(internalState));    // CHECK only for NodeController?
 
 //     if(k!=0) {cost /= k;}   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
 
@@ -378,29 +369,20 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 //    }
 
     ompl::base::Cost stabilizationFilteringCost(0);
-
     int stepsToStabilize=0;
-
-    ompl::base::State *stabilizedState = si_->allocState();
-
-    //this->Stabilize(internalState, stabilizedState, stabilizationFilteringCost, stepsToStabilize, constructionMode) ;
-
+    //ompl::base::State *stabilizedState = si_->allocState();
+    //this->Stabilize(internalState, stabilizedState, stabilizationFilteringCost, stepsToStabilize, constructionMode);
     //si_->copyState(endState, stabilizedState);
 
     si_->copyState(endState, internalState);
     
-    //filteringCost.v = cost + stabilizationFilteringCost.v;
     filteringCost = ompl::base::Cost(cost + stabilizationFilteringCost.value());
-
     stepsTaken = k+stepsToStabilize;
-
     timeToStop = k;
 
     si_->freeState(internalState);
-
     si_->freeState(tempEndState);
-
-    si_->freeState(stabilizedState);
+    //si_->freeState(stabilizedState);
 
     return true ;
 }
@@ -425,11 +407,16 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     ompl::base::State *internalState = si_->allocState();
     si_->copyState(internalState, startState);
 
-    ompl::base::State  *nominalX_K = si_->allocState();
+//     ompl::base::State  *nominalX_K = si_->allocState();  // memory leak!
+    ompl::base::State  *nominalX_K;
 
-    this->Evolve(internalState, k, endState) ;
+    ompl::base::State *tempEndState = si_->allocState();
+    si_->copyState(tempEndState, startState);
 
-    si_->copyState(internalState, endState);
+
+    this->Evolve(internalState, k, tempEndState) ;
+    si_->copyState(internalState, tempEndState);
+
 
     // if the propagated state is not valid, return false (only in construction mode)
     if(constructionMode)
@@ -437,35 +424,39 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
         if(!si_->checkTrueStateValidity())
         {
             OMPL_ERROR("Failed in checkTrueStateValidity() test!");
+            si_->copyState(endState, internalState);
+            return false;
+        }
+        else if(!si_->isValid(internalState))
+        {
+            OMPL_ERROR("Failed in isValid(internalState) test!");
+            si_->copyState(endState, internalState);
             return false;
         }
     }
 
-    if(k<lss_.size())
-      nominalX_K = lss_[k].getX();
 
-    else nominalX_K = lss_[lss_.size()-1].getX();
+    // check for deviation from the control target
+    if(k<lss_.size())
+        nominalX_K = lss_[k].getX();
+    else
+        nominalX_K = lss_[lss_.size()-1].getX();
 
     arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
-    arma::colvec endStateVec = endState->as<StateType>()->getArmaData();
+    arma::colvec endStateVec = internalState->as<StateType>()->getArmaData();
     arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
 
-//     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_ || !si_->checkTrueStateValidity())
-//     {
-//       return false;
-//     }
-    // for debug
-    auto val1 = norm(deviation,2);
-    auto val2 = abs(norm(deviation,2));
-    if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
+    auto deviationNorm = abs(norm(deviation,2));
+
+    if(deviationNorm > nominalTrajDeviationThreshold_)    // this threshold is defined in include/Setup/TwoDPointRobotSetup.h
     {
-        OMPL_ERROR("Too much of deviation larger than nominalTrajDeviationThreshold_ (%2.3f)!", nominalTrajDeviationThreshold_);
-        return false;
-    }
-    else if(!si_->isValid(endState))
-    {
-        OMPL_ERROR("Failed in isValid(endState) test! But this is only for the belief state, not the true state");
-//         return false;
+        std::cout << "Too much of deviation larger than a threshold (" << nominalTrajDeviationThreshold_ << ")!" << std::endl;
+        // quit control in construction mode, but continue in execution mode
+        if(constructionMode)
+        {
+            si_->copyState(endState, internalState);
+            return false;
+        }
     }
 
 
@@ -476,16 +467,23 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     // 4) cost = wc * sum(trace(cov_k))
 
     // actual execution cost but only for covariance penalty (even without weight multiplication)
-    arma::mat tempCovMat = endState->as<StateType>()->getCovariance();
-    cost += arma::trace(tempCovMat);       // 1,4)
+    arma::mat tempCovMat = internalState->as<StateType>()->getCovariance();
+
+    cost += arma::trace(tempCovMat);       // 1)
 //     cost += arma::trace(tempCovMat);    // 3) with division by the total number of time steps at the end
+//     cost += arma::trace(tempCovMat);    // 4)
 
-    if(!constructionMode) boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
-    //filteringCost.v = cost;
+    if(!constructionMode)
+        boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+
+
+    si_->copyState(endState, internalState);
+
     filteringCost = ompl::base::Cost(cost);
 
     si_->freeState(internalState);
+    si_->freeState(tempEndState);
 
     return true ;
 }

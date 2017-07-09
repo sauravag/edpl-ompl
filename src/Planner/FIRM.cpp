@@ -778,14 +778,14 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     // First construct a node stabilizer controller
     NodeControllerType nodeController;
 
-    // FIXME why reset the current state's covariance during execution as well?
+    // NOTE save the current state's original covariance if it is under execution
     arma::mat currentCovariance;
     if(!addReverseEdge)
         currentCovariance = state->as<FIRM::StateType>()->getCovariance();
 
     generateNodeController(state, nodeController); // Generating the node controller at sampled state, this will set stationary covariance at node
 
-    // FIXME why reset the current state's covariance during execution as well?
+    // NOTE revert the current state's covariance back to the original if it is under execution
     if(!addReverseEdge)
         state->as<FIRM::StateType>()->setCovariance(currentCovariance);
 
@@ -1069,7 +1069,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
         int stepsToStop = 0;
 
-        if(edgeController.Execute(startNodeState, endBelief, filteringCost, stepsExecuted, stepsToStop))
+        if(edgeController.Execute(startNodeState, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
         {
             successCount++;
 
@@ -1178,7 +1178,7 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
 
     // set the covariance
     node->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
-    state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);   // REVIEW why reset the current state's covariance during execution as well?
+    state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);   // NOTE this will be reverted to the (original) current state's covariance if it is under execution
 
     // create a node controller with node as the state and zero control as nominal control
     std::vector<ompl::control::Control*> zeroControl; zeroControl.push_back(siF_->getMotionModel()->getZeroControl());
