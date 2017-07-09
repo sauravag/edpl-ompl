@@ -64,13 +64,21 @@ public:
         Controller<FiniteTimeLQR, ExtendedKF>::setMaxTries(30);
         Controller<FiniteTimeLQR, ExtendedKF>::setMaxTrajectoryDeviation(0.5); // meters
 
+        Controller<StationaryLQR, LinearizedKF>::setNodeReachedAngle(10); // degrees
+        Controller<StationaryLQR, LinearizedKF>::setNodeReachedDistance(0.1);// meters
+        Controller<StationaryLQR, LinearizedKF>::setMaxTries(30);
+//         Controller<StationaryLQR, LinearizedKF>::setMaxTrajectoryDeviation(0.5); // meters
+//         Controller<StationaryLQR, LinearizedKF>::setMaxTrajectoryDeviation(2.25); // meters
+        Controller<StationaryLQR, LinearizedKF>::setMaxTrajectoryDeviation(2.50); // meters
+
         RHCICreate::setControlQueueSize(5);
         RHCICreate::setTurnOnlyDistance(0.01);
         Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(10.0); // degrees
 //         Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.2);// meters
         Controller<RHCICreate, ExtendedKF>::setNodeReachedDistance(0.1);// meters
         Controller<RHCICreate, ExtendedKF>::setMaxTries(30);
-        Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(0.5); // meters
+//         Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(0.5); // meters
+        Controller<RHCICreate, ExtendedKF>::setMaxTrajectoryDeviation(1.0); // meters
 
         // setting the mean and norm weights (used in reachability check)
         // NOTE these values will be overwritten by loadParameters()

@@ -56,6 +56,7 @@
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
 #define SHOW_MONTE_CARLO False
+// #define SHOW_MONTE_CARLO True
 
 namespace ompl
 {
@@ -614,6 +615,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
             if (loadedRoadmapFromFile_)
             {
                 Vertex start_loaded = 0;    // HACK
+//                 Vertex start_loaded = 193;    // HACK
                 startM_.push_back(start_loaded);
                 break;
             }
@@ -776,7 +778,16 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     // First construct a node stabilizer controller
     NodeControllerType nodeController;
 
+    // FIXME why reset the current state's covariance during execution as well?
+    arma::mat currentCovariance;
+    if(!addReverseEdge)
+        currentCovariance = state->as<FIRM::StateType>()->getCovariance();
+
     generateNodeController(state, nodeController); // Generating the node controller at sampled state, this will set stationary covariance at node
+
+    // FIXME why reset the current state's covariance during execution as well?
+    if(!addReverseEdge)
+        state->as<FIRM::StateType>()->setCovariance(currentCovariance);
 
     // Now add belief state to graph as FIRM node
     Vertex m;
@@ -1167,7 +1178,7 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
 
     // set the covariance
     node->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
-    state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
+    state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);   // REVIEW why reset the current state's covariance during execution as well?
 
     // create a node controller with node as the state and zero control as nominal control
     std::vector<ompl::control::Control*> zeroControl; zeroControl.push_back(siF_->getMotionModel()->getZeroControl());
@@ -1634,6 +1645,7 @@ void FIRM::executeFeedback(void)
             updateEdgeCollisionCost(currentVertex, goal);
 
             // resolve DP
+            solveDijkstraSearch(goal);
             solveDynamicProgram(goal, false);
 
             e = feedback_.at(currentVertex);
@@ -1712,6 +1724,7 @@ void FIRM::executeFeedback(void)
             // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
+            solveDijkstraSearch(goal);
             solveDynamicProgram(goal, false);
 
             Visualizer::doSaveVideo(doSaveVideo_);
@@ -1865,6 +1878,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
             // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
+            solveDijkstraSearch(goal);
             solveDynamicProgram(goal, false);
 
             Visualizer::doSaveVideo(doSaveVideo_);
@@ -1908,6 +1922,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
             siF_->freeState(tempTrueStateCopy);
 
+            solveDijkstraSearch(goal);
             solveDynamicProgram(goal, false);
 
             sendMostLikelyPathToViz(currentVertex, goal);
@@ -2031,18 +2046,21 @@ void FIRM::executeFeedbackWithRollout(void)
             }
         }
         // for debug
-        if(ompl::magic::PRINT_FUTURE_NODES)
-        {
-            std::cout << "futureFIRMNodes: { ";
-            foreach(futureVertex, futureFIRMNodes)
-                std::cout << futureVertex << " ";
-            std::cout << "}" << std::endl;
-        }
+//         if(ompl::magic::PRINT_FUTURE_NODES)
+//         {
+//             std::cout << "futureFIRMNodesDuplicate: { ";
+//             foreach(futureVertex, futureFIRMNodes)
+//                 std::cout << futureVertex << " ";
+//             std::cout << "}" << std::endl;
+//         }
 
 
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
+        // REVIEW NodeController should be invoked after following EdgeController for stepsToStop steps, but has never been done
         EdgeControllerType controller = edgeControllers_[e];
+//         NodeControllerType controller = nodeControllers_[boost::target(e, g_)];
+//         NodeControllerType controller = nodeControllers_[boost::source(e, g_)];
 
         assert(controller.getGoal());
 
@@ -2058,7 +2076,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
         controller.setSpaceInformation(policyExecutionSI_);
 
-        controller.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
+        bool controllerStatus = controller.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
 
 
     // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
@@ -2082,6 +2100,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
         siF_->getTrueState(tState);
 
+        // REVIEW isn't this redundant since checkTrueStateValidity() is already called in executeUpto()?
         if(!si_->isValid(tState))
         {
             OMPL_INFORM("Robot Collided :(");
@@ -2147,7 +2166,7 @@ void FIRM::executeFeedbackWithRollout(void)
             bool forwardEdgeAdded;
             // for debug
             if(ompl::magic::PRINT_FUTURE_NODES)
-                std::cout << "uniqueFIRMNodes: { ";
+                std::cout << "futureFIRMNodes: { ";
             for(int i=0; i<futureFIRMNodes.size(); i++)
             {
                 futureVertex = futureFIRMNodes[i];
@@ -2163,6 +2182,7 @@ void FIRM::executeFeedbackWithRollout(void)
                     if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[futureVertex]))
                     {
                         addEdgeToGraph(tempVertex, futureVertex, forwardEdgeAdded);
+                        Visualizer::addRolloutConnection(stateProperty_[tempVertex], stateProperty_[futureVertex]);
                     }
                     // for debug
                     if(ompl::magic::PRINT_FUTURE_NODES)
@@ -2212,10 +2232,17 @@ void FIRM::executeFeedbackWithRollout(void)
             Visualizer::clearRolloutConnections();
             Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[boost::target(e,g_)]);
 
-            // remove the temporary node after generating a rollout policy
-            boost::remove_vertex(tempVertex, g_);
+            // remove the temporary node/edges after generating a rollout policy
+            boost::clear_vertex(tempVertex, g_);    // remove all edges from or to tempVertex
+            boost::remove_vertex(tempVertex, g_);   // remove tempVertex
             nn_->remove(tempVertex);
 
+            // free the memory for open loop control for this temporary node
+            foreach(Edge edge, boost::out_edges(tempVertex, g_))
+            {
+                if(edge != e)
+                    edgeControllers_.erase(edge);   // will deallocate nominalXs_ and nominalUs_ of Controller.separatedController_
+            }
         }
 
         si_->freeState(tState);

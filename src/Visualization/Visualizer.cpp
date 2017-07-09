@@ -318,9 +318,9 @@ void Visualizer::refresh()
 
             if(feedbackEdges_.size()>0) drawFeedbackEdges();    // optional
 
-            drawRolloutConnections();
-
             drawMostLikelyPath();
+
+            drawRolloutConnections();
 
             // draw the rollout connection with lowest cost
             if(chosenRolloutConnection_)

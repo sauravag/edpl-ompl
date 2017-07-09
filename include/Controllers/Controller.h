@@ -299,7 +299,6 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
             {
                 OMPL_ERROR("Failed in checkTrueStateValidity() test!");
                 si_->copyState(endState, internalState);
-
                 return false;
             }
         }
@@ -316,21 +315,23 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 //         if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_ || !si_->checkTrueStateValidity())
 //         {
 //             si_->copyState(endState, internalState);
-//
 //             return false;
 //         }
+        // for debug
+        auto val1 = norm(deviation,2);
+        auto val2 = abs(norm(deviation,2));
         if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
         {
             OMPL_ERROR("Too much of deviation larger than nominalTrajDeviationThreshold_ (%2.3f)!", nominalTrajDeviationThreshold_);
             si_->copyState(endState, internalState);
-
             return false;
         }
+        // TODO check the validity of the belief state when constructing a graph by simulation, but not when actually executing)
         else if(!si_->isValid(tempEndState))
         {
-            OMPL_ERROR("Failed in isValid(tempEndState) test!");
+            OMPL_ERROR("Failed in isValid(endState) test! But this is only for the belief state, not the true state");
+//             OMPL_ERROR("Failed in isValid(tempEndState) test!");
             si_->copyState(endState, internalState);
-
             return false;
         }
 
@@ -358,6 +359,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         }
     } // do
     while(!this->isTerminated(tempEndState, k));
+//     while(!goal_->as<StateType>()->isReached(tempEndState));    // CHECK only for NodeController?
 
 //     if(k!=0) {cost /= k;}   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
 
@@ -434,6 +436,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     {
         if(!si_->checkTrueStateValidity())
         {
+            OMPL_ERROR("Failed in checkTrueStateValidity() test!");
             return false;
         }
     }
@@ -447,9 +450,22 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     arma::colvec endStateVec = endState->as<StateType>()->getArmaData();
     arma::colvec deviation = nomXVec.subvec(0,1) - endStateVec.subvec(0,1);
 
-    if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_ || !si_->checkTrueStateValidity())
+//     if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_ || !si_->checkTrueStateValidity())
+//     {
+//       return false;
+//     }
+    // for debug
+    auto val1 = norm(deviation,2);
+    auto val2 = abs(norm(deviation,2));
+    if(abs(norm(deviation,2)) > nominalTrajDeviationThreshold_)
     {
-      return false;
+        OMPL_ERROR("Too much of deviation larger than nominalTrajDeviationThreshold_ (%2.3f)!", nominalTrajDeviationThreshold_);
+        return false;
+    }
+    else if(!si_->isValid(endState))
+    {
+        OMPL_ERROR("Failed in isValid(endState) test! But this is only for the belief state, not the true state");
+//         return false;
     }
 
 
@@ -490,9 +506,14 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
 
     int k = 0;
 
+    filteringCost = ompl::base::Cost(0.0);
+    ompl::base::Cost filteringCostOneStep;
+
     while(k < numSteps)
     {
-        bool e = executeOneStep(k, tempState,tempEndState, filteringCost, constructionMode);
+        bool e = executeOneStep(k, tempState,tempEndState, filteringCostOneStep, constructionMode);
+
+        filteringCost = ompl::base::Cost(filteringCost.value() + filteringCostOneStep.value());
 
         k++;
 
