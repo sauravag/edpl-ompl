@@ -369,6 +369,9 @@ protected:
     /** \brief Add an edge from vertex a to b in graph */
     virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
 
+    /** \brief Generates the cost of the edge controlled by concatenated edge/node controllers*/
+    virtual FIRMWeight generateEdgeNodeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController);
+
     /** \brief Generates the cost of the edge */
     virtual FIRMWeight generateEdgeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController);
 

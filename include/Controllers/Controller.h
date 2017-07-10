@@ -96,7 +96,14 @@ class Controller
                    bool constructionMode=true);
 
         /** \brief Stabilize the system to an existing FIRM node */
-        virtual void  Stabilize(const ompl::base::State *startState,
+        virtual bool Stabilize(const ompl::base::State *startState,
+                                              ompl::base::State* endState,
+                                              ompl::base::Cost &stabilizationFilteringCost,
+                                              int &stepsToStabilize,
+                                              bool constructionMode=true);
+
+        /** \brief Stabilize the system to an existing FIRM node for given number of steps*/
+        virtual bool StabilizeUpto(const int numSteps, const ompl::base::State *startState,
                                               ompl::base::State* endState,
                                               ompl::base::Cost &stabilizationFilteringCost,
                                               int &stepsToStabilize,
@@ -312,7 +319,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 //             nominalX_K = lss_[lss_.size()-1].getX();
 
             // quit edge controller and switch to node controller!
-            OMPL_INFORM("Reached the end of EdgeController... Now switch to NodeController!");
+//             OMPL_INFORM("Reached the end of EdgeController... Now switch to NodeController!");
             break;
         }
 
@@ -451,7 +458,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
 //         nominalX_K = lss_[lss_.size()-1].getX();
 
         // quit edge controller and switch to node controller!
-        OMPL_WARN("Reached the end of EdgeController... Now NEED to switch to NodeController!");
+//         OMPL_WARN("Reached the end of EdgeController... Now NEED to switch to NodeController!");
     }
 
     arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
@@ -521,8 +528,6 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
 
     while(k < numSteps)
     {
-        // TODO if isTerminated() is satisfied for EdgeController, then switch to NodeController
-
 
         bool e = executeOneStep(k, tempState,tempEndState, filteringCostOneStep, constructionMode);
 
@@ -600,7 +605,7 @@ void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::S
 
 
 template <class SeparatedControllerType, class FilterType>
-void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base::State *startState,
+bool Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base::State *startState,
                                                                               ompl::base::State* endState,
                                                                               ompl::base::Cost &stabilizationFilteringCost,
                                                                               int &stepsToStabilize,
@@ -637,6 +642,7 @@ void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
             boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
 
+        // TODO check for state validity
     }
 
    //stabilizationFilteringCost.v = cost;
@@ -648,6 +654,61 @@ void Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
    tries_ = 0;
    stepsToStabilize = stepsTaken;
 
+   return true;
+}
+
+template <class SeparatedControllerType, class FilterType>
+bool Controller<SeparatedControllerType, FilterType>::StabilizeUpto(const int numSteps, const ompl::base::State *startState,
+                                                                              ompl::base::State* endState,
+                                                                              ompl::base::Cost &stabilizationFilteringCost,
+                                                                              int &stepsToStabilize,
+                                                                              bool constructionMode)
+{
+    int k = lss_.size()-1;
+
+    int stepsTaken = 0;
+
+    double cost = 0.0;
+
+    ompl::base::State *tempState1 = si_->allocState();
+    ompl::base::State *tempState2 = si_->allocState();
+
+    si_->copyState(tempState1, startState);
+    si_->copyState(tempState2, startState);
+
+//     while(!goal_->as<StateType>()->isReached(tempState1) && tries_ < maxTries_)
+    while(!goal_->as<StateType>()->isReached(tempState1) && stepsTaken < numSteps)
+    {
+
+        this->Evolve(tempState1, k, tempState2);
+
+        stepsTaken++;
+
+        arma::mat tempCovMat = tempState2->as<StateType>()->getCovariance();
+        cost += arma::trace(tempCovMat); 
+
+        si_->copyState(tempState1, tempState2) ;
+
+        tries_++;
+
+        if(!constructionMode)
+        {
+            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+        }
+
+        // TODO check for state validity
+    }
+
+   //stabilizationFilteringCost.v = cost;
+   stabilizationFilteringCost = ompl::base::Cost(cost);
+
+   si_->copyState(endState, tempState2);
+   si_->freeState(tempState1);
+   si_->freeState(tempState2);
+   tries_ = 0;
+   stepsToStabilize = stepsTaken;
+
+   return true;
 }
 
 template <class SeparatedControllerType, class FilterType>

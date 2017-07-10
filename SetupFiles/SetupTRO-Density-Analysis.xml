@@ -62,8 +62,9 @@
 <!-- 	<DataLog save = "1" folder = "./DataLog/" /> -->
 	<DataLog save = "1" folder = "./" />
 	<Roadmap save = "1" />
+	<MCParticles numparticles = "5" />
 <!-- 	<MCParticles numparticles = "10" /> -->
-	<MCParticles numparticles = "20" />
+<!-- 	<MCParticles numparticles = "20" /> -->
 	<RolloutSteps rolloutsteps = "1" />
 <!-- 	<RolloutSteps rolloutsteps = "3" /> -->
 <!-- 	<RolloutSteps rolloutsteps = "5" /> -->
@@ -90,8 +91,8 @@
 	<!-- [OPTION1] FIRM vs Rollout -->
 	<!-- method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
 	<!-- dynobst 1 to activate -->
-	<PlannerMode  method = "0"  dynobst = "0" />
-<!-- 	<PlannerMode  method = "1"  dynobst = "0" /> -->
+<!-- 	<PlannerMode  method = "0"  dynobst = "0" /> -->
+	<PlannerMode  method = "1"  dynobst = "0" />
 
 	<!-- [OPTION2] FIRM Node Density -->
 	<FIRMNodes  minNodes = "350"  maxNodes = "350" />

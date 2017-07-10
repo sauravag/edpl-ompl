@@ -1015,7 +1015,8 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edge
 
     EdgeControllerType edgeController;
 
-    const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController);
+//     const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController);
+    const FIRMWeight weight = generateEdgeNodeControllerWithCost(a, b, edgeController);
 
     if(weight.getSuccessProbability() == 0)
     {
@@ -1035,6 +1036,119 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edge
     edgeControllers_[newEdge.first] = edgeController;
 
     edgeAdded = true;
+}
+
+FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
+{
+    ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
+    ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+
+    // target node controller that will be concatenated after edgeController
+    NodeControllerType nodeController = nodeControllers_[b];
+
+     // Generate the edge controller for given start and end state
+    generateEdgeController(startNodeState,targetNodeState,edgeController);
+
+    double successCount = 0;
+
+    // initialize costs to 0
+    ompl::base::Cost edgeCost(0);
+    ompl::base::Cost nodeStabilizationCost(0);
+
+    // if want/do not want to show monte carlo sim
+    siF_->showRobotVisualization(SHOW_MONTE_CARLO);
+
+    for(unsigned int i=0; i< numMCParticles_;i++)
+    {
+
+        siF_->setTrueState(startNodeState);
+
+        siF_->setBelief(startNodeState);
+
+        ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
+
+        ompl::base::Cost filteringCost(0);
+
+        int stepsExecuted = 0;
+
+        int stepsToStop = 0;
+
+        // edge controller until the end of sequence
+        if(edgeController.Execute(startNodeState, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
+        {
+            successCount++;
+
+            // for debug
+            ompl::base::Cost edgeCostPrev;
+            if(ompl::magic::PRINT_EDGE_COST)
+                edgeCostPrev = ompl::base::Cost(edgeCost.value());
+
+
+            // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+            //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+            // 2) cost = wc * trace(cov_f)       + wt * K
+            // 3) cost = wc * mean(trace(cov_k)) + wt * K
+            // 4) cost = wc * sum(trace(cov_k))
+
+            // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
+            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);   // 1,2,3)
+//             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value());   // 4) cost = sum(trace(cov_k))
+
+            // for debug
+            if(ompl::magic::PRINT_EDGE_COST)
+                std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
+        }
+
+        // node controller for stabilization
+//         if(nodeController.Stabilize(startNodeState, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
+        if(nodeController.Stabilize(startNodeState, endBelief, filteringCost, stepsExecuted, true))
+        {
+            successCount++;
+
+            // for debug
+            ompl::base::Cost edgeCostPrev;
+            if(ompl::magic::PRINT_EDGE_COST)
+                edgeCostPrev = ompl::base::Cost(edgeCost.value());
+
+
+            // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+            //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+            // 2) cost = wc * trace(cov_f)       + wt * K
+            // 3) cost = wc * mean(trace(cov_k)) + wt * K
+            // 4) cost = wc * sum(trace(cov_k))
+
+            // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
+            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);   // 1,2,3)
+//             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value());   // 4) cost = sum(trace(cov_k))
+
+            // for debug
+            if(ompl::magic::PRINT_EDGE_COST)
+                std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
+        }
+
+        // free the memory
+        siF_->freeState(endBelief);
+    }
+    // for debug
+    ompl::base::Cost edgeCostSum;
+    if(ompl::magic::PRINT_EDGE_COST)
+        edgeCostSum = ompl::base::Cost(edgeCost.value());
+
+    siF_->showRobotVisualization(true);
+
+    //edgeCost.v = edgeCost.v / successCount ;
+    edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
+
+    // for debug
+    if(ompl::magic::PRINT_EDGE_COST)
+        std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = ( " << edgeCostSum.value() << " ) / " << successCount << std::endl;
+
+//     double transitionProbability = successCount / numMCParticles_ ;
+    double transitionProbability = (successCount/2) / numMCParticles_;    // successCount increases for both edgeController and nodeController, respectively
+
+    FIRMWeight weight(edgeCost.value(), transitionProbability);
+
+    return weight;
 }
 
 FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
@@ -1660,7 +1774,7 @@ void FIRM::executeFeedback(void)
 
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
-        {
+{
         ompl::base::Cost costCov;
 
         int stepsExecuted = 0;
@@ -1737,9 +1851,9 @@ void FIRM::executeFeedback(void)
         si_->freeState(tempTrueStateCopy);
 
         si_->copyState(cstartState, cendState);
-        }
+}
 
-        {
+{
 
         ompl::base::Cost costCov;
 
@@ -1820,7 +1934,8 @@ void FIRM::executeFeedback(void)
         si_->freeState(tempTrueStateCopy);
 
         si_->copyState(cstartState, cendState);
-        }
+}
+
     }
 
 
@@ -2141,12 +2256,15 @@ void FIRM::executeFeedbackWithRollout(void)
 
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
-        // REVIEW NodeController should be invoked after following EdgeController for stepsToStop steps, but has never been done
-        EdgeControllerType controller = edgeControllers_[e];
-//         NodeControllerType controller = nodeControllers_[boost::target(e, g_)];
-//         NodeControllerType controller = nodeControllers_[boost::source(e, g_)];
+        ompl::base::State *tState = si_->allocState();
 
-        assert(controller.getGoal());
+        // REVIEW NodeController should be invoked after following EdgeController for stepsToStop steps, but has never been done
+        EdgeControllerType edgeController = edgeControllers_[e];
+//         NodeControllerType edgeController = nodeControllers_[boost::target(e, g_)];
+//         NodeControllerType edgeController = nodeControllers_[boost::source(e, g_)];
+
+{
+        assert(edgeController.getGoal());
 
         ompl::base::Cost costCov;
 
@@ -2158,9 +2276,9 @@ void FIRM::executeFeedbackWithRollout(void)
         */
         int stepsExecuted = 0;
 
-        controller.setSpaceInformation(policyExecutionSI_);
+        edgeController.setSpaceInformation(policyExecutionSI_);
 
-        bool controllerStatus = controller.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
+        bool controllerStatus = edgeController.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
 
 
     // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
@@ -2180,7 +2298,7 @@ void FIRM::executeFeedbackWithRollout(void)
         costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
 
 
-        ompl::base::State *tState = si_->allocState();
+//         ompl::base::State *tState = si_->allocState();
 
         siF_->getTrueState(tState);
 
@@ -2190,7 +2308,66 @@ void FIRM::executeFeedbackWithRollout(void)
             OMPL_INFORM("Robot Collided :(");
             return;
         }
+}
 
+if(edgeController.isTerminated(tState, 0))  // check if tState is near to the target FIRM node (by x,y position)
+{
+        // REVIEW NodeController should be invoked after following EdgeController for stepsToStop steps, but has never been done
+//         EdgeControllerType controller = edgeControllers_[e];
+        NodeControllerType controller = nodeControllers_[boost::target(e, g_)];
+//         NodeControllerType controller = nodeControllers_[boost::source(e, g_)];
+
+        assert(controller.getGoal());
+
+        ompl::base::Cost costCov;
+
+        siF_->doVelocityLogging(true);
+
+        /**
+            Instead of executing the entire controller, we need to execute N steps, then calculate the cost to go through the neighboring nodes.
+            Whichever gives the lowest cost to go, is our new path. Do this at every N steps.
+        */
+        int stepsExecuted = 0;
+
+        controller.setSpaceInformation(policyExecutionSI_);
+
+        si_->copyState(cstartState, cendState);
+
+//         bool controllerStatus = controller.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
+//         bool controllerStatus = controller.Stabilize(cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
+//         controller.Stabilize(cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
+        controller.StabilizeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
+        bool controllerStatus = true;
+
+
+    // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+    //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+    // 2) cost = wc * trace(cov_f)       + wt * K
+    // 3) cost = wc * mean(trace(cov_k)) + wt * K
+    // 4) cost = wc * sum(trace(cov_k))
+
+        currentTimeStep_ += stepsExecuted;
+
+        executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
+
+        executionCost_ += informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
+//         executionCost_ += informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+//         executionCost_ += informationCostWeight_*executionCostCov_;    // 4)
+
+        costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
+
+
+//         ompl::base::State *tState = si_->allocState();
+
+        siF_->getTrueState(tState);
+
+        // REVIEW isn't this redundant since checkTrueStateValidity() is already called in executeUpto()?
+        if(!si_->isValid(tState))
+        {
+            OMPL_INFORM("Robot Collided :(");
+            return;
+        }
+}
 
         // If the robot has already reached a FIRM node then take feedback edge
         // else do rollout
@@ -2278,6 +2455,7 @@ void FIRM::executeFeedbackWithRollout(void)
                 std::cout << "}" << std::endl;
 
 
+            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tState);
 
             e = generateRolloutPolicy(tempVertex, goal);
