@@ -308,7 +308,13 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         if(k<lss_.size())
             nominalX_K = lss_[k].getX();
         else
-            nominalX_K = lss_[lss_.size()-1].getX();
+        {
+//             nominalX_K = lss_[lss_.size()-1].getX();
+
+            // quit edge controller and switch to node controller!
+            OMPL_INFORM("Reached the end of EdgeController... Now switch to NodeController!");
+            break;
+        }
 
         arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
         arma::colvec endStateVec = internalState->as<StateType>()->getArmaData();
@@ -349,7 +355,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         k++;
 
     } // do
-    while(!this->isTerminated(internalState, k));
+//     while(true);    // NOTE stick to EdgeController until the end of sequence, and switch to NodeController!
+    while(!this->isTerminated(internalState, k));    // CHECK this condition is too loose, so that the edge controller usually does not reach to the end of sequence!
 //     while(!goal_->as<StateType>()->isReached(internalState));    // CHECK only for NodeController?
 
 //     if(k!=0) {cost /= k;}   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
@@ -368,14 +375,14 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 //        outfile.close();
 //    }
 
+    si_->copyState(endState, internalState);
+
     ompl::base::Cost stabilizationFilteringCost(0);
     int stepsToStabilize=0;
-    //ompl::base::State *stabilizedState = si_->allocState();
-    //this->Stabilize(internalState, stabilizedState, stabilizationFilteringCost, stepsToStabilize, constructionMode);
-    //si_->copyState(endState, stabilizedState);
+//     ompl::base::State *stabilizedState = si_->allocState();
+//     this->Stabilize(internalState, stabilizedState, stabilizationFilteringCost, stepsToStabilize, constructionMode);
+//     si_->copyState(endState, stabilizedState);
 
-    si_->copyState(endState, internalState);
-    
     filteringCost = ompl::base::Cost(cost + stabilizationFilteringCost.value());
     stepsTaken = k+stepsToStabilize;
     timeToStop = k;
@@ -440,7 +447,12 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     if(k<lss_.size())
         nominalX_K = lss_[k].getX();
     else
-        nominalX_K = lss_[lss_.size()-1].getX();
+    {
+//         nominalX_K = lss_[lss_.size()-1].getX();
+
+        // quit edge controller and switch to node controller!
+        OMPL_WARN("Reached the end of EdgeController... Now NEED to switch to NodeController!");
+    }
 
     arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
     arma::colvec endStateVec = internalState->as<StateType>()->getArmaData();
@@ -509,6 +521,9 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
 
     while(k < numSteps)
     {
+        // TODO if isTerminated() is satisfied for EdgeController, then switch to NodeController
+
+
         bool e = executeOneStep(k, tempState,tempEndState, filteringCostOneStep, constructionMode);
 
         filteringCost = ompl::base::Cost(filteringCost.value() + filteringCostOneStep.value());

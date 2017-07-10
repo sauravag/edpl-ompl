@@ -1605,7 +1605,8 @@ void FIRM::executeFeedback(void)
 
     Vertex currentVertex =  start;
 
-    EdgeControllerType controller;
+    EdgeControllerType edgeController;
+    NodeControllerType nodeController;
 
     ompl::base::State *cstartState = si_->allocState();
     si_->copyState(cstartState, stateProperty_[start]);
@@ -1659,17 +1660,18 @@ void FIRM::executeFeedback(void)
 
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
-        controller = edgeControllers_[e];
-
+        {
         ompl::base::Cost costCov;
 
         int stepsExecuted = 0;
 
         int stepsToStop = 0;
 
-        controller.setSpaceInformation(policyExecutionSI_);
+        // EdgeController
+        edgeController = edgeControllers_[e];
+        edgeController.setSpaceInformation(policyExecutionSI_);
+        bool edgeControllerStatus = edgeController.Execute(cstartState, cendState, costCov, stepsExecuted, stepsToStop, false);
 
-        bool controllerStatus = controller.Execute(cstartState, cendState, costCov, stepsExecuted, stepsToStop, false);
 
 
         // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
@@ -1701,7 +1703,7 @@ void FIRM::executeFeedback(void)
            return;
         }
 
-        if(controllerStatus)
+        if(edgeControllerStatus)
         {
             numberofNodesReached_++;
 
@@ -1735,8 +1737,90 @@ void FIRM::executeFeedback(void)
         si_->freeState(tempTrueStateCopy);
 
         si_->copyState(cstartState, cendState);
+        }
+
+        {
+
+        ompl::base::Cost costCov;
+
+        int stepsExecuted = 0;
+
+        int stepsToStop = 0;
+
+        // NodeController
+        nodeController = nodeControllers_[boost::target(e, g_)];
+        nodeController.setSpaceInformation(policyExecutionSI_);
+//         bool nodeControllerStatus = nodeController.Execute(cstartState, cendState, costCov, stepsExecuted, stepsToStop, false);
+//         bool nodeControllerStatus = nodeController.Stabilize(cstartState, cendState, costCov, stepsExecuted, stepsToStop, false);
+//         bool nodeControllerStatus = nodeController.Stabilize(cstartState, cendState, costCov, stepsExecuted, false);
+        nodeController.Stabilize(cstartState, cendState, costCov, stepsExecuted, false);
+        bool nodeControllerStatus = true;
 
 
+        // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+        //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+        // 2) cost = wc * trace(cov_f)       + wt * K
+        // 3) cost = wc * mean(trace(cov_k)) + wt * K
+        // 4) cost = wc * sum(trace(cov_k))
+
+        currentTimeStep_ += stepsExecuted;
+
+        executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
+
+        executionCost_ += informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
+        //         executionCost_ += informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+        //         executionCost_ += informationCostWeight_*executionCostCov_;    // 4)
+
+        costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
+
+
+        // get a copy of the true state
+        ompl::base::State *tempTrueStateCopy = si_->allocState();
+
+        siF_->getTrueState(tempTrueStateCopy);
+
+        if(!si_->isValid(tempTrueStateCopy))
+        {
+           OMPL_INFORM("Robot Collided :(");
+
+           return;
+        }
+
+        if(nodeControllerStatus)
+        {
+            numberofNodesReached_++;
+
+            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
+
+            currentVertex = boost::target(e, g_);
+        }
+        else
+        {
+            Visualizer::doSaveVideo(false);
+            siF_->doVelocityLogging(false);
+
+            //
+            OMPL_INFORM("Controller stopped due to deviation, need to add new state at: ");
+            siF_->printState(cendState);
+            //
+
+            currentVertex = addStateToGraph(cendState);
+
+            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
+            siF_->setTrueState(tempTrueStateCopy);
+
+            solveDijkstraSearch(goal);
+            solveDynamicProgram(goal, false);
+
+            Visualizer::doSaveVideo(doSaveVideo_);
+            siF_->doVelocityLogging(true);
+
+        }
+
+        si_->freeState(tempTrueStateCopy);
+
+        si_->copyState(cstartState, cendState);
+        }
     }
 
 
