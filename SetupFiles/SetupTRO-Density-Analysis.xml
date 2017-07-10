@@ -3,9 +3,16 @@
 <!-- 	<landmark id = 1  x = 1		y = 18.0 /> -->
 <!-- 	<landmark id = 2  x = 17	y = 1.0 /> -->
 <!-- </LandmarkList> -->
+<!-- <LandmarkList> -->
+<!-- 	<landmark id = 1  x = 1		y = 17.875 /> -->
+<!-- 	<landmark id = 2  x = 2.125	y = 19.0 /> -->
+<!-- </LandmarkList> -->
 <LandmarkList>
-	<landmark id = 1  x = 1		y = 17.875 />
-	<landmark id = 2  x = 2.125	y = 19.0 />
+	<landmark id = 1  x = 1		y = 19 />
+	<landmark id = 2  x = 1		y = 16.75 />
+	<landmark id = 3  x = 3.25	y = 19 />
+	<landmark id = 4  x = 1		y = 10 />
+	<landmark id = 5  x = 10	y = 19 />
 </LandmarkList>
 <ObservationModels>
 	<HeadingBeaconObservationModel
@@ -102,7 +109,7 @@
 <!-- 	<FIRMNodes  minNodes = "750"  maxNodes = "750" /> -->
 
 	<!-- [OPTION3] Roadmap -->
-<!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
+    <RoadMap roadmapFile = "" useRoadMap = "0" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;450.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;550.xml" useRoadMap = "1" /> -->
@@ -113,7 +120,7 @@
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet2&#45;550.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet2&#45;650.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet2&#45;750.xml" useRoadMap = "1" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-DensitySet3-350.xml" useRoadMap = "1" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;450.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;550.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;650.xml" useRoadMap = "1" /> -->

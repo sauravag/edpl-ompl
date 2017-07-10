@@ -319,7 +319,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 //             nominalX_K = lss_[lss_.size()-1].getX();
 
             // quit edge controller and switch to node controller!
-//             OMPL_INFORM("Reached the end of EdgeController... Now switch to NodeController!");
+            //OMPL_INFORM("Reached the end of EdgeController... Now switch to NodeController!");
             break;
         }
 
@@ -356,8 +356,8 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 //         cost += arma::trace(tempCovMat);   // 4) cost for the sum of trace(cov) but without penalty for stepsToStop
 
 
-        if(!constructionMode)
-            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+        //if(!constructionMode)
+        //    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
         k++;
 
@@ -458,7 +458,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
 //         nominalX_K = lss_[lss_.size()-1].getX();
 
         // quit edge controller and switch to node controller!
-//         OMPL_WARN("Reached the end of EdgeController... Now NEED to switch to NodeController!");
+        //OMPL_WARN("Reached the end of EdgeController... Now NEED to switch to NodeController!");
     }
 
     arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
@@ -493,8 +493,8 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
 //     cost += arma::trace(tempCovMat);    // 4)
 
 
-    if(!constructionMode)
-        boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+    //if(!constructionMode)
+    //    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
 
     si_->copyState(endState, internalState);
@@ -637,10 +637,8 @@ bool Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
 
         tries_++;
 
-        if(!constructionMode)
-        {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
-        }
+        //if(!constructionMode)
+        //    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
         // TODO check for state validity
     }
@@ -691,10 +689,8 @@ bool Controller<SeparatedControllerType, FilterType>::StabilizeUpto(const int nu
 
         tries_++;
 
-        if(!constructionMode)
-        {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
-        }
+        //if(!constructionMode)
+        //    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
         // TODO check for state validity
     }

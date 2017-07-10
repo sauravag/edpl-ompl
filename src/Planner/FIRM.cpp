@@ -93,7 +93,7 @@ namespace ompl
 //         static const double TIME_TO_STOP_COST_WEIGHT = 0;
         static const double TIME_TO_STOP_COST_WEIGHT = 0.001;
 //         static const double TIME_TO_STOP_COST_WEIGHT = 0.01;
-//         static const double TIME_TO_STOP_COST_WEIGHT = 0.1;
+//         static const double TIME_TO_STOP_COST_WEIGHT = 0.1;     // with this, penalty terms for coviance and number of time steps will be in similar order
 //         static const double TIME_TO_STOP_COST_WEIGHT = 1;
 //         static const double TIME_TO_STOP_COST_WEIGHT = 10;
 
