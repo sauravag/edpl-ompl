@@ -615,7 +615,7 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
             if (loadedRoadmapFromFile_)
             {
                 Vertex start_loaded = 0;    // HACK
-//                 Vertex start_loaded = 193;    // HACK
+//                 Vertex start_loaded = 312;    // HACK
                 startM_.push_back(start_loaded);
                 break;
             }
@@ -1745,8 +1745,6 @@ void FIRM::executeFeedback(void)
 
         assert(currentVertex < boost::num_vertices(g_));
 
-        OMPL_INFORM("FIRM: Moving from Vertex %u to %u", currentVertex, boost::target(e, g_));
-
         // for debug
         if(ompl::magic::PRINT_FEEDBACK_PATH)
             std::cout << "PATH[" << currentVertex;
@@ -1770,7 +1768,16 @@ void FIRM::executeFeedback(void)
 
         double succProb = evaluateSuccessProbability(e, currentVertex, goal);
 
-        OMPL_INFORM("FIRM: Moving from Vertex %u to %u with TP = %f", currentVertex, boost::target(e, g_), succProb);
+        OMPL_INFORM("FIRM: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.3f) to %u (%2.3f, %2.3f, %2.3f, %2.3f) with TP = %f", currentVertex, boost::target(e, g_), 
+                stateProperty_[currentVertex]->as<FIRM::StateType>()->getX(),
+                stateProperty_[currentVertex]->as<FIRM::StateType>()->getY(),
+                stateProperty_[currentVertex]->as<FIRM::StateType>()->getYaw(),
+                arma::trace(stateProperty_[currentVertex]->as<FIRM::StateType>()->getCovariance()),
+                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getX(),
+                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getY(),
+                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getYaw(),
+                arma::trace(stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getCovariance()),
+                succProb);
 
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
@@ -2018,7 +2025,16 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         double succProb = evaluateSuccessProbability(e, currentVertex, goal);
 
-        OMPL_INFORM("FIRM: Moving from Vertex %u to %u with TP = %f", currentVertex, boost::target(e, g_), succProb);
+        OMPL_INFORM("FIRM: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.3f) to %u (%2.3f, %2.3f, %2.3f, %2.3f) with TP = %f", currentVertex, boost::target(e, g_), 
+                stateProperty_[currentVertex]->as<FIRM::StateType>()->getX(),
+                stateProperty_[currentVertex]->as<FIRM::StateType>()->getY(),
+                stateProperty_[currentVertex]->as<FIRM::StateType>()->getYaw(),
+                arma::trace(stateProperty_[currentVertex]->as<FIRM::StateType>()->getCovariance()),
+                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getX(),
+                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getY(),
+                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getYaw(),
+                arma::trace(stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getCovariance()),
+                succProb);
 
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
@@ -2220,7 +2236,16 @@ void FIRM::executeFeedbackWithRollout(void)
 
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
 
-        OMPL_INFORM("FIRM Rollout: Moving from Vertex %u to %u with TP = %f", tempVertex, boost::target(e, g_), succProb);
+        OMPL_INFORM("FIRM Rollout: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.3f) to %u (%2.3f, %2.3f, %2.3f, %2.3f) with TP = %f", tempVertex, boost::target(e, g_), 
+                stateProperty_[tempVertex]->as<FIRM::StateType>()->getX(),
+                stateProperty_[tempVertex]->as<FIRM::StateType>()->getY(),
+                stateProperty_[tempVertex]->as<FIRM::StateType>()->getYaw(),
+                arma::trace(stateProperty_[tempVertex]->as<FIRM::StateType>()->getCovariance()),
+                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getX(),
+                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getY(),
+                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getYaw(),
+                arma::trace(stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getCovariance()),
+                succProb);
 
         // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
         // update the future feedback node at every iteration
