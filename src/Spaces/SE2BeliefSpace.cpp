@@ -60,6 +60,12 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxed
 
     arma::colvec covDiffDiag = covDiff.diag();
 
+    // NOTE if the given state's covariance is already smaller than this goal state, set the difference to zero
+    for (int i=0; i<covDiffDiag.size(); i++)
+        if(covDiffDiag[i] < 0.0)
+            covDiffDiag[i] = 0.0;
+
+
     // Need weighted supNorm of difference in means
     double meanNorm = arma::norm(stateDiff % normWeights_, "inf");
 

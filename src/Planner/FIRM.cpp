@@ -2461,6 +2461,14 @@ if(edgeController.isTerminated(tState, 0))  // check if tState is near to the ta
                 if(std::find(futureFIRMNodes.begin(), futureFIRMNodes.begin()+i-0, futureVertex) == futureFIRMNodes.begin()+i-0)
                 {
                     unique = true;
+                    foreach(Edge nnedge, boost::out_edges(tempVertex, g_))
+                    {
+                        if(futureVertex == boost::target(nnedge, g_))
+                        {
+                            unique = false;
+                            break;
+                        }
+                    }
                 }
                 // check for motion validity and add to the graph
                 if(unique)
