@@ -133,21 +133,27 @@ namespace ompl
 
         static const int DEFAULT_NUM_OF_FEEDBACK_LOOK_AHEAD = 3;
 
-//         static const bool PRINT_FEEDBACK_PATH = true;
-        static const bool PRINT_FEEDBACK_PATH = false;
-
-        static const bool PRINT_COST_TO_GO = true;
-//         static const bool PRINT_COST_TO_GO = false;
-
-//         static const bool PRINT_EDGE_COST = true;
-        static const bool PRINT_EDGE_COST = false;
 
         static const bool PRINT_FUTURE_NODES = true;
 //         static const bool PRINT_FUTURE_NODES = false;
 
+        static const bool PRINT_COST_TO_GO = true;
+//         static const bool PRINT_COST_TO_GO = false;
+
+//         static const bool PRINT_FEEDBACK_PATH = true;
+        static const bool PRINT_FEEDBACK_PATH = false;
+
+//         static const bool PRINT_EDGE_COST = true;
+        static const bool PRINT_EDGE_COST = false;
+
+        // HACK this is also hard-coded in include/Controllers/Controller.h
+//         static const bool PRINT_MC_PARTICLES = true;
+        static const bool PRINT_MC_PARTICLES = false;
+
+
         // HACK just for density analysis setup
         // 1) if a roadmap is loaded, do not add duplicate start and goal states again (assuming start/goal are not changed)
-        // 2) save VideoFrames in the working directory (~/edpl_ompl/.)  // hard-coded in Visualization/GLWidget.cpp
+        // 2) save VideoFrames in the working directory (~/edpl_ompl/.)  // HACK hard-coded in src/Visualization/GLWidget.cpp
         static const bool DENSITY_ANALYSIS = true;
     }
 }
@@ -819,7 +825,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     if(addReverseEdge)  // graph construction phase
     {
         neighbors = connectionStrategy_(m, NNRadius_);
-        //neighbors = kConnectionStrategy_(m, numNearestNeighbors_);    // NOTE this makes sense only if all the points are sampled first and then connected to each other
+        //neighbors = kConnectionStrategy_(m, numNearestNeighbors_);    // NOTE this makes sense only if all the points are sampled first and then connected to each other, but not in the case point sampling and connection are done simultaneously
     }
     else  // rollout phase
     {
@@ -1015,6 +1021,10 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edge
 
     EdgeControllerType edgeController;
 
+    // for debug
+    if(ompl::magic::PRINT_MC_PARTICLES)
+        std::cout << "=================================================" << std::endl;
+
 //     const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController);
     const FIRMWeight weight = generateEdgeNodeControllerWithCost(a, b, edgeController);
 
@@ -1060,17 +1070,46 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
 
     for(unsigned int i=0; i< numMCParticles_;i++)
     {
-
-        siF_->setTrueState(startNodeState);
-
         siF_->setBelief(startNodeState);
 
+
+        // FIXME the true state always starts from the nominal state?
+        //siF_->setTrueState(startNodeState);
+
+        // NOTE random sampling of a true state from the current belief state for Monte Carlo simulation
+        ompl::base::State* sampState = siF_->allocState();
+        if(!startNodeState->as<FIRM::StateType>()->sampleFromBelief(sampState))
+        {
+            OMPL_WARN("Could not sample a true state from the current belief state!");
+            continue;
+        }
+        siF_->setTrueState(sampState);
+        siF_->freeState(sampState);
+
+        // for debug
+        if(ompl::magic::PRINT_MC_PARTICLES)
+        {
+            std::cout << "-------------------------------------------" << std::endl;
+            ompl::base::State *tmp = si_->allocState();
+            siF_->getTrueState(tmp);
+            OMPL_INFORM("True State: (%2.3f, %2.3f, %2.3f, %2.3f)",
+                    tmp->as<FIRM::StateType>()->getX(),
+                    tmp->as<FIRM::StateType>()->getY(),
+                    tmp->as<FIRM::StateType>()->getYaw(),
+                    arma::trace(tmp->as<FIRM::StateType>()->getCovariance()));
+            OMPL_INFORM("Belief State: (%2.3f, %2.3f, %2.3f, %2.3f)",
+                    startNodeState->as<FIRM::StateType>()->getX(),
+                    startNodeState->as<FIRM::StateType>()->getY(),
+                    startNodeState->as<FIRM::StateType>()->getYaw(),
+                    arma::trace(startNodeState->as<FIRM::StateType>()->getCovariance()));
+            siF_->freeState(tmp);
+            std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+        }
+
+
         ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
-
         ompl::base::Cost filteringCost(0);
-
         int stepsExecuted = 0;
-
         int stepsToStop = 0;
 
         // edge controller until the end of sequence

@@ -7,12 +7,19 @@
 <!-- 	<landmark id = 1  x = 1		y = 17.875 /> -->
 <!-- 	<landmark id = 2  x = 2.125	y = 19.0 /> -->
 <!-- </LandmarkList> -->
+<!-- <LandmarkList> -->
+<!-- 	<landmark id = 1  x = 1		y = 19 /> -->
+<!-- 	<landmark id = 2  x = 1		y = 16.75 /> -->
+<!-- 	<landmark id = 3  x = 3.25	y = 19 /> -->
+<!-- 	<landmark id = 4  x = 1		y = 10 /> -->
+<!-- 	<landmark id = 5  x = 10	y = 19 /> -->
+<!-- </LandmarkList> -->
 <LandmarkList>
 	<landmark id = 1  x = 1		y = 19 />
 	<landmark id = 2  x = 1		y = 16.75 />
 	<landmark id = 3  x = 3.25	y = 19 />
-	<landmark id = 4  x = 1		y = 10 />
-	<landmark id = 5  x = 10	y = 19 />
+	<landmark id = 4  x = 1		y = 12.25 />
+	<landmark id = 5  x = 7.75	y = 19 />
 </LandmarkList>
 <ObservationModels>
 	<HeadingBeaconObservationModel
@@ -42,14 +49,16 @@
 		max_linear_velocity= "4.0"
 		dt= "0.1"
 	  />
+</MotionModels>
+<!-- <MotionModels> -->
 <!-- 	<OmnidirectionalMotionModel  -->
 <!-- 		sigmaV="0.0" -->
 <!-- 		etaV="0.0" -->
 <!--         sigmaOmega="0.0" -->
 <!--         etaOmega="0.0" -->
 <!-- 		P_Wg_filename="" -->
-<!-- 		wind_noise_pos = "0.000" -->
-<!-- 		wind_noise_ang="0.000000"  -->
+<!-- 		wind_noise_pos = "0.000000001" -->
+<!-- 		wind_noise_ang="0.000000000001"  -->
 <!-- 		min_linear_velocity= "&#45;1.0" -->
 <!-- 		max_linear_velocity= "1.0" -->
 <!-- 		max_angular_velocity= "0.60" -->
@@ -62,7 +71,7 @@
 <!-- 		max_linear_velocity= "4.0" -->
 <!-- 		dt= "0.1" -->
 <!-- 	  /> -->
-</MotionModels>
+<!-- </MotionModels> -->
 <FIRM>
 	<Video save = "0" />
 <!-- 	<DataLog save = "0"/> -->
@@ -109,8 +118,8 @@
 <!-- 	<FIRMNodes  minNodes = "750"  maxNodes = "750" /> -->
 
 	<!-- [OPTION3] Roadmap -->
-<!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-DensitySet1-350.xml" useRoadMap = "1" />
+    <RoadMap roadmapFile = "" useRoadMap = "0" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;450.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;550.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;650.xml" useRoadMap = "1" /> -->

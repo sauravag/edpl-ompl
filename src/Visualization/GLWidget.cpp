@@ -164,12 +164,13 @@ void GLWidget::saveSnapshot()
 }
 
 
-// HACK just for density analysis setup
+// HACK the original ompl::magic parameters are defined in src/Planner/FIRM.cpp
 namespace ompl
 {
-    namespace magic
+    namespace magic_copy
     {
-        static const bool DENSITY_ANALYSIS = true;    // HACK defined again in addition to Planner/FIRM.cpp
+        // HACK just for density analysis setup
+        static const bool DENSITY_ANALYSIS = true;
     }
 }
 
@@ -179,7 +180,7 @@ void GLWidget::saveFrame()
     static unsigned int frameNum = 0;
 
     // HACK just for density analysis setup
-    if (ompl::magic::DENSITY_ANALYSIS)
+    if (ompl::magic_copy::DENSITY_ANALYSIS)
     {
         m_framePath = QString("./");
     }
@@ -201,7 +202,7 @@ void GLWidget::saveFrame()
     ostringstream oss;
 
     // HACK just for density analysis setup
-    if (ompl::magic::DENSITY_ANALYSIS)
+    if (ompl::magic_copy::DENSITY_ANALYSIS)
     {
         namespace pt = boost::posix_time;
         pt::ptime now = pt::second_clock::local_time();

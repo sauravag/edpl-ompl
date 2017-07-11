@@ -243,6 +243,17 @@ Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::St
 }
 
 
+// HACK the original ompl::magic parameters are defined in src/Planner/FIRM.cpp
+namespace ompl
+{
+    namespace magic_copy
+    {
+//         static const bool PRINT_MC_PARTICLES = true;
+        static const bool PRINT_MC_PARTICLES = false;
+    }
+}
+
+
 template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::State *startState,
                                                               ompl::base::State* endState,
@@ -282,6 +293,24 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
         this->Evolve(internalState, k, tempEndState) ;
         si_->copyState(internalState, tempEndState);
 
+        // for debug
+        if(ompl::magic_copy::PRINT_MC_PARTICLES)
+        {
+            ompl::base::State *tmp = si_->allocState();
+            si_->getTrueState(tmp);
+            OMPL_INFORM("True State: (%2.3f, %2.3f, %2.3f, %2.3f)",
+                    tmp->as<StateType>()->getX(),
+                    tmp->as<StateType>()->getY(),
+                    tmp->as<StateType>()->getYaw(),
+                    arma::trace(tmp->as<StateType>()->getCovariance()));
+            OMPL_INFORM("Belief State: (%2.3f, %2.3f, %2.3f, %2.3f)",
+                    internalState->as<StateType>()->getX(),
+                    internalState->as<StateType>()->getY(),
+                    internalState->as<StateType>()->getYaw(),
+                    arma::trace(internalState->as<StateType>()->getCovariance()));
+            si_->freeState(tmp);
+        }
+
 
         /** Check if the controller is in construction mode,
         If true, that means we are doing monte carlo sims,
@@ -298,13 +327,13 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 
             if(!si_->checkTrueStateValidity())
             {
-                OMPL_ERROR("Failed in checkTrueStateValidity() test!");
+                std::cout << "Failed in checkTrueStateValidity() test!" << std::endl;
                 si_->copyState(endState, internalState);
                 return false;
             }
             else if(!si_->isValid(internalState))
             {
-                OMPL_ERROR("Failed in isValid(internalState) test!");
+                std::cout << "Failed in isValid(internalState) test!" << std::endl;
                 si_->copyState(endState, internalState);
                 return false;
             }
@@ -437,13 +466,13 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     {
         if(!si_->checkTrueStateValidity())
         {
-            OMPL_ERROR("Failed in checkTrueStateValidity() test!");
+            std::cout << "Failed in checkTrueStateValidity() test!" << std::endl;
             si_->copyState(endState, internalState);
             return false;
         }
         else if(!si_->isValid(internalState))
         {
-            OMPL_ERROR("Failed in isValid(internalState) test!");
+            std::cout << "Failed in isValid(internalState) test!" << std::endl;
             si_->copyState(endState, internalState);
             return false;
         }

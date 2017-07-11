@@ -120,6 +120,34 @@ class R2BeliefSpace : public ompl::base::RealVectorStateSpace
             /** \brief Checks if the input state has stabilized to this state (node reachability check) */
             bool isReached(ompl::base::State *state, bool relaxedConstraint=false) const;
 
+
+            /** \brief Sample a new state from this belief state (mainly for Monte Carlo simulation) */
+            bool sampleFromBelief(ompl::base::State* sampState) const
+            {
+                // Cholesky decomposition such that covariance_ = transform * transform.t()
+                arma::mat transform;
+                if(!arma::chol(transform, covariance_, "lower"))
+                {
+                    OMPL_ERROR("Failed to decompose the covariance matrix for random sampling!");
+                    return false;
+                }
+
+                // draw a random sample from standard normal distribution
+                arma::colvec randvec(2, arma::fill::randn);
+
+                // transform this random sample for this Gaussian distribution
+                arma::colvec mean = getArmaData();
+                arma::colvec randvec_transformed = mean + transform * randvec;
+
+                // set the state property as
+                sampState->as<StateType>()->setX(randvec_transformed[0]);
+                sampState->as<StateType>()->setY(randvec_transformed[1]);
+                sampState->as<StateType>()->setCovariance(covariance_);    // REVIEW set the covariance as the same with this state
+
+                return true;
+            }
+
+
             static double meanNormWeight_, covNormWeight_, reachDist_;
 
             static arma::colvec normWeights_;
