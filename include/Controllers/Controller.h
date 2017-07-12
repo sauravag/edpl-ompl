@@ -385,15 +385,15 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
 //         cost += arma::trace(tempCovMat);   // 4) cost for the sum of trace(cov) but without penalty for stepsToStop
 
 
-        //if(!constructionMode)
-        //    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+        if(!constructionMode)
+           boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
         k++;
 
     } // do
-//     while(true);    // NOTE stick to EdgeController until the end of sequence, and switch to NodeController!
-    while(!this->isTerminated(internalState, k));    // CHECK this condition is too loose, so that the edge controller usually does not reach to the end of sequence!
-//     while(!goal_->as<StateType>()->isReached(internalState));    // CHECK only for NodeController?
+    // NOTE edge controller termination condition
+//     while(true);    // A) stick to EdgeController until the end of sequence, and switch to NodeController! complete control but it takes longer time
+    while(!this->isTerminated(internalState, k));    // B) this condition is loose, so the edge controller usually does not reach to the end of sequence! faster but approximate convergence in the middle of path
 
 //     if(k!=0) {cost /= k;}   // 3) cost for the sum of trace(cov); less oscillation and less jiggling motion
 
@@ -522,6 +522,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
 //     cost += arma::trace(tempCovMat);    // 4)
 
 
+    // no need for additional sleep for visualization during rollout
     //if(!constructionMode)
     //    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
@@ -652,8 +653,21 @@ bool Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
     si_->copyState(tempState1, startState);
     si_->copyState(tempState2, startState);
 
-    while(!goal_->as<StateType>()->isReached(tempState1) && tries_ < maxTries_)
+    while(!goal_->as<StateType>()->isReached(tempState1))
     {
+        if(tries_ > maxTries_)
+        {
+            std::cout << "Failed to Stabilize() within " << maxTries_ << " iterations!" << std::endl;
+
+            stabilizationFilteringCost = ompl::base::Cost(cost);
+            si_->copyState(endState, tempState2);
+            si_->freeState(tempState1);
+            si_->freeState(tempState2);
+            tries_ = 0;
+            stepsToStabilize = stepsTaken;
+
+            return false;
+        }
 
         this->Evolve(tempState1, k, tempState2);
 
@@ -666,22 +680,21 @@ bool Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base
 
         tries_++;
 
-        //if(!constructionMode)
-        //    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+        if(!constructionMode)
+           boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
         // TODO check for state validity
     }
 
-   //stabilizationFilteringCost.v = cost;
-   stabilizationFilteringCost = ompl::base::Cost(cost);
+    stabilizationFilteringCost = ompl::base::Cost(cost);
 
-   si_->copyState(endState, tempState2);
-   si_->freeState(tempState1);
-   si_->freeState(tempState2);
-   tries_ = 0;
-   stepsToStabilize = stepsTaken;
+    si_->copyState(endState, tempState2);
+    si_->freeState(tempState1);
+    si_->freeState(tempState2);
+    tries_ = 0;
+    stepsToStabilize = stepsTaken;
 
-   return true;
+    return true;
 }
 
 template <class SeparatedControllerType, class FilterType>
@@ -703,8 +716,7 @@ bool Controller<SeparatedControllerType, FilterType>::StabilizeUpto(const int nu
     si_->copyState(tempState1, startState);
     si_->copyState(tempState2, startState);
 
-//     while(!goal_->as<StateType>()->isReached(tempState1) && tries_ < maxTries_)
-    while(!goal_->as<StateType>()->isReached(tempState1) && stepsTaken < numSteps)
+    while(!goal_->as<StateType>()->isReached(tempState1) && stepsTaken < numSteps)    // iteration up to numSteps, not maxTries_
     {
 
         this->Evolve(tempState1, k, tempState2);
@@ -718,13 +730,13 @@ bool Controller<SeparatedControllerType, FilterType>::StabilizeUpto(const int nu
 
         tries_++;
 
+        // no need for additional sleep for visualization during rollout
         //if(!constructionMode)
         //    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
 
         // TODO check for state validity
     }
 
-   //stabilizationFilteringCost.v = cost;
    stabilizationFilteringCost = ompl::base::Cost(cost);
 
    si_->copyState(endState, tempState2);

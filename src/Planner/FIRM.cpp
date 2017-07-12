@@ -90,10 +90,11 @@ namespace ompl
         static const double DEFAULT_DISTANCE_TO_GOAL_COST_WEIGHT = 0.01; 
 
         /** \brief Weighting factor for edge execution time cost */
+        // NOTE this parameter should be large enough to prevent the robot from staying at a place for a long time until the covariance penalty gets smaller
 //         static const double TIME_TO_STOP_COST_WEIGHT = 0;
-        static const double TIME_TO_STOP_COST_WEIGHT = 0.001;
+//         static const double TIME_TO_STOP_COST_WEIGHT = 0.001;
 //         static const double TIME_TO_STOP_COST_WEIGHT = 0.01;
-//         static const double TIME_TO_STOP_COST_WEIGHT = 0.1;     // with this, penalty terms for coviance and number of time steps will be in similar order
+        static const double TIME_TO_STOP_COST_WEIGHT = 0.1;     // with this, penalty terms for coviance and number of time steps will be in similar order
 //         static const double TIME_TO_STOP_COST_WEIGHT = 1;
 //         static const double TIME_TO_STOP_COST_WEIGHT = 10;
 
@@ -134,14 +135,14 @@ namespace ompl
         static const int DEFAULT_NUM_OF_FEEDBACK_LOOK_AHEAD = 3;
 
 
-        static const bool PRINT_FUTURE_NODES = true;
-//         static const bool PRINT_FUTURE_NODES = false;
-
-        static const bool PRINT_COST_TO_GO = true;
-//         static const bool PRINT_COST_TO_GO = false;
+//         static const bool PRINT_FUTURE_NODES = true;
+        static const bool PRINT_FUTURE_NODES = false;
 
 //         static const bool PRINT_FEEDBACK_PATH = true;
         static const bool PRINT_FEEDBACK_PATH = false;
+
+        static const bool PRINT_COST_TO_GO = true;
+//         static const bool PRINT_COST_TO_GO = false;
 
 //         static const bool PRINT_EDGE_COST = true;
         static const bool PRINT_EDGE_COST = false;
@@ -187,7 +188,6 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     numberofNodesReached_ = 0;
 
-//     costHistory_.push_back(std::make_pair(currentTimeStep_,executionCost_));
     costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
 
     policyGenerator_ = new NBM3P(si);
@@ -621,7 +621,6 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
             if (loadedRoadmapFromFile_)
             {
                 Vertex start_loaded = 0;    // HACK
-//                 Vertex start_loaded = 312;    // HACK
                 startM_.push_back(start_loaded);
                 break;
             }
@@ -1025,8 +1024,8 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edge
     if(ompl::magic::PRINT_MC_PARTICLES)
         std::cout << "=================================================" << std::endl;
 
-//     const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController);
-    const FIRMWeight weight = generateEdgeNodeControllerWithCost(a, b, edgeController);
+    //const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController);      // deprecated: EdgeController only
+    const FIRMWeight weight = generateEdgeNodeControllerWithCost(a, b, edgeController);    // EdgeController and NodeController concatenated
 
     if(weight.getSuccessProbability() == 0)
     {
@@ -1071,10 +1070,6 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
     for(unsigned int i=0; i< numMCParticles_;i++)
     {
         siF_->setBelief(startNodeState);
-
-
-        // FIXME the true state always starts from the nominal state?
-        //siF_->setTrueState(startNodeState);
 
         // NOTE random sampling of a true state from the current belief state for Monte Carlo simulation
         ompl::base::State* sampState = siF_->allocState();
@@ -1139,7 +1134,6 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
         }
 
         // node controller for stabilization
-//         if(nodeController.Stabilize(startNodeState, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
         if(nodeController.Stabilize(startNodeState, endBelief, filteringCost, stepsExecuted, true))
         {
             successCount++;
@@ -1175,14 +1169,13 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
 
     siF_->showRobotVisualization(true);
 
-    //edgeCost.v = edgeCost.v / successCount ;
     edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
 
     // for debug
     if(ompl::magic::PRINT_EDGE_COST)
         std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = ( " << edgeCostSum.value() << " ) / " << successCount << std::endl;
 
-//     double transitionProbability = successCount / numMCParticles_ ;
+    //double transitionProbability = successCount / numMCParticles_ ;     // deprecated: if only an edge controller is being used
     double transitionProbability = (successCount/2) / numMCParticles_;    // successCount increases for both edgeController and nodeController, respectively
 
     FIRMWeight weight(edgeCost.value(), transitionProbability);
@@ -1742,41 +1735,41 @@ void FIRM::updateEdgeCollisionCost(FIRM::Vertex currentVertex, FIRM::Vertex goal
 
 void FIRM::executeFeedback(void)
 {
-
-    Visualizer::setMode(Visualizer::VZRDrawingMode::FIRMMode);
-    Visualizer::clearRobotPath();
-
-    Vertex start = startM_[0];
-    Vertex goal  = goalM_[0] ;
-
-    ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
-
-    sendMostLikelyPathToViz(start, goal);
-
-    siF_->setTrueState(stateProperty_[start]);
-    siF_->setBelief(stateProperty_[start]);
-
-    Vertex currentVertex =  start;
-
     EdgeControllerType edgeController;
     NodeControllerType nodeController;
 
-    ompl::base::State *cstartState = si_->allocState();
-    si_->copyState(cstartState, stateProperty_[start]);
+    bool edgeControllerStatus;
+    bool nodeControllerStatus;
 
+
+    Vertex start = startM_[0];
+    Vertex goal = goalM_[0];
+    Vertex currentVertex = start;
+
+    ompl::base::State *cstartState = si_->allocState();
     ompl::base::State *cendState = si_->allocState();
+    ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
+    ompl::base::State *tempTrueStateCopy = si_->allocState();
+
+    si_->copyState(cstartState, stateProperty_[start]);
+    siF_->setTrueState(stateProperty_[start]);
+    siF_->setBelief(stateProperty_[start]);
+
+
+    Visualizer::setMode(Visualizer::VZRDrawingMode::FIRMMode);
+    Visualizer::clearRobotPath();
+    sendMostLikelyPathToViz(start, goal);
+
+    Visualizer::doSaveVideo(doSaveVideo_);
+    siF_->doVelocityLogging(true);
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
+
 
     OMPL_INFORM("FIRM: Running policy execution");
 
-    Visualizer::doSaveVideo(doSaveVideo_);
-
-    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
-
-    siF_->doVelocityLogging(true);
-
     while(!goalState->as<FIRM::StateType>()->isReached(cstartState))
     {
-
+        // this implicitly means that isReached() for the goal is satisfied (by the node controller)
         if(currentVertex==goal)
             break;
 
@@ -1791,7 +1784,6 @@ void FIRM::executeFeedback(void)
         // Check if feedback policy is valid 
         while(!isFeedbackPolicyValid(currentVertex, goal))
         {
-
             OMPL_INFORM("FIRM: Invalid path detected from Vertex %u to %u", currentVertex, boost::target(e, g_));
 
             updateEdgeCollisionCost(currentVertex, goal);
@@ -1806,8 +1798,9 @@ void FIRM::executeFeedback(void)
         }
 
         double succProb = evaluateSuccessProbability(e, currentVertex, goal);
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
-        OMPL_INFORM("FIRM: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.3f) to %u (%2.3f, %2.3f, %2.3f, %2.3f) with TP = %f", currentVertex, boost::target(e, g_), 
+        OMPL_INFORM("FIRM: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to %u (%2.3f, %2.3f, %2.3f, %2.6f) with TP = %f", currentVertex, boost::target(e, g_), 
                 stateProperty_[currentVertex]->as<FIRM::StateType>()->getX(),
                 stateProperty_[currentVertex]->as<FIRM::StateType>()->getY(),
                 stateProperty_[currentVertex]->as<FIRM::StateType>()->getYaw(),
@@ -1818,57 +1811,93 @@ void FIRM::executeFeedback(void)
                 arma::trace(stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getCovariance()),
                 succProb);
 
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
-{
         ompl::base::Cost costCov;
-
         int stepsExecuted = 0;
-
         int stepsToStop = 0;
 
-        // EdgeController
-        edgeController = edgeControllers_[e];
-        edgeController.setSpaceInformation(policyExecutionSI_);
-        bool edgeControllerStatus = edgeController.Execute(cstartState, cendState, costCov, stepsExecuted, stepsToStop, false);
 
+        // NOTE NodeController will be invoked after executing EdgeController until it ends (until the end of sequence or isTerminated() is satisfied)
 
-
-        // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
-        //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
-        // 2) cost = wc * trace(cov_f)       + wt * K
-        // 3) cost = wc * mean(trace(cov_k)) + wt * K
-        // 4) cost = wc * sum(trace(cov_k))
-
-        currentTimeStep_ += stepsExecuted;
-
-        executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
-
-        executionCost_ += informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
-        //         executionCost_ += informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
-        //         executionCost_ += informationCostWeight_*executionCostCov_;    // 4)
-
-        costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
-
-
-        // get a copy of the true state
-        ompl::base::State *tempTrueStateCopy = si_->allocState();
-
-        siF_->getTrueState(tempTrueStateCopy);
-
-        if(!si_->isValid(tempTrueStateCopy))
+        // [1] EdgeController
         {
-           OMPL_INFORM("Robot Collided :(");
+            edgeController = edgeControllers_[e];
+            edgeController.setSpaceInformation(policyExecutionSI_);
+            edgeControllerStatus = edgeController.Execute(cstartState, cendState, costCov, stepsExecuted, stepsToStop, false);
 
-           return;
-        }
 
-        if(edgeControllerStatus)
+            // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+            //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+            // 2) cost = wc * trace(cov_f)       + wt * K
+            // 3) cost = wc * mean(trace(cov_k)) + wt * K
+            // 4) cost = wc * sum(trace(cov_k))
+
+            currentTimeStep_ += stepsExecuted;
+
+            executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
+
+            executionCost_ = informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
+            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+            //executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
+
+            costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
+
+
+            // this is a secondary (redundant) collision check for the true state
+            siF_->getTrueState(tempTrueStateCopy);
+            if(!si_->isValid(tempTrueStateCopy))
+            {
+                OMPL_INFORM("Robot Collided :(");
+                return;
+            }
+
+            // update cstartState for next iteration
+            si_->copyState(cstartState, cendState);
+
+        } // [1] EdgeController
+
+        // [2] NodeController
+        {
+            nodeController = nodeControllers_[boost::target(e, g_)];
+            nodeController.setSpaceInformation(policyExecutionSI_);
+            nodeControllerStatus = nodeController.Stabilize(cstartState, cendState, costCov, stepsExecuted, false);
+
+
+            // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+            //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+            // 2) cost = wc * trace(cov_f)       + wt * K
+            // 3) cost = wc * mean(trace(cov_k)) + wt * K
+            // 4) cost = wc * sum(trace(cov_k))
+
+            currentTimeStep_ += stepsExecuted;
+
+            executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
+
+            executionCost_ = informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
+            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+            //executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
+
+            costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
+
+
+            // this is a secondary (redundant) collision check for the true state
+            siF_->getTrueState(tempTrueStateCopy);
+            if(!si_->isValid(tempTrueStateCopy))
+            {
+                OMPL_INFORM("Robot Collided :(");
+                return;
+            }
+
+            // update the cstartState for next iteration
+            si_->copyState(cstartState, cendState);
+
+        } // [2] NodeController
+
+
+        if(nodeControllerStatus)    // regardless of failure of EdgeController (EdgeControllerStatus) due to high deviation
         {
             numberofNodesReached_++;
-
             nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
-
             currentVertex = boost::target(e, g_);
         }
         else
@@ -1876,14 +1905,12 @@ void FIRM::executeFeedback(void)
             Visualizer::doSaveVideo(false);
             siF_->doVelocityLogging(false);
 
-            //
             OMPL_INFORM("Controller stopped due to deviation, need to add new state at: ");
             siF_->printState(cendState);
-            //
 
             currentVertex = addStateToGraph(cendState);
 
-            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
+            // set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
             solveDijkstraSearch(goal);
@@ -1891,98 +1918,9 @@ void FIRM::executeFeedback(void)
 
             Visualizer::doSaveVideo(doSaveVideo_);
             siF_->doVelocityLogging(true);
-
         }
 
-        si_->freeState(tempTrueStateCopy);
-
-        si_->copyState(cstartState, cendState);
-}
-
-{
-
-        ompl::base::Cost costCov;
-
-        int stepsExecuted = 0;
-
-        int stepsToStop = 0;
-
-        // NodeController
-        nodeController = nodeControllers_[boost::target(e, g_)];
-        nodeController.setSpaceInformation(policyExecutionSI_);
-//         bool nodeControllerStatus = nodeController.Execute(cstartState, cendState, costCov, stepsExecuted, stepsToStop, false);
-//         bool nodeControllerStatus = nodeController.Stabilize(cstartState, cendState, costCov, stepsExecuted, stepsToStop, false);
-//         bool nodeControllerStatus = nodeController.Stabilize(cstartState, cendState, costCov, stepsExecuted, false);
-        nodeController.Stabilize(cstartState, cendState, costCov, stepsExecuted, false);
-        bool nodeControllerStatus = true;
-
-
-        // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
-        //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
-        // 2) cost = wc * trace(cov_f)       + wt * K
-        // 3) cost = wc * mean(trace(cov_k)) + wt * K
-        // 4) cost = wc * sum(trace(cov_k))
-
-        currentTimeStep_ += stepsExecuted;
-
-        executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
-
-        executionCost_ += informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
-        //         executionCost_ += informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
-        //         executionCost_ += informationCostWeight_*executionCostCov_;    // 4)
-
-        costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
-
-
-        // get a copy of the true state
-        ompl::base::State *tempTrueStateCopy = si_->allocState();
-
-        siF_->getTrueState(tempTrueStateCopy);
-
-        if(!si_->isValid(tempTrueStateCopy))
-        {
-           OMPL_INFORM("Robot Collided :(");
-
-           return;
-        }
-
-        if(nodeControllerStatus)
-        {
-            numberofNodesReached_++;
-
-            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
-
-            currentVertex = boost::target(e, g_);
-        }
-        else
-        {
-            Visualizer::doSaveVideo(false);
-            siF_->doVelocityLogging(false);
-
-            //
-            OMPL_INFORM("Controller stopped due to deviation, need to add new state at: ");
-            siF_->printState(cendState);
-            //
-
-            currentVertex = addStateToGraph(cendState);
-
-            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
-            siF_->setTrueState(tempTrueStateCopy);
-
-            solveDijkstraSearch(goal);
-            solveDynamicProgram(goal, false);
-
-            Visualizer::doSaveVideo(doSaveVideo_);
-            siF_->doVelocityLogging(true);
-
-        }
-
-        si_->freeState(tempTrueStateCopy);
-
-        si_->copyState(cstartState, cendState);
-}
-
-    }
+    } // while()
 
 
     // for analysis
@@ -1991,17 +1929,15 @@ void FIRM::executeFeedback(void)
     std::cout << "Execution time steps: " << currentTimeStep_ << std::endl;
     std::cout << "Execution covariance cost: " << executionCostCov_ << std::endl;
     std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << currentTimeStep_ << " )" << std::endl;     // 1)
-//     std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << "/" << currentTimeStep_ << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << currentTimeStep_ << " )" << std::endl;     // 3)
-//     std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " )" << std::endl;     // 4)
+    //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << "/" << currentTimeStep_ << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << currentTimeStep_ << " )" << std::endl;     // 3)
+    //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " )" << std::endl;     // 4)
     std::cout << std::endl;
 
 
     if(doSaveLogs_)
     {
         std::vector<std::pair<double, double> > velLog;
-
         siF_->getVelocityLog(velLog);
-
         for(int i=0; i < velLog.size(); i++)
         {
             //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); //unicycle
@@ -2009,17 +1945,14 @@ void FIRM::executeFeedback(void)
         }
 
         writeTimeSeriesDataToFile("StandardFIRMCostHistory.csv", "costToGo");
-
         writeTimeSeriesDataToFile("StandardFIRMSuccessProbabilityHistory.csv", "successProbability");
-
         writeTimeSeriesDataToFile("StandardFIRMNodesReachedHistory.csv","nodesReached");
-
         writeTimeSeriesDataToFile("StandardFIRMVelocityHistory.csv", "velocity");
     }
-
     Visualizer::doSaveVideo(false);
 
     // free the memory
+    si_->freeState(tempTrueStateCopy);
     si_->freeState(cstartState);
     si_->freeState(cendState);
 }
@@ -2064,7 +1997,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         double succProb = evaluateSuccessProbability(e, currentVertex, goal);
 
-        OMPL_INFORM("FIRM: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.3f) to %u (%2.3f, %2.3f, %2.3f, %2.3f) with TP = %f", currentVertex, boost::target(e, g_), 
+        OMPL_INFORM("FIRM: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to %u (%2.3f, %2.3f, %2.3f, %2.6f) with TP = %f", currentVertex, boost::target(e, g_), 
                 stateProperty_[currentVertex]->as<FIRM::StateType>()->getX(),
                 stateProperty_[currentVertex]->as<FIRM::StateType>()->getY(),
                 stateProperty_[currentVertex]->as<FIRM::StateType>()->getYaw(),
@@ -2100,9 +2033,9 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
 
-        executionCost_ += informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
-        //         executionCost_ += informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
-        //         executionCost_ += informationCostWeight_*executionCostCov_;    // 4)
+        executionCost_ = informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
+//         executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+//         executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
 
         costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
 
@@ -2129,7 +2062,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
             currentVertex = addStateToGraph(cendState);
 
-            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
+            // set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
             solveDijkstraSearch(goal);
@@ -2171,7 +2104,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
             currentVertex = addStateToGraph(cendState);
 
-            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
+            // set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
             siF_->setTrueState(tempTrueStateCopy);
 
             siF_->freeState(tempTrueStateCopy);
@@ -2198,6 +2131,37 @@ void FIRM::executeFeedbackWithKidnapping(void)
 // Experimental
 void FIRM::executeFeedbackWithRollout(void)
 {
+    EdgeControllerType edgeController;
+    NodeControllerType nodeController;
+
+    bool edgeControllerStatus;
+    bool nodeControllerStatus;
+
+
+    const Vertex start = startM_[0];
+    const Vertex goal = goalM_[0];
+    Vertex currentVertex = start;
+    Vertex tempVertex = currentVertex;
+
+    ompl::base::State *cstartState = si_->allocState();
+    ompl::base::State *cendState = si_->allocState();
+    ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
+    ompl::base::State *tempTrueStateCopy = si_->allocState();
+
+    //===== SET A Custom Init Covariance=====================
+    // using namespace arma;
+    // mat tempCC(3,3);
+    // tempCC<< 0.1 << 0.0 << 0.0 << endr
+    //         << 0.0 << 0.1 << 0.0 << endr
+    //         << 0.0 << 0.0 << 0.0000001<<endr;
+    // stateProperty_[start]->as<StateType>()->setCovariance(tempCC);
+    // Visualizer::updateCurrentBelief(stateProperty_[start]);
+    //================================
+
+    si_->copyState(cstartState, stateProperty_[start]);
+    siF_->setTrueState(stateProperty_[start]);
+    siF_->setBelief(stateProperty_[start]);
+
 
     // Open a file for writing rollout computation time
     std::ofstream outfile;
@@ -2209,73 +2173,39 @@ void FIRM::executeFeedbackWithRollout(void)
 
     Visualizer::setMode(Visualizer::VZRDrawingMode::RolloutMode);
     Visualizer::clearRobotPath();
+    sendMostLikelyPathToViz(start, goal);
 
-    const Vertex start = startM_[0];
-    const Vertex goal  = goalM_[0] ;
+    Visualizer::doSaveVideo(doSaveVideo_);
+    siF_->doVelocityLogging(true);
+    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
-    sendMostLikelyPathToViz(start, goal) ;
 
-    ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
-
-    //===== SET A Custom Init Covariance=====================
-    // using namespace arma;
-
-    // mat tempCC(3,3);
-
-    // tempCC<< 0.1 << 0.0 << 0.0 << endr
-    //         << 0.0 << 0.1 << 0.0 << endr
-    //         << 0.0 << 0.0 << 0.0000001<<endr;
-
-    // stateProperty_[start]->as<StateType>()->setCovariance(tempCC);
-    // Visualizer::updateCurrentBelief(stateProperty_[start]);
-    //================================
-
-    siF_->setTrueState(stateProperty_[start]);
-    siF_->setBelief(stateProperty_[start]);
-
-    Vertex currentVertex =  start;
-
-    ompl::base::State *cstartState = si_->allocState();
-    si_->copyState(cstartState, stateProperty_[start]);
-
-    ompl::base::State *cendState = si_->allocState();
-
-    OMPL_INFORM("FIRM: Running policy execution");
-
-    Edge e = feedback_.at(currentVertex);
+    //double averageTimeForRolloutComputation = 0;
+    int numberOfRollouts = 0;
 
 
     // local variables for robust connection to a desirable (but far) FIRM nodes during rollout
+    Edge e = feedback_.at(currentVertex);
 
     // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
-    Vertex nextFIRMVertex = boost::target(e, g_);
+    //Vertex nextFIRMVertex = boost::target(e, g_);
 
     // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
     // initialize a container of FIRM nodes on feedback path
     boost::circular_buffer<Vertex> futureFIRMNodes(numberOfTargetsInHistory_ * numberOfFeedbackLookAhead_);  // it is like a size-limited queue or buffer
 
 
-    Vertex tempVertex = currentVertex;
-
-    OMPL_INFORM("Goal State is: \n");
-
-    si_->printState(goalState);
-
-    double averageTimeForRolloutComputation = 0;
-
-    int numberOfRollouts = 0;
-
-    Visualizer::doSaveVideo(doSaveVideo_);
-
-    nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
+    OMPL_INFORM("FIRM: Running policy execution");
 
     // While the robot state hasn't reached the goal state, keep running
+    // HACK setting relaxedConstraint argument to false means isReached() condition is exceptionally relaxed for termination
     while(!goalState->as<FIRM::StateType>()->isReached(cstartState, true))
+    //while(!goalState->as<FIRM::StateType>()->isReached(cstartState, false))
     {
-
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
+        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
-        OMPL_INFORM("FIRM Rollout: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.3f) to %u (%2.3f, %2.3f, %2.3f, %2.3f) with TP = %f", tempVertex, boost::target(e, g_), 
+        OMPL_INFORM("FIRM Rollout: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to %u (%2.3f, %2.3f, %2.3f, %2.6f) with TP = %f", currentVertex, boost::target(e, g_), 
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getX(),
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getY(),
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getYaw(),
@@ -2309,158 +2239,137 @@ void FIRM::executeFeedbackWithRollout(void)
             }
         }
         // for debug
-//         if(ompl::magic::PRINT_FUTURE_NODES)
-//         {
-//             std::cout << "futureFIRMNodesDuplicate: { ";
-//             foreach(futureVertex, futureFIRMNodes)
-//                 std::cout << futureVertex << " ";
-//             std::cout << "}" << std::endl;
-//         }
+        // if(ompl::magic::PRINT_FUTURE_NODES)
+        // {
+        //     std::cout << "futureFIRMNodesDuplicate: { ";
+        //     foreach(futureVertex, futureFIRMNodes)
+        //         std::cout << futureVertex << " ";
+        //     std::cout << "}" << std::endl;
+        // }
 
-
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
-
-        ompl::base::State *tState = si_->allocState();
-
-        // REVIEW NodeController should be invoked after following EdgeController for stepsToStop steps, but has never been done
-        EdgeControllerType edgeController = edgeControllers_[e];
-//         NodeControllerType edgeController = nodeControllers_[boost::target(e, g_)];
-//         NodeControllerType edgeController = nodeControllers_[boost::source(e, g_)];
-
-{
-        assert(edgeController.getGoal());
-
-        ompl::base::Cost costCov;
-
-        siF_->doVelocityLogging(true);
 
         /**
-            Instead of executing the entire controller, we need to execute N steps, then calculate the cost to go through the neighboring nodes.
-            Whichever gives the lowest cost to go, is our new path. Do this at every N steps.
+          Instead of executing the entire controller, we need to execute N steps, then calculate the cost to go through the neighboring nodes.
+          Whichever gives the lowest cost to go, is our new path. Do this at every N steps.
         */
+        ompl::base::Cost costCov;
         int stepsExecuted = 0;
+        int stepsToStop = 0;
 
+
+        // NOTE NodeController will be invoked after executing EdgeController for the given rolloutSteps_ steps
+
+        // [1] EdgeController
+        edgeController = edgeControllers_[e];
         edgeController.setSpaceInformation(policyExecutionSI_);
-
-        bool controllerStatus = edgeController.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
-
-
-    // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
-    //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
-    // 2) cost = wc * trace(cov_f)       + wt * K
-    // 3) cost = wc * mean(trace(cov_k)) + wt * K
-    // 4) cost = wc * sum(trace(cov_k))
-
-        currentTimeStep_ += stepsExecuted;
-
-        executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
-
-        executionCost_ += informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
-//         executionCost_ += informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
-//         executionCost_ += informationCostWeight_*executionCostCov_;    // 4)
-
-        costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
-
-
-//         ompl::base::State *tState = si_->allocState();
-
-        siF_->getTrueState(tState);
-
-        // REVIEW isn't this redundant since checkTrueStateValidity() is already called in executeUpto()?
-        if(!si_->isValid(tState))
+        if(!edgeController.isTerminated(cstartState, 0))  // check if cstartState is NOT near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
-            OMPL_INFORM("Robot Collided :(");
-            return;
-        }
-}
-
-if(edgeController.isTerminated(tState, 0))  // check if tState is near to the target FIRM node (by x,y position)
-{
-        // REVIEW NodeController should be invoked after following EdgeController for stepsToStop steps, but has never been done
-//         EdgeControllerType controller = edgeControllers_[e];
-        NodeControllerType controller = nodeControllers_[boost::target(e, g_)];
-//         NodeControllerType controller = nodeControllers_[boost::source(e, g_)];
-
-        assert(controller.getGoal());
-
-        ompl::base::Cost costCov;
-
-        siF_->doVelocityLogging(true);
-
-        /**
-            Instead of executing the entire controller, we need to execute N steps, then calculate the cost to go through the neighboring nodes.
-            Whichever gives the lowest cost to go, is our new path. Do this at every N steps.
-        */
-        int stepsExecuted = 0;
-
-        controller.setSpaceInformation(policyExecutionSI_);
-
-        si_->copyState(cstartState, cendState);
-
-//         bool controllerStatus = controller.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
-//         bool controllerStatus = controller.Stabilize(cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
-//         controller.Stabilize(cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
-        controller.StabilizeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);   // REVIEW return value is not being used
-        bool controllerStatus = true;
+            edgeControllerStatus = edgeController.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
 
 
-    // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
-    //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
-    // 2) cost = wc * trace(cov_f)       + wt * K
-    // 3) cost = wc * mean(trace(cov_k)) + wt * K
-    // 4) cost = wc * sum(trace(cov_k))
+            // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+            //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+            // 2) cost = wc * trace(cov_f)       + wt * K
+            // 3) cost = wc * mean(trace(cov_k)) + wt * K
+            // 4) cost = wc * sum(trace(cov_k))
 
-        currentTimeStep_ += stepsExecuted;
+            currentTimeStep_ += stepsExecuted;
 
-        executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
+            executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
 
-        executionCost_ += informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
-//         executionCost_ += informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
-//         executionCost_ += informationCostWeight_*executionCostCov_;    // 4)
+            executionCost_ = informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
+            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+            //executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
 
-        costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
+            costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
 
 
-//         ompl::base::State *tState = si_->allocState();
+            // this is a secondary (redundant) collision check for the true state
+            siF_->getTrueState(tempTrueStateCopy);
+            if(!si_->isValid(tempTrueStateCopy))
+            {
+                OMPL_INFORM("Robot Collided :(");
+                return;
+            }
 
-        siF_->getTrueState(tState);
+            // update cstartState for next iteration
+            si_->copyState(cstartState, cendState);
 
-        // REVIEW isn't this redundant since checkTrueStateValidity() is already called in executeUpto()?
-        if(!si_->isValid(tState))
+        } // [1] EdgeController
+
+        // [2] NodeController
+        if(edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
-            OMPL_INFORM("Robot Collided :(");
-            return;
+            nodeController = nodeControllers_[boost::target(e, g_)];
+            nodeController.setSpaceInformation(policyExecutionSI_);
+            nodeControllerStatus = nodeController.StabilizeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
+
+
+            // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+            //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+            // 2) cost = wc * trace(cov_f)       + wt * K
+            // 3) cost = wc * mean(trace(cov_k)) + wt * K
+            // 4) cost = wc * sum(trace(cov_k))
+
+            currentTimeStep_ += stepsExecuted;
+
+            executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
+
+            executionCost_ = informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
+            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+            //executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
+
+            costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
+
+
+            // this is a secondary (redundant) collision check for the true state
+            siF_->getTrueState(tempTrueStateCopy);
+            if(!si_->isValid(tempTrueStateCopy))
+            {
+                OMPL_INFORM("Robot Collided :(");
+                return;
+            }
+
+            // update the cstartState for next iteration
+            si_->copyState(cstartState, cendState);
+
+        } // [2] NodeController
+
+        // free the memory for open loop control for this temporary node/edge created from previous iteration
+        if(boost::source(e, g_) != start)
+        {
+            // this will deallocate nominalXs_ and nominalUs_ of Controller.separatedController_
+            edgeControllers_.erase(e);
+            nodeControllers_.erase(boost::source(e, g_));
         }
-}
+
 
         // If the robot has already reached a FIRM node then take feedback edge
         // else do rollout
-        if(stateProperty_[boost::target(e,g_)]->as<FIRM::StateType>()->isReached(cendState, true))
+        if(stateProperty_[boost::target(e,g_)]->as<FIRM::StateType>()->isReached(cendState))
         {
             OMPL_INFORM("FIRM Rollout: Reached FIRM Node: %u", boost::target(e,g_));
 
             numberofNodesReached_++;
-
             nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
-            tempVertex = boost::target(e,g_);
-
-            // if the reached node is not the goal
-            if(tempVertex != goal)
-            {
-                e = feedback_.at(tempVertex);
-
-                // for debug
-                nextFIRMVertex = boost::target(e, g_);
-            }
+            // NOTE commented this to do rollout even if the robot (almost) reached a FIRM node
+            // tempVertex = boost::target(e,g_);
+            // // if the reached node is not the goal
+            // if(tempVertex != goal)
+            // {
+            //     e = feedback_.at(tempVertex);    // NOTE this is not guaranteed to be the best
+            //     // for debug
+            //     nextFIRMVertex = boost::target(e, g_);
+            // }
         }
 
-        else
+        // [3] Rollout
+        // NOTE commented this to do rollout even if the robot (almost) reached a FIRM node
+        //else
         {
-
-            siF_->doVelocityLogging(false);
-
             Visualizer::doSaveVideo(false);
+            siF_->doVelocityLogging(false);
 
             // start profiling time to compute rollout
             auto start_time = std::chrono::high_resolution_clock::now();
@@ -2480,11 +2389,11 @@ if(edgeController.isTerminated(tState, 0))  // check if tState is near to the ta
             // implemented in FIRM::addStateToGraph() for si_->checkMotion() validation
 
             // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
-//             bool forwardEdgeAdded;
-//             if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[nextFIRMVertex]))
-//             {
-//                 addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
-//             }
+            // bool forwardEdgeAdded;
+            // if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[nextFIRMVertex]))
+            // {
+            //     addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
+            // }
 
             // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
             Vertex futureVertex;
@@ -2527,32 +2436,32 @@ if(edgeController.isTerminated(tState, 0))  // check if tState is near to the ta
                 std::cout << "}" << std::endl;
 
 
-            // Set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
-            siF_->setTrueState(tState);
+            // set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
+            siF_->setTrueState(tempTrueStateCopy);
 
+            // select the best next edge
             e = generateRolloutPolicy(tempVertex, goal);
+
+            // XXX set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
+            siF_->setTrueState(tempTrueStateCopy);
 
 
             // end profiling time to compute rollout
             auto end_time = std::chrono::high_resolution_clock::now();
 
-            Visualizer::doSaveVideo(doSaveVideo_);
-
             numberOfRollouts++;
-
-            int numNN = numNearestNeighbors_;
-
             double timeToDoRollout = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-
-            averageTimeForRolloutComputation +=  timeToDoRollout / numNN;
-
+            //int numNN = numNearestNeighbors_;
+            //averageTimeForRolloutComputation += timeToDoRollout / numNN;    // rollout candidates are no longer limited to numNearestNeighbors_
             if(doSaveLogs_)
             {
-                outfile<<numberOfRollouts<<","<<NNRadius_<<","
-                   <<numNN<<","<<numMCParticles_<<","<<timeToDoRollout / (1000*numNN)<<","<<timeToDoRollout/1000<<std::endl;
+                //outfile<<numberOfRollouts<<","<<NNRadius_<<","<<numNN<<","<<numMCParticles_<<","<<timeToDoRollout/(1000*numNN)<<","<<timeToDoRollout/1000<<std::endl;
+                outfile<<numberOfRollouts<<","<<NNRadius_<<","<<numMCParticles_<<","<<timeToDoRollout/1000<<std::endl;
             }
-
             //std::cout << "Time to execute rollout : "<<timeToDoRollout << " milli seconds."<<std::endl;
+
+            Visualizer::doSaveVideo(doSaveVideo_);
+            siF_->doVelocityLogging(true);
 
 
             // NOTE commented to prevent redundant call of nearest neighbor search just for visualization! moved to FIRM::addStateToGraph()
@@ -2560,7 +2469,6 @@ if(edgeController.isTerminated(tState, 0))  // check if tState is near to the ta
 
             // for rollout edge visualization
             //boost::this_thread::sleep(boost::posix_time::milliseconds(50));  // doesn't seem to be necessary
-
 
             // clear the rollout candidate connection drawings and show the selected edge
             Visualizer::clearRolloutConnections();
@@ -2577,21 +2485,16 @@ if(edgeController.isTerminated(tState, 0))  // check if tState is near to the ta
                 if(edge != e)
                     edgeControllers_.erase(edge);   // will deallocate nominalXs_ and nominalUs_ of Controller.separatedController_
             }
-        }
 
-        si_->freeState(tState);
+        } // [3] Rollout
 
-        si_->copyState(cstartState, cendState);
-
-    }
+    } // while()
 
     nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
-//     OMPL_INFORM("FIRM: Number of nodes reached with Rollout: %u", numberofNodesReached_);
-
-    averageTimeForRolloutComputation = averageTimeForRolloutComputation / (1000*numberOfRollouts);
-
-//     std::cout<<"Nearest Neighbor Radius: "<<NNRadius_<<", Monte Carlo Particles: "<<numMCParticles_<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;    
+    //OMPL_INFORM("FIRM: Number of nodes reached with Rollout: %u", numberofNodesReached_);
+    //averageTimeForRolloutComputation = averageTimeForRolloutComputation / (1000*numberOfRollouts);
+    //std::cout<<"Nearest Neighbor Radius: "<<NNRadius_<<", Monte Carlo Particles: "<<numMCParticles_<<", Avg Time/neighbor (seconds): "<<averageTimeForRolloutComputation<<std::endl;    
 
 
     // for analysis
@@ -2600,40 +2503,32 @@ if(edgeController.isTerminated(tState, 0))  // check if tState is near to the ta
     std::cout << "Execution time steps: " << currentTimeStep_ << std::endl;
     std::cout << "Execution covariance cost: " << executionCostCov_ << std::endl;
     std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << currentTimeStep_ << " )" << std::endl;     // 1)
-//     std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << "/" << currentTimeStep_ << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << currentTimeStep_ << " )" << std::endl;     // 3)
-//     std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " )" << std::endl;     // 4)
+    //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << "/" << currentTimeStep_ << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << currentTimeStep_ << " )" << std::endl;     // 3)
+    //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " )" << std::endl;     // 4)
     std::cout << std::endl;
 
 
     if(doSaveLogs_)
     {
-
         outfile.close();
-
         writeTimeSeriesDataToFile("RolloutFIRMCostHistory.csv", "costToGo");
-
         writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory.csv", "successProbability");
-
         writeTimeSeriesDataToFile("RolloutFIRMNodesReachedHistory.csv","nodesReached");
-
-        std::vector<std::pair<double, double> > velLog;
-
+        std::vector<std::pair<double, double>> velLog;
         siF_->getVelocityLog(velLog);
-
         for(int i=0; i < velLog.size(); i++)
         {
             velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
             //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); // unicycle
         }
-
         writeTimeSeriesDataToFile("RolloutFIRMVelocityHistory.csv", "velocity");
     }
-
     Visualizer::doSaveVideo(false);
 
     // free the memory
     si_->freeState(cstartState);
     si_->freeState(cendState);
+    si_->freeState(tempTrueStateCopy);
 }
 
 void FIRM::showRolloutConnections(const FIRM::Vertex v)

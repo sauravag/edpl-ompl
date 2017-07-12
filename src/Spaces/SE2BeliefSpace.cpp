@@ -75,6 +75,7 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxed
 
     double reachConstraint  = reachDist_;
 
+    // HACK why only for rollout execution?
     if(relaxedConstraint)
         reachConstraint *= 4;
 

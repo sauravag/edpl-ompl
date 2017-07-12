@@ -59,18 +59,22 @@ public:
     ss_(ompl::base::StateSpacePtr(new SE2BeliefSpace()))
     {
         // set static variables
+        // Not in use as of now
         Controller<FiniteTimeLQR, ExtendedKF>::setNodeReachedAngle(10); // degrees
         Controller<FiniteTimeLQR, ExtendedKF>::setNodeReachedDistance(0.1);// meters
         Controller<FiniteTimeLQR, ExtendedKF>::setMaxTries(30);
         Controller<FiniteTimeLQR, ExtendedKF>::setMaxTrajectoryDeviation(0.5); // meters
 
+        // [2] NodeController (typedef in include/Planner/FIRM.h)
         Controller<StationaryLQR, LinearizedKF>::setNodeReachedAngle(10); // degrees
         Controller<StationaryLQR, LinearizedKF>::setNodeReachedDistance(0.1);// meters
-        Controller<StationaryLQR, LinearizedKF>::setMaxTries(30);
+//         Controller<StationaryLQR, LinearizedKF>::setMaxTries(30);
+        Controller<StationaryLQR, LinearizedKF>::setMaxTries(300);
 //         Controller<StationaryLQR, LinearizedKF>::setMaxTrajectoryDeviation(0.5); // meters
 //         Controller<StationaryLQR, LinearizedKF>::setMaxTrajectoryDeviation(2.25); // meters
         Controller<StationaryLQR, LinearizedKF>::setMaxTrajectoryDeviation(2.50); // meters
 
+        // [1] EdgeController (typedef in include/Planner/FIRM.h)
         RHCICreate::setControlQueueSize(5);
         RHCICreate::setTurnOnlyDistance(0.01);
         Controller<RHCICreate, ExtendedKF>::setNodeReachedAngle(10.0); // degrees
