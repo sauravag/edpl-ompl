@@ -88,13 +88,18 @@ namespace ompl
 
 
         /** \brief Weighting factor for filtering cost */
-        // NOTE this parameter should be small (compared to TIME_TO_STOP_COST_WEIGHT) to prevent the robot from staying at a place for a long time until the covariance penalty gets smaller
-        // this parameter will be reset to infcostw in the setup file
-        static const double DEFAULT_INFORMATION_COST_WEIGHT = 1.0;  // with this, the penalty term for the number of time steps will be 100 times larger than that for covariance, which can help to avoid getting stuck
+        // NOTE this parameter should be small (compared to DEFAULT_TIME_TO_STOP_COST_WEIGHT) to prevent the robot from staying at a place for a long time until the covariance penalty gets smaller
+        // this parameter will be reset to 'infcostw' in the setup file
+        static const double DEFAULT_INFORMATION_COST_WEIGHT = 100.0;
 
         /** \brief Weighting factor for edge execution time cost */
-        // this parameter will not be reset by the setup file, so just fix to this number, change change infcostw if rebalance is necessary
-        static const double TIME_TO_STOP_COST_WEIGHT = 1.0;  // with this, the penalty term for the number of time steps will be 100 times larger than that for covariance, which can help to avoid getting stuck
+        // this parameter will be reset to 'timecostw' in the setup file
+        static const double DEFAULT_TIME_TO_STOP_COST_WEIGHT = 1.0;
+
+        /** \brief The stationary penalty increment*/
+        // HACK this is to break (almost) indefinite stabilization process during rollout, while the theoretic optimality would be broken
+        // this parameter will be reset to 'statcostinc' in the setup file
+        static const double DEFAULT_STATIONARY_PENALTY_INCREMENT = 1.0;
 
 
         /** \brief The cost to go from goal. */
@@ -149,6 +154,9 @@ namespace ompl
         // HACK this is also hard-coded in include/Controllers/Controller.h
 //         static const bool PRINT_MC_PARTICLES = true;
         static const bool PRINT_MC_PARTICLES = false;
+
+        static const bool PRINT_STATIONARY_PENALTY = true;
+//         static const bool PRINT_STATIONARY_PENALTY = false;
 
 
         // HACK just for density analysis setup
@@ -213,9 +221,13 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     discountFactorDP_  = ompl::magic::DEFAULT_DP_DISCOUNT_FACTOR; 
 
+    distanceCostWeight_ = ompl::magic::DEFAULT_DISTANCE_TO_GOAL_COST_WEIGHT;
+
     informationCostWeight_ = ompl::magic::DEFAULT_INFORMATION_COST_WEIGHT;
 
-    distanceCostWeight_ = ompl::magic::DEFAULT_DISTANCE_TO_GOAL_COST_WEIGHT;
+    timeCostWeight_ = ompl::magic::DEFAULT_TIME_TO_STOP_COST_WEIGHT;
+
+    statCostIncrement_ = ompl::magic::DEFAULT_STATIONARY_PENALTY_INCREMENT;
 
     goalCostToGo_ = ompl::magic::DEFAULT_GOAL_COST_TO_GO;
 
@@ -1126,12 +1138,12 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
             // 4) cost = wc * sum(trace(cov_k))
 
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
-            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);   // 1,2,3)
+            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + timeCostWeight_*stepsToStop);   // 1,2,3)
 //             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value());   // 4) cost = sum(trace(cov_k))
 
             // for debug
             if(ompl::magic::PRINT_EDGE_COST)
-                std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
+                std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << timeCostWeight_ << "*" << stepsToStop << " )" << std::endl;
         }
 
         // node controller for stabilization
@@ -1152,12 +1164,12 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
             // 4) cost = wc * sum(trace(cov_k))
 
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
-            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);   // 1,2,3)
+            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + timeCostWeight_*stepsToStop);   // 1,2,3)
 //             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value());   // 4) cost = sum(trace(cov_k))
 
             // for debug
             if(ompl::magic::PRINT_EDGE_COST)
-                std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
+                std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << timeCostWeight_ << "*" << stepsToStop << " )" << std::endl;
         }
 
     }
@@ -1235,12 +1247,12 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
             // 4) cost = wc * sum(trace(cov_k))
 
             // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
-            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + ompl::magic::TIME_TO_STOP_COST_WEIGHT*stepsToStop);   // 1,2,3)
+            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + timeCostWeight_*stepsToStop);   // 1,2,3)
 //             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value());   // 4) cost = sum(trace(cov_k))
 
             // for debug
             if(ompl::magic::PRINT_EDGE_COST)
-                std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
+                std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << timeCostWeight_ << "*" << stepsToStop << " )" << std::endl;
         }
 
         // free the memory
@@ -1839,8 +1851,8 @@ void FIRM::executeFeedback(void)
 
             executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
 
-            executionCost_ = informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
-            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+            executionCost_ = informationCostWeight_*executionCostCov_ + timeCostWeight_*currentTimeStep_;    // 1)
+            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + timeCostWeight_*currentTimeStep_;    // 3)
             //executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
 
             costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
@@ -1876,8 +1888,8 @@ void FIRM::executeFeedback(void)
 
             executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
 
-            executionCost_ = informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
-            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+            executionCost_ = informationCostWeight_*executionCostCov_ + timeCostWeight_*currentTimeStep_;    // 1)
+            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + timeCostWeight_*currentTimeStep_;    // 3)
             //executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
 
             costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
@@ -1931,8 +1943,8 @@ void FIRM::executeFeedback(void)
     std::cout << std::endl;
     std::cout << "Execution time steps: " << currentTimeStep_ << std::endl;
     std::cout << "Execution covariance cost: " << executionCostCov_ << std::endl;
-    std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << currentTimeStep_ << " )" << std::endl;     // 1)
-    //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << "/" << currentTimeStep_ << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << currentTimeStep_ << " )" << std::endl;     // 3)
+    std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " + " << timeCostWeight_ << "*" << currentTimeStep_ << " )" << std::endl;     // 1)
+    //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << "/" << currentTimeStep_ << " + " << timeCostWeight_ << "*" << currentTimeStep_ << " )" << std::endl;     // 3)
     //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " )" << std::endl;     // 4)
     std::cout << std::endl;
 
@@ -2036,8 +2048,8 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
 
-        executionCost_ = informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
-//         executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+        executionCost_ = informationCostWeight_*executionCostCov_ + timeCostWeight_*currentTimeStep_;    // 1)
+//         executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + timeCostWeight_*currentTimeStep_;    // 3)
 //         executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
 
         costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
@@ -2145,6 +2157,7 @@ void FIRM::executeFeedbackWithRollout(void)
     const Vertex goal = goalM_[0];
     Vertex currentVertex = start;
     Vertex tempVertex = currentVertex;
+    Vertex targetNode;
 
     ompl::base::State *cstartState = si_->allocState();
     ompl::base::State *cendState = si_->allocState();
@@ -2205,24 +2218,25 @@ void FIRM::executeFeedbackWithRollout(void)
     while(!goalState->as<FIRM::StateType>()->isReached(cstartState, true))
     //while(!goalState->as<FIRM::StateType>()->isReached(cstartState, false))
     {
+        targetNode = boost::target(e, g_);
+
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
-        OMPL_INFORM("FIRM Rollout: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to %u (%2.3f, %2.3f, %2.3f, %2.6f) with TP = %f", currentVertex, boost::target(e, g_), 
+        OMPL_INFORM("FIRM Rollout: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to %u (%2.3f, %2.3f, %2.3f, %2.6f) with TP = %f", currentVertex, targetNode, 
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getX(),
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getY(),
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getYaw(),
                 arma::trace(stateProperty_[tempVertex]->as<FIRM::StateType>()->getCovariance()),
-                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getX(),
-                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getY(),
-                stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getYaw(),
-                arma::trace(stateProperty_[boost::target(e, g_)]->as<FIRM::StateType>()->getCovariance()),
+                stateProperty_[targetNode]->as<FIRM::StateType>()->getX(),
+                stateProperty_[targetNode]->as<FIRM::StateType>()->getY(),
+                stateProperty_[targetNode]->as<FIRM::StateType>()->getYaw(),
+                arma::trace(stateProperty_[targetNode]->as<FIRM::StateType>()->getCovariance()),
                 succProb);
 
         // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
         // update the future feedback node at every iteration
-        Vertex futureVertex = boost::target(e, g_);
-
+        Vertex futureVertex = targetNode;
         for(int i=0; i<numberOfFeedbackLookAhead_; i++)
         {
             futureFIRMNodes.push_back(futureVertex);
@@ -2265,7 +2279,25 @@ void FIRM::executeFeedbackWithRollout(void)
         // [1] EdgeController
         edgeController = edgeControllers_[e];
         edgeController.setSpaceInformation(policyExecutionSI_);
-        if(!edgeController.isTerminated(cstartState, 0))  // check if cstartState is NOT near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
+        if(edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
+        {
+            // NOTE do not execute edge controller to prevent jiggling motion around the target node
+
+            // update the stationary penalty
+            // HACK this is to break (almost) indefinite stabilization process during rollout, while the theoretic optimality would be broken
+            if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
+            {
+                stationaryPenalties_[targetNode] = statCostIncrement_;
+            }
+            else
+            {
+                stationaryPenalties_[targetNode] += statCostIncrement_;
+            }
+            // for debug
+            if(ompl::magic::PRINT_STATIONARY_PENALTY)
+                std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
+        }
+        else
         {
             edgeControllerStatus = edgeController.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
 
@@ -2280,8 +2312,8 @@ void FIRM::executeFeedbackWithRollout(void)
 
             executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
 
-            executionCost_ = informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
-            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+            executionCost_ = informationCostWeight_*executionCostCov_ + timeCostWeight_*currentTimeStep_;    // 1)
+            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + timeCostWeight_*currentTimeStep_;    // 3)
             //executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
 
             costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
@@ -2303,7 +2335,7 @@ void FIRM::executeFeedbackWithRollout(void)
         // [2] NodeController
         if(edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
-            nodeController = nodeControllers_[boost::target(e, g_)];
+            nodeController = nodeControllers_[targetNode];
             nodeController.setSpaceInformation(policyExecutionSI_);
             nodeControllerStatus = nodeController.StabilizeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
 
@@ -2318,8 +2350,8 @@ void FIRM::executeFeedbackWithRollout(void)
 
             executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
 
-            executionCost_ = informationCostWeight_*executionCostCov_ + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 1)
-            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + ompl::magic::TIME_TO_STOP_COST_WEIGHT*currentTimeStep_;    // 3)
+            executionCost_ = informationCostWeight_*executionCostCov_ + timeCostWeight_*currentTimeStep_;    // 1)
+            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + timeCostWeight_*currentTimeStep_;    // 3)
             //executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
 
             costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
@@ -2349,15 +2381,15 @@ void FIRM::executeFeedbackWithRollout(void)
 
         // If the robot has already reached a FIRM node then take feedback edge
         // else do rollout
-        if(stateProperty_[boost::target(e,g_)]->as<FIRM::StateType>()->isReached(cendState))
+        if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReached(cendState))
         {
-            OMPL_INFORM("FIRM Rollout: Reached FIRM Node: %u", boost::target(e,g_));
+            OMPL_INFORM("FIRM Rollout: Reached FIRM Node: %u", targetNode);
 
             numberofNodesReached_++;
             nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
             // NOTE commented this to do rollout even if the robot (almost) reached a FIRM node
-            // tempVertex = boost::target(e,g_);
+            // tempVertex = boost::target(e, g_);
             // // if the reached node is not the goal
             // if(tempVertex != goal)
             // {
@@ -2475,7 +2507,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
             // clear the rollout candidate connection drawings and show the selected edge
             Visualizer::clearRolloutConnections();
-            Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[boost::target(e,g_)]);
+            Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[targetNode]);
 
             // remove the temporary node/edges after generating a rollout policy
             boost::clear_vertex(tempVertex, g_);    // remove all edges from or to tempVertex
@@ -2505,8 +2537,8 @@ void FIRM::executeFeedbackWithRollout(void)
     std::cout << std::endl;
     std::cout << "Execution time steps: " << currentTimeStep_ << std::endl;
     std::cout << "Execution covariance cost: " << executionCostCov_ << std::endl;
-    std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << currentTimeStep_ << " )" << std::endl;     // 1)
-    //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << "/" << currentTimeStep_ << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << currentTimeStep_ << " )" << std::endl;     // 3)
+    std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " + " << timeCostWeight_ << "*" << currentTimeStep_ << " )" << std::endl;     // 1)
+    //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << "/" << currentTimeStep_ << " + " << timeCostWeight_ << "*" << currentTimeStep_ << " )" << std::endl;     // 3)
     //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " )" << std::endl;     // 4)
     std::cout << std::endl;
 
@@ -2709,13 +2741,22 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
         //arma::colvec targetToGoalVec = stateProperty_[goal]->as<FIRM::StateType>()->getArmaData() - stateProperty_[targetNode]->as<FIRM::StateType>()->getArmaData();
         //double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
 
+        // get the stationary penalty
+        // HACK this is to break (almost) indefinite stabilization process during rollout, while the theoretic optimality would be broken
+        double stationaryPenalty = 0.0;
+        if(stationaryPenalties_.find(targetNode) != stationaryPenalties_.end())
+            stationaryPenalty = stationaryPenalties_.at(targetNode);
+
         // the cost of taking the edge
-        double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
+        //double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
+        // HACK this is to break (almost) indefinite stabilization process during rollout, while the theoretic optimality would be broken
+        double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost() + stationaryPenalty;  // HACK only for rollout policy search; actual execution cost will not consider stationaryPenalty
 
 
         // for debug
         if(ompl::magic::PRINT_COST_TO_GO)
-            std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
+//             std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
+            std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << " + " << stationaryPenalty << std::endl;
 
 
         if(edgeCostToGo < minCost)
@@ -3077,7 +3118,7 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     numNearestNeighbors_ = numnn;
 
     // DP params
-    double discountFactorDP = 0.0, informationCostWeight = 0.0, distanceCostWeight = 0.0, goalCostToGo = 0.0, obstacleCostToGo = 0.0, initialCostToGo = 0.0, convergenceThresholdDP = 0.0;
+    double discountFactorDP = 0.0, informationCostWeight = 0.0, timeCostWeight = 0.0, statCostIncrement = 0.0, distanceCostWeight = 0.0, goalCostToGo = 0.0, obstacleCostToGo = 0.0, initialCostToGo = 0.0, convergenceThresholdDP = 0.0;
     int maxDPIterations = 0;
 
     child = node->FirstChild("DPDiscountFactor");
@@ -3087,6 +3128,14 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     itemElement->QueryDoubleAttribute("discountfac", &discountFactorDP);
     discountFactorDP_ = discountFactorDP;
 
+    child = node->FirstChild("DistCostWeight");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("distcostw", &distanceCostWeight);
+    distanceCostWeight_ = distanceCostWeight;
+
+
     child = node->FirstChild("InfCostWeight");
     assert( child );
     itemElement = child->ToElement();
@@ -3094,12 +3143,20 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     itemElement->QueryDoubleAttribute("infcostw", &informationCostWeight);
     informationCostWeight_ = informationCostWeight;
 
-    child = node->FirstChild("DistCostWeight");
+    child = node->FirstChild("TimeCostWeight");
     assert( child );
     itemElement = child->ToElement();
     assert( itemElement );
-    itemElement->QueryDoubleAttribute("distcostw", &distanceCostWeight);
-    distanceCostWeight_ = distanceCostWeight;
+    itemElement->QueryDoubleAttribute("timecostw", &timeCostWeight);
+    timeCostWeight_ = timeCostWeight;
+
+    child = node->FirstChild("StatCostInc");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("statcostinc", &statCostIncrement);
+    statCostIncrement_ = statCostIncrement;
+
 
     child = node->FirstChild("GoalCostToGo");
     assert( child );

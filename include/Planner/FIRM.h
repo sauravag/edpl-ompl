@@ -497,6 +497,9 @@ protected:
     /** \brief A table that stores the cost-to-go according to the node (vertex) ids */
     std::map <Vertex, double> costToGo_;
 
+    /** \brief A table that stores the stationary penalty for rollout according to the node (vertex) ids */
+    std::map <Vertex, double> stationaryPenalties_;
+
     /** \brief A table that stores the best child node (along the shortest path to the goal) according to the node (vertex) ids */
     std::map<Vertex, Vertex> bestChildVertexToGoal_;
 
@@ -579,9 +582,13 @@ private:
 
     double discountFactorDP_;
 
+    double distanceCostWeight_;
+
     double informationCostWeight_;
 
-    double distanceCostWeight_;
+    double timeCostWeight_;
+
+    double statCostIncrement_;
 
     double goalCostToGo_;
 
