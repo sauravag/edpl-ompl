@@ -21,14 +21,165 @@
 <!-- 	<landmark id = 4  x = 1		y = 10 /> -->
 <!-- 	<landmark id = 5  x = 10	y = 19 /> -->
 <!-- </LandmarkList> -->
+<!-- <LandmarkList> -->
+<!-- 	<landmark id = 1  x = 1		y = 19 /> -->
+<!-- 	<landmark id = 2  x = 1		y = 14.5 /> -->
+<!-- 	<landmark id = 3  x = 5.5	y = 19 /> -->
+<!-- 	<landmark id = 4  x = 1		y = 7.75 /> -->
+<!-- 	<landmark id = 5  x = 12.25	y = 19 /> -->
+<!-- 	<landmark id = 6  x = 5.5	y = 14.5 /> -->
+<!-- </LandmarkList> -->
+
+<!-- <LandmarkList> -->
+<!-- 	<landmark id = 0  x = 1		y = 19.0 /> -->
+<!-- 	<landmark id = 1  x = 1		y = 1 /> -->
+<!-- 	<landmark id = 12  x = 3.25		y = 3.25 /> -->
+<!-- 	<landmark id = 23  x = 5.5		y = 5.5 /> -->
+<!-- 	<landmark id = 34  x = 7.75		y = 7.75 /> -->
+<!-- 	<landmark id = 45  x = 10		y = 10 /> -->
+<!-- 	<landmark id = 56  x = 12.25		y = 12.25 /> -->
+<!-- 	<landmark id = 67  x = 14.5		y = 14.5 /> -->
+<!-- 	<landmark id = 78  x = 16.75		y = 16.75 /> -->
+<!-- 	<landmark id = 89  x = 19		y = 19 /> -->
+<!-- </LandmarkList> -->
 <LandmarkList>
-	<landmark id = 1  x = 1		y = 19 />
-	<landmark id = 2  x = 1		y = 14.5 />
-	<landmark id = 3  x = 5.5	y = 19 />
 	<landmark id = 4  x = 1		y = 7.75 />
-	<landmark id = 5  x = 12.25	y = 19 />
-	<landmark id = 6  x = 5.5	y = 14.5 />
+	<landmark id = 15  x = 3.25		y = 10 />
+	<landmark id = 26  x = 5.5		y = 12.25 />
+	<landmark id = 37  x = 7.75		y = 14.5 />
+	<landmark id = 48  x = 10		y = 16.75 />
+	<landmark id = 59  x = 12.25		y = 19 />
 </LandmarkList>
+<!-- <LandmarkList> -->
+<!-- 	<landmark id = 1  x = 1		y = 1 /> -->
+<!-- 	<landmark id = 3  x = 1		y = 5.5 /> -->
+<!-- 	<landmark id = 5  x = 1		y = 10 /> -->
+<!-- 	<landmark id = 7  x = 1		y = 14.5 /> -->
+<!-- 	<landmark id = 9  x = 1		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 12  x = 3.25		y = 3.25 /> -->
+<!--  -->
+<!-- 	<landmark id = 21  x = 5.5		y = 1 /> -->
+<!-- 	<landmark id = 23  x = 5.5		y = 5.5 /> -->
+<!-- 	<landmark id = 25  x = 5.5		y = 10 /> -->
+<!-- 	<landmark id = 27  x = 5.5		y = 14.5 /> -->
+<!-- 	<landmark id = 29  x = 5.5		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 34  x = 7.75		y = 7.75 /> -->
+<!--  -->
+<!-- 	<landmark id = 41  x = 10		y = 1 /> -->
+<!-- 	<landmark id = 43  x = 10		y = 5.5 /> -->
+<!-- 	<landmark id = 45  x = 10		y = 10 /> -->
+<!-- 	<landmark id = 47  x = 10		y = 14.5 /> -->
+<!-- 	<landmark id = 49  x = 10		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 56  x = 12.25		y = 12.25 /> -->
+<!--  -->
+<!-- 	<landmark id = 61  x = 14.5		y = 1 /> -->
+<!-- 	<landmark id = 63  x = 14.5		y = 5.5 /> -->
+<!-- 	<landmark id = 65  x = 14.5		y = 10 /> -->
+<!-- 	<landmark id = 67  x = 14.5		y = 14.5 /> -->
+<!-- 	<landmark id = 69  x = 14.5		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 78  x = 16.75		y = 16.75 /> -->
+<!--  -->
+<!-- 	<landmark id = 81  x = 19		y = 1 /> -->
+<!-- 	<landmark id = 83  x = 19		y = 5.5 /> -->
+<!-- 	<landmark id = 85  x = 19		y = 10 /> -->
+<!-- 	<landmark id = 87  x = 19		y = 14.5 /> -->
+<!-- 	<landmark id = 89  x = 19		y = 19 /> -->
+<!-- </LandmarkList> -->
+<!-- <LandmarkList> -->
+<!-- 	<landmark id = 1  x = 1		y = 1 /> -->
+<!-- 	<landmark id = 2  x = 1		y = 3.25 /> -->
+<!-- 	<landmark id = 3  x = 1		y = 5.5 /> -->
+<!-- 	<landmark id = 4  x = 1		y = 7.75 /> -->
+<!-- 	<landmark id = 5  x = 1		y = 10 /> -->
+<!-- 	<landmark id = 6  x = 1		y = 12.25 /> -->
+<!-- 	<landmark id = 7  x = 1		y = 14.5 /> -->
+<!-- 	<landmark id = 8  x = 1		y = 16.75 /> -->
+<!-- 	<landmark id = 9  x = 1		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 11  x = 3.25		y = 1 /> -->
+<!-- 	<landmark id = 12  x = 3.25		y = 3.25 /> -->
+<!-- 	<landmark id = 13  x = 3.25		y = 5.5 /> -->
+<!-- 	<landmark id = 14  x = 3.25		y = 7.75 /> -->
+<!-- 	<landmark id = 15  x = 3.25		y = 10 /> -->
+<!-- 	<landmark id = 16  x = 3.25		y = 12.25 /> -->
+<!-- 	<landmark id = 17  x = 3.25		y = 14.5 /> -->
+<!-- 	<landmark id = 18  x = 3.25		y = 16.75 /> -->
+<!-- 	<landmark id = 19  x = 3.25		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 21  x = 5.5		y = 1 /> -->
+<!-- 	<landmark id = 22  x = 5.5		y = 3.25 /> -->
+<!-- 	<landmark id = 23  x = 5.5		y = 5.5 /> -->
+<!-- 	<landmark id = 24  x = 5.5		y = 7.75 /> -->
+<!-- 	<landmark id = 25  x = 5.5		y = 10 /> -->
+<!-- 	<landmark id = 26  x = 5.5		y = 12.25 /> -->
+<!-- 	<landmark id = 27  x = 5.5		y = 14.5 /> -->
+<!-- 	<landmark id = 28  x = 5.5		y = 16.75 /> -->
+<!-- 	<landmark id = 29  x = 5.5		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 31  x = 7.75		y = 1 /> -->
+<!-- 	<landmark id = 32  x = 7.75		y = 3.25 /> -->
+<!-- 	<landmark id = 33  x = 7.75		y = 5.5 /> -->
+<!-- 	<landmark id = 34  x = 7.75		y = 7.75 /> -->
+<!-- 	<landmark id = 35  x = 7.75		y = 10 /> -->
+<!-- 	<landmark id = 36  x = 7.75		y = 12.25 /> -->
+<!-- 	<landmark id = 37  x = 7.75		y = 14.5 /> -->
+<!-- 	<landmark id = 38  x = 7.75		y = 16.75 /> -->
+<!-- 	<landmark id = 39  x = 7.75		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 41  x = 10		y = 1 /> -->
+<!-- 	<landmark id = 42  x = 10		y = 3.25 /> -->
+<!-- 	<landmark id = 43  x = 10		y = 5.5 /> -->
+<!-- 	<landmark id = 44  x = 10		y = 7.75 /> -->
+<!-- 	<landmark id = 45  x = 10		y = 10 /> -->
+<!-- 	<landmark id = 46  x = 10		y = 12.25 /> -->
+<!-- 	<landmark id = 47  x = 10		y = 14.5 /> -->
+<!-- 	<landmark id = 48  x = 10		y = 16.75 /> -->
+<!-- 	<landmark id = 49  x = 10		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 51  x = 12.25		y = 1 /> -->
+<!-- 	<landmark id = 52  x = 12.25		y = 3.25 /> -->
+<!-- 	<landmark id = 53  x = 12.25		y = 5.5 /> -->
+<!-- 	<landmark id = 54  x = 12.25		y = 7.75 /> -->
+<!-- 	<landmark id = 55  x = 12.25		y = 10 /> -->
+<!-- 	<landmark id = 56  x = 12.25		y = 12.25 /> -->
+<!-- 	<landmark id = 57  x = 12.25		y = 14.5 /> -->
+<!-- 	<landmark id = 58  x = 12.25		y = 16.75 /> -->
+<!-- 	<landmark id = 59  x = 12.25		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 61  x = 14.5		y = 1 /> -->
+<!-- 	<landmark id = 62  x = 14.5		y = 3.25 /> -->
+<!-- 	<landmark id = 63  x = 14.5		y = 5.5 /> -->
+<!-- 	<landmark id = 64  x = 14.5		y = 7.75 /> -->
+<!-- 	<landmark id = 65  x = 14.5		y = 10 /> -->
+<!-- 	<landmark id = 66  x = 14.5		y = 12.25 /> -->
+<!-- 	<landmark id = 67  x = 14.5		y = 14.5 /> -->
+<!-- 	<landmark id = 68  x = 14.5		y = 16.75 /> -->
+<!-- 	<landmark id = 69  x = 14.5		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 71  x = 16.75		y = 1 /> -->
+<!-- 	<landmark id = 72  x = 16.75		y = 3.25 /> -->
+<!-- 	<landmark id = 73  x = 16.75		y = 5.5 /> -->
+<!-- 	<landmark id = 74  x = 16.75		y = 7.75 /> -->
+<!-- 	<landmark id = 75  x = 16.75		y = 10 /> -->
+<!-- 	<landmark id = 76  x = 16.75		y = 12.25 /> -->
+<!-- 	<landmark id = 77  x = 16.75		y = 14.5 /> -->
+<!-- 	<landmark id = 78  x = 16.75		y = 16.75 /> -->
+<!-- 	<landmark id = 79  x = 16.75		y = 19 /> -->
+<!--  -->
+<!-- 	<landmark id = 81  x = 19		y = 1 /> -->
+<!-- 	<landmark id = 82  x = 19		y = 3.25 /> -->
+<!-- 	<landmark id = 83  x = 19		y = 5.5 /> -->
+<!-- 	<landmark id = 84  x = 19		y = 7.75 /> -->
+<!-- 	<landmark id = 85  x = 19		y = 10 /> -->
+<!-- 	<landmark id = 86  x = 19		y = 12.25 /> -->
+<!-- 	<landmark id = 87  x = 19		y = 14.5 /> -->
+<!-- 	<landmark id = 88  x = 19		y = 16.75 /> -->
+<!-- 	<landmark id = 89  x = 19		y = 19 /> -->
+<!-- </LandmarkList> -->
 <ObservationModels>
 	<HeadingBeaconObservationModel
 		sigma_heading = "0.000001"
@@ -97,7 +248,7 @@
 	<NumNN numnn = "10" />	<!-- NOTE this will be used for additional connection to k-nearest neighbors during rollout only -->
 <!-- 	<NumNN numnn = "15" /> -->
 	<DPDiscountFactor discountfac = "1.0" />
-	<InfCostWeight infcostw = "1.0"/>
+	<InfCostWeight infcostw = "1.0"/> <!-- NOTE with this, the penalty term for the number of time steps will be 100 times larger than that for covariance, which can help to avoid getting stuck -->
 	<DistCostWeight distcostw = "0.1"/>
 	<GoalCostToGo goalctg = "0.0"/>
 	<ObstCostToGo obsctg = "20000.0" />
@@ -115,8 +266,8 @@
 	<!-- [OPTION1] FIRM vs Rollout -->
 	<!-- method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
 	<!-- dynobst 1 to activate -->
-	<PlannerMode  method = "0"  dynobst = "0" />
-<!-- 	<PlannerMode  method = "1"  dynobst = "0" /> -->
+<!-- 	<PlannerMode  method = "0"  dynobst = "0" /> -->
+	<PlannerMode  method = "1"  dynobst = "0" />
 
 	<!-- [OPTION2] FIRM Node Density -->
 	<FIRMNodes  minNodes = "350"  maxNodes = "350" />
@@ -126,8 +277,8 @@
 <!-- 	<FIRMNodes  minNodes = "750"  maxNodes = "750" /> -->
 
 	<!-- [OPTION3] Roadmap -->
-    <RoadMap roadmapFile = "" useRoadMap = "0" />
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;350.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
+    <RoadMap roadmapFile = "./FIRMRoadMap-DensitySet1-350.xml" useRoadMap = "1" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;450.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;550.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;650.xml" useRoadMap = "1" /> -->

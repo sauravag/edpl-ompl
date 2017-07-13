@@ -83,20 +83,19 @@ namespace ompl
         /** \brief Maximum allowed number of iterations to solve DP */
         static const int DEFAULT_DP_MAX_ITERATIONS = 20000; // 20000 is a good number
 
-        /** \brief Weighting factor for filtering cost */
-        static const double DEFAULT_INFORMATION_COST_WEIGHT = 1.0;
-
         /** \brief Weighting factor for distance based cost */
         static const double DEFAULT_DISTANCE_TO_GOAL_COST_WEIGHT = 0.01; 
 
+
+        /** \brief Weighting factor for filtering cost */
+        // NOTE this parameter should be small (compared to TIME_TO_STOP_COST_WEIGHT) to prevent the robot from staying at a place for a long time until the covariance penalty gets smaller
+        // this parameter will be reset to infcostw in the setup file
+        static const double DEFAULT_INFORMATION_COST_WEIGHT = 1.0;  // with this, the penalty term for the number of time steps will be 100 times larger than that for covariance, which can help to avoid getting stuck
+
         /** \brief Weighting factor for edge execution time cost */
-        // NOTE this parameter should be large enough to prevent the robot from staying at a place for a long time until the covariance penalty gets smaller
-//         static const double TIME_TO_STOP_COST_WEIGHT = 0;
-//         static const double TIME_TO_STOP_COST_WEIGHT = 0.001;
-//         static const double TIME_TO_STOP_COST_WEIGHT = 0.01;
-        static const double TIME_TO_STOP_COST_WEIGHT = 0.1;     // with this, penalty terms for coviance and number of time steps will be in similar order
-//         static const double TIME_TO_STOP_COST_WEIGHT = 1;
-//         static const double TIME_TO_STOP_COST_WEIGHT = 10;
+        // this parameter will not be reset by the setup file, so just fix to this number, change change infcostw if rebalance is necessary
+        static const double TIME_TO_STOP_COST_WEIGHT = 1.0;  // with this, the penalty term for the number of time steps will be 100 times larger than that for covariance, which can help to avoid getting stuck
+
 
         /** \brief The cost to go from goal. */
         static const double DEFAULT_GOAL_COST_TO_GO = 0.0;
@@ -856,7 +855,9 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
         neighbors = connectionStrategy_(m, NNRadius_);
     }
 
-    OMPL_INFORM("Adding a state: %u nearest neighbors from %u nodes in the graph", neighbors.size(), boost::num_vertices(g_));
+    // do not print this during rollout
+    if(addReverseEdge)
+        OMPL_INFORM("Adding a state: %u nearest neighbors from %u nodes in the graph", neighbors.size(), boost::num_vertices(g_));
 
 
     // NOTE commented this to allow connection to farther but better FIRM node
@@ -1052,6 +1053,9 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
 
+    ompl::base::State* sampState = siF_->allocState();
+    ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
+
     // target node controller that will be concatenated after edgeController
     NodeControllerType nodeController = nodeControllers_[b];
 
@@ -1072,14 +1076,12 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
         siF_->setBelief(startNodeState);
 
         // NOTE random sampling of a true state from the current belief state for Monte Carlo simulation
-        ompl::base::State* sampState = siF_->allocState();
         if(!startNodeState->as<FIRM::StateType>()->sampleFromBelief(sampState))
         {
             OMPL_WARN("Could not sample a true state from the current belief state!");
             continue;
         }
         siF_->setTrueState(sampState);
-        siF_->freeState(sampState);
 
         // for debug
         if(ompl::magic::PRINT_MC_PARTICLES)
@@ -1102,7 +1104,6 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
         }
 
 
-        ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
         ompl::base::Cost filteringCost(0);
         int stepsExecuted = 0;
         int stepsToStop = 0;
@@ -1159,8 +1160,6 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
                 std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << ompl::magic::TIME_TO_STOP_COST_WEIGHT << "*" << stepsToStop << " )" << std::endl;
         }
 
-        // free the memory
-        siF_->freeState(endBelief);
     }
     // for debug
     ompl::base::Cost edgeCostSum;
@@ -1179,6 +1178,10 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
     double transitionProbability = (successCount/2) / numMCParticles_;    // successCount increases for both edgeController and nodeController, respectively
 
     FIRMWeight weight(edgeCost.value(), transitionProbability);
+
+    // free the memory
+    siF_->freeState(sampState);
+    siF_->freeState(endBelief);
 
     return weight;
 }

@@ -11,8 +11,8 @@ project(bspapp CXX C)
 # set the default build type
 if (NOT CMAKE_BUILD_TYPE)
     # By default, use Debug mode
-    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Type of build" FORCE)
-#     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Type of build" FORCE)
+#     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Type of build" FORCE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Type of build" FORCE)
 endif()
 
 message(STATUS "Building ${CMAKE_BUILD_TYPE}")
