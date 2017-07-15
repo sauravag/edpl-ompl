@@ -139,11 +139,11 @@
 	<!-- [OPTION1] FIRM vs Rollout -->
 	<!-- method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
 	<!-- dynobst 1 to activate -->
-	<PlannerMode  method = "0"  dynobst = "0" />
-<!-- 	<PlannerMode  method = "1"  dynobst = "0" /> -->
+<!-- 	<PlannerMode  method = "0"  dynobst = "0" /> -->
+	<PlannerMode  method = "1"  dynobst = "0" />
 
 	<!-- [OPTION2] FIRM Node Density -->
-	<FIRMNodes  minNodes = "350"  maxNodes = "350" />
+<!-- 	<FIRMNodes  minNodes = "350"  maxNodes = "350" /> -->
 <!-- 	<FIRMNodes  minNodes = "400"  maxNodes = "400" /> -->
 <!-- 	<FIRMNodes  minNodes = "450"  maxNodes = "450" /> -->
 <!-- 	<FIRMNodes  minNodes = "500"  maxNodes = "500" /> -->
@@ -152,9 +152,10 @@
 <!-- 	<FIRMNodes  minNodes = "650"  maxNodes = "650" /> -->
 <!-- 	<FIRMNodes  minNodes = "700"  maxNodes = "700" /> -->
 <!-- 	<FIRMNodes  minNodes = "750"  maxNodes = "750" /> -->
+	<FIRMNodes  minNodes = "800"  maxNodes = "800" />
 
 	<!-- [OPTION3] Roadmap -->
-    <RoadMap roadmapFile = "" useRoadMap = "0" />
+<!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;400.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;450.xml" useRoadMap = "1" /> -->
@@ -164,6 +165,7 @@
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;650.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;700.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet1&#45;750.xml" useRoadMap = "1" /> -->
+    <RoadMap roadmapFile = "./FIRMRoadMap-DensitySet1-800.xml" useRoadMap = "1" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet2&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet2&#45;450.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet2&#45;550.xml" useRoadMap = "1" /> -->

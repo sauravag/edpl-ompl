@@ -2961,7 +2961,7 @@ void FIRM::writeTimeSeriesDataToFile(std::string fname, std::string dataName)
         for(int i=0; i < costHistory_.size(); i++)
         {
 //             outfile<<costHistory_[i].first<<","<<costHistory_[i].second<<std::endl;
-            outfile << std::get<0>(costHistory_[i]) << "," << std::get<1>(costHistory_[i]) << std::get<2>(costHistory_[i]) << std::endl;
+            outfile << std::get<0>(costHistory_[i]) << "," << std::get<1>(costHistory_[i]) << "," << std::get<2>(costHistory_[i]) << std::endl;
         }
     }
 
