@@ -140,6 +140,31 @@ class Controller
         /** \brief Return the number of linear systems. */
         size_t Length() { return lss_.size(); }
 
+        void freeSeparatedController()
+        {
+            for(const auto nominalX : separatedController_.getNominalXs())
+                si_->freeState(nominalX);
+            for(const auto nominalU : separatedController_.getNominalUs())
+                si_->freeControl(nominalU);
+            //separatedController_.freeLinearSystems();
+        }
+
+        std::vector<ompl::base::State*> getNominalXs()
+        {
+            return separatedController_.getNominalXs();
+        }
+
+        std::vector<ompl::control::Control*> getNominalUs()
+        {
+            return separatedController_.getNominalUs();
+        }
+
+        void freeLinearSystems()
+        {
+            for(auto lss : lss_)
+                lss.freeX();
+        }
+
     private:
 
         /** \brief The pointer to the space information. */

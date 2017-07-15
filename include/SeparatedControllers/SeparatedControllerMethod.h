@@ -67,18 +67,32 @@ class SeparatedControllerMethod
         linearSystems_(linearSystems),
         motionModel_(mm) {}
 
-//     ~SeparatedControllerMethod() {}
-    ~SeparatedControllerMethod()
-    {
-        for(const auto state : nominalXs_)
-            motionModel_->freeState(state);
-        for(const auto control : nominalUs_)
-            motionModel_->freeControl(control);
-    }
+    ~SeparatedControllerMethod() {}
 
     virtual ompl::control::Control* generateFeedbackControl(const ompl::base::State *state, const size_t& _t = 0) = 0;
 
     //void SetReachedFlag(bool _flag){m_reachedFlag = _flag;}
+
+    ompl::base::State* getGoal()
+    {
+        return goal_;
+    }
+
+    std::vector<ompl::base::State*> getNominalXs()
+    {
+        return nominalXs_;
+    }
+
+    std::vector<ompl::control::Control*> getNominalUs()
+    {
+        return nominalUs_;
+    }
+
+    void freeLinearSystems()
+    {
+        for(auto lss : linearSystems_)
+            lss.freeX();
+    }
 
   protected:
 

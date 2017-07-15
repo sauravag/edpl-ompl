@@ -108,5 +108,8 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
         return newcontrol;
     }
 
+    // free the memory
+    space->freeState(relativeState);
+
     return control;
 }

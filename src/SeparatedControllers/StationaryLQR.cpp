@@ -82,6 +82,9 @@ ompl::control::Control* StationaryLQR::generateFeedbackControl(const ompl::base:
 
     ompl::control::Control* newcontrol  = motionModel_->ARMA2OMPL(nomU + dU);// control is nomU + dU
 
+    // free the memory
+    space->freeState(relativeState);
+
     return newcontrol;
 }
 

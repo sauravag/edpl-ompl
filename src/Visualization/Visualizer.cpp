@@ -392,7 +392,11 @@ void Visualizer::drawEnvironment()
     if(renderGeom_)
     {
         
-        envIndx_ = renderGeom_->renderEnvironment();
+        // render the environment model just once
+        if(envIndx_ <= 0)
+        {
+            envIndx_ = renderGeom_->renderEnvironment();
+        }
         
         glCallList(envIndx_);
 

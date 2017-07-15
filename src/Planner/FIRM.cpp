@@ -378,7 +378,7 @@ void FIRM::expandRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
             {
                 // add the vertex along the bouncing motion
                 Vertex m = boost::add_vertex(g_);
-                stateProperty_[m] = si_->cloneState(workStates[i]);
+                stateProperty_[m] = si_->cloneState(workStates[i]);    // REVIEW cloneState() again? why not save a pointer to this in the above line?
                 totalConnectionAttemptsProperty_[m] = 1;
                 successfulConnectionAttemptsProperty_[m] = 0;
                 disjointSets_.make_set(m);
@@ -492,6 +492,8 @@ void FIRM::growRoadmap(const ompl::base::PlannerTerminationCondition &ptc,
                         stateStable = false;
                     }
 
+                    // free the memory
+                    si_->freeState(lsState);
                 }
 
                 // If the number of nodes is greater than or equal to max required by setup, then stop building roadmap and try to find a solution
@@ -791,32 +793,24 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     boost::mutex::scoped_lock _(graphMutex_);
 
-    // First construct a node stabilizer controller
-    NodeControllerType nodeController;
-
-    // NOTE save the current state's original covariance if it is under execution
-    arma::mat currentCovariance;
-    if(!addReverseEdge)
-        currentCovariance = state->as<FIRM::StateType>()->getCovariance();
-
-    generateNodeController(state, nodeController); // Generating the node controller at sampled state, this will set stationary covariance at node
-
-    // NOTE revert the current state's covariance back to the original if it is under execution
-    if(!addReverseEdge)
-        state->as<FIRM::StateType>()->setCovariance(currentCovariance);
-
-    // Now add belief state to graph as FIRM node
+    // add the given belief state to graph as FIRM node
     Vertex m;
-
     m = boost::add_vertex(g_);
 
+    // NOTE do not generate a node controller for a temporary node during rollout execution as it will not be used at all
+    // in the case generateNodeController() is called during execution, the covariance of 'state' should be reverted to its original (actual) state's covariance after that function
     if(addReverseEdge)
+    {
+        // construct a node stabilizer controller
+        NodeControllerType nodeController;
+        generateNodeController(state, nodeController); // Generating the node controller at sampled state, this will set stationary covariance at node
+        nodeControllers_[m] = nodeController;
+
+        // visualize the FIRM node
         addStateToVisualization(state);
+    }
 
     stateProperty_[m] = state;
-
-    nodeControllers_[m] = nodeController;
-
     totalConnectionAttemptsProperty_[m] = 1;
     successfulConnectionAttemptsProperty_[m] = 0;
 
@@ -1004,7 +998,7 @@ bool FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::
         if(target > boost::num_vertices(g_))
             OMPL_ERROR("Error in constructing feedback path. Tried to access vertex ID not in graph.");
 
-        p->append(stateProperty_[currentVertex],edgeControllers_[edge]); // push the state and controller to take
+        p->append(stateProperty_[currentVertex],edgeControllers_.at(edge)); // push the state and controller to take
 
         if(target == goal)
         {
@@ -1069,7 +1063,7 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
     ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
 
     // target node controller that will be concatenated after edgeController
-    NodeControllerType nodeController = nodeControllers_[b];
+    NodeControllerType nodeController = nodeControllers_.at(b);
 
      // Generate the edge controller for given start and end state
     generateEdgeController(startNodeState,targetNodeState,edgeController);
@@ -1120,56 +1114,67 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
         int stepsExecuted = 0;
         int stepsToStop = 0;
 
-        // edge controller until the end of sequence
-        if(edgeController.Execute(startNodeState, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
+        // [1] EdgeController until the termination condition
+        bool edgeControllerStatus = false;
+        if(edgeController.isTerminated(startNodeState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
-            successCount++;
+            edgeControllerStatus = true;
+        }
+        else
+        {
+            if(edgeController.Execute(startNodeState, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
+            {
+                edgeControllerStatus = true;
 
-            // for debug
-            ompl::base::Cost edgeCostPrev;
-            if(ompl::magic::PRINT_EDGE_COST)
-                edgeCostPrev = ompl::base::Cost(edgeCost.value());
+                // for debug
+                ompl::base::Cost edgeCostPrev;
+                if(ompl::magic::PRINT_EDGE_COST)
+                    edgeCostPrev = ompl::base::Cost(edgeCost.value());
 
 
-            // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
-            //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
-            // 2) cost = wc * trace(cov_f)       + wt * K
-            // 3) cost = wc * mean(trace(cov_k)) + wt * K
-            // 4) cost = wc * sum(trace(cov_k))
+                // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+                //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+                // 2) cost = wc * trace(cov_f)       + wt * K
+                // 3) cost = wc * mean(trace(cov_k)) + wt * K
+                // 4) cost = wc * sum(trace(cov_k))
 
-            // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
-            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + timeCostWeight_*stepsToStop);   // 1,2,3)
-//             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value());   // 4) cost = sum(trace(cov_k))
+                // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
+                edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + timeCostWeight_*stepsToStop);   // 1,2,3)
+//                 edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value());   // 4) cost = sum(trace(cov_k))
 
-            // for debug
-            if(ompl::magic::PRINT_EDGE_COST)
-                std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << timeCostWeight_ << "*" << stepsToStop << " )" << std::endl;
+                // for debug
+                if(ompl::magic::PRINT_EDGE_COST)
+                    std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << timeCostWeight_ << "*" << stepsToStop << " )" << std::endl;
+            }
         }
 
-        // node controller for stabilization
-        if(nodeController.Stabilize(startNodeState, endBelief, filteringCost, stepsExecuted, true))
+        // [2] NodeController for stabilization
+        if(edgeControllerStatus)
         {
-            successCount++;
+            if(nodeController.Stabilize(startNodeState, endBelief, filteringCost, stepsExecuted, true))
+            {
+                successCount++;
 
-            // for debug
-            ompl::base::Cost edgeCostPrev;
-            if(ompl::magic::PRINT_EDGE_COST)
-                edgeCostPrev = ompl::base::Cost(edgeCost.value());
+                // for debug
+                ompl::base::Cost edgeCostPrev;
+                if(ompl::magic::PRINT_EDGE_COST)
+                    edgeCostPrev = ompl::base::Cost(edgeCost.value());
 
 
-            // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
-            //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
-            // 2) cost = wc * trace(cov_f)       + wt * K
-            // 3) cost = wc * mean(trace(cov_k)) + wt * K
-            // 4) cost = wc * sum(trace(cov_k))
+                // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+                //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+                // 2) cost = wc * trace(cov_f)       + wt * K
+                // 3) cost = wc * mean(trace(cov_k)) + wt * K
+                // 4) cost = wc * sum(trace(cov_k))
 
-            // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
-            edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + timeCostWeight_*stepsToStop);   // 1,2,3)
-//             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value());   // 4) cost = sum(trace(cov_k))
+                // compute the edge cost by the weighted sum of filtering cost and time to stop (we use number of time steps, time would be steps*dt)
+                edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value() + timeCostWeight_*stepsToStop);   // 1,2,3)
+                //             edgeCost = ompl::base::Cost(edgeCost.value() + informationCostWeight_*filteringCost.value());   // 4) cost = sum(trace(cov_k))
 
-            // for debug
-            if(ompl::magic::PRINT_EDGE_COST)
-                std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << timeCostWeight_ << "*" << stepsToStop << " )" << std::endl;
+                // for debug
+                if(ompl::magic::PRINT_EDGE_COST)
+                    std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << timeCostWeight_ << "*" << stepsToStop << " )" << std::endl;
+            }
         }
 
     }
@@ -1186,12 +1191,12 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
     if(ompl::magic::PRINT_EDGE_COST)
         std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = ( " << edgeCostSum.value() << " ) / " << successCount << std::endl;
 
-    //double transitionProbability = successCount / numMCParticles_ ;     // deprecated: if only an edge controller is being used
-    double transitionProbability = (successCount/2) / numMCParticles_;    // successCount increases for both edgeController and nodeController, respectively
+    double transitionProbability = successCount / numMCParticles_;
 
     FIRMWeight weight(edgeCost.value(), transitionProbability);
 
     // free the memory
+    siF_->freeState(startNodeState);
     siF_->freeState(sampState);
     siF_->freeState(endBelief);
 
@@ -1202,6 +1207,8 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 {
     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+
+    ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
 
      // Generate the edge controller for given start and end state
     generateEdgeController(startNodeState,targetNodeState,edgeController);
@@ -1221,8 +1228,6 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
         siF_->setTrueState(startNodeState);
 
         siF_->setBelief(startNodeState);
-
-        ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
 
         ompl::base::Cost filteringCost(0);
 
@@ -1254,9 +1259,6 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
             if(ompl::magic::PRINT_EDGE_COST)
                 std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << timeCostWeight_ << "*" << stepsToStop << " )" << std::endl;
         }
-
-        // free the memory
-        siF_->freeState(endBelief);
     }
     // for debug
     ompl::base::Cost edgeCostSum;
@@ -1276,9 +1278,12 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
     FIRMWeight weight(edgeCost.value(), transitionProbability);
 
+    // free the memory
+    siF_->freeState(startNodeState);
+    siF_->freeState(endBelief);
+
     return weight;
 }
-
 
 void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
 {
@@ -1303,11 +1308,8 @@ void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::ba
         si_->copyState(intermediate, x);
     }
 
-    // create the edge controller
-    EdgeControllerType ctrlr(target, intermediates, openLoopControls, siF_);
-
     // assign the edge controller
-    edgeController =  ctrlr;
+    edgeController = EdgeControllerType(target, intermediates, openLoopControls, siF_);
 }
 
 void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeControllerType &nodeController)
@@ -1337,19 +1339,18 @@ void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeController
         stationaryCovariance = arma::eye(stateDim,stateDim)*ompl::magic::NON_OBSERVABLE_NODE_COVARIANCE;
     }
 
-    // set the covariance
+    // set the stationary covariance (for construction mode)
     node->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
-    state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);   // NOTE this will be reverted to the (original) current state's covariance if it is under execution
+    // NOTE CHECK if this function was called during execution, the covariance of 'state' should be reverted to its original (actual) state's covariance after this function!
+    state->as<FIRM::StateType>()->setCovariance(stationaryCovariance);
 
     // create a node controller with node as the state and zero control as nominal control
     std::vector<ompl::control::Control*> zeroControl; zeroControl.push_back(siF_->getMotionModel()->getZeroControl());
 
     std::vector<ompl::base::State*> nodeState; nodeState.push_back(node);
 
-    NodeControllerType ctrlr(node, nodeState, zeroControl, siF_);
-
     // assign the node controller
-    nodeController = ctrlr;
+    nodeController = NodeControllerType(node, nodeState, zeroControl, siF_);
 
 }
 
@@ -1836,7 +1837,7 @@ void FIRM::executeFeedback(void)
 
         // [1] EdgeController
         {
-            edgeController = edgeControllers_[e];
+            edgeController = edgeControllers_.at(e);
             edgeController.setSpaceInformation(policyExecutionSI_);
             edgeControllerStatus = edgeController.Execute(cstartState, cendState, costCov, stepsExecuted, stepsToStop, false);
 
@@ -1873,7 +1874,7 @@ void FIRM::executeFeedback(void)
 
         // [2] NodeController
         {
-            nodeController = nodeControllers_[boost::target(e, g_)];
+            nodeController = nodeControllers_.at(boost::target(e, g_));
             nodeController.setSpaceInformation(policyExecutionSI_);
             nodeControllerStatus = nodeController.Stabilize(cstartState, cendState, costCov, stepsExecuted, false);
 
@@ -2025,7 +2026,7 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb) );
 
-        controller = edgeControllers_[e];
+        controller = edgeControllers_.at(e);
 
         ompl::base::Cost costCov(0);
 
@@ -2223,7 +2224,7 @@ void FIRM::executeFeedbackWithRollout(void)
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
-        OMPL_INFORM("FIRM Rollout: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to %u (%2.3f, %2.3f, %2.3f, %2.6f) with TP = %f", currentVertex, targetNode, 
+        OMPL_INFORM("FIRM Rollout: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to %u (%2.3f, %2.3f, %2.3f, %2.6f) with TP = %f", tempVertex, targetNode, 
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getX(),
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getY(),
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getYaw(),
@@ -2277,25 +2278,28 @@ void FIRM::executeFeedbackWithRollout(void)
         // NOTE NodeController will be invoked after executing EdgeController for the given rolloutSteps_ steps
 
         // [1] EdgeController
-        edgeController = edgeControllers_[e];
+        edgeController = edgeControllers_.at(e);
         edgeController.setSpaceInformation(policyExecutionSI_);
         if(edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
             // NOTE do not execute edge controller to prevent jiggling motion around the target node
 
-            // update the stationary penalty
-            // HACK this is to break (almost) indefinite stabilization process during rollout, while the theoretic optimality would be broken
-            if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
+            if(targetNode != goal)
             {
-                stationaryPenalties_[targetNode] = statCostIncrement_;
+                // increase the stationary penalty
+                // HACK this is to break (almost) indefinite stabilization process during rollout, while the theoretic optimality would be broken
+                if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
+                {
+                    stationaryPenalties_[targetNode] = statCostIncrement_;
+                }
+                else
+                {
+                    stationaryPenalties_[targetNode] += statCostIncrement_;
+                }
+                // for debug
+                if(ompl::magic::PRINT_STATIONARY_PENALTY)
+                    std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
             }
-            else
-            {
-                stationaryPenalties_[targetNode] += statCostIncrement_;
-            }
-            // for debug
-            if(ompl::magic::PRINT_STATIONARY_PENALTY)
-                std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
         }
         else
         {
@@ -2335,7 +2339,7 @@ void FIRM::executeFeedbackWithRollout(void)
         // [2] NodeController
         if(edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
-            nodeController = nodeControllers_[targetNode];
+            nodeController = nodeControllers_.at(targetNode);
             nodeController.setSpaceInformation(policyExecutionSI_);
             nodeControllerStatus = nodeController.StabilizeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
 
@@ -2370,21 +2374,33 @@ void FIRM::executeFeedbackWithRollout(void)
 
         } // [2] NodeController
 
-        // free the memory for open loop control for this temporary node/edge created from previous iteration
-        if(boost::source(e, g_) != start)
+
+        // [3] Free the memory for states and controls for this temporary node/edge created from previous iteration
+        if(tempVertex != start)
         {
-            // this will deallocate nominalXs_ and nominalUs_ of Controller.separatedController_
-            edgeControllers_.erase(e);
-            nodeControllers_.erase(boost::source(e, g_));
+            foreach(Edge edge, boost::out_edges(tempVertex, g_))
+            {
+                edgeControllers_[edge].freeSeparatedController();
+                edgeControllers_[edge].freeLinearSystems();
+                edgeControllers_.erase(edge);
+            }
+
+            // NOTE there is no node controller generated for this temporary node during rollout execution
+
+
+            // remove the temporary node/edges after executing one rollout iteration
+            // NOTE this is important to keep tempVertex to be the same over each iteration
+            boost::clear_vertex(tempVertex, g_);    // remove all edges from or to tempVertex
+            boost::remove_vertex(tempVertex, g_);   // remove tempVertex
+            //stateProperty_.erase(tempVertex);
+            nn_->remove(tempVertex);
         }
 
 
-        // If the robot has already reached a FIRM node then take feedback edge
-        // else do rollout
+        // [4] Rollout
         if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReached(cendState))
         {
             OMPL_INFORM("FIRM Rollout: Reached FIRM Node: %u", targetNode);
-
             numberofNodesReached_++;
             nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
@@ -2398,8 +2414,6 @@ void FIRM::executeFeedbackWithRollout(void)
             //     nextFIRMVertex = boost::target(e, g_);
             // }
         }
-
-        // [3] Rollout
         // NOTE commented this to do rollout even if the robot (almost) reached a FIRM node
         //else
         {
@@ -2477,9 +2491,6 @@ void FIRM::executeFeedbackWithRollout(void)
             // select the best next edge
             e = generateRolloutPolicy(tempVertex, goal);
 
-            // XXX set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
-            siF_->setTrueState(tempTrueStateCopy);
-
 
             // end profiling time to compute rollout
             auto end_time = std::chrono::high_resolution_clock::now();
@@ -2509,21 +2520,30 @@ void FIRM::executeFeedbackWithRollout(void)
             Visualizer::clearRolloutConnections();
             Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[targetNode]);
 
-            // remove the temporary node/edges after generating a rollout policy
-            boost::clear_vertex(tempVertex, g_);    // remove all edges from or to tempVertex
-            boost::remove_vertex(tempVertex, g_);   // remove tempVertex
-            nn_->remove(tempVertex);
-
-            // free the memory for open loop control for this temporary node
-            foreach(Edge edge, boost::out_edges(tempVertex, g_))
-            {
-                if(edge != e)
-                    edgeControllers_.erase(edge);   // will deallocate nominalXs_ and nominalUs_ of Controller.separatedController_
-            }
-
-        } // [3] Rollout
+        } // [4] Rollout
 
     } // while()
+
+    // [3'] Free the memory for states and controls for this temporary node/edge created from previous iteration
+    if(tempVertex != start)
+    {
+        foreach(Edge edge, boost::out_edges(tempVertex, g_))
+        {
+            edgeControllers_[edge].freeSeparatedController();
+            edgeControllers_[edge].freeLinearSystems();
+            edgeControllers_.erase(edge);
+        }
+
+        // NOTE there is no node controller generated for this temporary node during rollout execution
+
+
+        // remove the temporary node/edges after executing one rollout iteration
+        // NOTE this is important to keep tempVertex to be the same over each iteration
+        boost::clear_vertex(tempVertex, g_);    // remove all edges from or to tempVertex
+        boost::remove_vertex(tempVertex, g_);   // remove tempVertex
+        //stateProperty_.erase(tempVertex);
+        nn_->remove(tempVertex);
+    }
 
     nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
 
@@ -2922,6 +2942,8 @@ void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
 
             Visualizer::addGraphEdge(stateProperty_[a], stateProperty_[b]);
 
+            // free the memory
+            siF_->freeState(startNodeState);
         }
 
     }
