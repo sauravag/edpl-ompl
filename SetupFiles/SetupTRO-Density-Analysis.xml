@@ -119,9 +119,13 @@
 	<DPDiscountFactor discountfac = "1.0" />
 	<DistCostWeight distcostw = "0.1"/>
 
-	<InfCostWeight infcostw = "100.0"/>
+<!-- 	<InfCostWeight infcostw = "100.0"/> -->
+<!-- 	<TimeCostWeight timecostw = "1.0"/> -->
+<!-- 	<StatCostInc statcostinc = "1.0"/> -->
+
+	<InfCostWeight infcostw = "10000.0"/>
 	<TimeCostWeight timecostw = "1.0"/>
-	<StatCostInc statcostinc = "1.0"/>
+	<StatCostInc statcostinc = "100.0"/>
 
 	<GoalCostToGo goalctg = "0.0"/>
 	<ObstCostToGo obsctg = "20000.0" />
@@ -175,12 +179,17 @@
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet2&#45;650.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet2&#45;700.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet2&#45;750.xml" useRoadMap = "1" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-DensitySet2-800.xml" useRoadMap = "1" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet2&#45;800.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;350.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;400.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;450.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;500.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;550.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;600.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;650.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;700.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet3&#45;750.xml" useRoadMap = "1" /> -->
+    <RoadMap roadmapFile = "./FIRMRoadMap-DensitySet3-800.xml" useRoadMap = "1" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet4&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet4&#45;450.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet4&#45;550.xml" useRoadMap = "1" /> -->
