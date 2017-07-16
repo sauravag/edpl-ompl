@@ -197,6 +197,12 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
 
+    numberOfStationaryPenalizedNodes_ = 0;
+
+    sumOfStationaryPenalties_ = 0;
+
+    stationaryPenaltyHistory_.push_back(std::make_tuple(currentTimeStep_, numberOfStationaryPenalizedNodes_, sumOfStationaryPenalties_));
+
     policyGenerator_ = new NBM3P(si);
 
     policyExecutionSI_ = siF_; // by default policies are executed in the same space that the roadmap is generated
@@ -2291,11 +2297,17 @@ void FIRM::executeFeedbackWithRollout(void)
                 if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
                 {
                     stationaryPenalties_[targetNode] = statCostIncrement_;
+                    // for log
+                    numberOfStationaryPenalizedNodes_++;
                 }
                 else
                 {
                     stationaryPenalties_[targetNode] += statCostIncrement_;
                 }
+                // for log
+                sumOfStationaryPenalties_ += statCostIncrement_;
+                stationaryPenaltyHistory_.push_back(std::make_tuple(currentTimeStep_, numberOfStationaryPenalizedNodes_, sumOfStationaryPenalties_));
+
                 // for debug
                 if(ompl::magic::PRINT_STATIONARY_PENALTY)
                     std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
@@ -2553,6 +2565,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
 
     // for analysis
+
     // this data is also saved in run-(TIMESTAMP)/RolloutFIRMCostHistory.csv
     std::cout << std::endl;
     std::cout << "Execution time steps: " << currentTimeStep_ << std::endl;
@@ -2562,6 +2575,10 @@ void FIRM::executeFeedbackWithRollout(void)
     //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " )" << std::endl;     // 4)
     std::cout << std::endl;
 
+    // this data is also saved in run-(TIMESTAMP)/RolloutFIRMCostHistory.csv
+    std::cout << "Number of nodes with stationary penalty: " << numberOfStationaryPenalizedNodes_ << std::endl;
+    std::cout << "Sum of stationary penalties: " << sumOfStationaryPenalties_ << std::endl;
+
 
     if(doSaveLogs_)
     {
@@ -2569,6 +2586,7 @@ void FIRM::executeFeedbackWithRollout(void)
         writeTimeSeriesDataToFile("RolloutFIRMCostHistory.csv", "costToGo");
         writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory.csv", "successProbability");
         writeTimeSeriesDataToFile("RolloutFIRMNodesReachedHistory.csv","nodesReached");
+        writeTimeSeriesDataToFile("RolloutFIRMStationaryPenaltyHistory.csv","stationaryPenalty");
         std::vector<std::pair<double, double>> velLog;
         siF_->getVelocityLog(velLog);
         for(int i=0; i < velLog.size(); i++)
@@ -2960,7 +2978,6 @@ void FIRM::writeTimeSeriesDataToFile(std::string fname, std::string dataName)
     {
         for(int i=0; i < costHistory_.size(); i++)
         {
-//             outfile<<costHistory_[i].first<<","<<costHistory_[i].second<<std::endl;
             outfile << std::get<0>(costHistory_[i]) << "," << std::get<1>(costHistory_[i]) << "," << std::get<2>(costHistory_[i]) << std::endl;
         }
     }
@@ -2978,6 +2995,14 @@ void FIRM::writeTimeSeriesDataToFile(std::string fname, std::string dataName)
         for(int i=0; i < nodeReachedHistory_.size(); i++)
         {
             outfile<<nodeReachedHistory_[i].first<<","<<nodeReachedHistory_[i].second<<std::endl;
+        }
+    }
+
+    if(dataName.compare("stationaryPenalty")==0)
+    {
+        for(int i=0; i < stationaryPenaltyHistory_.size(); i++)
+        {
+            outfile << std::get<0>(stationaryPenaltyHistory_[i]) << "," << std::get<1>(stationaryPenaltyHistory_[i]) << "," << std::get<2>(stationaryPenaltyHistory_[i]) << std::endl;
         }
     }
 
