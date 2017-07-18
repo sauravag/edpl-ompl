@@ -844,7 +844,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
         // 1) allow longer edge length for connection to FIRM nodes during rollout
 //         neighbors = connectionStrategy_(m, 1.5*NNRadius_);
 //         neighbors = connectionStrategy_(m, 1.2*NNRadius_);
-//         neighbors = connectionStrategy_(m, 1.0*NNRadius_);
+        neighbors = connectionStrategy_(m, 1.0*NNRadius_);
 
         // 2) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list; this may be considered as a change of the graph connection property
 //         kneighbors = kConnectionStrategy_(m, numNearestNeighbors_);
@@ -864,7 +864,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
         // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
         // implemented in FIRM::executeFeedbackWithRollout() to access nextFIRMVertex information
-        neighbors = connectionStrategy_(m, NNRadius_);
+//         neighbors = connectionStrategy_(m, NNRadius_);
     }
 
     // do not print this during rollout
@@ -2215,7 +2215,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
     // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
     // initialize a container of FIRM nodes on feedback path
-    boost::circular_buffer<Vertex> futureFIRMNodes(numberOfTargetsInHistory_ * numberOfFeedbackLookAhead_);  // it is like a size-limited queue or buffer
+//     boost::circular_buffer<Vertex> futureFIRMNodes(numberOfTargetsInHistory_ * numberOfFeedbackLookAhead_);  // it is like a size-limited queue or buffer
 
 
     OMPL_INFORM("FIRM: Running policy execution");
@@ -2243,25 +2243,25 @@ void FIRM::executeFeedbackWithRollout(void)
 
         // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
         // update the future feedback node at every iteration
-        Vertex futureVertex = targetNode;
-        for(int i=0; i<numberOfFeedbackLookAhead_; i++)
-        {
-            futureFIRMNodes.push_back(futureVertex);
-
-            if(feedback_.find(futureVertex) != feedback_.end())    // there exists a valid feedback edge for this vertex
-            {
-                futureVertex = boost::target(feedback_.at(futureVertex), g_);
-            }
-            else    // there is no feedback edge coming from this vertex
-            {
-                // fill the rest of the buffer with the last valid vertex; redundant vertices will be ignored for rollout check
-                for(int j=i+1; j<numberOfFeedbackLookAhead_; j++)
-                {
-                    futureFIRMNodes.push_back(futureVertex);
-                }
-                break;
-            }
-        }
+//         Vertex futureVertex = targetNode;
+//         for(int i=0; i<numberOfFeedbackLookAhead_; i++)
+//         {
+//             futureFIRMNodes.push_back(futureVertex);
+//
+//             if(feedback_.find(futureVertex) != feedback_.end())    // there exists a valid feedback edge for this vertex
+//             {
+//                 futureVertex = boost::target(feedback_.at(futureVertex), g_);
+//             }
+//             else    // there is no feedback edge coming from this vertex
+//             {
+//                 // fill the rest of the buffer with the last valid vertex; redundant vertices will be ignored for rollout check
+//                 for(int j=i+1; j<numberOfFeedbackLookAhead_; j++)
+//                 {
+//                     futureFIRMNodes.push_back(futureVertex);
+//                 }
+//                 break;
+//             }
+//         }
         // for debug
         // if(ompl::magic::PRINT_FUTURE_NODES)
         // {
@@ -2457,44 +2457,44 @@ void FIRM::executeFeedbackWithRollout(void)
             // }
 
             // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
-            Vertex futureVertex;
-            bool forwardEdgeAdded;
-            // for debug
-            if(ompl::magic::PRINT_FUTURE_NODES)
-                std::cout << "futureFIRMNodes: { ";
-            for(int i=0; i<futureFIRMNodes.size(); i++)
-            {
-                futureVertex = futureFIRMNodes[i];
-                // check if not duplicate with the previous nodes
-                bool unique = false;
-                if(std::find(futureFIRMNodes.begin(), futureFIRMNodes.begin()+i-0, futureVertex) == futureFIRMNodes.begin()+i-0)
-                {
-                    unique = true;
-                    foreach(Edge nnedge, boost::out_edges(tempVertex, g_))
-                    {
-                        if(futureVertex == boost::target(nnedge, g_))
-                        {
-                            unique = false;
-                            break;
-                        }
-                    }
-                }
-                // check for motion validity and add to the graph
-                if(unique)
-                {
-                    if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[futureVertex]))
-                    {
-                        addEdgeToGraph(tempVertex, futureVertex, forwardEdgeAdded);
-                        Visualizer::addRolloutConnection(stateProperty_[tempVertex], stateProperty_[futureVertex]);
-                    }
-                    // for debug
-                    if(ompl::magic::PRINT_FUTURE_NODES)
-                        std::cout << futureVertex << " ";
-                }
-            }
-            // for debug
-            if(ompl::magic::PRINT_FUTURE_NODES)
-                std::cout << "}" << std::endl;
+//             Vertex futureVertex;
+//             bool forwardEdgeAdded;
+//             // for debug
+//             if(ompl::magic::PRINT_FUTURE_NODES)
+//                 std::cout << "futureFIRMNodes: { ";
+//             for(int i=0; i<futureFIRMNodes.size(); i++)
+//             {
+//                 futureVertex = futureFIRMNodes[i];
+//                 // check if not duplicate with the previous nodes
+//                 bool unique = false;
+//                 if(std::find(futureFIRMNodes.begin(), futureFIRMNodes.begin()+i-0, futureVertex) == futureFIRMNodes.begin()+i-0)
+//                 {
+//                     unique = true;
+//                     foreach(Edge nnedge, boost::out_edges(tempVertex, g_))
+//                     {
+//                         if(futureVertex == boost::target(nnedge, g_))
+//                         {
+//                             unique = false;
+//                             break;
+//                         }
+//                     }
+//                 }
+//                 // check for motion validity and add to the graph
+//                 if(unique)
+//                 {
+//                     if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[futureVertex]))
+//                     {
+//                         addEdgeToGraph(tempVertex, futureVertex, forwardEdgeAdded);
+//                         Visualizer::addRolloutConnection(stateProperty_[tempVertex], stateProperty_[futureVertex]);
+//                     }
+//                     // for debug
+//                     if(ompl::magic::PRINT_FUTURE_NODES)
+//                         std::cout << futureVertex << " ";
+//                 }
+//             }
+//             // for debug
+//             if(ompl::magic::PRINT_FUTURE_NODES)
+//                 std::cout << "}" << std::endl;
 
 
             // set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
