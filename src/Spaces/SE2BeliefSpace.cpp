@@ -39,6 +39,8 @@
 double SE2BeliefSpace::StateType::meanNormWeight_  = -1;
 double SE2BeliefSpace::StateType::covNormWeight_   = -1;
 double SE2BeliefSpace::StateType::reachDist_   = -1;
+double SE2BeliefSpace::StateType::reachDistPos_   = -1;
+double SE2BeliefSpace::StateType::reachDistOri_   = -1;
 arma::colvec SE2BeliefSpace::StateType::normWeights_ = arma::zeros<arma::colvec>(3);
 
 bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxedConstraint) const
@@ -88,6 +90,35 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxed
 
 }
 
+bool SE2BeliefSpace::StateType::isReachedPose(const ompl::base::State *state) const
+{
+    // subtract the two beliefs and get the norm
+    arma::colvec stateDiff = this->getArmaData() - state->as<SE2BeliefSpace::StateType>()->getArmaData();
+
+    if(stateDiff[2] > boost::math::constants::pi<double>())
+    {
+        stateDiff[2] = (stateDiff[2] - 2*boost::math::constants::pi<double>());
+    }
+    if(stateDiff[2] < -boost::math::constants::pi<double>())
+    {
+        stateDiff[2] = stateDiff[2] + 2*boost::math::constants::pi<double>();
+    }
+
+    // compute position and orientation error
+    double pos_distance_to_goal = arma::norm(stateDiff.subvec(0,1), 2);
+    double ori_distance_to_goal = std::abs(stateDiff[2]);
+
+    // check for threshold
+    if(pos_distance_to_goal > reachDistPos_)
+    {
+        return false;
+    }
+    if(ori_distance_to_goal > reachDistOri_)
+    {
+        return false;
+    }
+    return true;
+}
 
 ompl::base::State* SE2BeliefSpace::allocState(void) const
 {

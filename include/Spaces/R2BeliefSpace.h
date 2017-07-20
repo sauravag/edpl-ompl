@@ -117,8 +117,11 @@ class R2BeliefSpace : public ompl::base::RealVectorStateSpace
                 return stateVec;
             }
 
-            /** \brief Checks if the input state has stabilized to this state (node reachability check) */
+            /** \brief Checks if the input state has stabilized to this state (node pose and covariance reachability check) */
             bool isReached(ompl::base::State *state, bool relaxedConstraint=false) const;
+
+            /** \brief Checks if the input state has reached this state (node pose reachability check) */
+            bool isReachedPose(const ompl::base::State *state) const;
 
 
             /** \brief Sample a new state from this belief state (mainly for Monte Carlo simulation) */
@@ -148,7 +151,7 @@ class R2BeliefSpace : public ompl::base::RealVectorStateSpace
             }
 
 
-            static double meanNormWeight_, covNormWeight_, reachDist_;
+            static double meanNormWeight_, covNormWeight_, reachDist_, reachDistPos_, reachDistOri_;
 
             static arma::colvec normWeights_;
 

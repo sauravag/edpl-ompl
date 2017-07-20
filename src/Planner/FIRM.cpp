@@ -97,7 +97,7 @@ namespace ompl
         static const double DEFAULT_TIME_TO_STOP_COST_WEIGHT = 1.0;
 
         /** \brief The stationary penalty increment*/
-        // HACK this is to break (almost) indefinite stabilization process during rollout, while the theoretic optimality would be broken
+        // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
         // this parameter will be reset to 'statcostinc' in the setup file
         static const double DEFAULT_STATIONARY_PENALTY_INCREMENT = 1.0;
 
@@ -1066,6 +1066,7 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
 
     ompl::base::State* sampState = siF_->allocState();
+    ompl::base::State* tempState = siF_->allocState();
     ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
 
     // target node controller that will be concatenated after edgeController
@@ -1121,14 +1122,15 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
         int stepsToStop = 0;
 
         // [1] EdgeController until the termination condition
+        siF_->copyState(tempState, startNodeState);
         bool edgeControllerStatus = false;
-        if(edgeController.isTerminated(startNodeState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
+        if(edgeController.isTerminated(tempState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
             edgeControllerStatus = true;
         }
         else
         {
-            if(edgeController.Execute(startNodeState, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
+            if(edgeController.Execute(tempState, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
             {
                 edgeControllerStatus = true;
 
@@ -1151,13 +1153,17 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
                 // for debug
                 if(ompl::magic::PRINT_EDGE_COST)
                     std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << timeCostWeight_ << "*" << stepsToStop << " )" << std::endl;
+
+
+                // update tempState for node controller
+                si_->copyState(tempState, endBelief);
             }
         }
 
         // [2] NodeController for stabilization
         if(edgeControllerStatus)
         {
-            if(nodeController.Stabilize(startNodeState, endBelief, filteringCost, stepsExecuted, true))
+            if(nodeController.Stabilize(tempState, endBelief, filteringCost, stepsExecuted, true))
             {
                 successCount++;
 
@@ -1191,7 +1197,10 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
 
     siF_->showRobotVisualization(true);
 
-    edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
+    if(successCount!=0)
+        edgeCost = ompl::base::Cost(edgeCost.value() / successCount);
+    else
+        edgeCost = ompl::base::Cost(infiniteCostToGo_);  // this edge will not be added anyway
 
     // for debug
     if(ompl::magic::PRINT_EDGE_COST)
@@ -1204,6 +1213,7 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
     // free the memory
     siF_->freeState(startNodeState);
     siF_->freeState(sampState);
+    siF_->freeState(tempState);
     siF_->freeState(endBelief);
 
     return weight;
@@ -2290,28 +2300,35 @@ void FIRM::executeFeedbackWithRollout(void)
         {
             // NOTE do not execute edge controller to prevent jiggling motion around the target node
 
-            if(targetNode != goal)
-            {
-                // increase the stationary penalty
-                // HACK this is to break (almost) indefinite stabilization process during rollout, while the theoretic optimality would be broken
-                if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
-                {
-                    stationaryPenalties_[targetNode] = statCostIncrement_;
-                    // for log
-                    numberOfStationaryPenalizedNodes_++;
-                }
-                else
-                {
-                    stationaryPenalties_[targetNode] += statCostIncrement_;
-                }
-                // for log
-                sumOfStationaryPenalties_ += statCostIncrement_;
-                stationaryPenaltyHistory_.push_back(std::make_tuple(currentTimeStep_, numberOfStationaryPenalizedNodes_, sumOfStationaryPenalties_));
 
-                // for debug
-                if(ompl::magic::PRINT_STATIONARY_PENALTY)
-                    std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
+            // incrementally penalize a node that is being selected as a target due to the not-yet-converged current covariance even after the robot reached that node's position and orientation
+            // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
+            // it will help to break (almost) indefinite stabilization process during rollout, especially when land marks are not very close
+            if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReachedPose(cstartState))
+            {
+                if(targetNode != goal)
+                {
+                    // increase the stationary penalty
+                    if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
+                    {
+                        stationaryPenalties_[targetNode] = statCostIncrement_;
+                        // for log
+                        numberOfStationaryPenalizedNodes_++;
+                    }
+                    else
+                    {
+                        stationaryPenalties_[targetNode] += statCostIncrement_;
+                    }
+                    // for log
+                    sumOfStationaryPenalties_ += statCostIncrement_;
+                    stationaryPenaltyHistory_.push_back(std::make_tuple(currentTimeStep_, numberOfStationaryPenalizedNodes_, sumOfStationaryPenalties_));
+
+                    // for debug
+                    if(ompl::magic::PRINT_STATIONARY_PENALTY)
+                        std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
+                }
             }
+
         }
         else
         {
@@ -2351,39 +2368,46 @@ void FIRM::executeFeedbackWithRollout(void)
         // [2] NodeController
         if(edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
-            nodeController = nodeControllers_.at(targetNode);
-            nodeController.setSpaceInformation(policyExecutionSI_);
-            nodeControllerStatus = nodeController.StabilizeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
-
-
-            // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
-            //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
-            // 2) cost = wc * trace(cov_f)       + wt * K
-            // 3) cost = wc * mean(trace(cov_k)) + wt * K
-            // 4) cost = wc * sum(trace(cov_k))
-
-            currentTimeStep_ += stepsExecuted;
-
-            executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
-
-            executionCost_ = informationCostWeight_*executionCostCov_ + timeCostWeight_*currentTimeStep_;    // 1)
-            //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + timeCostWeight_*currentTimeStep_;    // 3)
-            //executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
-
-            costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
-
-
-            // this is a secondary (redundant) collision check for the true state
-            siF_->getTrueState(tempTrueStateCopy);
-            if(!si_->isValid(tempTrueStateCopy))
+            if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReached(cstartState))
             {
-                OMPL_INFORM("Robot Collided :(");
-                return;
+                // NOTE tried applying the stationary penalty if isReached(), instead of isTerminated(), is satisfied, but the resultant policy was more suboptimal
             }
+            else
+            {
+                nodeController = nodeControllers_.at(targetNode);
+                nodeController.setSpaceInformation(policyExecutionSI_);
+                nodeControllerStatus = nodeController.StabilizeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
 
-            // update the cstartState for next iteration
-            si_->copyState(cstartState, cendState);
 
+                // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+                //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+                // 2) cost = wc * trace(cov_f)       + wt * K
+                // 3) cost = wc * mean(trace(cov_k)) + wt * K
+                // 4) cost = wc * sum(trace(cov_k))
+
+                currentTimeStep_ += stepsExecuted;
+
+                executionCostCov_ += costCov.value() - ompl::magic::EDGE_COST_BIAS;    // 1,2,3,4) costCov is actual execution cost but only for covariance penalty (even without weight multiplication)
+
+                executionCost_ = informationCostWeight_*executionCostCov_ + timeCostWeight_*currentTimeStep_;    // 1)
+                //executionCost_ = informationCostWeight_*executionCostCov_/(currentTimeStep_==0 ? 1e-10 : currentTimeStep_) + timeCostWeight_*currentTimeStep_;    // 3)
+                //executionCost_ = informationCostWeight_*executionCostCov_;    // 4)
+
+                costHistory_.push_back(std::make_tuple(currentTimeStep_, executionCostCov_, executionCost_));
+
+
+                // this is a secondary (redundant) collision check for the true state
+                siF_->getTrueState(tempTrueStateCopy);
+                if(!si_->isValid(tempTrueStateCopy))
+                {
+                    OMPL_INFORM("Robot Collided :(");
+                    return;
+                }
+
+                // update the cstartState for next iteration
+                si_->copyState(cstartState, cendState);
+
+            }
         } // [2] NodeController
 
 
@@ -2435,7 +2459,14 @@ void FIRM::executeFeedbackWithRollout(void)
             // start profiling time to compute rollout
             auto start_time = std::chrono::high_resolution_clock::now();
 
+            // save the current true state
+            siF_->getTrueState(tempTrueStateCopy);
+
+            // add the current belief state to the graph temporarily
             tempVertex = addStateToGraph(cendState, false);
+
+            // restore the current true state
+            siF_->setTrueState(tempTrueStateCopy);
 
 
             // NOTE robust connection to a desirable (but far) FIRM nodes during rollout
@@ -2780,14 +2811,14 @@ FIRM::Edge FIRM::generateRolloutPolicy(const FIRM::Vertex currentVertex, const F
         //double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
 
         // get the stationary penalty
-        // HACK this is to break (almost) indefinite stabilization process during rollout, while the theoretic optimality would be broken
+        // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
         double stationaryPenalty = 0.0;
         if(stationaryPenalties_.find(targetNode) != stationaryPenalties_.end())
             stationaryPenalty = stationaryPenalties_.at(targetNode);
 
         // the cost of taking the edge
         //double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
-        // HACK this is to break (almost) indefinite stabilization process during rollout, while the theoretic optimality would be broken
+        // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
         double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost() + stationaryPenalty;  // HACK only for rollout policy search; actual execution cost will not consider stationaryPenalty
 
 

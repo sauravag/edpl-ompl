@@ -39,6 +39,8 @@
 double R2BeliefSpace::StateType::meanNormWeight_  = -1;
 double R2BeliefSpace::StateType::covNormWeight_   = -1;
 double R2BeliefSpace::StateType::reachDist_   = -1;
+double R2BeliefSpace::StateType::reachDistPos_   = -1;
+double R2BeliefSpace::StateType::reachDistOri_   = -1;
 arma::colvec R2BeliefSpace::StateType::normWeights_ = arma::zeros<arma::colvec>(3);
 
 bool R2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxedConstraint) const
@@ -75,6 +77,22 @@ bool R2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxedC
 
     return false;
 
+}
+
+bool R2BeliefSpace::StateType::isReachedPose(const ompl::base::State *state) const
+{
+    // subtract the two beliefs and get the norm
+    arma::colvec stateDiff = this->getArmaData() - state->as<R2BeliefSpace::StateType>()->getArmaData();
+
+    // compute position and orientation error
+    double pos_distance_to_goal = arma::norm(stateDiff.subvec(0,1), 2);
+
+    // check for threshold
+    if(pos_distance_to_goal > reachDistPos_)
+    {
+        return false;
+    }
+    return true;
 }
 
 ompl::base::State* R2BeliefSpace::allocState(void) const
@@ -123,7 +141,7 @@ void R2BeliefSpace::getRelativeState(const State *from, const State *to, State *
 void R2BeliefSpace::printBeliefState(const State *state)
 {
     std::cout<<"----Printing BeliefState----"<<std::endl;
-    std::cout<<"State [X, Y, Yaw]: ";
+    std::cout<<"State [X, Y]: ";
     std::cout<<"["<<state->as<R2BeliefSpace::StateType>()->getX()<<", "<<state->as<R2BeliefSpace::StateType>()->getY()<<"]"<<std::endl;
     std::cout<<"Covariance  is" <<std::endl;
     std::cout<<state->as<R2BeliefSpace::StateType>()->getCovariance()<<std::endl;
