@@ -129,10 +129,10 @@
 <!-- 	<TimeCostWeight timecostw = "1.0"/> -->
 <!-- 	<StatCostInc statcostinc = "100.0"/> -->
 
-	<!-- DensitySet1~10 -->
+	<!-- DensitySet# -->
 	<InfCostWeight infcostw = "100.0"/>
 	<TimeCostWeight timecostw = "0.0"/>
-	<StatCostInc statcostinc = "0.0"/>	<!-- without stationary penalty -->
+	<StatCostInc statcostinc = "1.0"/>	<!-- NOTE if APPLY_STATIONARY_PENALTY in FIRM.cpp is set to false, this will have no effect! -->
 
 	<GoalCostToGo goalctg = "0.0"/>
 	<ObstCostToGo obsctg = "20000.0" />
@@ -146,6 +146,7 @@
 
 
 <PlanningProblem>
+
 
 	<!-- [OPTION1] FIRM vs Rollout -->
 	<!-- method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
@@ -177,6 +178,7 @@
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet9&#45;700.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet9&#45;750.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet9&#45;800.xml" useRoadMap = "1" /> -->
+
 
 	<Robot robotFile = "./Models/iRobot_thin.obj" />
 <!-- 	<Robot robotFile = "./Models/iRobot.obj" /> -->

@@ -134,6 +134,36 @@ namespace ompl
         static const double EDGE_COST_BIAS = 0.0; // NOTE this bias is set to 0.0 for density analysis in include/Controllers/Controller.h
 
 
+
+        // NOTE HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT
+        // but none of these is a complete solution to this problem...
+
+
+        // HACK {1} CONNECTION TO FUTURE FIRM NODES
+        // this is a hack in the aspect that it changes the connectivity between nodes when constructing a graph and when executing with a rollout
+        // this helps rollout to achieve a near-optimal solution even with small number of nodes in the graph, if possible
+        // but it is not much helpful to avoid indefinite stabilization during rollout
+        static const bool CONNECT_TO_FURTURE_NODES = true;
+//         static const bool CONNECT_TO_FURTURE_NODES = false;
+
+
+        // HACK {2} ACCUMULATING STATIONARY PENALTY
+        // this can help to avoid indefinite stabilization happening around one node, but it causes the robot to wander over the neighbors
+        // this behavior can make FIRM-Rollout to perform worse than FIRM-Offline
+        static const bool APPLY_STATIONARY_PENALTY = true;
+//         static const bool APPLY_STATIONARY_PENALTY = false;
+
+
+        // HACK {3} EDGE COST WITH A BORDER BELIEF STATE
+        // this is to use a sampled border belief state to avoid under-estimating the actual edge cost during execution,
+        // which can help to reduce the number of iterations to stabilize to a node and move to another node earlier
+        // but there is a possibility to over-estimate the actual edge cost as well, which can result in loss of optimality in FIRM-Offline
+        // (total path cost of FIRM-Offline will not be monotonically decreasing as more nodes are added to the graph)
+        static const bool BORDER_BELIEF_SAMPLING = true;
+//         static const bool BORDER_BELIEF_SAMPLING = false;
+
+
+
         static const int DEFAULT_NUM_OF_TARGETS_IN_HISTORY = 3;
 
         static const int DEFAULT_NUM_OF_FEEDBACK_LOOK_AHEAD = 3;
@@ -155,8 +185,8 @@ namespace ompl
 //         static const bool PRINT_MC_PARTICLES = true;
         static const bool PRINT_MC_PARTICLES = false;
 
-        static const bool PRINT_STATIONARY_PENALTY = true;
-//         static const bool PRINT_STATIONARY_PENALTY = false;
+//         static const bool PRINT_STATIONARY_PENALTY = true;
+        static const bool PRINT_STATIONARY_PENALTY = false;
 
 
         // HACK just for density analysis setup
@@ -1029,7 +1059,7 @@ bool FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::
     return true;
 }
 
-void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded, const bool constructionMode)
+void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded, const bool addReverseEdge)
 {
 
     EdgeControllerType edgeController;
@@ -1038,6 +1068,21 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edge
     if(ompl::magic::PRINT_MC_PARTICLES)
         std::cout << "=================================================" << std::endl;
 
+    // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {3} EDGE COST WITH A BORDER BELIEF STATE
+    // apply the edge cost computation option
+    bool constructionMode;
+    if(ompl::magic::BORDER_BELIEF_SAMPLING)
+    {
+        // use the border belief state to compute the edge cost when constructing a graph
+        constructionMode = addReverseEdge;
+    }
+    else
+    {
+        // use the center belief state to compute the edge cost even when constructing a graph
+        constructionMode = false;
+    }
+
+    // generate an edge controller and compute edge cost
     //const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController, constructionMode);      // deprecated: EdgeController only
     const FIRMWeight weight = generateEdgeNodeControllerWithCost(a, b, edgeController, constructionMode);    // EdgeController and NodeController concatenated
 
@@ -2296,9 +2341,10 @@ void FIRM::executeFeedbackWithRollout(void)
     // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
     //Vertex nextFIRMVertex = boost::target(e, g_);
 
+    // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
     // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
     // initialize a container of FIRM nodes on feedback path
-//     boost::circular_buffer<Vertex> futureFIRMNodes(numberOfTargetsInHistory_ * numberOfFeedbackLookAhead_);  // it is like a size-limited queue or buffer
+    boost::circular_buffer<Vertex> futureFIRMNodes(numberOfTargetsInHistory_ * numberOfFeedbackLookAhead_);  // it is like a size-limited queue or buffer
 
 
     OMPL_INFORM("FIRM: Running policy execution");
@@ -2324,35 +2370,39 @@ void FIRM::executeFeedbackWithRollout(void)
                 arma::trace(stateProperty_[targetNode]->as<FIRM::StateType>()->getCovariance()),
                 succProb);
 
+        // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
         // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
         // update the future feedback node at every iteration
-//         Vertex futureVertex = targetNode;
-//         for(int i=0; i<numberOfFeedbackLookAhead_; i++)
-//         {
-//             futureFIRMNodes.push_back(futureVertex);
-//
-//             if(feedback_.find(futureVertex) != feedback_.end())    // there exists a valid feedback edge for this vertex
-//             {
-//                 futureVertex = boost::target(feedback_.at(futureVertex), g_);
-//             }
-//             else    // there is no feedback edge coming from this vertex
-//             {
-//                 // fill the rest of the buffer with the last valid vertex; redundant vertices will be ignored for rollout check
-//                 for(int j=i+1; j<numberOfFeedbackLookAhead_; j++)
-//                 {
-//                     futureFIRMNodes.push_back(futureVertex);
-//                 }
-//                 break;
-//             }
-//         }
-        // for debug
-        // if(ompl::magic::PRINT_FUTURE_NODES)
-        // {
-        //     std::cout << "futureFIRMNodesDuplicate: { ";
-        //     foreach(futureVertex, futureFIRMNodes)
-        //         std::cout << futureVertex << " ";
-        //     std::cout << "}" << std::endl;
-        // }
+        if(ompl::magic::CONNECT_TO_FURTURE_NODES)
+        {
+            Vertex futureVertex = targetNode;
+            for(int i=0; i<numberOfFeedbackLookAhead_; i++)
+            {
+                futureFIRMNodes.push_back(futureVertex);
+
+                if(feedback_.find(futureVertex) != feedback_.end())    // there exists a valid feedback edge for this vertex
+                {
+                    futureVertex = boost::target(feedback_.at(futureVertex), g_);
+                }
+                else    // there is no feedback edge coming from this vertex
+                {
+                    // fill the rest of the buffer with the last valid vertex; redundant vertices will be ignored for rollout check
+                    for(int j=i+1; j<numberOfFeedbackLookAhead_; j++)
+                    {
+                        futureFIRMNodes.push_back(futureVertex);
+                    }
+                    break;
+                }
+            }
+            // for debug
+            // if(ompl::magic::PRINT_FUTURE_NODES)
+            // {
+            //     std::cout << "futureFIRMNodesDuplicate: { ";
+            //     foreach(futureVertex, futureFIRMNodes)
+            //         std::cout << futureVertex << " ";
+            //     std::cout << "}" << std::endl;
+            // }
+        }
 
 
         /**
@@ -2374,31 +2424,35 @@ void FIRM::executeFeedbackWithRollout(void)
             // NOTE do not execute edge controller to prevent jiggling motion around the target node
 
 
-            // incrementally penalize a node that is being selected as a target due to the not-yet-converged current covariance even after the robot reached that node's position and orientation
-            // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
-            // it will help to break (almost) indefinite stabilization process during rollout, especially when land marks are not very close
-            if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReachedPose(cstartState))
+            // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {2} ACCUMULATING STATIONARY PENALTY
+            if(ompl::magic::APPLY_STATIONARY_PENALTY)
             {
-                if(targetNode != goal)
+                // incrementally penalize a node that is being selected as a target due to the not-yet-converged current covariance even after the robot reached that node's position and orientation
+                // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
+                // it will help to break (almost) indefinite stabilization process during rollout, especially when land marks are not very close
+                if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReachedPose(cstartState))
                 {
-                    // increase the stationary penalty
-                    if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
+                    if(targetNode != goal)
                     {
-                        stationaryPenalties_[targetNode] = statCostIncrement_;
+                        // increase the stationary penalty
+                        if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
+                        {
+                            stationaryPenalties_[targetNode] = statCostIncrement_;
+                            // for log
+                            numberOfStationaryPenalizedNodes_++;
+                        }
+                        else
+                        {
+                            stationaryPenalties_[targetNode] += statCostIncrement_;
+                        }
                         // for log
-                        numberOfStationaryPenalizedNodes_++;
-                    }
-                    else
-                    {
-                        stationaryPenalties_[targetNode] += statCostIncrement_;
-                    }
-                    // for log
-                    sumOfStationaryPenalties_ += statCostIncrement_;
-                    stationaryPenaltyHistory_.push_back(std::make_tuple(currentTimeStep_, numberOfStationaryPenalizedNodes_, sumOfStationaryPenalties_));
+                        sumOfStationaryPenalties_ += statCostIncrement_;
+                        stationaryPenaltyHistory_.push_back(std::make_tuple(currentTimeStep_, numberOfStationaryPenalizedNodes_, sumOfStationaryPenalties_));
 
-                    // for debug
-                    if(ompl::magic::PRINT_STATIONARY_PENALTY)
-                        std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
+                        // for debug
+                        if(ompl::magic::PRINT_STATIONARY_PENALTY)
+                            std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
+                    }
                 }
             }
 
@@ -2561,45 +2615,49 @@ void FIRM::executeFeedbackWithRollout(void)
             //     addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
             // }
 
+            // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
             // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
-//             Vertex futureVertex;
-//             bool forwardEdgeAdded;
-//             // for debug
-//             if(ompl::magic::PRINT_FUTURE_NODES)
-//                 std::cout << "futureFIRMNodes: { ";
-//             for(int i=0; i<futureFIRMNodes.size(); i++)
-//             {
-//                 futureVertex = futureFIRMNodes[i];
-//                 // check if not duplicate with the previous nodes
-//                 bool unique = false;
-//                 if(std::find(futureFIRMNodes.begin(), futureFIRMNodes.begin()+i-0, futureVertex) == futureFIRMNodes.begin()+i-0)
-//                 {
-//                     unique = true;
-//                     foreach(Edge nnedge, boost::out_edges(tempVertex, g_))
-//                     {
-//                         if(futureVertex == boost::target(nnedge, g_))
-//                         {
-//                             unique = false;
-//                             break;
-//                         }
-//                     }
-//                 }
-//                 // check for motion validity and add to the graph
-//                 if(unique)
-//                 {
-//                     if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[futureVertex]))
-//                     {
-//                         addEdgeToGraph(tempVertex, futureVertex, forwardEdgeAdded);
-//                         Visualizer::addRolloutConnection(stateProperty_[tempVertex], stateProperty_[futureVertex]);
-//                     }
-//                     // for debug
-//                     if(ompl::magic::PRINT_FUTURE_NODES)
-//                         std::cout << futureVertex << " ";
-//                 }
-//             }
-//             // for debug
-//             if(ompl::magic::PRINT_FUTURE_NODES)
-//                 std::cout << "}" << std::endl;
+            if(ompl::magic::CONNECT_TO_FURTURE_NODES)
+            {
+                Vertex futureVertex;
+                bool forwardEdgeAdded;
+                // for debug
+                if(ompl::magic::PRINT_FUTURE_NODES)
+                    std::cout << "futureFIRMNodes: { ";
+                for(int i=0; i<futureFIRMNodes.size(); i++)
+                {
+                    futureVertex = futureFIRMNodes[i];
+                    // check if not duplicate with the previous nodes
+                    bool unique = false;
+                    if(std::find(futureFIRMNodes.begin(), futureFIRMNodes.begin()+i-0, futureVertex) == futureFIRMNodes.begin()+i-0)
+                    {
+                        unique = true;
+                        foreach(Edge nnedge, boost::out_edges(tempVertex, g_))
+                        {
+                            if(futureVertex == boost::target(nnedge, g_))
+                            {
+                                unique = false;
+                                break;
+                            }
+                        }
+                    }
+                    // check for motion validity and add to the graph
+                    if(unique)
+                    {
+                        if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[futureVertex]))
+                        {
+                            addEdgeToGraph(tempVertex, futureVertex, forwardEdgeAdded);
+                            Visualizer::addRolloutConnection(stateProperty_[tempVertex], stateProperty_[futureVertex]);
+                        }
+                        // for debug
+                        if(ompl::magic::PRINT_FUTURE_NODES)
+                            std::cout << futureVertex << " ";
+                    }
+                }
+                // for debug
+                if(ompl::magic::PRINT_FUTURE_NODES)
+                    std::cout << "}" << std::endl;
+            }
 
 
             // set true state back to its correct value after Monte Carlo (happens during adding state to Graph)

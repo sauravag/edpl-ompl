@@ -367,7 +367,7 @@ protected:
     virtual bool constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::base::PathPtr &solution);
 
     /** \brief Add an edge from vertex a to b in graph */
-    virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded, const bool constructionMode=true);
+    virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded, const bool addReverseEdge=true);
 
     /** \brief Generates the cost of the edge controlled by concatenated edge/node controllers*/
     virtual FIRMWeight generateEdgeNodeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController, const bool constructionMode=true);
