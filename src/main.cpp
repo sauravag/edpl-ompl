@@ -99,7 +99,7 @@ void plan(const std::string &setupFilePath)
 
 #ifdef __linux__
             // HACK to make a beep sound (linux only)
-            ret = system("sh -c \"echo '\a'> $(tty)\" 2>/dev/null");
+            //ret = system("sh -c \"echo '\a'> $(tty)\" 2>/dev/null");
 #endif
 
             keepTrying = 0;

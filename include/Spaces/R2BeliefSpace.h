@@ -123,35 +123,18 @@ class R2BeliefSpace : public ompl::base::RealVectorStateSpace
             /** \brief Checks if the input state has reached this state (node pose reachability check) */
             bool isReachedPose(const ompl::base::State *state) const;
 
+            /** \brief Checks if the input state's covariance has reached this state (node covariance reachability check) */
+            bool isReachedCov(const ompl::base::State *state) const;
+
+
+            /** \brief Sample a border belief state from this belief state (mainly for Monte Carlo simulation) */
+            bool sampleBorderBeliefState(ompl::base::State* borderBelief) const;
 
             /** \brief Sample a new state from this belief state (mainly for Monte Carlo simulation) */
-            bool sampleFromBelief(ompl::base::State* sampState) const
-            {
-                // Cholesky decomposition such that covariance_ = transform * transform.t()
-                arma::mat transform;
-                if(!arma::chol(transform, covariance_, "lower"))
-                {
-                    OMPL_ERROR("Failed to decompose the covariance matrix for random sampling!");
-                    return false;
-                }
-
-                // draw a random sample from standard normal distribution
-                arma::colvec randvec(2, arma::fill::randn);
-
-                // transform this random sample for this Gaussian distribution
-                arma::colvec mean = getArmaData();
-                arma::colvec randvec_transformed = mean + transform * randvec;
-
-                // set the state property as
-                sampState->as<StateType>()->setX(randvec_transformed[0]);
-                sampState->as<StateType>()->setY(randvec_transformed[1]);
-                sampState->as<StateType>()->setCovariance(covariance_);    // REVIEW set the covariance as the same with this state
-
-                return true;
-            }
+            bool sampleTrueStateFromBelief(ompl::base::State* sampState) const;
 
 
-            static double meanNormWeight_, covNormWeight_, reachDist_, reachDistPos_, reachDistOri_;
+            static double meanNormWeight_, covNormWeight_, reachDist_, reachDistPos_, reachDistOri_, reachDistCov_;
 
             static arma::colvec normWeights_;
 

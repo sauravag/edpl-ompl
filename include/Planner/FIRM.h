@@ -331,7 +331,7 @@ protected:
 
     /** \brief Construct a graph node for a given state (\e state), store it in the nearest neighbors data structure
         and then connect it to the roadmap in accordance to the connection strategy. */
-    virtual Vertex addStateToGraph(ompl::base::State *state, bool addReverseEdge = true, bool shouldCreateNodeController=true);
+    virtual Vertex addStateToGraph(ompl::base::State *state, bool addReverseEdge = true);
 
     /** \brief Load a state from XML and add to Graph*/
     //virtual Vertex loadStateToGraph(ompl::base::State *state);
@@ -367,13 +367,13 @@ protected:
     virtual bool constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::base::PathPtr &solution);
 
     /** \brief Add an edge from vertex a to b in graph */
-    virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
+    virtual void addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded, const bool constructionMode=true);
 
     /** \brief Generates the cost of the edge controlled by concatenated edge/node controllers*/
-    virtual FIRMWeight generateEdgeNodeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController);
+    virtual FIRMWeight generateEdgeNodeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController, const bool constructionMode=true);
 
     /** \brief Generates the cost of the edge */
-    virtual FIRMWeight generateEdgeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController);
+    virtual FIRMWeight generateEdgeControllerWithCost(const Vertex a, const Vertex b, EdgeControllerType &edgeController, const bool constructionMode=true);
 
     /** \brief Generates an edge controller and loads the edge properties from XML */
     //virtual FIRMWeight loadEdgeControllerWithCost(const Vertex start, const Vertex goal, EdgeControllerType &edgeController);

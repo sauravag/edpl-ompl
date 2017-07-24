@@ -794,7 +794,7 @@ void FIRM::constructRoadmap(const ompl::base::PlannerTerminationCondition &ptc)
     si_->freeStates(xstates);
 }
 
-FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge, bool shouldCreateNodeController)
+FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge)
 {
 
     boost::mutex::scoped_lock _(graphMutex_);
@@ -922,7 +922,8 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
                 bool forwardEdgeAdded=false;
                 bool reverseEdgeAdded=false;
 
-                addEdgeToGraph(m, n, forwardEdgeAdded);
+                // NOTE in execution mode, i.e., addReverseEdge is false, compute edge cost from the center belief state, not from a sampled border belief state
+                addEdgeToGraph(m, n, forwardEdgeAdded, addReverseEdge);
 
                 if(forwardEdgeAdded)
                 {
@@ -1028,7 +1029,7 @@ bool FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::
     return true;
 }
 
-void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded)
+void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded, const bool constructionMode)
 {
 
     EdgeControllerType edgeController;
@@ -1037,8 +1038,8 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edge
     if(ompl::magic::PRINT_MC_PARTICLES)
         std::cout << "=================================================" << std::endl;
 
-    //const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController);      // deprecated: EdgeController only
-    const FIRMWeight weight = generateEdgeNodeControllerWithCost(a, b, edgeController);    // EdgeController and NodeController concatenated
+    //const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController, constructionMode);      // deprecated: EdgeController only
+    const FIRMWeight weight = generateEdgeNodeControllerWithCost(a, b, edgeController, constructionMode);    // EdgeController and NodeController concatenated
 
     if(weight.getSuccessProbability() == 0)
     {
@@ -1060,13 +1061,13 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edge
     edgeAdded = true;
 }
 
-FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
+FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController, const bool constructionMode)
 {
     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
 
+    ompl::base::State* tempBelief = siF_->allocState();
     ompl::base::State* sampState = siF_->allocState();
-    ompl::base::State* tempState = siF_->allocState();
     ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
 
     // target node controller that will be concatenated after edgeController
@@ -1086,10 +1087,28 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
 
     for(unsigned int i=0; i< numMCParticles_;i++)
     {
-        siF_->setBelief(startNodeState);
+        if(constructionMode)
+        {
+            // NOTE sample a start belief state that marginally satisfies isReached() condition for the center belief state, startNodeState
+            // this is to estimate the actual edge cost more  that can happen during execution
+            // NOTE edgeController is not separately generated for these sampled border belief state unlike the actual rollout execution case
+            if(!startNodeState->as<FIRM::StateType>()->sampleBorderBeliefState(tempBelief))
+            {
+                OMPL_WARN("Could not sample a border belief state from the current belief state!");
+                continue;
+            }
+            siF_->setBelief(tempBelief);
+        }
+        else
+        {
+            // NOTE in execution mode, the current belief state would already be on the border, so there is no need to inflate the covariance again
+            siF_->copyState(tempBelief, startNodeState);
+            siF_->setBelief(tempBelief);
+        }
 
-        // NOTE random sampling of a true state from the current belief state for Monte Carlo simulation
-        if(!startNodeState->as<FIRM::StateType>()->sampleFromBelief(sampState))
+
+        // NOTE random sampling of a true state from the sampled border belief state for Monte Carlo simulation
+        if(!tempBelief->as<FIRM::StateType>()->sampleTrueStateFromBelief(sampState))
         {
             OMPL_WARN("Could not sample a true state from the current belief state!");
             continue;
@@ -1108,10 +1127,10 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
                     tmp->as<FIRM::StateType>()->getYaw(),
                     arma::trace(tmp->as<FIRM::StateType>()->getCovariance()));
             OMPL_INFORM("Belief State: (%2.3f, %2.3f, %2.3f, %2.3f)",
-                    startNodeState->as<FIRM::StateType>()->getX(),
-                    startNodeState->as<FIRM::StateType>()->getY(),
-                    startNodeState->as<FIRM::StateType>()->getYaw(),
-                    arma::trace(startNodeState->as<FIRM::StateType>()->getCovariance()));
+                    tempBelief->as<FIRM::StateType>()->getX(),
+                    tempBelief->as<FIRM::StateType>()->getY(),
+                    tempBelief->as<FIRM::StateType>()->getYaw(),
+                    arma::trace(tempBelief->as<FIRM::StateType>()->getCovariance()));
             siF_->freeState(tmp);
             std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
         }
@@ -1122,15 +1141,14 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
         int stepsToStop = 0;
 
         // [1] EdgeController until the termination condition
-        siF_->copyState(tempState, startNodeState);
         bool edgeControllerStatus = false;
-        if(edgeController.isTerminated(tempState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
+        if(edgeController.isTerminated(tempBelief, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
             edgeControllerStatus = true;
         }
         else
         {
-            if(edgeController.Execute(tempState, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
+            if(edgeController.Execute(tempBelief, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
             {
                 edgeControllerStatus = true;
 
@@ -1155,15 +1173,15 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
                     std::cout << "edgeCost[" << a << "->" << b << "] " << edgeCost.value() << " = " << edgeCostPrev.value() << " + ( " << informationCostWeight_ << "*" << filteringCost.value() << " + " << timeCostWeight_ << "*" << stepsToStop << " )" << std::endl;
 
 
-                // update tempState for node controller
-                si_->copyState(tempState, endBelief);
+                // update tempBelief for node controller
+                si_->copyState(tempBelief, endBelief);
             }
         }
 
         // [2] NodeController for stabilization
         if(edgeControllerStatus)
         {
-            if(nodeController.Stabilize(tempState, endBelief, filteringCost, stepsExecuted, true))
+            if(nodeController.Stabilize(tempBelief, endBelief, filteringCost, stepsExecuted, true))
             {
                 successCount++;
 
@@ -1212,18 +1230,21 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
 
     // free the memory
     siF_->freeState(startNodeState);
+    siF_->freeState(tempBelief);
     siF_->freeState(sampState);
-    siF_->freeState(tempState);
     siF_->freeState(endBelief);
 
     return weight;
 }
 
-FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
+// deprecated
+FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController, const bool constructionMode)
 {
     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
 
+    ompl::base::State* tempBelief = siF_->allocState();
+    ompl::base::State* sampState = siF_->allocState();
     ompl::base::State* endBelief = siF_->allocState(); // allocate the end state of the controller
 
      // Generate the edge controller for given start and end state
@@ -1240,10 +1261,54 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
     for(unsigned int i=0; i< numMCParticles_;i++)
     {
+        if(constructionMode)
+        {
+            // NOTE sample a start belief state that marginally satisfies isReached() condition for the center belief state, startNodeState
+            // this is to estimate the actual edge cost more  that can happen during execution
+            // NOTE edgeController is not separately generated for these sampled border belief state unlike the actual rollout execution case
+            if(!startNodeState->as<FIRM::StateType>()->sampleBorderBeliefState(tempBelief))
+            {
+                OMPL_WARN("Could not sample a border belief state from the current belief state!");
+                continue;
+            }
+            siF_->setBelief(tempBelief);
+        }
+        else
+        {
+            // NOTE in execution mode, the current belief state would already be on the border, so there is no need to inflate the covariance again
+            siF_->copyState(tempBelief, startNodeState);
+            siF_->setBelief(tempBelief);
+        }
 
-        siF_->setTrueState(startNodeState);
 
-        siF_->setBelief(startNodeState);
+        // NOTE random sampling of a true state from the current belief state for Monte Carlo simulation
+        if(!tempBelief->as<FIRM::StateType>()->sampleTrueStateFromBelief(sampState))
+        {
+            OMPL_WARN("Could not sample a true state from the current belief state!");
+            continue;
+        }
+        siF_->setTrueState(sampState);
+
+        // for debug
+        if(ompl::magic::PRINT_MC_PARTICLES)
+        {
+            std::cout << "-------------------------------------------" << std::endl;
+            ompl::base::State *tmp = si_->allocState();
+            siF_->getTrueState(tmp);
+            OMPL_INFORM("True State: (%2.3f, %2.3f, %2.3f, %2.3f)",
+                    tmp->as<FIRM::StateType>()->getX(),
+                    tmp->as<FIRM::StateType>()->getY(),
+                    tmp->as<FIRM::StateType>()->getYaw(),
+                    arma::trace(tmp->as<FIRM::StateType>()->getCovariance()));
+            OMPL_INFORM("Belief State: (%2.3f, %2.3f, %2.3f, %2.3f)",
+                    tempBelief->as<FIRM::StateType>()->getX(),
+                    tempBelief->as<FIRM::StateType>()->getY(),
+                    tempBelief->as<FIRM::StateType>()->getYaw(),
+                    arma::trace(tempBelief->as<FIRM::StateType>()->getCovariance()));
+            siF_->freeState(tmp);
+            std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+        }
+
 
         ompl::base::Cost filteringCost(0);
 
@@ -1251,7 +1316,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
         int stepsToStop = 0;
 
-        if(edgeController.Execute(startNodeState, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
+        if(edgeController.Execute(tempBelief, endBelief, filteringCost, stepsExecuted, stepsToStop, true))
         {
             successCount++;
 
@@ -1296,6 +1361,8 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
 
     // free the memory
     siF_->freeState(startNodeState);
+    siF_->freeState(tempBelief);
+    siF_->freeState(sampState);
     siF_->freeState(endBelief);
 
     return weight;
@@ -1585,6 +1652,7 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
 
     std::map<Vertex, double> newCostToGo;
     std::map<Vertex, Vertex> bestChildVertexToGoal;
+    std::vector<Vertex> closed_list;
 
     costToGo_ = std::map<Vertex, double>();
 
@@ -1612,16 +1680,19 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
     }
     feedback_.clear();
 
-
     // do Dijkstra search (starting from the goal)
+    // NOTE this is a PRIORITIZED SINGLE-PASS VALUE ITERATION that can provide good intial values for general value iteration method
+    // it some of transitionProbability is not equal to 1, the solution will not be optimal
+    // thus, solveDynamicProgram(), which is general value iteration, should be called afterward
     int cnt=0;
     while (!heapCostToGo.empty())
     {
         // the node with the mininum cost-to-go for next expansion
         std::pair<Vertex, double> vertexCostToGo = heapCostToGo.top();
         const Vertex childVertex = vertexCostToGo.first;
-        const double childCostToGo = vertexCostToGo.second;    // already closed (optimized)
+        const double childCostToGo = vertexCostToGo.second;    // already closed
         heapCostToGo.pop();
+        closed_list.push_back(childVertex);
 
         // relax the costs of edges coming toward the node
         foreach(Edge edge, boost::in_edges(childVertex, g_))
@@ -1629,8 +1700,10 @@ void FIRM::solveDijkstraSearch(const FIRM::Vertex goalVertex)
             const Vertex parentVertex = boost::source(edge, g_);
             const double parentCostToGo = newCostToGo[parentVertex];
 
-            // skip if this parent node is already closed (optimized)
-            if (parentCostToGo <= childCostToGo)
+            // skip if this parent node is already closed
+            //if (parentCostToGo <= childCostToGo)    // if all transitionProbability equals to 1, this condition is sufficient
+            //    continue;
+            if (std::find(closed_list.begin(), closed_list.end(), parentVertex) != closed_list.end())    // otherwise, we forcefully check for single-pass history
                 continue;
 
             // update the edge cost
@@ -2368,11 +2441,12 @@ void FIRM::executeFeedbackWithRollout(void)
         // [2] NodeController
         if(edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
-            if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReached(cstartState))
-            {
+            //if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReached(cstartState))
+            //{
                 // NOTE tried applying the stationary penalty if isReached(), instead of isTerminated(), is satisfied, but the resultant policy was more suboptimal
-            }
-            else
+            //}
+
+            // call StabilizeUpto() at every rollout iteration
             {
                 nodeController = nodeControllers_.at(targetNode);
                 nodeController.setSpaceInformation(policyExecutionSI_);
@@ -2708,7 +2782,10 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
         std::cout << "->" << currentVertex;
 
     // cycle through feedback, if feedback edge is invalid, return false
-    while(currentVertex != goalVertex)
+    // NOTE Dynamic Programming may leave feedback_ path information even to the disconnected components
+    // to fix this behavior, limit the number of iteration to the total number of vertices in the graph
+    int nIter=0;
+    while(currentVertex != goalVertex && nIter < boost::num_vertices(g_))
     {
         // to avoid illegal access to non-existing element in feedback_
         if (feedback_.find(currentVertex) == feedback_.end())    // there is no feedback edge coming from this vertex
@@ -2737,10 +2814,17 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
            
         currentVertex =  target;
 
+        nIter++;
+
         // for debug
         if(ompl::magic::PRINT_FEEDBACK_PATH)
             std::cout << "->" << target;
+    }
 
+    if(nIter >= boost::num_vertices(g_))
+    {
+        OMPL_WARN("Reached a node that is NOT connected to the goal! Quit isFeedbackPolicyValid()!");
+        return true;    // not returning false to avoid calling solveDijkstraSearch()/solveDynamicProgram() again!
     }
 
     // for debug

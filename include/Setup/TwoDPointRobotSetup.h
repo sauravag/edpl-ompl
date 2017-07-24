@@ -91,6 +91,7 @@ public:
         StateType::reachDist_ =  0.009;    // 0.015     // distance threshold for position, orientation, and covariance
         StateType::reachDistPos_ = 0.1;    // meters    // distance threshold for position
         StateType::reachDistOri_ = 10.0/180.0*boost::math::constants::pi<double>();    // radian    // distance threshold for orientation
+        StateType::reachDistCov_ = 0.0004;    // distance threshold for covariance
 
         // set the state component norm weights
         arma::colvec normWeights(3);
