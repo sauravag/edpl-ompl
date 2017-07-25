@@ -99,6 +99,7 @@ add_library (bsp_lib
 	src/ObservationModels/TwoDBeaconObservationModel.cpp
 	src/ObservationModels/HeadingBeaconObservationModel.cpp
 	src/Planner/FIRM.cpp
+	src/Planner/FIRMCP.cpp
 	src/Planner/NBM3P.cpp
 	src/Samplers/GaussianValidBeliefSampler.cpp
 	src/Samplers/UniformValidBeliefSampler.cpp
@@ -133,7 +134,7 @@ target_link_libraries (bsp_lib
 
 
 # Add the main as executable
-add_executable (bsp-app-demo src/main.cpp)
+add_executable (bsp-app-demo src/main_firm.cpp)
 
 # make sure libfcl.so is in /usr/local/lib/
 target_link_libraries (bsp-app-demo
@@ -143,4 +144,15 @@ target_link_libraries (bsp-app-demo
 	libfcl.so
 )
 
+
+# Add the main as executable
+add_executable (firmcp-demo src/main_firmcp.cpp)
+
+# make sure libfcl.so is in /usr/local/lib/
+target_link_libraries (firmcp-demo
+	bsp_lib
+	${OMPLAPP_LIBRARY}
+	${OMPLAPPBASE_LIBRARY}
+	libfcl.so
+)
 

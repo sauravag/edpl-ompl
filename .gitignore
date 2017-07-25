@@ -1,4 +1,5 @@
 bsp-app-demo
+firmcp-demo
 *.layout
 *.depend
 *.o

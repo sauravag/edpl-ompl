@@ -171,7 +171,7 @@ public:
     }
 
 
-    void setup()
+    virtual void setup()
     {
         if(!setup_)
         {
@@ -254,7 +254,7 @@ public:
         return planner_->solve(planningTime_);
     }
 
-    void executeSolution(int choice=0)
+    virtual void executeSolution(int choice=0)
     {
 
         switch(choice)
@@ -306,7 +306,7 @@ public:
 
     }
 
-    void updateEnvironmentMesh(int obindx = 0)
+    virtual void updateEnvironmentMesh(int obindx = 0)
     {
         
         if(dynamicObstacles_)
@@ -329,7 +329,7 @@ public:
         return boost::bind(&TwoDPointRobotSetup::getGeometricComponentStateInternal, this, _1, _2);
     }
 
-    void saveRoadmap()
+    virtual void saveRoadmap()
     {
         planner_->as<FIRM>()->savePlannerData();
     }
@@ -660,7 +660,7 @@ protected:
 
     }
 
-private:
+protected:
 
     ompl::base::State *start_;
 

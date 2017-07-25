@@ -44,7 +44,6 @@
 #include <boost/graph/astar_search.hpp>
 #include <boost/graph/incremental_components.hpp>
 #include <boost/property_map/vector_property_map.hpp>
-#include <boost/foreach.hpp>
 #include <boost/thread.hpp>
 #include <tinyxml.h>
 #include <boost/heap/fibonacci_heap.hpp>
@@ -55,146 +54,6 @@
 
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
-#define SHOW_MONTE_CARLO False
-// #define SHOW_MONTE_CARLO True
-
-namespace ompl
-{
-    namespace magic
-    {
-
-        /** \brief The number of steps to take for a random bounce
-            motion generated as part of the expansion step of PRM. */
-        static const unsigned int MAX_RANDOM_BOUNCE_STEPS   = 5;
-
-        /** \brief The number of nearest neighbors to consider by
-            default in the construction of the PRM roadmap */
-        static const int DEFAULT_NEAREST_NEIGHBORS = 5;
-
-        /** \brief The time in seconds for a single roadmap building operation */
-        static const double ROADMAP_BUILD_TIME = 60;  // 60 is a good number    
-
-        /** \brief For a node that is not observable, use a fixed covariance */
-        static const double NON_OBSERVABLE_NODE_COVARIANCE = 0.1; // 0.1 is a good number
-
-        /** \brief Discounting factor for the Dynamic Programming solution, helps converge faster if set < 1.0 */
-        static const float DEFAULT_DP_DISCOUNT_FACTOR = 1.0;
-
-        /** \brief Maximum allowed number of iterations to solve DP */
-        static const int DEFAULT_DP_MAX_ITERATIONS = 20000; // 20000 is a good number
-
-        /** \brief Weighting factor for distance based cost */
-        static const double DEFAULT_DISTANCE_TO_GOAL_COST_WEIGHT = 0.01; 
-
-
-        /** \brief Weighting factor for filtering cost */
-        // NOTE this parameter should be small (compared to DEFAULT_TIME_TO_STOP_COST_WEIGHT) to prevent the robot from staying at a place for a long time until the covariance penalty gets smaller
-        // this parameter will be reset to 'infcostw' in the setup file
-        static const double DEFAULT_INFORMATION_COST_WEIGHT = 100.0;
-
-        /** \brief Weighting factor for edge execution time cost */
-        // this parameter will be reset to 'timecostw' in the setup file
-        static const double DEFAULT_TIME_TO_STOP_COST_WEIGHT = 1.0;
-
-        /** \brief The stationary penalty increment*/
-        // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
-        // this parameter will be reset to 'statcostinc' in the setup file
-        static const double DEFAULT_STATIONARY_PENALTY_INCREMENT = 1.0;
-
-
-        /** \brief The cost to go from goal. */
-        static const double DEFAULT_GOAL_COST_TO_GO = 0.0;
-
-        /** \brief The initial cost to go from a non-goal node*/
-        static const double DEFAULT_INIT_COST_TO_GO = 2.0; // 2 is a good number
-
-        /** \brief The infinite cost to go from a non-goal node*/
-        static const double DEFAULT_INF_COST_TO_GO = 1000000000.0; // 1000000000 is a good number
-
-        /** \brief The cost to traverse an obstacle*/
-        static const double DEFAULT_OBSTACLE_COST_TO_GO = 200; // 200 is a good number
-
-        /** \brief The minimum difference between cost-to-go from start to goal between two successive DP iterations for DP to coverge*/
-        static const double DEFAULT_DP_CONVERGENCE_THRESHOLD = 1e-3; // 1e-3 is a good number
-
-        /** \brief Default neighborhood radius */
-        static const double DEFAULT_NEAREST_NEIGHBOUR_RADIUS = 5.0; // 5.0 meters is good
-
-        static const double KIDNAPPING_INNOVATION_CHANGE_THRESHOLD = 5.0; // 50%
-
-        static const unsigned int MAX_MM_POLICY_LENGTH   = 1000;
-
-        static const float MIN_ROBOT_CLEARANCE = 0.10;
-
-        static const unsigned int MIN_STEPS_AFTER_CLEARANCE_VIOLATION_REPLANNING = 10;
-
-        static const int DEFAULT_STEPS_TO_ROLLOUT = 10;
-
-//         static const double EDGE_COST_BIAS = 0.001; // In controller.h all edge costs are added up from 0.001 as the starting cost, this helps DP converge
-        static const double EDGE_COST_BIAS = 0.0; // NOTE this bias is set to 0.0 for density analysis in include/Controllers/Controller.h
-
-
-
-        // NOTE HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT
-        // but none of these is a complete solution to this problem...
-
-
-        // HACK {1} CONNECTION TO FUTURE FIRM NODES
-        // this is a hack in the aspect that it changes the connectivity between nodes when constructing a graph and when executing with a rollout
-        // this helps rollout to achieve a near-optimal solution even with small number of nodes in the graph, if possible
-        // but it is not much helpful to avoid indefinite stabilization during rollout
-        static const bool CONNECT_TO_FURTURE_NODES = true;
-//         static const bool CONNECT_TO_FURTURE_NODES = false;
-
-
-        // HACK {2} ACCUMULATING STATIONARY PENALTY
-        // this can help to avoid indefinite stabilization happening around one node, but it causes the robot to wander over the neighbors
-        // this behavior can make FIRM-Rollout to perform worse than FIRM-Offline
-        static const bool APPLY_STATIONARY_PENALTY = true;
-//         static const bool APPLY_STATIONARY_PENALTY = false;
-
-
-        // HACK {3} EDGE COST WITH A BORDER BELIEF STATE
-        // this is to use a sampled border belief state to avoid under-estimating the actual edge cost during execution,
-        // which can help to reduce the number of iterations to stabilize to a node and move to another node earlier
-        // but there is a possibility to over-estimate the actual edge cost as well, which can result in loss of optimality in FIRM-Offline
-        // (total path cost of FIRM-Offline will not be monotonically decreasing as more nodes are added to the graph)
-        static const bool BORDER_BELIEF_SAMPLING = true;
-//         static const bool BORDER_BELIEF_SAMPLING = false;
-
-
-
-        static const int DEFAULT_NUM_OF_TARGETS_IN_HISTORY = 3;
-
-        static const int DEFAULT_NUM_OF_FEEDBACK_LOOK_AHEAD = 3;
-
-
-//         static const bool PRINT_FUTURE_NODES = true;
-        static const bool PRINT_FUTURE_NODES = false;
-
-//         static const bool PRINT_FEEDBACK_PATH = true;
-        static const bool PRINT_FEEDBACK_PATH = false;
-
-        static const bool PRINT_COST_TO_GO = true;
-//         static const bool PRINT_COST_TO_GO = false;
-
-//         static const bool PRINT_EDGE_COST = true;
-        static const bool PRINT_EDGE_COST = false;
-
-        // HACK this is also hard-coded in include/Controllers/Controller.h
-//         static const bool PRINT_MC_PARTICLES = true;
-        static const bool PRINT_MC_PARTICLES = false;
-
-//         static const bool PRINT_STATIONARY_PENALTY = true;
-        static const bool PRINT_STATIONARY_PENALTY = false;
-
-
-        // HACK just for density analysis setup
-        // 1) if a roadmap is loaded, do not add duplicate start and goal states again (assuming start/goal are not changed)
-        // 2) save VideoFrames in the working directory (~/edpl_ompl/.)  // HACK hard-coded in src/Visualization/GLWidget.cpp
-        static const bool DENSITY_ANALYSIS = true;
-    }
-}
 
 FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode) :
     ompl::base::Planner(si, "FIRM"),
@@ -1128,7 +987,7 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
     ompl::base::Cost nodeStabilizationCost(0);
 
     // if want/do not want to show monte carlo sim
-    siF_->showRobotVisualization(SHOW_MONTE_CARLO);
+    siF_->showRobotVisualization(ompl::magic::SHOW_MONTE_CARLO);
 
     for(unsigned int i=0; i< numMCParticles_;i++)
     {
@@ -1302,7 +1161,7 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
     ompl::base::Cost nodeStabilizationCost(0);
 
     // if want/do not want to show monte carlo sim
-    siF_->showRobotVisualization(SHOW_MONTE_CARLO);
+    siF_->showRobotVisualization(ompl::magic::SHOW_MONTE_CARLO);
 
     for(unsigned int i=0; i< numMCParticles_;i++)
     {

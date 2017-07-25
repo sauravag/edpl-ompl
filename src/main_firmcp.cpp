@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Author: Saurav Agarwal */
+/* Author: Sung Kyun Kim, Saurav Agarwal */
 
 /*! \mainpage EDPL-OMPL
  *
@@ -57,13 +57,14 @@
 #include <istream>
 
 //#include "Setup/FIRM2DSetup.h"
-#include "Setup/TwoDPointRobotSetup.h"
+//#include "Setup/TwoDPointRobotSetup.h"
+#include "Setup/TwoDPointRobotFIRMCPSetup.h"
 
 #ifdef USE_ROS
     #include "Setup/FIRMAruco2DROSSetup.h"
 #endif
 
-#include "Setup/MultiModalSetup.h"
+//#include "Setup/MultiModalSetup.h"
 //#include "Testing/Tests.h"
 
 using namespace std;
@@ -71,8 +72,9 @@ using namespace std;
 void plan(const std::string &setupFilePath)
 {
     //FIRM2DSetup *mySetup(new FIRM2DSetup);
+    //TwoDPointRobotFIRMCPSetup *mySetup(new TwoDPointRobotSetup);
 
-    TwoDPointRobotSetup *mySetup(new TwoDPointRobotSetup);
+    TwoDPointRobotFIRMCPSetup *mySetup(new TwoDPointRobotFIRMCPSetup);
 
     mySetup->setPathToSetupFile(setupFilePath.c_str());
 
