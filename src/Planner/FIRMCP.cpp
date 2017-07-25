@@ -144,7 +144,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
         // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
         // update the future feedback node at every iteration
-        if(ompl::magic::CONNECT_TO_FURTURE_NODES)
+        if(connectToFutureNodes_)
         {
             Vertex futureVertex = targetNode;
             for(int i=0; i<numberOfFeedbackLookAhead_; i++)
@@ -196,7 +196,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
 
             // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {2} ACCUMULATING STATIONARY PENALTY
-            if(ompl::magic::APPLY_STATIONARY_PENALTY)
+            if(applyStationaryPenalty_)
             {
                 // incrementally penalize a node that is being selected as a target due to the not-yet-converged current covariance even after the robot reached that node's position and orientation
                 // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
@@ -388,7 +388,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
             // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
             // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
-            if(ompl::magic::CONNECT_TO_FURTURE_NODES)
+            if(connectToFutureNodes_)
             {
                 Vertex futureVertex;
                 bool forwardEdgeAdded;

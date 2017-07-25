@@ -118,11 +118,20 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
 
     distanceCostWeight_ = ompl::magic::DEFAULT_DISTANCE_TO_GOAL_COST_WEIGHT;
 
+
+    connectToFutureNodes_ = ompl::magic::CONNECT_TO_FUTURE_NODES;
+
+    applyStationaryPenalty_ = ompl::magic::APPLY_STATIONARY_PENALTY;
+
+    borderBeliefSampling_ = ompl::magic::BORDER_BELIEF_SAMPLING;
+
+
     informationCostWeight_ = ompl::magic::DEFAULT_INFORMATION_COST_WEIGHT;
 
     timeCostWeight_ = ompl::magic::DEFAULT_TIME_TO_STOP_COST_WEIGHT;
 
     statCostIncrement_ = ompl::magic::DEFAULT_STATIONARY_PENALTY_INCREMENT;
+
 
     goalCostToGo_ = ompl::magic::DEFAULT_GOAL_COST_TO_GO;
 
@@ -930,7 +939,7 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edge
     // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {3} EDGE COST WITH A BORDER BELIEF STATE
     // apply the edge cost computation option
     bool constructionMode;
-    if(ompl::magic::BORDER_BELIEF_SAMPLING)
+    if(borderBeliefSampling_)
     {
         // use the border belief state to compute the edge cost when constructing a graph
         constructionMode = addReverseEdge;
@@ -2232,7 +2241,7 @@ void FIRM::executeFeedbackWithRollout(void)
         // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
         // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
         // update the future feedback node at every iteration
-        if(ompl::magic::CONNECT_TO_FURTURE_NODES)
+        if(connectToFutureNodes_)
         {
             Vertex futureVertex = targetNode;
             for(int i=0; i<numberOfFeedbackLookAhead_; i++)
@@ -2284,7 +2293,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
 
             // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {2} ACCUMULATING STATIONARY PENALTY
-            if(ompl::magic::APPLY_STATIONARY_PENALTY)
+            if(applyStationaryPenalty_)
             {
                 // incrementally penalize a node that is being selected as a target due to the not-yet-converged current covariance even after the robot reached that node's position and orientation
                 // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
@@ -2476,7 +2485,7 @@ void FIRM::executeFeedbackWithRollout(void)
 
             // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
             // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
-            if(ompl::magic::CONNECT_TO_FURTURE_NODES)
+            if(connectToFutureNodes_)
             {
                 Vertex futureVertex;
                 bool forwardEdgeAdded;
@@ -3213,6 +3222,19 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     assert( itemElement );
     itemElement->QueryDoubleAttribute("distcostw", &distanceCostWeight);
     distanceCostWeight_ = distanceCostWeight;
+
+
+    int connectToFutureNodes = 0, applyStationaryPenalty = 0, borderBeliefSampling = 0;
+    child = node->FirstChild("StabilizationHack");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryIntAttribute("connectToFutureNodes", &connectToFutureNodes);
+    itemElement->QueryIntAttribute("applyStationaryPenalty", &applyStationaryPenalty);
+    itemElement->QueryIntAttribute("borderBeliefSampling", &borderBeliefSampling);
+    connectToFutureNodes_ = (bool)connectToFutureNodes;
+    applyStationaryPenalty_ = (bool)applyStationaryPenalty;
+    borderBeliefSampling_ = (bool)borderBeliefSampling;
 
 
     child = node->FirstChild("InfCostWeight");

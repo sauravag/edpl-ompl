@@ -119,20 +119,32 @@
 	<DPDiscountFactor discountfac = "1.0" />
 	<DistCostWeight distcostw = "0.1"/>
 
+	<!-- WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT -->
+	<!-- 0: disabled, 1: enabled -->
+<!-- 	<StabilizationHack -->
+<!-- 		connectToFutureNodes = "0" -->
+<!-- 		applyStationaryPenalty = "0" -->
+<!-- 		borderBeliefSampling = "0" -->
+<!-- 		/> -->
+	<StabilizationHack
+		connectToFutureNodes = "1"
+		applyStationaryPenalty = "1"
+		borderBeliefSampling = "1"
+		/>
+
+	<!-- weights in cost function -->
 	<!-- higher weight on time -->
 <!-- 	<InfCostWeight infcostw = "100.0"/> -->
 <!-- 	<TimeCostWeight timecostw = "1.0"/> -->
 <!-- 	<StatCostInc statcostinc = "1.0"/> -->
-
 	<!-- higher weight on covariance -->
 <!-- 	<InfCostWeight infcostw = "10000.0"/> -->
 <!-- 	<TimeCostWeight timecostw = "1.0"/> -->
 <!-- 	<StatCostInc statcostinc = "100.0"/> -->
-
 	<!-- DensitySet# -->
 	<InfCostWeight infcostw = "100.0"/>
 	<TimeCostWeight timecostw = "0.0"/>
-	<StatCostInc statcostinc = "1.0"/>	<!-- NOTE if APPLY_STATIONARY_PENALTY in FIRM.cpp is set to false, this will have no effect! -->
+	<StatCostInc statcostinc = "1.0"/>	<!-- NOTE if applyStationaryPenalty is set to 0, this will have no effect! -->
 
 	<GoalCostToGo goalctg = "0.0"/>
 	<ObstCostToGo obsctg = "20000.0" />

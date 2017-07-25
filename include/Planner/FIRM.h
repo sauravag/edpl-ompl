@@ -167,21 +167,22 @@ namespace ompl
 
         // NOTE HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT
         // but none of these is a complete solution to this problem...
+        // these three flags for FIRM can be reset according to a setup file read by FIRM::loadParametersFromFile()
 
 
         // HACK {1} CONNECTION TO FUTURE FIRM NODES
         // this is a hack in the aspect that it changes the connectivity between nodes when constructing a graph and when executing with a rollout
         // this helps rollout to achieve a near-optimal solution even with small number of nodes in the graph, if possible
         // but it is not much helpful to avoid indefinite stabilization during rollout
-        static const bool CONNECT_TO_FURTURE_NODES = true;
-//         static const bool CONNECT_TO_FURTURE_NODES = false;
+//         static const bool CONNECT_TO_FUTURE_NODES = true;
+        static const bool CONNECT_TO_FUTURE_NODES = false;
 
 
         // HACK {2} ACCUMULATING STATIONARY PENALTY
         // this can help to avoid indefinite stabilization happening around one node, but it causes the robot to wander over the neighbors
         // this behavior can make FIRM-Rollout to perform worse than FIRM-Offline
-        static const bool APPLY_STATIONARY_PENALTY = true;
-//         static const bool APPLY_STATIONARY_PENALTY = false;
+//         static const bool APPLY_STATIONARY_PENALTY = true;
+        static const bool APPLY_STATIONARY_PENALTY = false;
 
 
         // HACK {3} EDGE COST WITH A BORDER BELIEF STATE
@@ -189,8 +190,8 @@ namespace ompl
         // which can help to reduce the number of iterations to stabilize to a node and move to another node earlier
         // but there is a possibility to over-estimate the actual edge cost as well, which can result in loss of optimality in FIRM-Offline
         // (total path cost of FIRM-Offline will not be monotonically decreasing as more nodes are added to the graph)
-        static const bool BORDER_BELIEF_SAMPLING = true;
-//         static const bool BORDER_BELIEF_SAMPLING = false;
+//         static const bool BORDER_BELIEF_SAMPLING = true;
+        static const bool BORDER_BELIEF_SAMPLING = false;
 
 
 
@@ -733,11 +734,20 @@ protected:
 
     double distanceCostWeight_;
 
+
+    bool connectToFutureNodes_;
+
+    bool applyStationaryPenalty_;
+
+    bool borderBeliefSampling_;
+
+
     double informationCostWeight_;
 
     double timeCostWeight_;
 
     double statCostIncrement_;
+
 
     double goalCostToGo_;
 
