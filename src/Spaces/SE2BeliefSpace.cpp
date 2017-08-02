@@ -250,6 +250,78 @@ bool SE2BeliefSpace::StateType::sampleTrueStateFromBelief(ompl::base::State* sam
     return true;
 }
 
+double SE2BeliefSpace::StateType::getStateDistanceTo(const ompl::base::State *state) const
+{
+    // subtract the two beliefs and get the norm
+    arma::colvec stateDiff = state->as<SE2BeliefSpace::StateType>()->getArmaData() - this->getArmaData();
+
+    if(stateDiff[2] > boost::math::constants::pi<double>())
+    {
+        stateDiff[2] = (stateDiff[2] - 2*boost::math::constants::pi<double>());
+    }
+    if(stateDiff[2] < -boost::math::constants::pi<double>())
+    {
+        stateDiff[2] = stateDiff[2] + 2*boost::math::constants::pi<double>();
+    }
+
+    // compute weighted sum of position and orientation errors
+    arma::colvec stateDiffDiag = stateDiff.diag();
+    double state_distance = arma::norm(abs(stateDiffDiag) % normWeights_, 2);
+
+    return state_distance;
+}
+
+double SE2BeliefSpace::StateType::getPosDistanceTo(const ompl::base::State *state) const
+{
+    // subtract the two beliefs and get the norm
+    arma::colvec stateDiff = state->as<SE2BeliefSpace::StateType>()->getArmaData() - this->getArmaData();
+
+    // compute position error
+    double pos_distance = arma::norm(stateDiff.subvec(0,1), 2);
+
+    return pos_distance;
+}
+
+double SE2BeliefSpace::StateType::getOriDistanceTo(const ompl::base::State *state) const
+{
+    // subtract the two beliefs and get the norm
+    arma::colvec stateDiff = state->as<SE2BeliefSpace::StateType>()->getArmaData() - this->getArmaData();
+
+    if(stateDiff[2] > boost::math::constants::pi<double>())
+    {
+        stateDiff[2] = (stateDiff[2] - 2*boost::math::constants::pi<double>());
+    }
+    if(stateDiff[2] < -boost::math::constants::pi<double>())
+    {
+        stateDiff[2] = stateDiff[2] + 2*boost::math::constants::pi<double>();
+    }
+
+    // compute orientation error
+    double ori_distance = std::abs(stateDiff[2]);
+
+    return ori_distance;
+}
+
+double SE2BeliefSpace::StateType::getCovDistanceTo(const ompl::base::State *state) const
+{
+    // subtract the two covariances
+    arma::mat covDiff = state->as<SE2BeliefSpace::StateType>()->getCovariance() - this->getCovariance();
+
+    arma::colvec covDiffDiag = covDiff.diag();
+
+    // NOTE if the given (goal) state's covariance is already smaller than this state, set the difference to zero
+    for (int i=0; i<covDiffDiag.size(); i++)
+        if(covDiffDiag[i] > 0.0)  // NOTE this is opposite from isReachedCov() where this state is the goal state
+            covDiffDiag[i] = 0.0;
+
+
+    // compute covariance error
+    //double cov_distance_to_goal = arma::norm(sqrt(abs(covDiffDiag)) % normWeights_, "inf");    // deprecated
+    double cov_distance = arma::norm(abs(covDiffDiag) % normWeights_, 2);
+
+    return cov_distance;
+}
+
 ompl::base::State* SE2BeliefSpace::allocState(void) const
 {
     StateType *state = new StateType();
@@ -281,6 +353,7 @@ double SE2BeliefSpace::distance(const State* state1, const State *state2)
 
     return pow(dx*dx+dy*dy, 0.5);
 }
+
 void SE2BeliefSpace::getRelativeState(const State *from, const State *to, State *state)
 {
 	state->as<StateType>()->setX(to->as<StateType>()->getX() - from->as<StateType>()->getX());

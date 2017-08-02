@@ -180,10 +180,167 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
           Instead of executing the entire controller, we need to execute N steps, then calculate the cost to go through the neighboring nodes.
           Whichever gives the lowest cost to go, is our new path. Do this at every N steps.
         */
+
+        // [4] Rollout
+        if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReached(cendState))
+        {
+            OMPL_INFORM("FIRMCP: Reached FIRM Node: %u", targetNode);
+            numberofNodesReached_++;
+            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
+
+            // NOTE commented this to do rollout even if the robot (almost) reached a FIRM node
+            // tempVertex = boost::target(e, g_);
+            // // if the reached node is not the goal
+            // if(tempVertex != goal)
+            // {
+            //     e = feedback_.at(tempVertex);    // NOTE this is not guaranteed to be the best
+            //     // for debug
+            //     nextFIRMVertex = boost::target(e, g_);
+            // }
+        }
+        // NOTE commented this to do rollout even if the robot (almost) reached a FIRM node
+        //else
+        {
+            Visualizer::doSaveVideo(false);
+            siF_->doVelocityLogging(false);
+
+            // start profiling time to compute rollout
+            auto start_time = std::chrono::high_resolution_clock::now();
+
+
+//             // save the current true state
+//             siF_->getTrueState(tempTrueStateCopy);
+//
+//             // add the current belief state to the graph
+//             tempVertex = addStateToGraph(cendState, false);
+//
+//             // restore the current true state
+//             siF_->setTrueState(tempTrueStateCopy);
+//
+//
+//             // NOTE robust connection to a desirable (but far) FIRM nodes during rollout
+//
+//             // 1) allow longer edge length for connection to FIRM nodes during rollout
+//             // implemented in FIRM::addStateToGraph()
+//
+//             // 2) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list for rollout policy
+//             // implemented in FIRM::addStateToGraph() for si_->checkMotion() validation
+//
+//             // 3) instead of bounded nearest neighbors, use k-nearest neighbors during rollout; this may be considered as a change of the graph connection property
+//             // implemented in FIRM::addStateToGraph() for si_->checkMotion() validation
+//
+//             // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
+//             // bool forwardEdgeAdded;
+//             // if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[nextFIRMVertex]))
+//             // {
+//             //     addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
+//             // }
+//
+//             // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
+//             // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
+//             if(connectToFutureNodes_)
+//             {
+//                 Vertex futureVertex;
+//                 bool forwardEdgeAdded;
+//                 // for debug
+//                 if(ompl::magic::PRINT_FUTURE_NODES)
+//                     std::cout << "futureFIRMNodes: { ";
+//                 for(int i=0; i<futureFIRMNodes.size(); i++)
+//                 {
+//                     futureVertex = futureFIRMNodes[i];
+//                     // check if not duplicate with the previous nodes
+//                     bool unique = false;
+//                     if(std::find(futureFIRMNodes.begin(), futureFIRMNodes.begin()+i-0, futureVertex) == futureFIRMNodes.begin()+i-0)
+//                     {
+//                         unique = true;
+//                         foreach(Edge nnedge, boost::out_edges(tempVertex, g_))
+//                         {
+//                             if(futureVertex == boost::target(nnedge, g_))
+//                             {
+//                                 unique = false;
+//                                 break;
+//                             }
+//                         }
+//                     }
+//                     // check for motion validity and add to the graph
+//                     if(unique)
+//                     {
+//                         if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[futureVertex]))
+//                         {
+//                             addEdgeToGraph(tempVertex, futureVertex, forwardEdgeAdded);
+//                             Visualizer::addRolloutConnection(stateProperty_[tempVertex], stateProperty_[futureVertex]);
+//                         }
+//                         // for debug
+//                         if(ompl::magic::PRINT_FUTURE_NODES)
+//                             std::cout << futureVertex << " ";
+//                     }
+//                 }
+//                 // for debug
+//                 if(ompl::magic::PRINT_FUTURE_NODES)
+//                     std::cout << "}" << std::endl;
+//             }
+//
+//
+//             // set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
+//             siF_->setTrueState(tempTrueStateCopy);
+//
+//             // select the best next edge
+//             e = generateRolloutPolicy(tempVertex, goal);
+
+
+
+
+
+            // FIRMCP
+
+            // save the current true state
+            siF_->getTrueState(tempTrueStateCopy);
+
+            // select the best next edge
+            generatePOMCPPolicy(tempVertex, goal);
+
+            // restore the current true state
+            siF_->setTrueState(tempTrueStateCopy);
+
+
+
+
+
+
+            // end profiling time to compute rollout
+            auto end_time = std::chrono::high_resolution_clock::now();
+
+            numberOfRollouts++;
+            double timeToDoRollout = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+            //int numNN = numNearestNeighbors_;
+            //averageTimeForRolloutComputation += timeToDoRollout / numNN;    // rollout candidates are no longer limited to numNearestNeighbors_
+            if(doSaveLogs_)
+            {
+                //outfile<<numberOfRollouts<<","<<NNRadius_<<","<<numNN<<","<<numMCParticles_<<","<<timeToDoRollout/(1000*numNN)<<","<<timeToDoRollout/1000<<std::endl;
+                outfile<<numberOfRollouts<<","<<NNRadius_<<","<<numMCParticles_<<","<<timeToDoRollout/1000<<std::endl;
+            }
+            //std::cout << "Time to execute rollout : "<<timeToDoRollout << " milli seconds."<<std::endl;
+
+            Visualizer::doSaveVideo(doSaveVideo_);
+            siF_->doVelocityLogging(true);
+
+
+            // NOTE commented to prevent redundant call of nearest neighbor search just for visualization! moved to FIRM::addStateToGraph()
+            //showRolloutConnections(tempVertex);
+
+            // for rollout edge visualization
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(50));  // doesn't seem to be necessary
+
+            // clear the rollout candidate connection drawings and show the selected edge
+            Visualizer::clearRolloutConnections();
+            Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[targetNode]);
+
+        } // [4] Rollout
+
+
         ompl::base::Cost costCov;
         int stepsExecuted = 0;
         int stepsToStop = 0;
-
 
         // NOTE NodeController will be invoked after executing EdgeController for the given rolloutSteps_ steps
 
@@ -331,143 +488,6 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
             nn_->remove(tempVertex);
         }
 
-
-        // [4] Rollout
-        if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReached(cendState))
-        {
-            OMPL_INFORM("FIRMCP: Reached FIRM Node: %u", targetNode);
-            numberofNodesReached_++;
-            nodeReachedHistory_.push_back(std::make_pair(currentTimeStep_, numberofNodesReached_) );
-
-            // NOTE commented this to do rollout even if the robot (almost) reached a FIRM node
-            // tempVertex = boost::target(e, g_);
-            // // if the reached node is not the goal
-            // if(tempVertex != goal)
-            // {
-            //     e = feedback_.at(tempVertex);    // NOTE this is not guaranteed to be the best
-            //     // for debug
-            //     nextFIRMVertex = boost::target(e, g_);
-            // }
-        }
-        // NOTE commented this to do rollout even if the robot (almost) reached a FIRM node
-        //else
-        {
-            Visualizer::doSaveVideo(false);
-            siF_->doVelocityLogging(false);
-
-            // start profiling time to compute rollout
-            auto start_time = std::chrono::high_resolution_clock::now();
-
-            // save the current true state
-            siF_->getTrueState(tempTrueStateCopy);
-
-            // add the current belief state to the graph temporarily
-            tempVertex = addStateToGraph(cendState, false);
-
-            // restore the current true state
-            siF_->setTrueState(tempTrueStateCopy);
-
-
-            // NOTE robust connection to a desirable (but far) FIRM nodes during rollout
-
-            // 1) allow longer edge length for connection to FIRM nodes during rollout
-            // implemented in FIRM::addStateToGraph()
-
-            // 2) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list for rollout policy
-            // implemented in FIRM::addStateToGraph() for si_->checkMotion() validation
-
-            // 3) instead of bounded nearest neighbors, use k-nearest neighbors during rollout; this may be considered as a change of the graph connection property
-            // implemented in FIRM::addStateToGraph() for si_->checkMotion() validation
-
-            // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
-            // bool forwardEdgeAdded;
-            // if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[nextFIRMVertex]))
-            // {
-            //     addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
-            // }
-
-            // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
-            // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
-            if(connectToFutureNodes_)
-            {
-                Vertex futureVertex;
-                bool forwardEdgeAdded;
-                // for debug
-                if(ompl::magic::PRINT_FUTURE_NODES)
-                    std::cout << "futureFIRMNodes: { ";
-                for(int i=0; i<futureFIRMNodes.size(); i++)
-                {
-                    futureVertex = futureFIRMNodes[i];
-                    // check if not duplicate with the previous nodes
-                    bool unique = false;
-                    if(std::find(futureFIRMNodes.begin(), futureFIRMNodes.begin()+i-0, futureVertex) == futureFIRMNodes.begin()+i-0)
-                    {
-                        unique = true;
-                        foreach(Edge nnedge, boost::out_edges(tempVertex, g_))
-                        {
-                            if(futureVertex == boost::target(nnedge, g_))
-                            {
-                                unique = false;
-                                break;
-                            }
-                        }
-                    }
-                    // check for motion validity and add to the graph
-                    if(unique)
-                    {
-                        if(si_->checkMotion(stateProperty_[tempVertex], stateProperty_[futureVertex]))
-                        {
-                            addEdgeToGraph(tempVertex, futureVertex, forwardEdgeAdded);
-                            Visualizer::addRolloutConnection(stateProperty_[tempVertex], stateProperty_[futureVertex]);
-                        }
-                        // for debug
-                        if(ompl::magic::PRINT_FUTURE_NODES)
-                            std::cout << futureVertex << " ";
-                    }
-                }
-                // for debug
-                if(ompl::magic::PRINT_FUTURE_NODES)
-                    std::cout << "}" << std::endl;
-            }
-
-
-            // set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
-            siF_->setTrueState(tempTrueStateCopy);
-
-            // select the best next edge
-            e = generateRolloutPolicy(tempVertex, goal);
-
-
-            // end profiling time to compute rollout
-            auto end_time = std::chrono::high_resolution_clock::now();
-
-            numberOfRollouts++;
-            double timeToDoRollout = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-            //int numNN = numNearestNeighbors_;
-            //averageTimeForRolloutComputation += timeToDoRollout / numNN;    // rollout candidates are no longer limited to numNearestNeighbors_
-            if(doSaveLogs_)
-            {
-                //outfile<<numberOfRollouts<<","<<NNRadius_<<","<<numNN<<","<<numMCParticles_<<","<<timeToDoRollout/(1000*numNN)<<","<<timeToDoRollout/1000<<std::endl;
-                outfile<<numberOfRollouts<<","<<NNRadius_<<","<<numMCParticles_<<","<<timeToDoRollout/1000<<std::endl;
-            }
-            //std::cout << "Time to execute rollout : "<<timeToDoRollout << " milli seconds."<<std::endl;
-
-            Visualizer::doSaveVideo(doSaveVideo_);
-            siF_->doVelocityLogging(true);
-
-
-            // NOTE commented to prevent redundant call of nearest neighbor search just for visualization! moved to FIRM::addStateToGraph()
-            //showRolloutConnections(tempVertex);
-
-            // for rollout edge visualization
-            //boost::this_thread::sleep(boost::posix_time::milliseconds(50));  // doesn't seem to be necessary
-
-            // clear the rollout candidate connection drawings and show the selected edge
-            Visualizer::clearRolloutConnections();
-            Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[targetNode]);
-
-        } // [4] Rollout
-
     } // while()
 
     // [3'] Free the memory for states and controls for this temporary node/edge created from previous iteration
@@ -500,7 +520,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
     // for analysis
 
-    // this data is also saved in run-(TIMESTAMP)/RolloutFIRMCostHistory.csv
+    // this data is also saved in run-(TIMESTAMP)/FIRMCPCostHistory.csv
     std::cout << std::endl;
     std::cout << "Execution time steps: " << currentTimeStep_ << std::endl;
     std::cout << "Execution covariance cost: " << executionCostCov_ << std::endl;
@@ -509,7 +529,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
     //std::cout << "Execution cost: " << executionCost_ << "  ( = " << informationCostWeight_ << "*" << executionCostCov_ << " )" << std::endl;     // 4)
     std::cout << std::endl;
 
-    // this data is also saved in run-(TIMESTAMP)/RolloutFIRMCostHistory.csv
+    // this data is also saved in run-(TIMESTAMP)/FIRMCPCostHistory.csv
     std::cout << "Number of nodes with stationary penalty: " << numberOfStationaryPenalizedNodes_ << std::endl;
     std::cout << "Sum of stationary penalties: " << sumOfStationaryPenalties_ << std::endl;
 
@@ -517,10 +537,10 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
     if(doSaveLogs_)
     {
         outfile.close();
-        writeTimeSeriesDataToFile("RolloutFIRMCostHistory.csv", "costToGo");
-        writeTimeSeriesDataToFile("RolloutFIRMSuccessProbabilityHistory.csv", "successProbability");
-        writeTimeSeriesDataToFile("RolloutFIRMNodesReachedHistory.csv","nodesReached");
-        writeTimeSeriesDataToFile("RolloutFIRMStationaryPenaltyHistory.csv","stationaryPenalty");
+        writeTimeSeriesDataToFile("FIRMCPCostHistory.csv", "costToGo");
+        writeTimeSeriesDataToFile("FIRMCPSuccessProbabilityHistory.csv", "successProbability");
+        writeTimeSeriesDataToFile("FIRMCPNodesReachedHistory.csv","nodesReached");
+        writeTimeSeriesDataToFile("FIRMCPStationaryPenaltyHistory.csv","stationaryPenalty");
         std::vector<std::pair<double, double>> velLog;
         siF_->getVelocityLog(velLog);
         for(int i=0; i < velLog.size(); i++)
@@ -528,7 +548,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
             velocityHistory_.push_back(std::make_pair(i, sqrt( pow(velLog[i].first,2) + pow(velLog[i].second,2) ))); // omni
             //velocityHistory_.push_back(std::make_pair(i, velLog[i].first)); // unicycle
         }
-        writeTimeSeriesDataToFile("RolloutFIRMVelocityHistory.csv", "velocity");
+        writeTimeSeriesDataToFile("FIRMCPVelocityHistory.csv", "velocity");
     }
     Visualizer::doSaveVideo(false);
 
@@ -536,5 +556,612 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
     si_->freeState(cstartState);
     si_->freeState(cendState);
     si_->freeState(tempTrueStateCopy);
+}
+
+FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const FIRM::Vertex goal)
+{
+    // XXX parameters for POMCP    // should move to setup file
+    int numPOMCPParticles_ = 100;
+    int maxPOMCPDepth_ = 100;
+
+
+    // declare local variables
+    ompl::base::State* currentBelief = si_->cloneState(stateProperty_[currentVertex]);
+    ompl::base::State* goalBelief = si_->cloneState(stateProperty_[goal]);
+    ompl::base::State* tempTrueStateCopy = siF_->allocState();
+    ompl::base::State* sampState = siF_->allocState();
+
+
+    // save the current true state
+    siF_->getTrueState(tempTrueStateCopy);
+
+
+
+    // Update()
+
+    // NOTE this needs to move to executeFeedbackWithPOMCP() after actual execution by edge/node controllers
+    // add the executed (a,o) pair to history
+
+
+    // check if the end state matches a node in the tree
+
+
+    // prune the old tree and set the end state as a root
+
+
+    // --------------
+
+
+    Edge edgeToTake;
+
+
+    // this History.size() increase by 1 after each one-branch search by one particle until the finite horizon
+    // currentHistoryDepth = History.size();
+
+
+    // for N particles
+    for (unsigned int i=0; i<numPOMCPParticles_; i++)
+    {
+        // sample a particle from the root (current) belief state
+        // NOTE random sampling of a true state from the current belief state for Monte Carlo simulation
+        if(!currentBelief->as<FIRM::StateType>()->sampleTrueStateFromBelief(sampState))
+        {
+            OMPL_WARN("Could not sample a true state from the current belief state!");
+            continue;
+        }
+        siF_->setTrueState(sampState);
+
+
+        // Simulate()
+        int currentDepth = 0;
+        pomcpSimulate(sampState, currentDepth);
+
+
+
+        // discard any simulated history
+        // History.truncate(currentHistoryDepth);
+
+
+    }
+
+
+    // select the best action
+    // GreedyUCB()
+
+
+    // restore the current true state
+    siF_->setTrueState(tempTrueStateCopy);
+
+
+    // free the memory
+    si_->freeState(currentBelief);
+    si_->freeState(goalBelief);
+    si_->freeState(tempTrueStateCopy);
+    si_->freeState(sampState);
+
+    return edgeToTake;
+
+
+
+
+//     #<{(|*
+//         For the given node, find the out edges and see the total cost of taking that edge
+//         The cost of taking the edge is cost to go from the target of the edge + the cost of the edge itself
+//     |)}>#
+//     double minCost = std::numeric_limits<double>::max();
+//     Edge edgeToTake;
+//
+//     // for debug
+//     FIRM::Vertex minCostVertCurrent, minCostVertNext, minCostVertNextNext;
+//
+//     // Iterate over the out edges
+//     foreach(Edge e, boost::out_edges(currentVertex, g_))
+//     {
+//
+//         // Get the target node of the edge
+//         Vertex targetNode = boost::target(e, g_);  
+//
+//         // The FIRM edge to take from the target node
+//         //Edge nextFIRMEdge = feedback_.at(targetNode);
+//
+//         // The node to which next firm edge goes
+//         //Vertex targetOfNextFIRMEdge = boost::target(nextFIRMEdge, g_);
+//
+//         // for debug
+//         if(ompl::magic::PRINT_FEEDBACK_PATH)
+//             std::cout << "PATH[" << currentVertex;
+//
+//         // Check if feedback from target to goal is valid or not
+//         if(!isFeedbackPolicyValid(targetNode, goal))
+//         {
+//
+//             //OMPL_INFORM("Rollout: Invalid path detected from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+//
+//             updateEdgeCollisionCost(targetNode, goal);
+//
+//             // resolve Dijkstra/DP
+//             solveDijkstraSearch(goal);
+//             solveDynamicProgram(goal, false);
+//
+//             //targetOfNextFIRMEdge = boost::target(feedback_.at(targetNode), g_);  
+//             //OMPL_INFORM("Rollout: Updated path, next firm edge moving from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+//
+//         }
+//
+//         // The cost to go from the target node
+//         double nextNodeCostToGo = costToGo_[targetNode];
+//
+//         // Find the weight of the edge
+//         FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, e);
+//
+//         // The transition prob of the edge
+//         double transitionProbability = edgeWeight.getSuccessProbability();        
+//         
+//         // compute distance from goal to target
+//         //arma::colvec targetToGoalVec = stateProperty_[goal]->as<FIRM::StateType>()->getArmaData() - stateProperty_[targetNode]->as<FIRM::StateType>()->getArmaData();
+//         //double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
+//
+//         // get the stationary penalty
+//         // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
+//         double stationaryPenalty = 0.0;
+//         if(stationaryPenalties_.find(targetNode) != stationaryPenalties_.end())
+//             stationaryPenalty = stationaryPenalties_.at(targetNode);
+//
+//         // the cost of taking the edge
+//         //double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
+//         // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
+//         double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost() + stationaryPenalty;  // HACK only for rollout policy search; actual execution cost will not consider stationaryPenalty
+//
+//
+//         // for debug
+//         if(ompl::magic::PRINT_COST_TO_GO)
+// //             std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
+//             std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << " + " << stationaryPenalty << std::endl;
+//
+//
+//         if(edgeCostToGo < minCost)
+//         {
+//             minCost  = edgeCostToGo;
+//             edgeToTake = e;
+//
+//             // for debug
+//             minCostVertCurrent = currentVertex;
+//             minCostVertNext = targetNode;
+//             //minCostVertNextNext = targetOfNextFIRMEdge;
+//         }
+//     }
+//
+//     // for debug
+//     if(ompl::magic::PRINT_COST_TO_GO)
+//         std::cout << "minC[" << minCostVertCurrent << "->" << minCostVertNext << "->G] " << minCost << std::endl;
+//
+//     return edgeToTake;
+}
+
+void FIRMCP::pomcpSimulate(ompl::base::State* sampState, int currentDepth)
+{
+    // if (depth > maxPOMCPDepth_)
+    //  return ...
+
+    // if new node
+    pomcpRollout(sampState, currentDepth+1);
+
+    // otherwise
+//     pompcpSimulate(sampState, currentDepth+1);
+
+    // update
+
+
+    // return R
+
+
+}
+
+void FIRMCP::pomcpRollout(ompl::base::State* sampState, int currentDepth)
+{
+    // if (depth > maxPOMCPDepth_)
+    //  return ...
+
+
+    // create a new node with default invalid N(ha) and V(ha)
+        // need to register as a Vertex
+        // need to add this to nearest neighbor database
+        // find nearest neighbor child FIRM nodes, not any of POMCP tree nodes
+            // then, save this child node id's in the Vertex attibute
+            // also save estimated edge cost (from ditance) in the Vertex attibute
+        // need edge/node controllers to its neighbors
+        // but without edge cost computation
+
+    // create a new node if not coincides any of existing POMCP tree nodes
+    if ((sampState->as<FIRM::StateType>()->getChildQnodes()).size()==0)
+    {
+        // this will compute approximate edge cost, cost-to-go, and heuristic action weight
+        addStateToPOMCPTreeWithApproxCostToGo(sampState);
+    }
+
+
+
+
+    // SELECT AN ACTION FROM ROLLOUT POLICY
+
+//     // find nearest neighbors to enumerate possible action
+//         // need to add the current state to the nearest neighbor database
+//             // adding every state to NN database during Rollout?
+//             // need to remove afterward? maybe yes only for NN database, but not for FIRM graph
+//             // or utilize graph connection once generated? yes
+//         // then just call 
+//         // neighbors = connectionStrategy_(m, NNRadius_);
+//
+//     // for each neighbor
+//         // compute the distance
+//         // compute the approximate edge cost
+//         // compute the approximate cost-to-go
+//         // compute the regularized weight from approximate cost-to-go
+
+
+    // importance sampling to pick one neighbor as a target
+
+    // get the connected neighbor list
+    const std::vector<Vertex>& childQnodes = sampState->as<FIRM::StateType>()->getChildQnodes();
+
+    // allot a section in the weight bar according to each weight
+    std::vector<double> weightSections;  // upper limit of accumulated weight for each action
+    double weight, weightSum = 0.0;
+    for (const auto& childQnode : childQnodes)
+    {
+        weight = sampState->as<FIRM::StateType>()->getChildQweight(childQnode);
+        weightSum += weight;
+        weightSections.push_back(weightSum);
+    }
+    for (auto& weight : weightSections)
+    {
+        weight /= weightSum;  // normalize the accumulated weight
+    }
+//     // for debug
+//     std::cout << "-----------------------------" << std::endl;
+//     std::cout << "childQnode: {";
+//     for (const auto& childQnode : childQnodes)
+//         std::cout << childQnode << " ";
+//     std::cout << "}" << std::endl;
+//     std::cout << "weight: {";
+//     for (const auto& weight : weightSections)
+//         std::cout << weight << " ";
+//     std::cout << "}" << std::endl;
+
+
+    // randomly pick an accumulate weight threshold
+    arma::colvec weightPickedVec = arma::randu<arma::colvec>(1,1);  // range: [0, 1]
+    double weightPicked = weightPickedVec[0];
+
+    // enumerate to find the matching weightSection, assuming that childQnodes.size() is not so big
+    int jSelected;
+    for (int j=0; j<weightSections.size(); j++)
+    {
+        if (weightPicked < weightSections[j])
+        {
+            jSelected = j;
+            break;
+        }
+    }
+
+    // select the action
+    Vertex selectedChildQnode = childQnodes[jSelected];
+    // for debug
+    OMPL_INFORM("FIRMCP: Selected chlidQnode for POMCP-Rollout: %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
+            stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
+            stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getY(),
+            stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getYaw(),
+            arma::trace(stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getCovariance()));
+
+
+    // simulate action execution
+        // if the currently reached FIRM node is selected again (stabilization), execute several times more than the other case (transition), to reduce the depth of the tree toward the stabilization
+    ompl::base::State* nextState = si_->allocState();
+
+    // recursively call pomcpRollout()
+//     pomcpRollout(nextState, currentDepth+1)
+
+
+
+
+    // free the memory
+    si_->freeState(nextState);
+
+    // return discounted return
+
+
+}
+
+FIRM::Vertex FIRMCP::addStateToPOMCPTreeWithApproxCostToGo(ompl::base::State *state)
+{
+    // just for compatibility with FIRM::addStateToGraph()
+    bool addReverseEdge = false;
+
+    boost::mutex::scoped_lock _(graphMutex_);
+
+    // add the given belief state to graph as FIRM node
+    Vertex m;
+    m = boost::add_vertex(g_);      // this value will be the max_id+1, i.e., boost::num_vertices(g_)?   // REVIEW initialized values of Vertex attributes? all zeros?
+
+    // NOTE do not generate a node controller for a temporary node during rollout execution as it will not be used at all
+    // in the case generateNodeController() is called during execution, the covariance of 'state' should be reverted to its original (actual) state's covariance after that function
+    if(addReverseEdge)
+    {
+        // construct a node stabilizer controller
+        NodeControllerType nodeController;
+        generateNodeController(state, nodeController); // Generating the node controller at sampled state, this will set stationary covariance at node
+        nodeControllers_[m] = nodeController;
+
+        // visualize the FIRM node
+        addStateToVisualization(state);
+    }
+
+    stateProperty_[m] = state;
+    totalConnectionAttemptsProperty_[m] = 1;
+    successfulConnectionAttemptsProperty_[m] = 0;
+
+
+    // add this vertex to the database for nearest neighbor search
+    nn_->add(m);
+
+    // Which milestones will we attempt to connect to?
+    //std::vector<Vertex> neighbors = connectionStrategy_(m);
+
+    // NOTE use longer nearest neighbor to avoid oscillating behavior of rollout policy by allowing connection to farther FIRM nodes
+    std::vector<Vertex> neighbors;
+    std::vector<Vertex> kneighbors;
+    if(addReverseEdge)  // graph construction phase
+    {
+        neighbors = connectionStrategy_(m, NNRadius_);
+        //neighbors = kConnectionStrategy_(m, numNearestNeighbors_);    // NOTE this makes sense only if all the points are sampled first and then connected to each other, but not in the case point sampling and connection are done simultaneously
+    }
+    else  // rollout phase
+    {
+        // NOTE robust connection to a desirable (but far) FIRM nodes during rollout
+
+        // 1) allow longer edge length for connection to FIRM nodes during rollout
+//         neighbors = connectionStrategy_(m, 1.5*NNRadius_);
+//         neighbors = connectionStrategy_(m, 1.2*NNRadius_);
+        neighbors = connectionStrategy_(m, 1.0*NNRadius_);
+
+        // 2) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list; this may be considered as a change of the graph connection property
+//         kneighbors = kConnectionStrategy_(m, numNearestNeighbors_);
+//         // remove duplicate entities from kneighbors
+//         std::vector<Vertex>::iterator diff;
+//         diff = std::set_difference(kneighbors.begin(), kneighbors.end(), neighbors.begin(), neighbors.end(), kneighbors.begin());
+//         kneighbors.erase(diff, kneighbors.end());   // {kneighbors} = {kneighbors} - {neighbors}
+//         // concantenate kneighbors to neighbors
+//         neighbors.insert(neighbors.end(), kneighbors.begin(), kneighbors.end());
+
+        // 3) instead of bounded nearest neighbors, use k-nearest neighbors during rollout; this may be considered as a change of the graph connection property
+//         neighbors = kConnectionStrategy_(m, numNearestNeighbors_);
+
+        // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list
+        // implemented in FIRM::executeFeedbackWithRollout() to access nextFIRMVertex information
+//         neighbors = connectionStrategy_(m, NNRadius_);
+
+        // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
+        // implemented in FIRM::executeFeedbackWithRollout() to access nextFIRMVertex information
+//         neighbors = connectionStrategy_(m, NNRadius_);
+    }
+
+    // do not print this during rollout
+    if(addReverseEdge)
+        OMPL_INFORM("Adding a state: %u nearest neighbors from %u nodes in the graph", neighbors.size(), boost::num_vertices(g_));
+
+
+    // NOTE commented this to allow connection to farther but better FIRM node
+/*
+    // If reverse edge not required, that means this is a virtual state added in rollout
+    // We will sort by cost and use N lowest cost to go neighbors
+    if(!addReverseEdge && !neighbors.empty())
+    {
+        std::vector<std::pair<double,Vertex>> tempItems;
+
+        foreach (Vertex n, neighbors)
+        {
+            if(n != m)
+                tempItems.push_back(std::make_pair(costToGo_[n], n));
+        }
+
+        std::sort(tempItems.begin(), tempItems.end());
+
+        neighbors.clear();
+
+        int nti = tempItems.size();
+
+        // Now we add those neighbors with lowest cost and such that the robot can move to them, i.e. path is valid
+        int t_countNN = 0;
+
+        for(int i = 0; i < nti; i++)
+        {
+            if(si_->checkMotion(stateProperty_[m], stateProperty_[tempItems[i].second]))
+            {
+                neighbors.push_back(tempItems[i].second);
+                t_countNN++;
+            }
+
+            if(t_countNN >= numNearestNeighbors_)
+                break;            
+        }
+    }
+*/
+
+    // remove this vertex to the database to exclude POMCP tree nodes from edge connection to FIRM nodes
+    nn_->remove(m);
+
+
+    // XXX tuning parameters
+    //double costToGoRegulator_ = 0.0;      // exploitative
+    double costToGoRegulator_ = 1.0;
+    //double costToGoRegulator_ = 10000.0;  // explorative
+
+
+    FIRMWeight approxEdgeCost;
+    double approxCostToGo, weight;
+    foreach (Vertex n, neighbors)
+    {
+        if ( m!=n )
+        {
+            totalConnectionAttemptsProperty_[m]++;
+            totalConnectionAttemptsProperty_[n]++;
+
+            // XXX CHECK is it better to checkMotion() beforehand, or learn by running Monte Carlo simulation?
+            if (si_->checkMotion(stateProperty_[m], stateProperty_[n]))     // NOTE skip this process since it calls (computationally expensive) isValid() function for all interpolated states along the edge
+            {
+
+                bool forwardEdgeAdded=false;
+
+                // NOTE in execution mode, i.e., addReverseEdge is false, compute edge cost from the center belief state, not from a sampled border belief state
+                approxEdgeCost = addEdgeToPOMCPTreeWithApproxCost(m, n, forwardEdgeAdded);
+
+                if(forwardEdgeAdded)
+                {
+                    successfulConnectionAttemptsProperty_[m]++;
+
+                    // compute the approximate cost-to-go
+                    approxCostToGo = approxEdgeCost.getCost() + costToGo_[n];
+
+                    // compute weight for this action with regularization
+                    // with higher costToGoRegulator_, weight will be closer to uniform distribution over actions
+                    weight = 1.0 / (approxCostToGo + costToGoRegulator_);
+
+                    // for debug
+                    std::cout << "weight[" << n << "]: " << weight << " (=1.0/(" << approxCostToGo << "+" << costToGoRegulator_ << "))" << std::endl;
+
+                    // save approximate edge cost and cost-to-go for next Monte Carlo Tree Search
+                    stateProperty_[m]->as<FIRM::StateType>()->addChildQnode(n);
+                    stateProperty_[m]->as<FIRM::StateType>()->addChildQweight(n, weight);
+                }
+            }
+        }
+    }
+
+    // for rollout edge visualization
+    if(!addReverseEdge)
+    {
+        foreach(Vertex n, neighbors)
+        {
+            if(boost::edge(m, n, g_).second)
+            {
+                Visualizer::addRolloutConnection(stateProperty_[m], stateProperty_[n]);
+            }
+        }
+        //boost::this_thread::sleep(boost::posix_time::milliseconds(50));  // moved to FIRM::executeFeedbackWithRollout() for more accurate time computation
+    }
+
+    policyGenerator_->addFIRMNodeToObservationGraph(state);
+
+    return m;
+}
+
+FIRMWeight FIRMCP::addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded)
+{
+    // just for compatibility with FIRM::addEdgeToGraph()
+    bool addReverseEdge = false;
+
+    EdgeControllerType edgeController;
+
+    // for debug
+    if(ompl::magic::PRINT_MC_PARTICLES)
+        std::cout << "=================================================" << std::endl;
+
+    // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {3} EDGE COST WITH A BORDER BELIEF STATE
+    // apply the edge cost computation option
+    bool constructionMode;
+    if(borderBeliefSampling_)
+    {
+        // use the border belief state to compute the edge cost when constructing a graph
+        constructionMode = addReverseEdge;
+    }
+    else
+    {
+        // use the center belief state to compute the edge cost even when constructing a graph
+        constructionMode = false;
+    }
+
+    // generate an edge controller and compute edge cost
+    //const FIRMWeight weight = generateEdgeControllerWithCost(a, b, edgeController, constructionMode);      // deprecated: EdgeController only
+    //const FIRMWeight weight = generateEdgeNodeControllerWithCost(a, b, edgeController, constructionMode);  // EdgeController and NodeController concatenated
+    const FIRMWeight weight = generateEdgeNodeControllerWithApproxCost(a, b, edgeController);    // EdgeController and NodeController concatenated; heuristically compute edge cost for POMCP-Rollout without Monte Carlo simulation
+
+    assert(edgeController.getGoal() && "The generated controller has no goal");
+
+    const unsigned int id = maxEdgeID_++;
+
+    const Graph::edge_property_type properties(weight, id);
+
+    // create an edge with the edge weight property
+    std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
+
+    edgeControllers_[newEdge.first] = edgeController;
+
+    edgeAdded = true;
+
+    return weight;
+}
+
+FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
+{
+    // just for compatibility with FIRM::generateEdgeNodeControllerWithCost
+    bool constructionMode = false;
+
+
+    ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
+    ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+
+     // Generate the edge controller for given start and end state
+    generateEdgeController(startNodeState,targetNodeState,edgeController);
+
+
+    // XXX tuning parameters (these are determined from actual transition results)
+    double heurPosStepSize_ = 0.1;
+    double heurOriStepSize_ = 0.05;
+    double heurCovStepSize_ = 0.000001;  // NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks
+//     double heurCovStepSize_ = 0.00001;
+    double covConvergenceRate_ = 0.9;   // cov_{k+1} = covConvergenceRate * cov_k
+
+    // compute the distance between two states
+    double posDistance = startNodeState->as<FIRM::StateType>()->getPosDistanceTo(targetNodeState);
+    double oriDistance = startNodeState->as<FIRM::StateType>()->getOriDistanceTo(targetNodeState);
+    double covDistance = startNodeState->as<FIRM::StateType>()->getCovDistanceTo(targetNodeState);
+    double startTraceCov = startNodeState->as<FIRM::StateType>()->getTraceCovariance();
+
+    // compensate the distance considering isReached() tolerance
+    posDistance = ((posDistance - StateType::reachDistPos_) > 0.0) ? (posDistance - StateType::reachDistPos_) : 0.0;
+    oriDistance = ((oriDistance - StateType::reachDistOri_) > 0.0) ? (oriDistance - StateType::reachDistOri_) : 0.0;
+    covDistance = ((covDistance - StateType::reachDistCov_) > 0.0) ? (covDistance - StateType::reachDistCov_) : 0.0;
+
+    // compute an approximate edge cost (heuristically!)
+    double numPosConvergence = posDistance / heurPosStepSize_;
+    double numOriConvergence = oriDistance / heurOriStepSize_;
+    double numCovConvergence = covDistance / heurCovStepSize_;
+    double maxNumConvergence = std::max(std::max(numPosConvergence, numOriConvergence), numCovConvergence);
+    double stepsToStop = maxNumConvergence;
+    double filteringCost = startTraceCov * covConvergenceRate_ * (1 - std::pow(covConvergenceRate_, stepsToStop)) / (1 - covConvergenceRate_);  // sum_{k=1}^{stepsToStop}(covConvergenceRate^k * startTraceCov)
+
+    // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
+    //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
+    // 2) cost = wc * trace(cov_f)       + wt * K
+    // 3) cost = wc * mean(trace(cov_k)) + wt * K
+    // 4) cost = wc * sum(trace(cov_k))
+
+    double approxEdgeCost = informationCostWeight_*filteringCost + timeCostWeight_*stepsToStop;   // 1,2,3)
+    //double approxEdgeCost = informationCostWeight_*filteringCost.value();   // 4)
+
+    // for debug
+    if(ompl::magic::PRINT_EDGE_COST)
+        std::cout << "approxEdgeCost[" << a << "->" << b << "] " << approxEdgeCost << std::endl;
+
+
+    ompl::base::Cost edgeCost(approxEdgeCost);
+    double transitionProbability = 1.0;    // just naively set this to 1.0
+
+    FIRMWeight weight(edgeCost.value(), transitionProbability);
+
+    // free the memory
+    siF_->freeState(startNodeState);
+
+    return weight;
 }
 

@@ -1,4 +1,5 @@
 /*********************************************************************
+
 * Software License Agreement (BSD License)
 *
 *  Copyright (c) 2014, Texas A&M University
@@ -76,6 +77,11 @@ class R2BeliefSpace : public ompl::base::RealVectorStateSpace
             arma::mat getCovariance(void) const
             {
                 return covariance_;
+            }
+
+            double getTraceCovariance(void) const
+            {
+                return arma::trace(covariance_);
             }
 
 

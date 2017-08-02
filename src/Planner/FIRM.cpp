@@ -721,8 +721,9 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
     // Initialize to its own (dis)connected component.
     disjointSets_.make_set(m);
 
-    nn_->add(m);
 
+    // add this vertex to the database for nearest neighbor search
+    nn_->add(m);
 
     // Which milestones will we attempt to connect to?
     //std::vector<Vertex> neighbors = connectionStrategy_(m);

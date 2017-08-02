@@ -55,6 +55,9 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
         class StateType : public CompoundStateSpace::StateType
         {
         public:
+
+            typedef unsigned long int Vertex;    // HACK from include/Planner/FIRM.h
+
             StateType(void) : CompoundStateSpace::StateType()
             {
               covariance_ = arma::zeros<arma::mat>(3,3);
@@ -81,9 +84,24 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return as<SO2StateSpace::StateType>(1)->value;
             }
 
+            arma::colvec getArmaData(void) const
+            {
+                arma::colvec stateVec(3);
+
+                stateVec[0] = getX();
+                stateVec[1] = getY();
+                stateVec[2] = getYaw();
+                return stateVec;
+            }
+
             arma::mat getCovariance(void) const
             {
                 return covariance_;
+            }
+
+            double getTraceCovariance(void) const
+            {
+                return arma::trace(covariance_);
             }
 
 
@@ -132,15 +150,74 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 covariance_ = cov;
             }
 
-            arma::colvec getArmaData(void) const
-            {
-                arma::colvec stateVec(3);
 
-                stateVec[0] = getX();
-                stateVec[1] = getY();
-                stateVec[2] = getYaw();
-                return stateVec;
+            void clearChildQnodes(){
+                childQnodes_.clear();
             }
+
+            void clearChildQweights(){
+                childQweights_.clear();
+            }
+
+            void clearChildQvalues(){
+                childQvalues_.clear();
+            }
+
+            void clearChildQvisits(){
+                childQvisits_.clear();
+            }
+
+
+            void addChildQnode(Vertex childQnode){
+                childQnodes_.push_back(childQnode);
+            }
+
+            void addChildQweight(Vertex childQnode, double weight){
+                childQweights_[childQnode] = weight;
+            }
+
+            void addChildQvalue(Vertex childQnode, double value){
+                childQvalues_[childQnode] = value;
+            }
+
+            void addChildQvisit(Vertex childQnode, double visit){
+                childQvisits_[childQnode] = visit;
+            }
+
+
+            const std::vector<Vertex> getChildQnodes() const {
+                return childQnodes_;
+            }
+
+            double getChildQweight(Vertex childQnode){
+                if (childQweights_.find(childQnode) == childQweights_.end())
+                {
+                    OMPL_ERROR("childQnode is not found in childQweights_!");
+                    return 0.0;   // not to allow this action to be selected
+                }
+                return childQweights_.at(childQnode);
+            }
+
+            double getChildQvalue(Vertex childQnode){
+                if (childQvalues_.find(childQnode) == childQvalues_.end())
+                {
+                    OMPL_ERROR("childQnode is not found in childQvalues_!");
+                    //return ompl::magic::DEFAULT_INF_COST_TO_GO;   // not to allow this action to be selected
+                    return 1000000000.0;
+                }
+                return childQvalues_.at(childQnode);
+            }
+
+            double getChildQvisit(Vertex childQnode){
+                if (childQvisits_.find(childQnode) == childQvisits_.end())
+                {
+                    OMPL_ERROR("childQnode is not found in childQvisits_!");
+                    //return ompl::magic::DEFAULT_INF_COST_TO_GO;   // not to allow this action to be selected
+                    return 1000000000.0;
+                }
+                return childQvisits_.at(childQnode);
+            }
+
 
             /** \brief Checks if the input state has stabilized to this state (node pose and covariance reachability check) */
             bool isReached(ompl::base::State *state, bool relaxedConstraint=false) const;
@@ -159,6 +236,12 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             bool sampleTrueStateFromBelief(ompl::base::State* sampState) const;
 
 
+            double getStateDistanceTo(const ompl::base::State *state) const;
+            double getPosDistanceTo(const ompl::base::State *state) const;
+            double getOriDistanceTo(const ompl::base::State *state) const;
+            double getCovDistanceTo(const ompl::base::State *state) const;
+
+
             static double meanNormWeight_, covNormWeight_, reachDist_, reachDistPos_, reachDistOri_, reachDistCov_;
 
             static arma::colvec normWeights_;
@@ -166,6 +249,21 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
         private:
               arma::mat covariance_;
               size_t controllerID_;
+
+
+              // FIRMCP
+              // SE2BeliefSpace state will represent a VNODE in POMCP (a belief state from {a1, o1, a2, o2, ..., at, ot})
+              // SE2BeliefSpace state will also contain the information of QNODEs in POMCP (a belief state from {a1, o1, a2, o2, ..., at, ot, a(t+1)} for each action)
+              // QNODES will not be explicitly saved in the graph
+
+              //Vertex parentVnode_;
+
+              std::vector<Vertex> childQnodes_;                // T(ha)           // size: [number of actions (controllers to the connected neighbors)]
+              std::map<Vertex, double> childQweights_;         // w(ha)           // size: [number of actions]  // heuristic value only for POMCP-Rollout
+              std::map<Vertex, double> childQvalues_;          // Q(ha)           // size: [number of actions]
+              std::map<Vertex, int> childQvisits_;             // N(ha)           // size: [number of actions]
+
+              std::vector<std::vector<Vertex>> childQVnodes_;  // T(hao)          // size: [number of actions] x [number of (distinctive) observations]
 
         };
 

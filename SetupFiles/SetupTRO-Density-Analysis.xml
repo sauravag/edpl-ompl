@@ -121,16 +121,16 @@
 
 	<!-- WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT -->
 	<!-- 0: disabled, 1: enabled -->
-<!-- 	<StabilizationHack -->
-<!-- 		connectToFutureNodes = "0" -->
-<!-- 		applyStationaryPenalty = "0" -->
-<!-- 		borderBeliefSampling = "0" -->
-<!-- 		/> -->
 	<StabilizationHack
-		connectToFutureNodes = "1"
-		applyStationaryPenalty = "1"
-		borderBeliefSampling = "1"
+		connectToFutureNodes = "0"
+		applyStationaryPenalty = "0"
+		borderBeliefSampling = "0"
 		/>
+<!-- 	<StabilizationHack -->
+<!-- 		connectToFutureNodes = "1" -->
+<!-- 		applyStationaryPenalty = "1" -->
+<!-- 		borderBeliefSampling = "1" -->
+<!-- 		/> -->
 
 	<!-- weights in cost function -->
 	<!-- higher weight on time -->
@@ -179,7 +179,8 @@
 <!-- 	<FIRMNodes  minNodes = "800"  maxNodes = "800" /> -->
 
 	<!-- [OPTION3] Roadmap -->
-    <RoadMap roadmapFile = "" useRoadMap = "0" />
+<!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
+    <RoadMap roadmapFile = "./FIRMRoadMap-350.xml" useRoadMap = "1" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet9&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet9&#45;400.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet9&#45;450.xml" useRoadMap = "1" /> -->

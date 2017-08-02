@@ -259,6 +259,11 @@ public:
 
         switch(choice)
         {
+            case 0:
+
+                planner_->as<FIRM>()->executeFeedback();
+                break;
+
             case 1:
 
                 planner_->as<FIRM>()->executeFeedbackWithRollout();
@@ -271,8 +276,8 @@ public:
 
             default:
 
-                planner_->as<FIRM>()->executeFeedback();
-
+                OMPL_ERROR("PlanningMode method %d is not valid... Check the setup file!", choice);
+                exit(0);
                 break;
         }
 

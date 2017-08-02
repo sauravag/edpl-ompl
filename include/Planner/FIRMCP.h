@@ -49,8 +49,24 @@ public:
 
     virtual ~FIRMCP(void);
 
-    /** \brief Executes the Partially Observable Monte Carlo Planning (POMCP) on top of FIRM algorithm */
+    /** \brief Executes the Partially Observable Monte Carlo Planning (POMCP) on top of FIRM graph */
     void executeFeedbackWithPOMCP(void);
+
+
+protected:
+
+    /** \brief Generate the POMCP policy */
+    virtual Edge generatePOMCPPolicy(const Vertex currentVertex, const FIRM::Vertex goal);
+
+    void pomcpSimulate(ompl::base::State* sampState, int currentDepth);
+
+    void pomcpRollout(ompl::base::State* sampState, int currentDepth);
+
+    FIRM::Vertex addStateToPOMCPTreeWithApproxCostToGo(ompl::base::State *state);
+
+    FIRMWeight addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
+
+    FIRMWeight generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController);
 
 };
 
