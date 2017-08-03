@@ -564,7 +564,6 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 {
     // XXX parameters for POMCP    // should move to setup file
     int numPOMCPParticles_ = 100;
-    int maxPOMCPDepth_ = 100;
 
 
     // declare local variables
@@ -616,7 +615,6 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 
         // run Monte Carlo simulation for one particle and update cost-to-go and number of visits
         int currentDepth = 0;
-//         pomcpSimulate(currentBelief, currentDepth);
         pomcpSimulate(currentVertex, currentDepth);
 
 
@@ -741,18 +739,16 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 //     return edgeToTake;
 }
 
-// void FIRMCP::pomcpSimulate(ompl::base::State* sampState, int currentDepth)
 void FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth)
 {
     // if (depth > maxPOMCPDepth_)
     //  return ...
 
     // if new node
-//     pomcpRollout(sampState, currentDepth+1);
     pomcpRollout(currentVertex, currentDepth+1);
 
     // otherwise
-//     pompcpSimulate(sampState, currentDepth+1);
+//     pompcpSimulate(currentVertex, currentDepth+1);
 
     // update
 
@@ -762,17 +758,17 @@ void FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth)
 
 }
 
-// double FIRMCP::pomcpRollout(ompl::base::State* sampState, int currentDepth)
 double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth)
 {
     // XXX turning parameters
-    int maxPOMCPDepth_ = 100;
+//     int maxPOMCPDepth_ = 100;
+    int maxPOMCPDepth_ = 10;
 
     if (currentDepth > maxPOMCPDepth_)
     {
         // clear the rollout candidate connection drawings and show the selected edge
         Visualizer::clearRolloutConnections();
-//         Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[targetNode]);
+        //Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[targetNode]);
 
         return 0.0;
     }
@@ -787,9 +783,9 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth)
         // need edge/node controllers to its neighbors
         // but without edge cost computation
 
-    ompl::base::State* currentBelief = stateProperty_[currentVertex];
 
-    // create a new node if not coincides any of existing POMCP tree nodes
+    // CREATE A NEW NODE IF NOT COINCIDES ANY OF EXISTING POMCP TREE NODES
+    ompl::base::State* currentBelief = stateProperty_[currentVertex];
     if ((currentBelief->as<FIRM::StateType>()->getChildQnodes()).size()==0)
     {
         // this will compute approximate edge cost, cost-to-go, and heuristic action weight
@@ -815,7 +811,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth)
 //         // compute the regularized weight from approximate cost-to-go
 
 
-    // importance sampling to pick one neighbor as a target
+    // IMPORTANCE SAMPLING TO PICK ONE NEIGHBOR AS A TARGET
 
     // get the connected neighbor list
     const std::vector<Vertex>& childQnodes = currentBelief->as<FIRM::StateType>()->getChildQnodes();
@@ -844,7 +840,6 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth)
 //         std::cout << weight << " ";
 //     std::cout << "}" << std::endl;
 
-
     // randomly pick an accumulate weight threshold
     arma::colvec weightPickedVec = arma::randu<arma::colvec>(1,1);  // range: [0, 1]
     double weightPicked = weightPickedVec[0];
@@ -860,7 +855,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth)
         }
     }
 
-    // select the action
+
+    // SELECT THE ACTION
     Vertex selectedChildQnode = childQnodes[jSelected];
     // for debug
     OMPL_INFORM("FIRMCP: Selected chlidQnode for POMCP-Rollout: %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
@@ -872,13 +868,12 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth)
     Edge selectedEdge = boost::edge(currentVertex, selectedChildQnode, g_).first;
 
 
-    // simulate action execution
+    // SIMULATE ACTION EXECUTION
         // TODO if the currently reached FIRM node is selected again (stabilization), execute several times more than the other case (transition), to reduce the depth of the tree toward the stabilization
 
     ompl::base::State* nextBelief = siF_->allocState();
 
     double executionCost;
-//     if (!executeSimulationUpto(rolloutSteps_, currentBelief, nextBelief, executionCost))
     if (!executeSimulationUpto(rolloutSteps_, currentBelief, selectedEdge, nextBelief, executionCost))
     {
         OMPL_ERROR("Failed to executeSimulationUpto()!");
@@ -892,6 +887,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth)
             nextBelief->as<FIRM::StateType>()->getYaw(),
             arma::trace(nextBelief->as<FIRM::StateType>()->getCovariance()));
 
+
+    // ADD A QVNODE TO THE POMCP TREE
     // if the transioned state after simulated execution, T(h, a_j, o_k), is near to any of existing childQVnodes_[selectedChildQnode] (for the same action), T(h, a_j, o_l), on POMCP tree, merge them into one node!
     // REVIEW TODO how to update the existing belief state when another belief state is merged into this?
     // XXX currently, just keep the very first belief state without updating its belief state
@@ -907,8 +904,9 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth)
 
             // CHECK which one? there is no from-to relationship between these childQVnodes...
             if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
-                //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
+            //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
             {
+                OMPL_WARN("Existing childQVnode!");
                 nextVertex = childQVnode;
                 reachedChildQVnodes.push_back(childQVnode);
             }
@@ -925,13 +923,13 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth)
     }
     else
     {
-        OMPL_INFORM("A new childQVnode!");
-        nextVertex = addQVnodeToPOMCPTree(nextBelief);
+        //OMPL_INFORM("A new childQVnode!");
+        nextVertex = addQVnodeToPOMCPTree(siF_->cloneState(nextBelief));
+        currentBelief->as<FIRM::StateType>()->addChildQVnode(selectedChildQnode, nextVertex);
     }
 
 
     // recursively call pomcpRollout()
-//     double delayedCostToGo = pomcpRollout(nextBelief, currentDepth+1);
     double delayedCostToGo = pomcpRollout(nextVertex, currentDepth+1);
 
     // total cost-to-go from this node
@@ -963,8 +961,7 @@ FIRM::Vertex FIRMCP::addQVnodeToPOMCPTree(ompl::base::State *state)
     return m;
 }
 
-// FIRM::Vertex FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(ompl::base::State *state)
-FIRM::Vertex FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m)
+void FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m)
 {
     // just for compatibility with FIRM::addStateToGraph()
     bool addReverseEdge = false;
@@ -1070,8 +1067,8 @@ FIRM::Vertex FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m)
                     approxCostToGo = approxEdgeCost.getCost() + costToGo_[n];
 
                     // HACK XXX XXX extremely exploitative
-                    approxCostToGo = std::pow(approxCostToGo, 10);
-//                     approxCostToGo = std::pow(approxCostToGo, 3);
+//                     approxCostToGo = std::pow(approxCostToGo, 10);
+                    approxCostToGo = std::pow(approxCostToGo, 3);
 
                     // compute weight for this action with regularization
                     // with higher costToGoRegulator_, weight will be closer to uniform distribution over actions
@@ -1102,8 +1099,6 @@ FIRM::Vertex FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m)
     }
 
     policyGenerator_->addFIRMNodeToObservationGraph(stateProperty_[m]);
-
-    return m;
 }
 
 FIRMWeight FIRMCP::addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded)
@@ -1216,7 +1211,6 @@ FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a
     return weight;
 }
 
-// bool FIRMCP::executeSimulationUpto(const int numSteps, const ompl::base::State *startState, ompl::base::State* endState, double& executionCost)
 bool FIRMCP::executeSimulationUpto(const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost)
 {
     EdgeControllerType edgeController;

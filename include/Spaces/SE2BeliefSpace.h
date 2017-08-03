@@ -167,21 +167,29 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 childQvisits_.clear();
             }
 
+            void clearChildQVnodes(){
+                childQVnodes_.clear();
+            }
+
 
             void addChildQnode(Vertex childQnode){
                 childQnodes_.push_back(childQnode);
             }
 
-            void addChildQweight(Vertex childQnode, double weight){
+            void addChildQweight(const Vertex childQnode, double weight){
                 childQweights_[childQnode] = weight;
             }
 
-            void addChildQvalue(Vertex childQnode, double value){
+            void addChildQvalue(const Vertex childQnode, double value){
                 childQvalues_[childQnode] = value;
             }
 
-            void addChildQvisit(Vertex childQnode, double visit){
+            void addChildQvisit(const Vertex childQnode, double visit){
                 childQvisits_[childQnode] = visit;
+            }
+
+            void addChildQVnode(const Vertex childQnode, Vertex childQVnode){
+                childQVnodes_[childQnode].push_back(childQVnode);
             }
 
 
@@ -189,7 +197,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return childQnodes_;
             }
 
-            double getChildQweight(Vertex childQnode){
+            double getChildQweight(const Vertex childQnode){
                 if (childQweights_.find(childQnode) == childQweights_.end())
                 {
                     OMPL_ERROR("childQnode is not found in childQweights_!");
@@ -198,7 +206,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return childQweights_.at(childQnode);
             }
 
-            double getChildQvalue(Vertex childQnode){
+            double getChildQvalue(const Vertex childQnode){
                 if (childQvalues_.find(childQnode) == childQvalues_.end())
                 {
                     OMPL_ERROR("childQnode is not found in childQvalues_!");
@@ -208,7 +216,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return childQvalues_.at(childQnode);
             }
 
-            double getChildQvisit(Vertex childQnode){
+            double getChildQvisit(const Vertex childQnode){
                 if (childQvisits_.find(childQnode) == childQvisits_.end())
                 {
                     OMPL_ERROR("childQnode is not found in childQvisits_!");
@@ -218,7 +226,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return childQvisits_.at(childQnode);
             }
 
-            const std::vector<Vertex> getChildQVnodes(Vertex selectedChildQnode) const {
+            const std::vector<Vertex> getChildQVnodes(const Vertex selectedChildQnode) const {
                 if (childQVnodes_.find(selectedChildQnode) == childQVnodes_.end())
                 {
                     //OMPL_INFO("selectedChildQnode is not found in childQVnodes_!");
