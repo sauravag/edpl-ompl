@@ -58,9 +58,9 @@ protected:
     /** \brief Generate the POMCP policy */
     virtual Edge generatePOMCPPolicy(const Vertex currentVertex, const FIRM::Vertex goal);
 
-    void pomcpSimulate(const Vertex currentVertex, int currentDepth);
+    double pomcpSimulate(const Vertex currentVertex, const int currentDepth);
 
-    double pomcpRollout(const Vertex currentVertex, int currentDepth);
+    double pomcpRollout(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev);
 
     FIRM::Vertex addQVnodeToPOMCPTree(ompl::base::State *state);
 
