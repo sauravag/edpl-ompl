@@ -218,6 +218,15 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return childQvisits_.at(childQnode);
             }
 
+            const std::vector<Vertex> getChildQVnodes(Vertex selectedChildQnode) const {
+                if (childQVnodes_.find(selectedChildQnode) == childQVnodes_.end())
+                {
+                    //OMPL_INFO("selectedChildQnode is not found in childQVnodes_!");
+                    return std::vector<Vertex>();  // return an empty vector
+                }
+                return childQVnodes_.at(selectedChildQnode);
+            }
+
 
             /** \brief Checks if the input state has stabilized to this state (node pose and covariance reachability check) */
             bool isReached(ompl::base::State *state, bool relaxedConstraint=false) const;
@@ -258,12 +267,12 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
 
               //Vertex parentVnode_;
 
-              std::vector<Vertex> childQnodes_;                // T(ha)           // size: [number of actions (controllers to the connected neighbors)]
-              std::map<Vertex, double> childQweights_;         // w(ha)           // size: [number of actions]  // heuristic value only for POMCP-Rollout
-              std::map<Vertex, double> childQvalues_;          // Q(ha)           // size: [number of actions]
-              std::map<Vertex, int> childQvisits_;             // N(ha)           // size: [number of actions]
+              std::vector<Vertex> childQnodes_;                     // T(ha)  // size: [number of actions (controllers to the connected neighbors)]
+              std::map<Vertex, double> childQweights_;              // w(ha)  // size: [number of actions]  // heuristic value only for POMCP-Rollout
+              std::map<Vertex, double> childQvalues_;               // Q(ha)  // size: [number of actions]
+              std::map<Vertex, int> childQvisits_;                  // N(ha)  // size: [number of actions]
 
-              std::vector<std::vector<Vertex>> childQVnodes_;  // T(hao)          // size: [number of actions] x [number of (distinctive) observations]
+              std::map<Vertex, std::vector<Vertex>> childQVnodes_;  // T(hao) // size: [number of actions] x [number of (distinctive) observations]
 
         };
 

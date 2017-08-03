@@ -58,16 +58,20 @@ protected:
     /** \brief Generate the POMCP policy */
     virtual Edge generatePOMCPPolicy(const Vertex currentVertex, const FIRM::Vertex goal);
 
-    void pomcpSimulate(ompl::base::State* sampState, int currentDepth);
+    void pomcpSimulate(const Vertex currentVertex, int currentDepth);
 
-    void pomcpRollout(ompl::base::State* sampState, int currentDepth);
+    double pomcpRollout(const Vertex currentVertex, int currentDepth);
 
-    FIRM::Vertex addStateToPOMCPTreeWithApproxCostToGo(ompl::base::State *state);
+    FIRM::Vertex addQVnodeToPOMCPTree(ompl::base::State *state);
+
+//     FIRM::Vertex expandQnodesOnPOMCPTreeWithApproxCostToGo(ompl::base::State *state);
+    FIRM::Vertex expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m);
 
     FIRMWeight addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
 
     FIRMWeight generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController);
 
+    bool executeSimulationUpto(const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost);
 };
 
 
