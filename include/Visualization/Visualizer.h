@@ -75,6 +75,7 @@ class Visualizer
             FeedbackViewMode,
             PRMViewMode,
             FIRMMode,
+            FIRMCPMode,
             RolloutMode,
             MultiModalMode
         };

@@ -267,7 +267,10 @@ void Visualizer::refresh()
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    drawRobotPath();
+    if(mode_!=FIRMCPMode)
+    {
+        drawRobotPath();
+    }
 
     drawEnvironment();
 
@@ -307,6 +310,29 @@ void Visualizer::refresh()
             if(feedbackEdges_.size()>0) drawFeedbackEdges();
 
             drawMostLikelyPath();
+
+            robotPath_.push_back(si_->cloneState(trueState_));
+
+            break;
+
+        case FIRMCPMode:
+
+            drawGraphBeliefNodes();
+
+            if(feedbackEdges_.size()>0) drawFeedbackEdges();    // optional
+
+            drawMostLikelyPath();
+
+            drawRolloutConnections();
+
+            // draw the rollout connection with lowest cost
+            if(chosenRolloutConnection_)
+            {
+                glColor3d(1.0 , 0.0 , 0.0);
+                glLineWidth(4.0);
+                    drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
+                glLineWidth(1.0);
+            }
 
             robotPath_.push_back(si_->cloneState(trueState_));
 
@@ -362,11 +388,13 @@ void Visualizer::refresh()
     }
 
     if(trueState_ && mode_ !=MultiModalMode)
+//     if(trueState_ && mode_ !=MultiModalMode && mode_!=FIRMCPMode)
     {
         drawRobot(trueState_);
     }
 
     if(currentBelief_ && mode_ !=MultiModalMode)
+//     if(currentBelief_ && mode_ !=MultiModalMode && mode_!=FIRMCPMode)
     {
         drawState(currentBelief_, (VZRStateType)1);
     }
