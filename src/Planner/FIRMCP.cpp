@@ -145,92 +145,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
             auto start_time = std::chrono::high_resolution_clock::now();
 
 
-//             // save the current true state
-//             siF_->getTrueState(tempTrueStateCopy);
-//
-//             // add the current belief state to the graph
-//             tempVertex = addStateToGraph(cendState, false);
-//
-//             // restore the current true state
-//             siF_->setTrueState(tempTrueStateCopy);
-//
-//
-//             // NOTE robust connection to a desirable (but far) FIRM nodes during rollout
-//
-//             // 1) allow longer edge length for connection to FIRM nodes during rollout
-//             // implemented in FIRM::addStateToGraph()
-//
-//             // 2) forcefully include the current state's k-nearest neighbors of FIRM nodes in the candidate list for rollout policy
-//             // implemented in FIRM::addStateToGraph() for siF_->checkMotion() validation
-//
-//             // 3) instead of bounded nearest neighbors, use k-nearest neighbors during rollout; this may be considered as a change of the graph connection property
-//             // implemented in FIRM::addStateToGraph() for siF_->checkMotion() validation
-//
-//             // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
-//             // bool forwardEdgeAdded;
-//             // if(siF_->checkMotion(stateProperty_[tempVertex], stateProperty_[nextFIRMVertex]))
-//             // {
-//             //     addEdgeToGraph(tempVertex, nextFIRMVertex, forwardEdgeAdded);
-//             // }
-//
-//             // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
-//             // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
-//             if(connectToFutureNodes_)
-//             {
-//                 Vertex futureVertex;
-//                 bool forwardEdgeAdded;
-//                 // for debug
-//                 if(ompl::magic::PRINT_FUTURE_NODES)
-//                     std::cout << "futureFIRMNodes: { ";
-//                 for(int i=0; i<futureFIRMNodes.size(); i++)
-//                 {
-//                     futureVertex = futureFIRMNodes[i];
-//                     // check if not duplicate with the previous nodes
-//                     bool unique = false;
-//                     if(std::find(futureFIRMNodes.begin(), futureFIRMNodes.begin()+i-0, futureVertex) == futureFIRMNodes.begin()+i-0)
-//                     {
-//                         unique = true;
-//                         foreach(Edge nnedge, boost::out_edges(tempVertex, g_))
-//                         {
-//                             if(futureVertex == boost::target(nnedge, g_))
-//                             {
-//                                 unique = false;
-//                                 break;
-//                             }
-//                         }
-//                     }
-//                     // check for motion validity and add to the graph
-//                     if(unique)
-//                     {
-//                         if(siF_->checkMotion(stateProperty_[tempVertex], stateProperty_[futureVertex]))
-//                         {
-//                             addEdgeToGraph(tempVertex, futureVertex, forwardEdgeAdded);
-//                             Visualizer::addRolloutConnection(stateProperty_[tempVertex], stateProperty_[futureVertex]);
-//                         }
-//                         // for debug
-//                         if(ompl::magic::PRINT_FUTURE_NODES)
-//                             std::cout << futureVertex << " ";
-//                     }
-//                 }
-//                 // for debug
-//                 if(ompl::magic::PRINT_FUTURE_NODES)
-//                     std::cout << "}" << std::endl;
-//             }
-//
-//
-//             // set true state back to its correct value after Monte Carlo (happens during adding state to Graph)
-//             siF_->setTrueState(tempTrueStateCopy);
-//
-//             // select the best next edge
-//             e = generateRolloutPolicy(tempVertex, goal);
-
-
-
-
             // FIRMCP
-
-            // save the current true state
-            siF_->getTrueState(tempTrueStateCopy);
 
             // add the current belief state to the graph
 //             tempVertex = addStateToGraph(cstartState, false);
@@ -290,9 +205,17 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
 
 
+            // save the current true state
+            siF_->getTrueState(tempTrueStateCopy);
+
+    // if want/do not want to show monte carlo sim
+    siF_->showRobotVisualization(ompl::magic::SHOW_MONTE_CARLO);
 
             // select the best next edge
             e = generatePOMCPPolicy(tempVertex, goal);
+
+    // enable robot visualization again
+    siF_->showRobotVisualization(true);
 
             // restore the current true state
             siF_->setTrueState(tempTrueStateCopy);
@@ -554,6 +477,16 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
             //     nextFIRMVertex = boost::target(e, g_);
             // }
         }
+
+        // for debug
+        siF_->getTrueState(tempTrueStateCopy);
+        OMPL_INFORM("tempTrueStateCopy: (%2.3f, %2.3f, %2.3f, %2.6f)",
+                tempTrueStateCopy->as<FIRM::StateType>()->getX(),
+                tempTrueStateCopy->as<FIRM::StateType>()->getY(),
+                tempTrueStateCopy->as<FIRM::StateType>()->getYaw(),
+                arma::trace(tempTrueStateCopy->as<FIRM::StateType>()->getCovariance()));
+
+
     } // while()
 
     // XXX HACK CHECK REVIEW
@@ -697,11 +630,15 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
             std::vector<Vertex> minQvalueNodes;
             Vertex childQnode, selectedChildQnode;
             double childQvalue;
+            // for debug
+            std::cout << "childQvalues: ";
             for (int j=0; j<childQnodes.size(); j++)
             {
                 childQnode = childQnodes[j];
 //                 childQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(childQnode);
                 childQvalue = stateProperty_[currentVertex]->as<FIRM::StateType>()->getChildQvalue(childQnode);
+                // for debug
+                std::cout << "[" << childQnode << "]" << childQvalue << " ";
 
                 if (minQvalue >= childQvalue)
                 {
@@ -720,9 +657,14 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
             else
             {
                 assert(minQvalueNodes.size()!=0);
+                OMPL_WARN("More than one childQnodes are with the minQvalue!");
                 int random = rand() % minQvalueNodes.size();
                 selectedChildQnode = minQvalueNodes[random];  // to break the tie
             }
+            // for debug
+            std::cout << std::endl;
+            std::cout << "minQvalue: " << "[" << selectedChildQnode << "]" << minQvalue << std::endl;
+
             // for debug
             OMPL_INFORM("FIRMCP-Execute ##### selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
                     stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
@@ -853,7 +795,8 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
     // XXX turning parameters
 //     int maxPOMCPDepth_ = 100;
-    int maxPOMCPDepth_ = 10;
+//     int maxPOMCPDepth_ = 10;
+    int maxPOMCPDepth_ = 1;
 
 
     ompl::base::State* currentBelief = stateProperty_[currentVertex];
@@ -1061,6 +1004,7 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
     //         if (isNewNodeExpanded)
     //             std::cout << "approxQvalue: " << currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode) << std::endl;
 
+        // REVIEW CHECK HOW ABOUT OTHER HEURISTICS TO UPDATE THE VALUE, LIKE SIMPLY TAKING THE MIN VALUE?
         // update the cost-to-go
         double selectedChildQvisit = currentBelief->as<FIRM::StateType>()->getChildQvisit(selectedChildQnode);  // N(ha)
         double selectedChildQvalue;
@@ -1087,8 +1031,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 {
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
-    int maxPOMCPDepth_ = 10;
-//     int maxPOMCPDepth_ = 1;
+//     int maxPOMCPDepth_ = 10;
+    int maxPOMCPDepth_ = 1;
 
     ompl::base::State* currentBelief = stateProperty_[currentVertex];
     Edge selectedEdge;
@@ -1757,7 +1701,6 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
 //         //stateProperty_.erase(tempVertex);
 //         nn_->remove(tempVertex);
 //     }
-
 
     // return the simulated result state
     siF_->copyState(endState, cendState);
