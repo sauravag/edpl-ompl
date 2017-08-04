@@ -58,13 +58,13 @@ protected:
     /** \brief Generate the POMCP policy */
     virtual Edge generatePOMCPPolicy(const Vertex currentVertex, const FIRM::Vertex goal);
 
-    double pomcpSimulate(const Vertex currentVertex, const int currentDepth);
+    double pomcpSimulate(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev);
 
-    double pomcpRollout(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev);
+    double pomcpRollout(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev, const bool isNewNodeExpanded=false);
 
     FIRM::Vertex addQVnodeToPOMCPTree(ompl::base::State *state);
 
-    void expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m);
+    void expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const bool isNewNodeExpanded=false);
 
     FIRMWeight addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
 

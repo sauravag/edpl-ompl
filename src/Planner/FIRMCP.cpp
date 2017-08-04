@@ -615,7 +615,8 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 
         // run Monte Carlo simulation for one particle and update cost-to-go and number of visits
         int currentDepth = 0;
-        double totalCostToGo = pomcpSimulate(currentVertex, currentDepth);
+        Edge selectedEdgeDummy;  // XXX
+        double totalCostToGo = pomcpSimulate(currentVertex, currentDepth, selectedEdgeDummy);
 
 
         // for debug
@@ -743,129 +744,163 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 //     return edgeToTake;
 }
 
-double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth)
+double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev)
 {
 
-    Edge selectedEdgeDummy;  // XXX
-    double delayedCostToGo = pomcpRollout(currentVertex, currentDepth, selectedEdgeDummy);
-    return delayedCostToGo;
+//     Edge selectedEdgeDummy;  // XXX
+//     double delayedCostToGo = pomcpRollout(currentVertex, currentDepth, selectedEdgeDummy);
+//     return delayedCostToGo;
 
-//     // XXX turning parameters
-// //     int maxPOMCPDepth_ = 100;
-//     int maxPOMCPDepth_ = 10;
-//
-//     if (currentDepth > maxPOMCPDepth_)
-//     {
-//         // clear the rollout candidate connection drawings and show the selected edge
-//         Visualizer::clearRolloutConnections();
-//         //Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[targetNode]);
-//
-//
-//
-// //         // TODO CONTINUE TO MOVE TOWARD THE LATEST TARGET FIRM NODE AND RETURN COST-TO-GO
-// //
-// //
-// //         if (targetBelief->isReached(currentBelief))
-// //         {
-// //             //return costToGo_[targetVertex];
-// //             return costToGo_[targetVertex] + edgeCostToCenterBelief;
-// //         }
-// //
-// //         selectedEdge = selectedEdgePrev;    // selectedEdgePrev should be one of function arguments
-//
-//
-//         return 0.0;
-//     }
-//
-//
-//     // create a new node with default invalid N(ha) and V(ha)
-//         // need to register as a Vertex
-//         // need to add this to nearest neighbor database
-//         // find nearest neighbor child FIRM nodes, not any of POMCP tree nodes
-//             // then, save this child node id's in the Vertex attibute
-//             // also save estimated edge cost (from ditance) in the Vertex attibute
-//         // need edge/node controllers to its neighbors
-//         // but without edge cost computation
-//
-//     double delayedCostToGo;
-//
-//     // CREATE A NEW NODE IF NOT COINCIDES ANY OF EXISTING POMCP TREE NODES
-//     ompl::base::State* currentBelief = stateProperty_[currentVertex];
+
+    // XXX turning parameters
+//     int maxPOMCPDepth_ = 100;
+    int maxPOMCPDepth_ = 10;
+
+
+    ompl::base::State* currentBelief = stateProperty_[currentVertex];
+    Edge selectedEdge;
+    Vertex selectedChildQnode;
+    double delayedCostToGo;
+    double executionCost;
+    bool isNewNodeExpanded = false;
+
+
+    // CREATE A NEW NODE IF NOT COINCIDES ANY OF EXISTING POMCP TREE NODES
 //     if ((currentBelief->as<FIRM::StateType>()->getChildQnodes()).size()==0)
-//     {
-//
-//
-//         // if new node
-//         delayedCostToGo = pomcpRollout(currentVertex, currentDepth+1);
-//
-//
-// //         // this will compute approximate edge cost, cost-to-go, and heuristic action weight
-// //         // NOTE call this function just once per POMCP tree node
-// //         expandQnodesOnPOMCPTreeWithApproxCostToGo(currentVertex);
-//     }
-//
-//     else
-//     {
-//
-//         // SELECT AN ACTION USING GREEDY UCB POLICY
-//
-//         //     // find nearest neighbors to enumerate possible action
-//         //         // need to add the current state to the nearest neighbor database
-//         //             // adding every state to NN database during Rollout?
-//         //             // need to remove afterward? maybe yes only for NN database, but not for FIRM graph
-//         //             // or utilize graph connection once generated? yes
-//         //         // then just call 
-//         //         // neighbors = connectionStrategy_(m, NNRadius_);
-//         //
-//         //     // for each neighbor
-//         //         // compute the distance
-//         //         // compute the approximate edge cost
-//         //         // compute the approximate cost-to-go
-//         //         // compute the regularized weight from approximate cost-to-go
-//
-//
-//         // SELECT THE ACTION
-//         Vertex selectedChildQnode = childQnodes[jSelected];
-//         // for debug
-//         OMPL_INFORM("FIRMCP: Selected chlidQnode for POMCP-Rollout: %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
-//                 stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
-//                 stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getY(),
-//                 stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getYaw(),
-//                 arma::trace(stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getCovariance()));
-//
-//         Edge selectedEdge = boost::edge(currentVertex, selectedChildQnode, g_).first;
-//
-//
-//         // SIMULATE ACTION EXECUTION
-//         // TODO if the currently reached FIRM node is selected again (stabilization), execute several times more than the other case (transition), to reduce the depth of the tree toward the stabilization
-//
-//         ompl::base::State* nextBelief = siF_->allocState();
-//
-//         double executionCost;
-//         if (!executeSimulationUpto(rolloutSteps_, currentBelief, selectedEdge, nextBelief, executionCost))
-//         {
-//             OMPL_ERROR("Failed to executeSimulationUpto()!");
-//             return obstacleCostToGo_;
-//         }
-//
-//         // XXXXX for debug
+//     if ((currentBelief->as<FIRM::StateType>()->getChildQvalues()).size()==0)  // NOTE childQvalues are added only if this node was expanded before in expandQnodesOnPOMCPTreeWithApproxCostToGo()
+    if (!currentBelief->as<FIRM::StateType>()->getChildQexpanded())  // NOTE childQvalues are added only if this node was expanded before in expandQnodesOnPOMCPTreeWithApproxCostToGo()
+    {
+        isNewNodeExpanded = true;  // so, initialize N(ha) and V(ha) of this node for all actions
+
+        // if (currentDepth > maxPOMCPDepth_), pomcpRollout() will handle it
+
+        delayedCostToGo = pomcpRollout(currentVertex, currentDepth, selectedEdgePrev, isNewNodeExpanded);   // pass isNewNodeExpanded only for the first pomcpRollout()
+        executionCost = 0.0;
+
+        currentBelief->as<FIRM::StateType>()->setChildQexpanded();
+
+        // total cost-to-go from this node
+        double discountFactor = 1.0;
+        double totalCostToGo = executionCost + discountFactor*delayedCostToGo;
+
+        return totalCostToGo;
+    }
+    else
+    {
+
+        if (currentDepth > maxPOMCPDepth_)
+        {
+            Vertex targetVertex = boost::target(selectedEdgePrev, g_);   // latest target before reaching the finite horizon
+
+            // TODO CONTINUE TO MOVE TOWARD THE LATEST TARGET FIRM NODE AND RETURN COST-TO-GO
+            if (stateProperty_[targetVertex]->as<FIRM::StateType>()->isReached(currentBelief))
+            {
+                // clear the rollout candidate connection drawings and show the selected edge
+                Visualizer::clearRolloutConnections();
+                //Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[targetNode]);
+
+                //return costToGo_[targetVertex] + edgeCostToCenterBelief;
+                return costToGo_[targetVertex];
+            }
+
+            selectedEdge = selectedEdgePrev;    // selectedEdgePrev should be one of function arguments
+            selectedChildQnode = targetVertex;
+        }
+        else
+        {
+
+
+            // create a new node with default invalid N(ha) and V(ha)
+            // need to register as a Vertex
+            // need to add this to nearest neighbor database
+            // find nearest neighbor child FIRM nodes, not any of POMCP tree nodes
+            // then, save this child node id's in the Vertex attibute
+            // also save estimated edge cost (from ditance) in the Vertex attibute
+            // need edge/node controllers to its neighbors
+            // but without edge cost computation
+
+
+
+            // SELECT AN ACTION USING GREEDY UCB POLICY
+            const std::vector<Vertex>& childQnodes = currentBelief->as<FIRM::StateType>()->getChildQnodes();
+            double minQvalue = infiniteCostToGo_;
+            std::vector<Vertex> minQvalueNodes;
+            Vertex childQnode;
+            double childQvalue;
+            for (int j=0; j<childQnodes.size(); j++)
+            {
+                childQnode = childQnodes[j];
+                childQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(childQnode);
+
+                // TODO need exploration term!
+
+
+
+
+                if (minQvalue >= childQvalue)
+                {
+                    if (minQvalue > childQvalue)
+                    {
+                        minQvalueNodes.clear();
+                    }
+                    minQvalue = childQvalue;
+                    minQvalueNodes.push_back(childQnode);
+                }
+            }
+            if (minQvalueNodes.size()==1)
+            {
+                selectedChildQnode = minQvalueNodes[0];
+            }
+            else
+            {
+                assert(minQvalueNodes.size()!=0);
+                int random = rand() % minQvalueNodes.size();
+                selectedChildQnode = minQvalueNodes[random];  // to break the tie
+            }
+            // for debug
+            OMPL_INFORM("FIRMCP-Simulate: selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
+                    stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
+                    stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getY(),
+                    stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getYaw(),
+                    arma::trace(stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getCovariance()));
+
+            selectedEdge = boost::edge(currentVertex, selectedChildQnode, g_).first;
+
+        } // else if (currentDepth <= maxPOMCPDepth_)
+
+
+        // SIMULATE ACTION EXECUTION
+        // TODO if the currently reached FIRM node is selected again (stabilization), execute several times more than the other case (transition), to reduce the depth of the tree toward the stabilization
+
+        ompl::base::State* nextBelief = siF_->allocState();
+
+        if (!executeSimulationUpto(rolloutSteps_, currentBelief, selectedEdge, nextBelief, executionCost))
+        {
+            OMPL_ERROR("Failed to executeSimulationUpto()!");
+            return obstacleCostToGo_;
+        }
+
+        // XXXXX for debug
 //         OMPL_INFORM("FIRMCP: Moved to: (%2.3f, %2.3f, %2.3f, %2.6f)",
 //                 nextBelief->as<FIRM::StateType>()->getX(),
 //                 nextBelief->as<FIRM::StateType>()->getY(),
 //                 nextBelief->as<FIRM::StateType>()->getYaw(),
 //                 arma::trace(nextBelief->as<FIRM::StateType>()->getCovariance()));
-//
-//
-//         // ADD A QVNODE TO THE POMCP TREE
-//         // if the transioned state after simulated execution, T(h, a_j, o_k), is near to any of existing childQVnodes_[selectedChildQnode] (for the same action), T(h, a_j, o_l), on POMCP tree, merge them into one node!
-//         // REVIEW TODO how to update the existing belief state when another belief state is merged into this?
-//         // XXX currently, just keep the very first belief state without updating its belief state
-//         // but the first belief state won't represent the all belief states that are merged into it
-//         Vertex nextVertex;
-//         std::vector<Vertex> reachedChildQVnodes;
-//         const std::vector<Vertex>& childQVnodes = currentBelief->as<FIRM::StateType>()->getChildQVnodes(selectedChildQnode);
-//         if (childQVnodes.size()!=0)
-//         {
+
+        // XXX
+        Visualizer::clearRolloutConnections();
+
+        // ADD A QVNODE TO THE POMCP TREE
+        // if the transioned state after simulated execution, T(h, a_j, o_k), is near to any of existing childQVnodes_[selectedChildQnode] (for the same action), T(h, a_j, o_l), on POMCP tree, merge them into one node!
+        // REVIEW TODO how to update the existing belief state when another belief state is merged into this?
+        // XXX currently, just keep the very first belief state without updating its belief state
+        // but the first belief state won't represent the all belief states that are merged into it
+        Vertex nextVertex;
+        std::vector<Vertex> reachedChildQVnodes;
+        const std::vector<Vertex>& childQVnodes = currentBelief->as<FIRM::StateType>()->getChildQVnodes(selectedChildQnode);
+        if (childQVnodes.size()!=0)
+        {
+            // ORIGINAL
 //             for (int j=0; j<childQVnodes.size(); j++)
 //             {
 //                 Vertex childQVnode = childQVnodes[j];
@@ -888,41 +923,66 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth)
 //                 //nextVertex = which childQVnode?
 //                 exit(0);    // XXX
 //             }
-//         }
-//         else
-//         {
-//             //OMPL_INFORM("A new childQVnode!");
-//             nextVertex = addQVnodeToPOMCPTree(siF_->cloneState(nextBelief));
-//             currentBelief->as<FIRM::StateType>()->addChildQVnode(selectedChildQnode, nextVertex);
-//         }
-//
-//
-//         // recursively call pomcpSimulate()
-//         delayedCostToGo = pomcpSimulate(nextVertex, currentDepth+1);
-//
-//     }
-//
-//     // total cost-to-go from this node
-//     double discountFactor = 1.0;
-//     double totalCostToGo = executionCost + discountFactor*delayedCostToGo;
-//
-//
-//
-//     // update
-//
-//
-//
-//
-//
-//     // free the memory
-//     siF_->freeState(nextBelief);
-//
-//     // return total cost-to-go
-//     return totalCostToGo;
 
+            // HACK for pomcpSimulate(), assume that T(hao) are always merged into one!
+            nextVertex = childQVnodes[0];
+        }
+        else
+        {
+            //OMPL_INFORM("A new childQVnode!");
+            nextVertex = addQVnodeToPOMCPTree(siF_->cloneState(nextBelief));
+            currentBelief->as<FIRM::StateType>()->addChildQVnode(selectedChildQnode, nextVertex);
+        }
+
+
+        // recursively call pomcpSimulate()
+        delayedCostToGo = pomcpSimulate(nextVertex, currentDepth+1, selectedEdge);
+
+
+        // free the memory
+        siF_->freeState(nextBelief);
+
+
+
+
+
+        // total cost-to-go from this node
+        double discountFactor = 1.0;
+        double totalCostToGo = executionCost + discountFactor*delayedCostToGo;
+
+
+
+        // update the number of visits
+        currentBelief->as<FIRM::StateType>()->addThisQVvisit();                    // N(h) += 1
+        currentBelief->as<FIRM::StateType>()->addChildQvisit(selectedChildQnode);  // N(ha) += 1
+
+            // for debug
+    //         if (isNewNodeExpanded)
+    //             std::cout << "approxQvalue: " << currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode) << std::endl;
+
+        // update the cost-to-go
+        double selectedChildQvisit = currentBelief->as<FIRM::StateType>()->getChildQvisit(selectedChildQnode);  // N(ha)
+        double selectedChildQvalue;
+        if (isNewNodeExpanded)
+            selectedChildQvalue = 0.0;  // to discard initial V(ha) set to be approxCostToGo from expandQnodesOnPOMCPTreeWithApproxCostToGo() for the first POMCP-Rollout node
+        else
+            selectedChildQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode);     // V(ha)
+        double selectedChildQvalueUpdated = selectedChildQvalue + (totalCostToGo - selectedChildQvalue) / selectedChildQvisit;  // V(ha) = V(ha) + (totalCostToGo - V(ha)) / N(ha)
+        currentBelief->as<FIRM::StateType>()->setChildQvalue(selectedChildQnode, selectedChildQvalueUpdated);
+
+            // for debug
+    //         if (isNewNodeExpanded)
+    //             std::cout << "executedQvalue: " << currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode) << std::endl;
+
+
+
+        // return total cost-to-go
+        return totalCostToGo;
+
+    } // else if ((currentBelief->as<FIRM::StateType>()->getChildQnodes()).size()!=0)
 }
 
-double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev)
+double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev, const bool isNewNodeExpanded)
 {
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
@@ -948,7 +1008,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
             return costToGo_[targetVertex];
         }
 
-        selectedEdge = selectedEdgePrev;    // selectedEdgePrev should be one of function arguments
+        selectedEdge = selectedEdgePrev;
         selectedChildQnode = targetVertex;
     }
     else
@@ -969,7 +1029,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
         {
             // this will compute approximate edge cost, cost-to-go, and heuristic action weight
             // NOTE call this function just once per POMCP tree node
-            expandQnodesOnPOMCPTreeWithApproxCostToGo(currentVertex);
+            expandQnodesOnPOMCPTreeWithApproxCostToGo(currentVertex, isNewNodeExpanded);
         }
 
 
@@ -1038,7 +1098,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
         // SELECT THE ACTION
         selectedChildQnode = childQnodes[jSelected];
         // for debug
-        OMPL_INFORM("FIRMCP: Selected chlidQnode for POMCP-Rollout: %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
+        OMPL_INFORM("FIRMCP-Rollout: selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
                 stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
                 stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getY(),
                 stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getYaw(),
@@ -1068,6 +1128,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     //         nextBelief->as<FIRM::StateType>()->getYaw(),
     //         arma::trace(nextBelief->as<FIRM::StateType>()->getCovariance()));
 
+    // XXX
+    Visualizer::clearRolloutConnections();
 
     // ADD A QVNODE TO THE POMCP TREE
     // if the transioned state after simulated execution, T(h, a_j, o_k), is near to any of existing childQVnodes_[selectedChildQnode] (for the same action), T(h, a_j, o_l), on POMCP tree, merge them into one node!
@@ -1113,12 +1175,39 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     // recursively call pomcpRollout()
     double delayedCostToGo = pomcpRollout(nextVertex, currentDepth+1, selectedEdge);
 
+    // free the memory
+    siF_->freeState(nextBelief);
+
+
     // total cost-to-go from this node
     double discountFactor = 1.0;
     double totalCostToGo = executionCost + discountFactor*delayedCostToGo;
 
-    // free the memory
-    siF_->freeState(nextBelief);
+
+
+
+    if (isNewNodeExpanded)
+    {
+        // update the number of visits
+        currentBelief->as<FIRM::StateType>()->addThisQVvisit();                    // N(h) += 1
+        currentBelief->as<FIRM::StateType>()->addChildQvisit(selectedChildQnode);  // N(ha) += 1
+
+        // for debug
+        //         if (isNewNodeExpanded)
+        //             std::cout << "approxQvalue: " << currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode) << std::endl;
+
+        // update the cost-to-go
+        double selectedChildQvisit = currentBelief->as<FIRM::StateType>()->getChildQvisit(selectedChildQnode);  // N(ha)
+        double selectedChildQvalue;
+        if (isNewNodeExpanded)
+            selectedChildQvalue = 0.0;  // to discard initial V(ha) set to be approxCostToGo from expandQnodesOnPOMCPTreeWithApproxCostToGo() for the first POMCP-Rollout node
+        else
+            selectedChildQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode);     // V(ha)
+        double selectedChildQvalueUpdated = selectedChildQvalue + (totalCostToGo - selectedChildQvalue) / selectedChildQvisit;  // V(ha) = V(ha) + (totalCostToGo - V(ha)) / N(ha)
+        currentBelief->as<FIRM::StateType>()->setChildQvalue(selectedChildQnode, selectedChildQvalueUpdated);
+    }
+    
+
 
     // return total cost-to-go
     return totalCostToGo;
@@ -1142,7 +1231,7 @@ FIRM::Vertex FIRMCP::addQVnodeToPOMCPTree(ompl::base::State *state)
     return m;
 }
 
-void FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m)
+void FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const bool isNewNodeExpanded)
 {
     // just for compatibility with FIRM::addStateToGraph()
     bool addReverseEdge = false;
@@ -1247,20 +1336,27 @@ void FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m)
                     // compute the approximate cost-to-go
                     approxCostToGo = approxEdgeCost.getCost() + costToGo_[n];
 
-                    // HACK XXX XXX extremely exploitative
-//                     approxCostToGo = std::pow(approxCostToGo, 10);
-                    approxCostToGo = std::pow(approxCostToGo, 3);
-
                     // compute weight for this action with regularization
                     // with higher costToGoRegulator_, weight will be closer to uniform distribution over actions
-                    weight = 1.0 / (approxCostToGo + costToGoRegulator_);
+//                     weight = 1.0 / (approxCostToGo + costToGoRegulator_);
+                    // HACK XXX XXX extremely exploitative
+                    weight = 1.0 / (std::pow(approxCostToGo, 3) + costToGoRegulator_);
 
                     // for debug
                     //std::cout << "weight[" << n << "]: " << weight << " (=1.0/(" << approxCostToGo << "+" << costToGoRegulator_ << "))" << std::endl;
 
-                    // save approximate edge cost and cost-to-go for next Monte Carlo Tree Search
+                    // save childQnode and weight for next POMCP-Rollout
                     stateProperty_[m]->as<FIRM::StateType>()->addChildQnode(n);
-                    stateProperty_[m]->as<FIRM::StateType>()->addChildQweight(n, weight);
+                    stateProperty_[m]->as<FIRM::StateType>()->setChildQweight(n, weight);
+
+                    // save approximate cost-to-go as an initial value for next POMCP-Simulate
+                    // save for all nodes, and check for expanded by getChildQexpanded()
+//                     if (isNewNodeExpanded)
+                    {
+                        // CHECK if approxCostToGo are actually a good initial value!
+                        // this should depend on the tuning parameters... for the current setting, it over-estimates the executedCostToGo by 10 %
+                        stateProperty_[m]->as<FIRM::StateType>()->setChildQvalue(n, approxCostToGo);
+                    }
                 }
             }
         }
