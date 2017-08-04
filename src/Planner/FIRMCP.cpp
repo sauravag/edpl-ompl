@@ -887,7 +887,7 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
     else
     {
 
-        if (currentDepth > maxPOMCPDepth_)
+        if (currentDepth >= maxPOMCPDepth_)
         {
             Vertex targetVertex = boost::target(selectedEdgePrev, g_);   // latest target before reaching the finite horizon
 
@@ -965,7 +965,7 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
             selectedEdge = boost::edge(currentVertex, selectedChildQnode, g_).first;
 
-        } // else if (currentDepth <= maxPOMCPDepth_)
+        } // else if (currentDepth < maxPOMCPDepth_)
 
 
         // SIMULATE ACTION EXECUTION
@@ -973,9 +973,11 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
         ompl::base::State* nextBelief = siF_->allocState();
 
-        if (!executeSimulationUpto(rolloutSteps_, currentBelief, selectedEdge, nextBelief, executionCost))
+        // the terminating edge controller was used once when currentDepth==maxPOMCPDepth_
+        int kStep = std::max(0, currentDepth - maxPOMCPDepth_ + 1);
+        if (!executeSimulationFromUpto(kStep, rolloutSteps_, currentBelief, selectedEdge, nextBelief, executionCost))
         {
-            OMPL_ERROR("Failed to executeSimulationUpto()!");
+            OMPL_ERROR("Failed to executeSimulationFromUpto()!");
             return obstacleCostToGo_;
         }
 
@@ -1092,7 +1094,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     Edge selectedEdge;
     Vertex selectedChildQnode;
 
-    if (currentDepth > maxPOMCPDepth_)
+    if (currentDepth >= maxPOMCPDepth_)
     {
         Vertex targetVertex = boost::target(selectedEdgePrev, g_);   // latest target before reaching the finite horizon
 
@@ -1205,7 +1207,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 
         selectedEdge = boost::edge(currentVertex, selectedChildQnode, g_).first;
 
-    } // else if (currentDepth <= maxPOMCPDepth_)
+    } // else if (currentDepth < maxPOMCPDepth_)
 
 
     // SIMULATE ACTION EXECUTION
@@ -1214,9 +1216,12 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     ompl::base::State* nextBelief = siF_->allocState();
 
     double executionCost;
-    if (!executeSimulationUpto(rolloutSteps_, currentBelief, selectedEdge, nextBelief, executionCost))
+
+    // the terminating edge controller was used once when currentDepth==maxPOMCPDepth_
+    int kStep = std::max(0, currentDepth - maxPOMCPDepth_ + 1);
+    if (!executeSimulationFromUpto(kStep, rolloutSteps_, currentBelief, selectedEdge, nextBelief, executionCost))
     {
-        OMPL_ERROR("Failed to executeSimulationUpto()!");
+        OMPL_ERROR("Failed to executeSimulationFromUpto()!");
         return obstacleCostToGo_;
     }
 
@@ -1587,7 +1592,7 @@ FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a
     return weight;
 }
 
-bool FIRMCP::executeSimulationUpto(const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost)
+bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost)
 {
     EdgeControllerType edgeController;
     NodeControllerType nodeController;
@@ -1625,7 +1630,7 @@ bool FIRMCP::executeSimulationUpto(const int numSteps, const ompl::base::State *
     {
         // NOTE do not execute edge controller to prevent jiggling motion around the target node
 
-        edgeControllerStatus = edgeController.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
+        edgeControllerStatus = edgeController.executeFromUpto(kStep, numSteps, cstartState, cendState, costCov, stepsExecuted, false);
 
 
         // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
@@ -1700,7 +1705,7 @@ bool FIRMCP::executeSimulationUpto(const int numSteps, const ompl::base::State *
             nodeController = nodeControllers_.at(targetNode);
             nodeController.setSpaceInformation(policyExecutionSI_);
 
-            nodeControllerStatus = nodeController.StabilizeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
+            nodeControllerStatus = nodeController.StabilizeUpto(numSteps, cstartState, cendState, costCov, stepsExecuted, false);
 
 
             // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost

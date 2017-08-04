@@ -95,6 +95,13 @@ class Controller
                    int &stepsTaken,
                    bool constructionMode=true);
 
+        /** \brief Execute the controller for given number of steps */
+         virtual bool executeFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState,
+                   ompl::base::State* endState,
+                   ompl::base::Cost &filteringCost,
+                   int &stepsTaken,
+                   bool constructionMode=true);
+
         /** \brief Stabilize the system to an existing FIRM node */
         virtual bool Stabilize(const ompl::base::State *startState,
                                               ompl::base::State* endState,
@@ -509,10 +516,10 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
         nominalX_K = lss_[k].getX();
     else
     {
-//         nominalX_K = lss_[lss_.size()-1].getX();
+        nominalX_K = lss_[lss_.size()-1].getX();
 
         // quit edge controller and switch to node controller!
-        //OMPL_WARN("Reached the end of EdgeController... Now NEED to switch to NodeController!");
+        OMPL_WARN("Reached the end of EdgeController... Now NEED to switch to NodeController!");
     }
 
     arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
@@ -610,6 +617,60 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
     si_->freeState(tempState);
 
     stepsTaken = k;
+
+    return true;
+}
+
+template <class SeparatedControllerType, class FilterType>
+bool Controller<SeparatedControllerType, FilterType>::executeFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState,
+                                                              ompl::base::State* endState,
+                                                              ompl::base::Cost &filteringCost,
+                                                              int &stepsTaken,
+                                                              bool constructionMode)
+{
+    ompl::base::State *tempState = si_->allocState();
+
+    si_->copyState(tempState, startState);
+
+    ompl::base::State *tempEndState = si_->allocState();
+
+//     int k = 0;
+    int k = kStep;
+
+    filteringCost = ompl::base::Cost(0.0);
+    ompl::base::Cost filteringCostOneStep;
+
+//     while(k < numSteps)
+    while(k < numSteps + kStep)
+    {
+
+        bool e = executeOneStep(k, tempState,tempEndState, filteringCostOneStep, constructionMode);
+
+        filteringCost = ompl::base::Cost(filteringCost.value() + filteringCostOneStep.value());
+
+        k++;
+
+        si_->copyState(tempState, tempEndState);
+
+        si_->copyState(endState, tempEndState);
+
+        if(!e)
+        {
+            si_->freeState(tempEndState);
+
+            si_->freeState(tempState);
+
+            return false;
+        }
+
+    }
+
+    si_->freeState(tempEndState);
+
+    si_->freeState(tempState);
+
+//     stepsTaken = k;
+    stepsTaken = k - kStep;
 
     return true;
 }
