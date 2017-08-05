@@ -150,7 +150,8 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
             // add the current belief state to the graph
 //             tempVertex = addStateToGraph(cstartState, false);
 
-    ompl::base::State* currentBelief = cstartStatePrev;  // latest start state that is already executed
+//     ompl::base::State* currentBelief = cstartStatePrev;  // latest start state that is already executed
+    ompl::base::State* currentBelief = stateProperty_[tempVertex];  // latest start state that is already executed
     ompl::base::State* nextBelief = cstartState;         // current start state to be executed
     Vertex selectedChildQnode = targetNode;              // target node of last execution
 
@@ -581,7 +582,8 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
     // XXX tuning parameters for POMCP    // should move to setup file
 //     int numPOMCPParticles_ = 100;
 //     int numPOMCPParticles_ = 30;
-    int numPOMCPParticles_ = 10;
+//     int numPOMCPParticles_ = 10;
+    int numPOMCPParticles_ = 5;
 
 
     // declare local variables
@@ -676,7 +678,7 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
             else
             {
                 assert(minQvalueNodes.size()!=0);
-                OMPL_WARN("More than one childQnodes are with the minQvalue!");
+                //OMPL_WARN("More than one childQnodes are with the minQvalue!");
                 int random = rand() % minQvalueNodes.size();
                 selectedChildQnode = minQvalueNodes[random];  // to break the tie
             }
@@ -812,11 +814,12 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 //     return delayedCostToGo;
 
 
-    // XXX turning parameters
+    // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
-//     int maxPOMCPDepth_ = 10;
-    int maxPOMCPDepth_ = 5;
+    int maxPOMCPDepth_ = 10;
+//     int maxPOMCPDepth_ = 5;
 //     int maxPOMCPDepth_ = 1;
+    int ultimateMaxPOMCPDepth_ = 300;
 //     double c_exploration = std::sqrt(2.0);
 //     double c_exploration = 1.0;
     double cExploration_ = 0.1;
@@ -855,6 +858,13 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
         if (currentDepth >= maxPOMCPDepth_)
         {
+
+            if (currentDepth >= ultimateMaxPOMCPDepth_)
+            {
+                OMPL_WARN("Could not reach to the target node within %d iterations", ultimateMaxPOMCPDepth_);
+                return obstacleCostToGo_;
+            }
+
             Vertex targetVertex = boost::target(selectedEdgePrev, g_);   // latest target before reaching the finite horizon
 
             // TODO CONTINUE TO MOVE TOWARD THE LATEST TARGET FIRM NODE AND RETURN COST-TO-GO
@@ -1083,9 +1093,10 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 {
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
-//     int maxPOMCPDepth_ = 10;
-    int maxPOMCPDepth_ = 5;
+    int maxPOMCPDepth_ = 10;
+//     int maxPOMCPDepth_ = 5;
 //     int maxPOMCPDepth_ = 1;
+    int ultimateMaxPOMCPDepth_ = 300;
 
     ompl::base::State* currentBelief = stateProperty_[currentVertex];
     Edge selectedEdge;
@@ -1093,6 +1104,12 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 
     if (currentDepth >= maxPOMCPDepth_)
     {
+
+        if (currentDepth >= ultimateMaxPOMCPDepth_)
+        {
+            OMPL_WARN("Could not reach to the target node within %d iterations", ultimateMaxPOMCPDepth_);
+            return obstacleCostToGo_;
+        }
 
         // TODO need code cleanup
         // CREATE A NEW NODE IF NOT COINCIDES ANY OF EXISTING POMCP TREE NODES
@@ -1479,6 +1496,7 @@ void FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
                     // compute weight for this action with regularization
                     // with higher costToGoRegulator_, weight will be closer to uniform distribution over actions
 //                     weight = 1.0 / (approxCostToGo + costToGoRegulator_);
+
                     // HACK XXX XXX extremely exploitative
                     weight = 1.0 / (std::pow(approxCostToGo, 3) + costToGoRegulator_);
 

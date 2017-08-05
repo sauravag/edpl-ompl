@@ -267,10 +267,7 @@ void Visualizer::refresh()
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    if(mode_!=FIRMCPMode)
-    {
-        drawRobotPath();
-    }
+    drawRobotPath();
 
     drawEnvironment();
 
@@ -315,7 +312,7 @@ void Visualizer::refresh()
 
             break;
 
-        case FIRMCPMode:
+        case RolloutMode:
 
             drawGraphBeliefNodes();
 
@@ -338,7 +335,7 @@ void Visualizer::refresh()
 
             break;
 
-        case RolloutMode:
+        case FIRMCPMode:
 
             drawGraphBeliefNodes();
 
@@ -388,13 +385,11 @@ void Visualizer::refresh()
     }
 
     if(trueState_ && mode_ !=MultiModalMode)
-//     if(trueState_ && mode_ !=MultiModalMode && mode_!=FIRMCPMode)
     {
         drawRobot(trueState_);
     }
 
     if(currentBelief_ && mode_ !=MultiModalMode)
-//     if(currentBelief_ && mode_ !=MultiModalMode && mode_!=FIRMCPMode)
     {
         drawState(currentBelief_, (VZRStateType)1);
     }
