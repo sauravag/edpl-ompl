@@ -62,7 +62,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             {
               covariance_ = arma::zeros<arma::mat>(3,3);
               controllerID_ = -1;
-              thisQVvisit_ = 0;
+              thisQVvisit_ = 0.0;
               childQexpanded_ = false;
             }
 
@@ -154,7 +154,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
 
 
             void clearQVvisit(){
-                thisQVvisit_ = 0;
+                thisQVvisit_ = 0.0;
             }
 
             void clearChildQexpanded(){
@@ -182,7 +182,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             }
 
 
-            void addThisQVvisit(const double visit=1){
+            void addThisQVvisit(const double visit=1.0){
                 thisQVvisit_ += visit;
             }
 
@@ -202,7 +202,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 childQvalues_[childQnode] = value;
             }
 
-            void addChildQvisit(const Vertex childQnode, const double visit=1){
+            void addChildQvisit(const Vertex childQnode, const double visit=1.0){
                 childQvisits_[childQnode] += visit;
             }
 
@@ -211,7 +211,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             }
 
 
-            const int getThisQVvisit() const {
+            const double getThisQVvisit() const {
                 return thisQVvisit_;
             }
 
@@ -249,9 +249,10 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             double getChildQvisit(const Vertex childQnode){
                 if (childQvisits_.find(childQnode) == childQvisits_.end())
                 {
-                    OMPL_ERROR("childQnode is not found in childQvisits_!");
+                    //OMPL_ERROR("childQnode is not found in childQvisits_!");
                     //return ompl::magic::DEFAULT_INF_COST_TO_GO;   // not to allow this action to be selected
-                    return 1000000000.0;
+                    //return 1000000000.0;
+                    return 0.0;  // not yet expanded, so no visit
                 }
                 return childQvisits_.at(childQnode);
             }

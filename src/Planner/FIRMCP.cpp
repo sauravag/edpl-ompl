@@ -152,7 +152,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
     ompl::base::State* currentBelief = cstartStatePrev;  // latest start state that is already executed
     ompl::base::State* nextBelief = cstartState;         // current start state to be executed
-    Vertex selectedChildQnode = targetNode;
+    Vertex selectedChildQnode = targetNode;              // target node of last execution
 
     // ADD A QVNODE TO THE POMCP TREE
     // if the transioned state after simulated execution, T(h, a_j, o_k), is near to any of existing childQVnodes_[selectedChildQnode] (for the same action), T(h, a_j, o_l), on POMCP tree, merge them into one node!
@@ -162,47 +162,64 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
     Vertex nextVertex;
     std::vector<Vertex> reachedChildQVnodes;
     const std::vector<Vertex>& childQVnodes = currentBelief->as<FIRM::StateType>()->getChildQVnodes(selectedChildQnode);
-    if (childQVnodes.size()!=0)
-    {
-        // XXX XXX XXX
-    // in case of pomcpRollout()
-//         for (int j=0; j<childQVnodes.size(); j++)
-//         {
-//             Vertex childQVnode = childQVnodes[j];
-//
-//             // CHECK which one? there is no from-to relationship between these childQVnodes...
-//             if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
-//             //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
-//             {
-//                 //OMPL_WARN("Existing childQVnode!");
-//                 nextVertex = childQVnode;
-//                 reachedChildQVnodes.push_back(childQVnode);
-//             }
-//         }
-//         // REVIEW what if a new childQVnode coincides more than one existing childQVnodes (for the same action)?
-//         // pick the closest one?
-//         // OR merge all childQVnodes[selectedChildQnode] into one node but with proper belief state merging scheme?!
-//         if (reachedChildQVnodes.size()>1)
-//         {
-//             OMPL_WARN("There are %d reachedChildQVnodes for this new childQVnode!", reachedChildQVnodes.size());
-//             //nextVertex = which childQVnode?
-//             exit(0);    // XXX
-//         }
 
-    // in case of pomcpSimulate()
-        // HACK for pomcpSimulate(), assume that T(hao) are always merged into one!
-        nextVertex = childQVnodes[0];
+// 1)
+            // ORIGINAL
+            for (int j=0; j<childQVnodes.size(); j++)
+            {
+                Vertex childQVnode = childQVnodes[j];
 
-    }
-    else
+                // CHECK which one? there is no from-to relationship between these childQVnodes...
+                if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
+                    //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
+                {
+                    OMPL_WARN("Existing childQVnode!");
+                    nextVertex = childQVnode;
+                    reachedChildQVnodes.push_back(childQVnode);
+                }
+            }
+            // REVIEW what if a new childQVnode coincides more than one existing childQVnodes (for the same action)?
+            // pick the closest one?
+            // OR merge all childQVnodes[selectedChildQnode] into one node but with proper belief state merging scheme?!
+            if (reachedChildQVnodes.size()>1)
+            {
+                //OMPL_WARN("There are %d reachedChildQVnodes for this new childQVnode!", reachedChildQVnodes.size());
+                //nextVertex = which childQVnode?
+                //exit(0);    // XXX
+
+                nextVertex = reachedChildQVnodes[0];
+            }
+            else if (reachedChildQVnodes.size()==0)
+
+// 2)
+//         if (childQVnodes.size()!=0)
+//         {
+//             // HACK for pomcpSimulate(), assume that T(hao) are always merged into one!
+//             nextVertex = childQVnodes[0];
+//         }
+//         else
+
     {
         //OMPL_INFORM("A new childQVnode!");
         nextVertex = addQVnodeToPOMCPTree(siF_->cloneState(nextBelief));
         currentBelief->as<FIRM::StateType>()->addChildQVnode(selectedChildQnode, nextVertex);
     }
 
-    tempVertex = nextVertex;
+    // for debug
+    OMPL_INFORM("FIRMCP: Moved from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to %u (%2.3f, %2.3f, %2.3f, %2.6f)", tempVertex, nextVertex, 
+            stateProperty_[tempVertex]->as<FIRM::StateType>()->getX(),
+            stateProperty_[tempVertex]->as<FIRM::StateType>()->getY(),
+            stateProperty_[tempVertex]->as<FIRM::StateType>()->getYaw(),
+            arma::trace(stateProperty_[tempVertex]->as<FIRM::StateType>()->getCovariance()),
+            stateProperty_[nextVertex]->as<FIRM::StateType>()->getX(),
+            stateProperty_[nextVertex]->as<FIRM::StateType>()->getY(),
+            stateProperty_[nextVertex]->as<FIRM::StateType>()->getYaw(),
+            arma::trace(stateProperty_[nextVertex]->as<FIRM::StateType>()->getCovariance()));
+    // for debug
+    //std::cout << tempVertex << " #[" << selectedChildQnode << "]# " << nextVertex;
+    //OMPL_INFORM("FIRMCP: Moved %d #[%d]# %d", tempVertex, selectedChildQnode, nextVertex);
 
+    tempVertex = nextVertex;
 
 
             // save the current true state
@@ -250,7 +267,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
-        OMPL_INFORM("FIRMCP: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to %u (%2.3f, %2.3f, %2.3f, %2.6f) with TP = %f", tempVertex, targetNode, 
+        OMPL_INFORM("FIRMCP: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to [%u] (%2.3f, %2.3f, %2.3f, %2.6f) with TP = %f", tempVertex, targetNode, 
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getX(),
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getY(),
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getYaw(),
@@ -479,12 +496,12 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         }
 
         // for debug
-        siF_->getTrueState(tempTrueStateCopy);
-        OMPL_INFORM("tempTrueStateCopy: (%2.3f, %2.3f, %2.3f, %2.6f)",
-                tempTrueStateCopy->as<FIRM::StateType>()->getX(),
-                tempTrueStateCopy->as<FIRM::StateType>()->getY(),
-                tempTrueStateCopy->as<FIRM::StateType>()->getYaw(),
-                arma::trace(tempTrueStateCopy->as<FIRM::StateType>()->getCovariance()));
+//         siF_->getTrueState(tempTrueStateCopy);
+//         OMPL_INFORM("tempTrueStateCopy: (%2.3f, %2.3f, %2.3f, %2.6f)",
+//                 tempTrueStateCopy->as<FIRM::StateType>()->getX(),
+//                 tempTrueStateCopy->as<FIRM::StateType>()->getY(),
+//                 tempTrueStateCopy->as<FIRM::StateType>()->getYaw(),
+//                 arma::trace(tempTrueStateCopy->as<FIRM::StateType>()->getCovariance()));
 
 
     } // while()
@@ -610,6 +627,8 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
         }
         siF_->setTrueState(sampState);  // true state is only used for collision check by checkTrueStateValidity()
 
+        // for debug
+        std::cout << currentVertex;
 
         // run Monte Carlo simulation for one particle and update cost-to-go and number of visits
         int currentDepth = 0;
@@ -666,11 +685,11 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
             std::cout << "minQvalue: " << "[" << selectedChildQnode << "]" << minQvalue << std::endl;
 
             // for debug
-            OMPL_INFORM("FIRMCP-Execute ##### selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
-                    stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
-                    stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getY(),
-                    stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getYaw(),
-                    arma::trace(stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getCovariance()));
+//             OMPL_INFORM("FIRMCP-Execute ##### selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
+//                     stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
+//                     stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getY(),
+//                     stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getYaw(),
+//                     arma::trace(stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getCovariance()));
 
             Edge selectedEdge = boost::edge(currentVertex, selectedChildQnode, g_).first;
 
@@ -796,7 +815,11 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
     // XXX turning parameters
 //     int maxPOMCPDepth_ = 100;
 //     int maxPOMCPDepth_ = 10;
-    int maxPOMCPDepth_ = 1;
+    int maxPOMCPDepth_ = 5;
+//     int maxPOMCPDepth_ = 1;
+//     double c_exploration = std::sqrt(2.0);
+//     double c_exploration = 1.0;
+    double cExploration_ = 0.1;
 
 
     ompl::base::State* currentBelief = stateProperty_[currentVertex];
@@ -841,6 +864,9 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
                 Visualizer::clearRolloutConnections();
                 //Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[targetNode]);
 
+                // for debug
+                std::cout << std::endl;
+
                 //return costToGo_[targetVertex] + edgeCostToCenterBelief;
                 return costToGo_[targetVertex];
             }
@@ -874,10 +900,18 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
                 childQnode = childQnodes[j];
                 childQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(childQnode);
 
-                // TODO need exploration term!
+                //for debug
+                //std::cout << "childQvalue = " << childQvalue;
 
-
-
+                // apply exploration bonus!
+                double thisQVvisit = currentBelief->as<FIRM::StateType>()->getThisQVvisit();            // N(h)
+                double childQvisit = currentBelief->as<FIRM::StateType>()->getChildQvisit(childQnode);  // N(ha)
+                // NOTE we minimize, not maximize, the cost-to-go
+//                 childQvalue -= cExploration_ * std::sqrt( std::log(thisQVvisit+1) / (childQvisit+1) );
+                childQvalue -= cExploration_ * std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1e-10) );
+                //for debug
+                //std::cout << " - " << cExploration_ << " * " << std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1e-10) ) << " = " << childQvalue << std::endl;
+                childQvalue = (childQvalue > 0.0) ? childQvalue : 0.0;
 
                 if (minQvalue >= childQvalue)
                 {
@@ -900,11 +934,11 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
                 selectedChildQnode = minQvalueNodes[random];  // to break the tie
             }
             // for debug
-            OMPL_INFORM("FIRMCP-Simulate >>>> selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
-                    stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
-                    stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getY(),
-                    stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getYaw(),
-                    arma::trace(stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getCovariance()));
+//             OMPL_INFORM("FIRMCP-Simulate >>>> selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
+//                     stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
+//                     stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getY(),
+//                     stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getYaw(),
+//                     arma::trace(stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getCovariance()));
 
             selectedEdge = boost::edge(currentVertex, selectedChildQnode, g_).first;
 
@@ -942,42 +976,51 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
         Vertex nextVertex;
         std::vector<Vertex> reachedChildQVnodes;
         const std::vector<Vertex>& childQVnodes = currentBelief->as<FIRM::StateType>()->getChildQVnodes(selectedChildQnode);
-        if (childQVnodes.size()!=0)
-        {
-            // ORIGINAL
-//             for (int j=0; j<childQVnodes.size(); j++)
-//             {
-//                 Vertex childQVnode = childQVnodes[j];
-//
-//                 // CHECK which one? there is no from-to relationship between these childQVnodes...
-//                 if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
-//                     //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
-//                 {
-//                     OMPL_WARN("Existing childQVnode!");
-//                     nextVertex = childQVnode;
-//                     reachedChildQVnodes.push_back(childQVnode);
-//                 }
-//             }
-//             // REVIEW what if a new childQVnode coincides more than one existing childQVnodes (for the same action)?
-//             // pick the closest one?
-//             // OR merge all childQVnodes[selectedChildQnode] into one node but with proper belief state merging scheme?!
-//             if (reachedChildQVnodes.size()>1)
-//             {
-//                 OMPL_WARN("There are %d reachedChildQVnodes for this new childQVnode!", reachedChildQVnodes.size());
-//                 //nextVertex = which childQVnode?
-//                 exit(0);    // XXX
-//             }
 
-            // HACK for pomcpSimulate(), assume that T(hao) are always merged into one!
-            nextVertex = childQVnodes[0];
-        }
-        else
+// 1)
+            // ORIGINAL
+            for (int j=0; j<childQVnodes.size(); j++)
+            {
+                Vertex childQVnode = childQVnodes[j];
+
+                // CHECK which one? there is no from-to relationship between these childQVnodes...
+                if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
+                    //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
+                {
+                    //OMPL_WARN("Existing childQVnode!");
+                    nextVertex = childQVnode;
+                    reachedChildQVnodes.push_back(childQVnode);
+                }
+            }
+            // REVIEW what if a new childQVnode coincides more than one existing childQVnodes (for the same action)?
+            // pick the closest one?
+            // OR merge all childQVnodes[selectedChildQnode] into one node but with proper belief state merging scheme?!
+            if (reachedChildQVnodes.size()>1)
+            {
+                //OMPL_WARN("There are %d reachedChildQVnodes for this new childQVnode!", reachedChildQVnodes.size());
+                //nextVertex = which childQVnode?
+                //exit(0);    // XXX
+
+                nextVertex = reachedChildQVnodes[0];
+            }
+            else if (reachedChildQVnodes.size()==0)
+
+// 2)
+//         if (childQVnodes.size()!=0)
+//         {
+//             // HACK for pomcpSimulate(), assume that T(hao) are always merged into one!
+//             nextVertex = childQVnodes[0];
+//         }
+//         else
+
         {
             //OMPL_INFORM("A new childQVnode!");
             nextVertex = addQVnodeToPOMCPTree(siF_->cloneState(nextBelief));
             currentBelief->as<FIRM::StateType>()->addChildQVnode(selectedChildQnode, nextVertex);
         }
 
+        // for debug
+        std::cout << "-[" << selectedChildQnode << "]-" << nextVertex;
 
         // recursively call pomcpSimulate()
         delayedCostToGo = pomcpSimulate(nextVertex, currentDepth+1, selectedEdge);
@@ -1032,7 +1075,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
 //     int maxPOMCPDepth_ = 10;
-    int maxPOMCPDepth_ = 1;
+    int maxPOMCPDepth_ = 5;
+//     int maxPOMCPDepth_ = 1;
 
     ompl::base::State* currentBelief = stateProperty_[currentVertex];
     Edge selectedEdge;
@@ -1048,6 +1092,9 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
             // clear the rollout candidate connection drawings and show the selected edge
             Visualizer::clearRolloutConnections();
             //Visualizer::setChosenRolloutConnection(stateProperty_[tempVertex], stateProperty_[targetNode]);
+
+            // for debug
+            std::cout << std::endl;
 
             //return costToGo_[targetVertex] + edgeCostToCenterBelief;
             return costToGo_[targetVertex];
@@ -1070,7 +1117,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 
 
         // CREATE A NEW NODE IF NOT COINCIDES ANY OF EXISTING POMCP TREE NODES
-        if ((currentBelief->as<FIRM::StateType>()->getChildQnodes()).size()==0)
+//         if ((currentBelief->as<FIRM::StateType>()->getChildQnodes()).size()==0)
+    if (!currentBelief->as<FIRM::StateType>()->getChildQexpanded())  // NOTE childQvalues are added only if this node was expanded before in expandQnodesOnPOMCPTreeWithApproxCostToGo()
         {
             // this will compute approximate edge cost, cost-to-go, and heuristic action weight
             // NOTE call this function just once per POMCP tree node
@@ -1143,11 +1191,11 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
         // SELECT THE ACTION
         selectedChildQnode = childQnodes[jSelected];
         // for debug
-        OMPL_INFORM("FIRMCP-Rollout ~~~~~ selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
-                stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
-                stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getY(),
-                stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getYaw(),
-                arma::trace(stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getCovariance()));
+//         OMPL_INFORM("FIRMCP-Rollout ~~~~~ selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
+//                 stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getX(),
+//                 stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getY(),
+//                 stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getYaw(),
+//                 arma::trace(stateProperty_[selectedChildQnode]->as<FIRM::StateType>()->getCovariance()));
 
         selectedEdge = boost::edge(currentVertex, selectedChildQnode, g_).first;
 
@@ -1187,38 +1235,51 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     Vertex nextVertex;
     std::vector<Vertex> reachedChildQVnodes;
     const std::vector<Vertex>& childQVnodes = currentBelief->as<FIRM::StateType>()->getChildQVnodes(selectedChildQnode);
-    if (childQVnodes.size()!=0)
-    {
-        for (int j=0; j<childQVnodes.size(); j++)
-        {
-            Vertex childQVnode = childQVnodes[j];
 
-            // CHECK which one? there is no from-to relationship between these childQVnodes...
-            if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
-            //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
+// 1)
+            // ORIGINAL
+            for (int j=0; j<childQVnodes.size(); j++)
             {
-                //OMPL_WARN("Existing childQVnode!");
-                nextVertex = childQVnode;
-                reachedChildQVnodes.push_back(childQVnode);
+                Vertex childQVnode = childQVnodes[j];
+
+                // CHECK which one? there is no from-to relationship between these childQVnodes...
+                if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
+                    //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
+                {
+                    OMPL_WARN("Existing childQVnode!");
+                    nextVertex = childQVnode;
+                    reachedChildQVnodes.push_back(childQVnode);
+                }
             }
-        }
-        // REVIEW what if a new childQVnode coincides more than one existing childQVnodes (for the same action)?
-        // pick the closest one?
-        // OR merge all childQVnodes[selectedChildQnode] into one node but with proper belief state merging scheme?!
-        if (reachedChildQVnodes.size()>1)
-        {
-            OMPL_WARN("There are %d reachedChildQVnodes for this new childQVnode!", reachedChildQVnodes.size());
-            //nextVertex = which childQVnode?
-            exit(0);    // XXX
-        }
-    }
-    else
+            // REVIEW what if a new childQVnode coincides more than one existing childQVnodes (for the same action)?
+            // pick the closest one?
+            // OR merge all childQVnodes[selectedChildQnode] into one node but with proper belief state merging scheme?!
+            if (reachedChildQVnodes.size()>1)
+            {
+                //OMPL_WARN("There are %d reachedChildQVnodes for this new childQVnode!", reachedChildQVnodes.size());
+                //nextVertex = which childQVnode?
+                //exit(0);    // XXX
+
+                nextVertex = reachedChildQVnodes[0];
+            }
+            else if (reachedChildQVnodes.size()==0)
+
+// 2)
+//         if (childQVnodes.size()!=0)
+//         {
+//             // HACK for pomcpSimulate(), assume that T(hao) are always merged into one!
+//             nextVertex = childQVnodes[0];
+//         }
+//         else
+
     {
         //OMPL_INFORM("A new childQVnode!");
         nextVertex = addQVnodeToPOMCPTree(siF_->cloneState(nextBelief));
         currentBelief->as<FIRM::StateType>()->addChildQVnode(selectedChildQnode, nextVertex);
     }
 
+    // for debug
+    std::cout << "~(" << selectedChildQnode << ")~" << nextVertex;
 
     // recursively call pomcpRollout()
     double delayedCostToGo = pomcpRollout(nextVertex, currentDepth+1, selectedEdge);
