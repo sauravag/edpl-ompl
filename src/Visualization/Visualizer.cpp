@@ -267,7 +267,7 @@ void Visualizer::refresh()
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    drawRobotPath();
+    //drawRobotPath();
 
     drawEnvironment();
 
@@ -309,6 +309,7 @@ void Visualizer::refresh()
             drawMostLikelyPath();
 
             robotPath_.push_back(si_->cloneState(trueState_));
+            drawRobotPath();
 
             break;
 
@@ -332,6 +333,7 @@ void Visualizer::refresh()
             }
 
             robotPath_.push_back(si_->cloneState(trueState_));
+            drawRobotPath();
 
             break;
 
@@ -355,6 +357,7 @@ void Visualizer::refresh()
             }
 
             robotPath_.push_back(si_->cloneState(trueState_));
+            drawRobotPath();
 
             break;
 
@@ -392,6 +395,12 @@ void Visualizer::refresh()
     if(currentBelief_ && mode_ !=MultiModalMode)
     {
         drawState(currentBelief_, (VZRStateType)1);
+    }
+
+    // XXX XXX
+    if(mode_ == FIRMCPMode)
+    {
+        drawRobotPath();
     }
 
     glPopMatrix();

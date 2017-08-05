@@ -7,38 +7,10 @@
 	<landmark id = 48  x = 10		y = 16.75 />
 	<landmark id = 59  x = 12.25	y = 19 />
 </LandmarkList>
-<!-- <ObservationModels> -->
-<!-- 	<HeadingBeaconObservationModel -->
-<!-- 		sigma_heading = "0.000001" -->
-<!-- 		sigma_ss = "0.005" -->
-<!-- 		/> -->
-<!-- </ObservationModels> -->
-<!-- <MotionModels> -->
-<!-- 	<OmnidirectionalMotionModel  -->
-<!-- 		sigmaV="0.0" -->
-<!-- 		etaV="0.0" -->
-<!--         sigmaOmega="0.0" -->
-<!--         etaOmega="0.0" -->
-<!-- 		P_Wg_filename="" -->
-<!-- 		wind_noise_pos = "0.001" -->
-<!-- 		wind_noise_ang="0.000001" -->
-<!-- 		min_linear_velocity= "&#45;1.0" -->
-<!-- 		max_linear_velocity= "1.0" -->
-<!-- 		max_angular_velocity= "0.60" -->
-<!-- 		dt= "0.1" -->
-<!-- 		/>  -->
-<!-- 	<TwoDPointMotionModel  -->
-<!-- 		sigmaV="0.0" -->
-<!-- 		etaV="0.0" -->
-<!-- 		wind_noise_pos="0.1" -->
-<!-- 		max_linear_velocity= "4.0" -->
-<!-- 		dt= "0.1" -->
-<!-- 		/> -->
-<!-- </MotionModels> -->
 <ObservationModels>
 	<HeadingBeaconObservationModel
-		sigma_heading = "0.0000000000001"
-		sigma_ss = "0.0000000001"
+		sigma_heading = "0.000001"
+		sigma_ss = "0.005"
 		/>
 </ObservationModels>
 <MotionModels>
@@ -48,8 +20,8 @@
         sigmaOmega="0.0"
         etaOmega="0.0"
 		P_Wg_filename=""
-		wind_noise_pos = "0.0000000001"
-		wind_noise_ang="0.0000000000001"
+		wind_noise_pos = "0.001"
+		wind_noise_ang="0.000001"
 		min_linear_velocity= "-1.0"
 		max_linear_velocity= "1.0"
 		max_angular_velocity= "0.60"
@@ -58,7 +30,7 @@
 	<TwoDPointMotionModel 
 		sigmaV="0.0"
 		etaV="0.0"
-		wind_noise_pos="0.0"
+		wind_noise_pos="0.1"
 		max_linear_velocity= "4.0"
 		dt= "0.1"
 		/>

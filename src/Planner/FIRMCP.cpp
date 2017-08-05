@@ -685,6 +685,8 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
             // for debug
             std::cout << std::endl;
             std::cout << "minQvalue: " << "[" << selectedChildQnode << "]" << minQvalue << std::endl;
+            std::cout << "executionCost: " << executionCost_ << std::endl;
+            std::cout << "expTotalCost: " << minQvalue + executionCost_ << std::endl;
 
             // for debug
 //             OMPL_INFORM("FIRMCP-Execute ##### selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
@@ -822,7 +824,8 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
     int ultimateMaxPOMCPDepth_ = 300;
 //     double c_exploration = std::sqrt(2.0);
 //     double c_exploration = 1.0;
-    double cExploration_ = 0.1;
+//     double cExploration_ = 0.1;
+    double cExploration_ = 0.0;
 
 
     ompl::base::State* currentBelief = stateProperty_[currentVertex];
@@ -1390,6 +1393,14 @@ FIRM::Vertex FIRMCP::addQVnodeToPOMCPTree(ompl::base::State *state)
 
 void FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const bool isNewNodeExpanded)
 {
+    // XXX tuning parameters
+    double costToGoRegulator_ = 0.0;      // exploitative
+//     double costToGoRegulator_ = 1.0;
+    //double costToGoRegulator_ = 10000.0;  // explorative
+    double cExpolitationForRollout_ = 3.0;
+//     double cExpolitationForRollout_ = 10.0;
+
+
     // just for compatibility with FIRM::addStateToGraph()
     bool addReverseEdge = false;
 
@@ -1462,12 +1473,6 @@ void FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
     }
 
 
-    // XXX tuning parameters
-    double costToGoRegulator_ = 0.0;      // exploitative
-//     double costToGoRegulator_ = 1.0;
-    //double costToGoRegulator_ = 10000.0;  // explorative
-
-
     FIRMWeight approxEdgeCost;
     double approxCostToGo, weight;
     foreach (Vertex n, neighbors)
@@ -1498,7 +1503,8 @@ void FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
 //                     weight = 1.0 / (approxCostToGo + costToGoRegulator_);
 
                     // HACK XXX XXX extremely exploitative
-                    weight = 1.0 / (std::pow(approxCostToGo, 3) + costToGoRegulator_);
+                    // NOTE POMCP-Rollout policy should be more exploitative, so that pure-rollout branch can be more similar to the optimal branch and thus, simulate() also just follow the incrementally constructed rollout branch
+                    weight = 1.0 / (std::pow(approxCostToGo, cExpolitationForRollout_) + costToGoRegulator_);
 
                     // for debug
                     //std::cout << "weight[" << n << "]: " << weight << " (=1.0/(" << approxCostToGo << "+" << costToGoRegulator_ << "))" << std::endl;
@@ -1609,9 +1615,10 @@ FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a
     double startTraceCov = startNodeState->as<FIRM::StateType>()->getTraceCovariance();
 
     // compensate the distance considering isReached() tolerance
-    posDistance = ((posDistance - StateType::reachDistPos_) > 0.0) ? (posDistance - StateType::reachDistPos_) : 0.0;
-    oriDistance = ((oriDistance - StateType::reachDistOri_) > 0.0) ? (oriDistance - StateType::reachDistOri_) : 0.0;
-    covDistance = ((covDistance - StateType::reachDistCov_) > 0.0) ? (covDistance - StateType::reachDistCov_) : 0.0;
+    // OPTIONAL) enabling these may lead to under-estimation of the actual cost, which then can result in jiggling execution
+//     posDistance = ((posDistance - StateType::reachDistPos_) > 0.0) ? (posDistance - StateType::reachDistPos_) : 0.0;
+//     oriDistance = ((oriDistance - StateType::reachDistOri_) > 0.0) ? (oriDistance - StateType::reachDistOri_) : 0.0;
+//     covDistance = ((covDistance - StateType::reachDistCov_) > 0.0) ? (covDistance - StateType::reachDistCov_) : 0.0;
 
     // compute an approximate edge cost (heuristically!)
     double numPosConvergence = posDistance / heurPosStepSize_;
