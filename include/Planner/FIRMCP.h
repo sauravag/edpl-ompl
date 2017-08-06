@@ -64,7 +64,7 @@ protected:
 
     FIRM::Vertex addQVnodeToPOMCPTree(ompl::base::State *state);
 
-    void expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const bool isNewNodeExpanded=false);
+    bool expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const bool isNewNodeExpanded=false);
 
     FIRMWeight addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
 
