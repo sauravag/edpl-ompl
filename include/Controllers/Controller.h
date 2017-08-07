@@ -361,12 +361,43 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
             {
                 std::cout << "Failed in checkTrueStateValidity() test!" << std::endl;
                 si_->copyState(endState, internalState);
+
+                ompl::base::Cost stabilizationFilteringCost(0);
+                int stepsToStabilize=0;
+                // ompl::base::State *stabilizedState = si_->allocState();
+                // this->Stabilize(internalState, stabilizedState, stabilizationFilteringCost, stepsToStabilize, constructionMode);
+                // si_->copyState(endState, stabilizedState);
+
+                filteringCost = ompl::base::Cost(cost + stabilizationFilteringCost.value());
+                stepsTaken = k+stepsToStabilize;
+                timeToStop = k;
+
+                si_->freeState(internalState);
+                si_->freeState(tempEndState);
+                //si_->freeState(stabilizedState);
+
                 return false;
             }
             else if(!si_->isValid(internalState))
             {
                 std::cout << "Failed in isValid(internalState) test!" << std::endl;
+
                 si_->copyState(endState, internalState);
+
+                ompl::base::Cost stabilizationFilteringCost(0);
+                int stepsToStabilize=0;
+                // ompl::base::State *stabilizedState = si_->allocState();
+                // this->Stabilize(internalState, stabilizedState, stabilizationFilteringCost, stepsToStabilize, constructionMode);
+                // si_->copyState(endState, stabilizedState);
+
+                filteringCost = ompl::base::Cost(cost + stabilizationFilteringCost.value());
+                stepsTaken = k+stepsToStabilize;
+                timeToStop = k;
+
+                si_->freeState(internalState);
+                si_->freeState(tempEndState);
+                //si_->freeState(stabilizedState);
+
                 return false;
             }
         }
@@ -397,6 +428,21 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
             if(constructionMode)
             {
                 si_->copyState(endState, internalState);
+
+                ompl::base::Cost stabilizationFilteringCost(0);
+                int stepsToStabilize=0;
+                // ompl::base::State *stabilizedState = si_->allocState();
+                // this->Stabilize(internalState, stabilizedState, stabilizationFilteringCost, stepsToStabilize, constructionMode);
+                // si_->copyState(endState, stabilizedState);
+
+                filteringCost = ompl::base::Cost(cost + stabilizationFilteringCost.value());
+                stepsTaken = k+stepsToStabilize;
+                timeToStop = k;
+
+                si_->freeState(internalState);
+                si_->freeState(tempEndState);
+                //si_->freeState(stabilizedState);
+
                 return false;
             }
         }
@@ -470,6 +516,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
                                                               bool constructionMode)
 {
     using namespace std;
+    bool result = true;
 
     //HOW TO SET INITAL VALUE OF COST
     //cost = 1 ,for time based only if time per execution is "1"
@@ -499,14 +546,16 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
         if(!si_->checkTrueStateValidity())
         {
             std::cout << "Failed in checkTrueStateValidity() test!" << std::endl;
-            si_->copyState(endState, internalState);
-            return false;
+            //si_->copyState(endState, internalState);
+            //return false;
+            result = false;
         }
         else if(!si_->isValid(internalState))
         {
             std::cout << "Failed in isValid(internalState) test!" << std::endl;
-            si_->copyState(endState, internalState);
-            return false;
+            //si_->copyState(endState, internalState);
+            //return false;
+            result = false;
         }
     }
 
@@ -520,6 +569,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
 
         // quit edge controller and switch to node controller!
         OMPL_WARN("Reached the end of EdgeController... Now NEED to switch to NodeController!");
+        result = false;
     }
 
     arma::colvec nomXVec = nominalX_K->as<StateType>()->getArmaData();
@@ -530,12 +580,13 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
 
     if(deviationNorm > nominalTrajDeviationThreshold_)    // this threshold is defined in include/Setup/TwoDPointRobotSetup.h
     {
-        std::cout << "Too much of deviation larger than a threshold (" << nominalTrajDeviationThreshold_ << ")!" << std::endl;
-        // quit control in construction mode, but continue in execution mode
-        if(constructionMode)
+        std::cout << "Too much of deviation larger than a threshold, " << nominalTrajDeviationThreshold_ << "!" << std::endl;
+        // // HACK quit control in construction mode, but continue in execution mode
+        // if(constructionMode)
         {
-            si_->copyState(endState, internalState);
-            return false;
+            //si_->copyState(endState, internalState);
+            //return false;
+            result = false;
         }
     }
 
@@ -566,7 +617,8 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     si_->freeState(internalState);
     si_->freeState(tempEndState);
 
-    return true ;
+    //return true;
+    return result;
 }
 
 
@@ -606,6 +658,8 @@ bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numS
             si_->freeState(tempEndState);
 
             si_->freeState(tempState);
+
+            stepsTaken = k;
 
             return false;
         }
@@ -659,6 +713,9 @@ bool Controller<SeparatedControllerType, FilterType>::executeFromUpto(const int 
             si_->freeState(tempEndState);
 
             si_->freeState(tempState);
+
+//             stepsTaken = k;
+            stepsTaken = k - kStep;
 
             return false;
         }

@@ -107,10 +107,13 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
     //double averageTimeForRolloutComputation = 0;
     int numberOfRollouts = 0;
 
-
     // local variables for robust connection to a desirable (but far) FIRM nodes during rollout
     Edge e = feedback_.at(currentVertex);
     targetNode = boost::target(e, g_);
+
+    // counter of the number of executions of the same edge controller in a row
+    int kStepOfEdgeController = 0;
+    Edge e_prev;  // do not set this to e from the beginning
 
     // 4) forcefully include the next FIRM node of the previously reached FIRM node in the candidate (nearest neighbor) list for rollout policy
     //Vertex nextFIRMVertex = boost::target(e, g_);
@@ -239,6 +242,13 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
             siF_->setTrueState(tempTrueStateCopy);
 
 
+            // if the edge controller of the last execution is being used again now, apply the kStep'th open-loop control of the edge controller
+            if (e == e_prev)
+                kStepOfEdgeController++;
+            else
+                kStepOfEdgeController = 0;
+
+            e_prev = e;
 
 
 
@@ -343,8 +353,8 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         {
             // NOTE do not execute edge controller to prevent jiggling motion around the target node
 
-            edgeControllerStatus = edgeController.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
-
+            //edgeControllerStatus = edgeController.executeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
+            edgeControllerStatus = edgeController.executeFromUpto(kStepOfEdgeController, rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
 
             // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
             //*1) cost = wc * sum(trace(cov_k))  + wt * K  (for k=1,...,K)
@@ -613,10 +623,6 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
     // --------------
 
 
-
-    // this History.size() increase by 1 after each one-branch search by one particle until the finite horizon
-    // currentHistoryDepth = History.size();
-
     // for N particles
     for (unsigned int i=0; i<numPOMCPParticles_; i++)
     {
@@ -628,19 +634,29 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
             continue;
         }
         siF_->setTrueState(sampState);  // true state is only used for collision check by checkTrueStateValidity()
-
         // for debug
         std::cout << currentVertex;
 
         // run Monte Carlo simulation for one particle and update cost-to-go and number of visits
         int currentDepth = 0;
-        Edge selectedEdgeDummy;  // XXX
-        double totalCostToGo = pomcpSimulate(currentVertex, currentDepth, selectedEdgeDummy);
-        // for debug
-        std::cout << "totalCostToGo: " << totalCostToGo << std::endl;
+        int collisionDepth = (int)ompl::magic::DEFAULT_INF_COST_TO_GO;  // initialize as if collision never happens
+        Edge selectedEdgeDummy;  // just for syntax
 
-        // discard any simulated history
-        // History.truncate(currentHistoryDepth);
+        double totalCostToGo = pomcpSimulate(currentVertex, currentDepth, selectedEdgeDummy, collisionDepth);
+        
+    // NOTE penalize collision with discount
+    // obstacleCostToGo_ would affect up to ~5 steps from the depth of collision and decay beyond it, so that its parent branch can have a chance to be selected
+    int depthDiff = collisionDepth - currentDepth;
+    depthDiff = (depthDiff < 0) ? 0 : depthDiff;
+    double discountedCollisionPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));
+//     totalCostToGo += computeDiscountedCollisionPenalty(executionCost, currentDepth, collisionDepth);
+//     totalCostToGo += discountedCollisionPenalty;
+    double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedCollisionPenalty;
+
+
+// for debug
+//         std::cout << "totalCostToGo: " << totalCostToGo << std::endl;
+        std::cout << "totalCostToGoWithDiscountedPenalty: " << totalCostToGoWithDiscountedPenalty << std::endl;
     }
 
     // select the best action
@@ -808,20 +824,15 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 //     return edgeToTake;
 }
 
-double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev)
+double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev, int& collisionDepth)
 {
-
-//     Edge selectedEdgeDummy;  // XXX
-//     double delayedCostToGo = pomcpRollout(currentVertex, currentDepth, selectedEdgeDummy);
-//     return delayedCostToGo;
-
-
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
     int maxPOMCPDepth_ = 10;
 //     int maxPOMCPDepth_ = 5;
 //     int maxPOMCPDepth_ = 1;
-    int ultimateMaxPOMCPDepth_ = 300;
+    int maxFIRMReachDepth_ = 300;
+//     int maxFIRMReachDepth_ = 100;
 //     double c_exploration = std::sqrt(2.0);
 //     double c_exploration = 1.0;
 //     double cExploration_ = 0.1;
@@ -845,7 +856,7 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
         // if (currentDepth > maxPOMCPDepth_), pomcpRollout() will handle it
 
-        delayedCostToGo = pomcpRollout(currentVertex, currentDepth, selectedEdgePrev, isNewNodeExpanded);   // pass isNewNodeExpanded only for the first pomcpRollout()
+        delayedCostToGo = pomcpRollout(currentVertex, currentDepth, selectedEdgePrev, collisionDepth, isNewNodeExpanded);   // pass isNewNodeExpanded only for the first pomcpRollout()
         executionCost = 0.0;
 
         currentBelief->as<FIRM::StateType>()->setChildQexpanded();
@@ -853,6 +864,16 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
         // total cost-to-go from this node
         double discountFactor = 1.0;
         double totalCostToGo = executionCost + discountFactor*delayedCostToGo;
+
+        
+    // NOTE penalize collision with discount
+    // obstacleCostToGo_ would affect up to ~5 steps from the depth of collision and decay beyond it, so that its parent branch can have a chance to be selected
+    int depthDiff = collisionDepth - currentDepth;
+    depthDiff = (depthDiff < 0) ? 0 : depthDiff;
+    double discountedCollisionPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));
+//     totalCostToGo += computeDiscountedCollisionPenalty(executionCost, currentDepth, collisionDepth);
+//     totalCostToGo += discountedCollisionPenalty;
+    double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedCollisionPenalty;
 
         return totalCostToGo;
     }
@@ -862,10 +883,16 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
         if (currentDepth >= maxPOMCPDepth_)
         {
 
-            if (currentDepth >= ultimateMaxPOMCPDepth_)
+            if (currentDepth >= maxFIRMReachDepth_)
             {
-                OMPL_WARN("Could not reach to the target node within %d iterations", ultimateMaxPOMCPDepth_);
-                return obstacleCostToGo_;
+                OMPL_WARN("Could not reach to the target node within %d iterations", maxFIRMReachDepth_);
+                //return obstacleCostToGo_;
+
+                // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+                double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
+                executionCost *= maxFIRMReachDepth_ - currentDepth;
+                collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
+                return executionCost;
             }
 
             Vertex targetVertex = boost::target(selectedEdgePrev, g_);   // latest target before reaching the finite horizon
@@ -970,8 +997,11 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
         if (!executionStatus)
         {
             OMPL_ERROR("Failed to executeSimulationFromUpto()!");
-            //return obstacleCostToGo_;
-            executionCost = obstacleCostToGo_;
+            //executionCost = obstacleCostToGo_;  // commented; obstacleCostToGo_ penalty will be considered by collisionDepth
+
+            // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+            executionCost *= maxFIRMReachDepth_ - currentDepth;
+            collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
         }
 
         // XXXXX for debug
@@ -1045,7 +1075,7 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
         double delayedCostToGo = 0.0;
         if (executionStatus)  // if not collided during latest execution
         {
-            delayedCostToGo = pomcpSimulate(nextVertex, currentDepth+1, selectedEdge);
+            delayedCostToGo = pomcpSimulate(nextVertex, currentDepth+1, selectedEdge, collisionDepth);
         }
 
         // free the memory
@@ -1058,7 +1088,16 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
         // total cost-to-go from this node
         double discountFactor = 1.0;
         double totalCostToGo = executionCost + discountFactor*delayedCostToGo;
-//         double totalCostToGoWithDiscountedJobs = executionCost + discountFactor*delayedCostToGo;
+
+        
+    // NOTE penalize collision with discount
+    // obstacleCostToGo_ would affect up to ~5 steps from the depth of collision and decay beyond it, so that its parent branch can have a chance to be selected
+    int depthDiff = collisionDepth - currentDepth;
+    depthDiff = (depthDiff < 0) ? 0 : depthDiff;
+    double discountedCollisionPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));
+//     totalCostToGo += computeDiscountedCollisionPenalty(executionCost, currentDepth, collisionDepth);
+//     totalCostToGo += discountedCollisionPenalty;
+    double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedCollisionPenalty;
 
 
 
@@ -1085,19 +1124,25 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 //             selectedChildQvalue = 0.0;  // to discard initial V(ha) set to be approxCostToGo from expandQnodesOnPOMCPTreeWithApproxCostToGo() for the first POMCP-Rollout node
 //         selectedChildQvalueUpdated = selectedChildQvalue + (totalCostToGo - selectedChildQvalue) / selectedChildQvisit;  // V(ha) = V(ha) + (totalCostToGo - V(ha)) / N(ha)
 
-        // b) V(ha) = min(V(ha), totalCostToGo); Greedily taking the mininum
-        // this naively ignores the chance of collision if there is at least a particle that didn't experience collision
-        if (isNewNodeExpanded)   // XXXXX
-            selectedChildQvalueUpdated = totalCostToGo;  // V(ha) = totalCostToGo for the first new node
-        else
-            selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGo);  // V(ha) = min(V(ha), totalCostToGo)
-
-        // c) V(ha) = min(V(ha), totalCostToGoWithDiscountedJobs); Greedily taking the minimum, but with Jobs, obstacle cost-to-go, discounted by its depth!
-        // Jobs should be discounted almost near to zero after ~5 steps to allow their parent branch to have a chance to be selected
+        // b) V(ha) = V(ha) + (totalCostToGoWithDiscountedPenalty - V(ha)) / N(ha); All Moves As First (AMAF) heuristic
+        // collision happening very far from the current node affects this without any discount; execution gets stuck
 //         if (isNewNodeExpanded)   // XXXXX
-//             selectedChildQvalueUpdated = totalCostToGoWithDiscountedJobs;  // V(ha) = totalCostToGo for the first new node
+//             selectedChildQvalue = 0.0;  // to discard initial V(ha) set to be approxCostToGo from expandQnodesOnPOMCPTreeWithApproxCostToGo() for the first POMCP-Rollout node
+//         selectedChildQvalueUpdated = selectedChildQvalue + (totalCostToGoWithDiscountedPenalty - selectedChildQvalue) / selectedChildQvisit;  // V(ha) = V(ha) + (totalCostToGoWithDiscountedPenalty - V(ha)) / N(ha)
+
+        // c) V(ha) = min(V(ha), totalCostToGo); Greedily taking the mininum
+        // this naively ignores the chance of collision if there is at least a particle that didn't experience collision
+//         if (isNewNodeExpanded)   // XXXXX
+//             selectedChildQvalueUpdated = totalCostToGo;  // V(ha) = totalCostToGo for the first new node
 //         else
 //             selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGo);  // V(ha) = min(V(ha), totalCostToGo)
+
+        // d) V(ha) = min(V(ha), totalCostToGoWithDiscountedPenalty); Greedily taking the mininum
+        // this naively ignores the chance of collision if there is at least a particle that didn't experience collision
+        if (isNewNodeExpanded)   // XXXXX
+            selectedChildQvalueUpdated = totalCostToGoWithDiscountedPenalty;  // V(ha) = totalCostToGoWithDiscountedPenalty for the first new node
+        else
+            selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGoWithDiscountedPenalty);  // V(ha) = min(V(ha), totalCostToGoWithDiscountedPenalty)
 
 
         currentBelief->as<FIRM::StateType>()->setChildQvalue(selectedChildQnode, selectedChildQvalueUpdated);
@@ -1114,14 +1159,15 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
     } // else if ((currentBelief->as<FIRM::StateType>()->getChildQnodes()).size()!=0)
 }
 
-double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev, const bool isNewNodeExpanded)
+double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev, int& collisionDepth, const bool isNewNodeExpanded)
 {
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
     int maxPOMCPDepth_ = 10;
 //     int maxPOMCPDepth_ = 5;
 //     int maxPOMCPDepth_ = 1;
-    int ultimateMaxPOMCPDepth_ = 300;
+    int maxFIRMReachDepth_ = 300;
+//     int maxFIRMReachDepth_ = 100;
 
     ompl::base::State* currentBelief = stateProperty_[currentVertex];
     Edge selectedEdge;
@@ -1130,10 +1176,16 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     if (currentDepth >= maxPOMCPDepth_)
     {
 
-        if (currentDepth >= ultimateMaxPOMCPDepth_)
+        if (currentDepth >= maxFIRMReachDepth_)
         {
-            OMPL_WARN("Could not reach to the target node within %d iterations", ultimateMaxPOMCPDepth_);
-            return obstacleCostToGo_;
+            OMPL_WARN("Could not reach to the target node within %d iterations", maxFIRMReachDepth_);
+            //return obstacleCostToGo_;
+
+            // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+            double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
+            executionCost *= maxFIRMReachDepth_ - currentDepth;
+            collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
+            return executionCost;
         }
 
         // TODO need code cleanup
@@ -1146,7 +1198,13 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
             if (!expandQnodesOnPOMCPTreeWithApproxCostToGo(currentVertex, isNewNodeExpanded))
             {
                 OMPL_WARN("Failed to expandQnodesOnPOMCPTreeWithApproxCostToGo()!");
-                return obstacleCostToGo_;
+                //return obstacleCostToGo_;
+
+                // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+                double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
+                executionCost *= maxFIRMReachDepth_ - currentDepth;
+                collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
+                return executionCost;
             }
         }
 
@@ -1192,7 +1250,13 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
             if (!expandQnodesOnPOMCPTreeWithApproxCostToGo(currentVertex, isNewNodeExpanded))
             {
                 OMPL_WARN("Failed to expandQnodesOnPOMCPTreeWithApproxCostToGo()!");
-                return obstacleCostToGo_;
+                //return obstacleCostToGo_;
+
+                // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+                double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
+                executionCost *= maxFIRMReachDepth_ - currentDepth;
+                collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
+                return executionCost;
             }
         }
 
@@ -1287,8 +1351,11 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     if (!executionStatus)
     {
         OMPL_ERROR("Failed to executeSimulationFromUpto()!");
-        //return obstacleCostToGo_;
-        executionCost = obstacleCostToGo_;
+        //executionCost = obstacleCostToGo_;  // commented; obstacleCostToGo_ penalty will be considered by collisionDepth
+
+        // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+        executionCost *= maxFIRMReachDepth_ - currentDepth;
+        collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
     }
 
     // for debug
@@ -1363,7 +1430,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     double delayedCostToGo = 0.0;
     if (executionStatus)  // if not collided during latest execution
     {
-        delayedCostToGo = pomcpRollout(nextVertex, currentDepth+1, selectedEdge);
+        delayedCostToGo = pomcpRollout(nextVertex, currentDepth+1, selectedEdge, collisionDepth);
     }
 
     // free the memory
@@ -1373,9 +1440,15 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     // total cost-to-go from this node
     double discountFactor = 1.0;
     double totalCostToGo = executionCost + discountFactor*delayedCostToGo;
-//     double totalCostToGoWithDiscountedJobs = executionCost + discountFactor*delayedCostToGo;
 
-
+    // NOTE penalize collision with discount
+    // obstacleCostToGo_ would affect up to ~5 steps from the depth of collision and decay beyond it, so that its parent branch can have a chance to be selected
+    int depthDiff = collisionDepth - currentDepth;
+    depthDiff = (depthDiff < 0) ? 0 : depthDiff;
+    double discountedCollisionPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));
+//     totalCostToGo += computeDiscountedCollisionPenalty(executionCost, currentDepth, collisionDepth);
+//     totalCostToGo += discountedCollisionPenalty;
+    double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedCollisionPenalty;
 
 
     if (isNewNodeExpanded)
@@ -1402,19 +1475,25 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 //             selectedChildQvalue = 0.0;  // to discard initial V(ha) set to be approxCostToGo from expandQnodesOnPOMCPTreeWithApproxCostToGo() for the first POMCP-Rollout node
 //         selectedChildQvalueUpdated = selectedChildQvalue + (totalCostToGo - selectedChildQvalue) / selectedChildQvisit;  // V(ha) = V(ha) + (totalCostToGo - V(ha)) / N(ha)
 
-        // b) V(ha) = min(V(ha), totalCostToGo); Greedily taking the mininum
-        // this naively ignores the chance of collision if there is at least a particle that didn't experience collision
-        if (isNewNodeExpanded)   // XXXXX
-            selectedChildQvalueUpdated = totalCostToGo;  // V(ha) = totalCostToGo for the first new node
-        else
-            selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGo);  // V(ha) = min(V(ha), totalCostToGo)
-
-        // c) V(ha) = min(V(ha), totalCostToGoWithDiscountedJobs); Greedily taking the minimum, but with Jobs, obstacle cost-to-go, discounted by its depth!
-        // Jobs should be discounted almost near to zero after ~5 steps to allow their parent branch to have a chance to be selected
+        // b) V(ha) = V(ha) + (totalCostToGoWithDiscountedPenalty - V(ha)) / N(ha); All Moves As First (AMAF) heuristic
+        // collision happening very far from the current node affects this without any discount; execution gets stuck
 //         if (isNewNodeExpanded)   // XXXXX
-//             selectedChildQvalueUpdated = totalCostToGoWithDiscountedJobs;  // V(ha) = totalCostToGo for the first new node
+//             selectedChildQvalue = 0.0;  // to discard initial V(ha) set to be approxCostToGo from expandQnodesOnPOMCPTreeWithApproxCostToGo() for the first POMCP-Rollout node
+//         selectedChildQvalueUpdated = selectedChildQvalue + (totalCostToGoWithDiscountedPenalty - selectedChildQvalue) / selectedChildQvisit;  // V(ha) = V(ha) + (totalCostToGoWithDiscountedPenalty - V(ha)) / N(ha)
+
+        // c) V(ha) = min(V(ha), totalCostToGo); Greedily taking the mininum
+        // this naively ignores the chance of collision if there is at least a particle that didn't experience collision
+//         if (isNewNodeExpanded)   // XXXXX
+//             selectedChildQvalueUpdated = totalCostToGo;  // V(ha) = totalCostToGo for the first new node
 //         else
 //             selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGo);  // V(ha) = min(V(ha), totalCostToGo)
+
+        // d) V(ha) = min(V(ha), totalCostToGoWithDiscountedPenalty); Greedily taking the mininum
+        // this naively ignores the chance of collision if there is at least a particle that didn't experience collision
+        if (isNewNodeExpanded)   // XXXXX
+            selectedChildQvalueUpdated = totalCostToGoWithDiscountedPenalty;  // V(ha) = totalCostToGoWithDiscountedPenalty for the first new node
+        else
+            selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGoWithDiscountedPenalty);  // V(ha) = min(V(ha), totalCostToGoWithDiscountedPenalty)
 
 
         currentBelief->as<FIRM::StateType>()->setChildQvalue(selectedChildQnode, selectedChildQvalueUpdated);
@@ -1515,12 +1594,15 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
     }
 
     // check for valid neighbors
-    if (neighbors.size()==1)
+    if (!addReverseEdge)
     {
-        if (m==neighbors[0])
+        if (neighbors.size()==1)
         {
-            OMPL_ERROR("No neighbor other than itself was found for vertex %d", m);
-            return false;
+            if (m==neighbors[0])
+            {
+                OMPL_ERROR("No neighbor other than itself was found for vertex %d", m);
+                return false;
+            }
         }
     }
 
@@ -1765,11 +1847,26 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
         //costHistory_.push_back(std::make_tuple(currentTimeStep, executionCostCov, executionCost));
 
 
+        // if edgeControllerStatus is false (usually due to collision or too much of deviation)
+        if(!edgeControllerStatus)
+        {
+            OMPL_INFORM("Edge controller failed :(");
+
+            // return the simulated result state
+            siF_->copyState(endState, cendState);
+
+            return false;
+        }
+
         // this is a secondary (redundant) collision check for the true state
         siF_->getTrueState(tempTrueStateCopy);
         if(!siF_->isValid(tempTrueStateCopy))
         {
             OMPL_INFORM("Robot Collided :(");
+
+            // return the simulated result state
+            siF_->copyState(endState, cendState);
+
             return false;
         }
 
@@ -1840,11 +1937,26 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
             //costHistory_.push_back(std::make_tuple(currentTimeStep, executionCostCov, executionCost));
 
 
+            // if nodeControllerStatus is false (usually due to too many iterations, more than maxTries_)
+            if(!nodeControllerStatus)
+            {
+                OMPL_INFORM("Node controller failed :(");
+
+                // return the simulated result state
+                siF_->copyState(endState, cendState);
+
+                return false;
+            }
+
             // this is a secondary (redundant) collision check for the true state
             siF_->getTrueState(tempTrueStateCopy);
             if(!siF_->isValid(tempTrueStateCopy))
             {
                 OMPL_INFORM("Robot Collided :(");
+
+                // return the simulated result state
+                siF_->copyState(endState, cendState);
+
                 return false;
             }
 

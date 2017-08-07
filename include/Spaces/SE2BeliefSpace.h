@@ -281,7 +281,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             bool sampleBorderBeliefState(ompl::base::State* borderBelief) const;
 
             /** \brief Sample a new state from this belief state (mainly for Monte Carlo simulation) */
-            bool sampleTrueStateFromBelief(ompl::base::State* sampState) const;
+            bool sampleTrueStateFromBelief(ompl::base::State* sampState, const double nsigma=2.0) const;
 
 
             double getStateDistanceTo(const ompl::base::State *state) const;

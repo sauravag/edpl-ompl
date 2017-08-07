@@ -809,13 +809,16 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 */
 
     // check for valid neighbors
-    if (neighbors.size()==1)
+    if (!addReverseEdge)
     {
-        if (m==neighbors[0])
+        if (neighbors.size()==1)
         {
-            OMPL_ERROR("No neighbor other than itself was found for vertex %d", m);
-            //return -1;  // invalid vertex id
-            exit(0);
+            if (m==neighbors[0])
+            {
+                OMPL_ERROR("No neighbor other than itself was found for vertex %d", m);
+                //return -1;  // invalid vertex id
+                exit(0);
+            }
         }
     }
 

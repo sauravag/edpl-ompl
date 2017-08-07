@@ -181,7 +181,7 @@ bool R2BeliefSpace::StateType::sampleBorderBeliefState(ompl::base::State* border
     return true;
 }
 
-bool R2BeliefSpace::StateType::sampleTrueStateFromBelief(ompl::base::State* sampState) const
+bool R2BeliefSpace::StateType::sampleTrueStateFromBelief(ompl::base::State* sampState, const double nsigma) const
 {
     // Cholesky decomposition such that covariance_ = transform * transform.t()
     arma::mat transform;
@@ -196,7 +196,7 @@ bool R2BeliefSpace::StateType::sampleTrueStateFromBelief(ompl::base::State* samp
 
     // transform this random sample for this Gaussian distribution
     arma::colvec mean = getArmaData();
-    arma::colvec randvec_transformed = mean + transform * randvec;
+    arma::colvec randvec_transformed = mean + nsigma * transform * randvec;
 
     // set the new state property
     sampState->as<StateType>()->setX(randvec_transformed[0]);
