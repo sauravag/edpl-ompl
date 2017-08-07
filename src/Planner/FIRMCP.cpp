@@ -169,39 +169,40 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
 // 1)
             // ORIGINAL
-//             for (int j=0; j<selectedChildQVnodes.size(); j++)
-//             {
-//                 Vertex childQVnode = selectedChildQVnodes[j];
-//
-//                 // CHECK which one? there is no from-to relationship between these selectedChildQVnodes...
-//                 if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
-//                     //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
-//                 {
-//                     OMPL_WARN("Existing childQVnode!");
-//                     nextVertex = childQVnode;
-//                     reachedChildQVnodes.push_back(childQVnode);
-//                 }
-//             }
-//             // REVIEW what if a new childQVnode coincides more than one existing selectedChildQVnodes (for the same action)?
-//             // pick the closest one?
-//             // OR merge all selectedChildQVnodes[selectedChildQnode] into one node but with proper belief state merging scheme?!
-//             if (reachedChildQVnodes.size()>1)
-//             {
-//                 //OMPL_WARN("There are %d reachedChildQVnodes for this new childQVnode!", reachedChildQVnodes.size());
-//                 //nextVertex = which childQVnode?
-//                 //exit(0);    // XXX
-//
-//                 nextVertex = reachedChildQVnodes[0];
-//             }
-//             else if (reachedChildQVnodes.size()==0)
+            for (int j=0; j<selectedChildQVnodes.size(); j++)
+            {
+                Vertex childQVnode = selectedChildQVnodes[j];
+
+                // CHECK which one? there is no from-to relationship between these selectedChildQVnodes...
+                if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
+                    //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
+                {
+                    OMPL_WARN("Existing childQVnode!");
+                    nextVertex = childQVnode;
+                    reachedChildQVnodes.push_back(childQVnode);
+                }
+            }
+            // REVIEW what if a new childQVnode coincides more than one existing selectedChildQVnodes (for the same action)?
+            // pick the closest one?
+            // OR merge all selectedChildQVnodes[selectedChildQnode] into one node but with proper belief state merging scheme?!
+            if (reachedChildQVnodes.size()>1)
+            {
+                OMPL_WARN("There are %d reachedChildQVnodes for this new childQVnode!", reachedChildQVnodes.size());
+                //nextVertex = which childQVnode?
+                //exit(0);    // XXX
+
+                int random = rand() % reachedChildQVnodes.size();
+                nextVertex = reachedChildQVnodes[random];  // to break the tie
+            }
+            else if (reachedChildQVnodes.size()==0)
 
 // 2)
-        if (selectedChildQVnodes.size()!=0)
-        {
-            // HACK for pomcpSimulate(), assume that T(hao) are always merged into one!
-            nextVertex = selectedChildQVnodes[0];
-        }
-        else
+//         if (selectedChildQVnodes.size()!=0)
+//         {
+//             // HACK for pomcpSimulate(), assume that T(hao) are always merged into one!
+//             nextVertex = selectedChildQVnodes[0];
+//         }
+//         else
 
     {
         //OMPL_INFORM("A new childQVnode!");
@@ -594,6 +595,7 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 //     int numPOMCPParticles_ = 30;
 //     int numPOMCPParticles_ = 10;
     int numPOMCPParticles_ = 5;
+    double nsigma_ = 3.0;
 
 
     // declare local variables
@@ -628,7 +630,7 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
     {
         // sample a particle from the root (current) belief state
         // NOTE random sampling of a true state from the current belief state for Monte Carlo simulation
-        if(!currentBelief->as<FIRM::StateType>()->sampleTrueStateFromBelief(sampState))
+        if(!currentBelief->as<FIRM::StateType>()->sampleTrueStateFromBelief(sampState, nsigma_))
         {
             OMPL_WARN("Could not sample a true state from the current belief state!");
             continue;
@@ -648,10 +650,11 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
     // obstacleCostToGo_ would affect up to ~5 steps from the depth of collision and decay beyond it, so that its parent branch can have a chance to be selected
     int depthDiff = collisionDepth - currentDepth;
     depthDiff = (depthDiff < 0) ? 0 : depthDiff;
-    double discountedCollisionPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));
+    double discountedPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));
 //     totalCostToGo += computeDiscountedCollisionPenalty(executionCost, currentDepth, collisionDepth);
-//     totalCostToGo += discountedCollisionPenalty;
-    double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedCollisionPenalty;
+//     totalCostToGo += discountedPenalty;
+
+    double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedPenalty;
 
 
 // for debug
@@ -663,46 +666,45 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
     // GreedyUCB()
 //             const std::vector<Vertex>& childQnodes = currentBelief->as<FIRM::StateType>()->getChildQnodes();
             const std::vector<Vertex>& childQnodes = stateProperty_[currentVertex]->as<FIRM::StateType>()->getChildQnodes();
-            double minQvalue = infiniteCostToGo_;
-            std::vector<Vertex> minQvalueNodes;
+            double minQcosttogo = infiniteCostToGo_;
+            std::vector<Vertex> minQcosttogoNodes;
             Vertex childQnode, selectedChildQnode;
-            double childQvalue;
+            double childQcosttogo;
             // for debug
-            std::cout << "childQvalues: ";
+            std::cout << "childQcosttogoes: ";
             for (int j=0; j<childQnodes.size(); j++)
             {
                 childQnode = childQnodes[j];
-//                 childQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(childQnode);
-                childQvalue = stateProperty_[currentVertex]->as<FIRM::StateType>()->getChildQvalue(childQnode);
+                childQcosttogo = stateProperty_[currentVertex]->as<FIRM::StateType>()->getChildQcosttogo(childQnode);
                 // for debug
-                std::cout << "[" << childQnode << "]" << childQvalue << " ";
+                std::cout << "[" << childQnode << "]" << childQcosttogo << " ";
 
-                if (minQvalue >= childQvalue)
+                if (minQcosttogo >= childQcosttogo)
                 {
-                    if (minQvalue > childQvalue)
+                    if (minQcosttogo > childQcosttogo)
                     {
-                        minQvalueNodes.clear();
+                        minQcosttogoNodes.clear();
                     }
-                    minQvalue = childQvalue;
-                    minQvalueNodes.push_back(childQnode);
+                    minQcosttogo = childQcosttogo;
+                    minQcosttogoNodes.push_back(childQnode);
                 }
             }
-            if (minQvalueNodes.size()==1)
+            if (minQcosttogoNodes.size()==1)
             {
-                selectedChildQnode = minQvalueNodes[0];
+                selectedChildQnode = minQcosttogoNodes[0];
             }
             else
             {
-                assert(minQvalueNodes.size()!=0);
-                //OMPL_WARN("More than one childQnodes are with the minQvalue!");
-                int random = rand() % minQvalueNodes.size();
-                selectedChildQnode = minQvalueNodes[random];  // to break the tie
+                assert(minQcosttogoNodes.size()!=0);
+                //OMPL_WARN("More than one childQnodes are with the minQcosttogo!");
+                int random = rand() % minQcosttogoNodes.size();
+                selectedChildQnode = minQcosttogoNodes[random];  // to break the tie
             }
             // for debug
             std::cout << std::endl;
-            std::cout << "minQvalue: " << "[" << selectedChildQnode << "]" << minQvalue << std::endl;
+            std::cout << "minQcosttogo: " << "[" << selectedChildQnode << "]" << minQcosttogo << std::endl;
             std::cout << "executionCost: " << executionCost_ << std::endl;
-            std::cout << "expTotalCost: " << minQvalue + executionCost_ << std::endl;
+            std::cout << "expTotalCost: " << minQcosttogo + executionCost_ << std::endl;
 
             // for debug
 //             OMPL_INFORM("FIRMCP-Execute ##### selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
@@ -726,102 +728,6 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
     siF_->freeState(sampState);
 
     return selectedEdge;
-
-
-
-
-//     #<{(|*
-//         For the given node, find the out edges and see the total cost of taking that edge
-//         The cost of taking the edge is cost to go from the target of the edge + the cost of the edge itself
-//     |)}>#
-//     double minCost = std::numeric_limits<double>::max();
-//     Edge edgeToTake;
-//
-//     // for debug
-//     FIRM::Vertex minCostVertCurrent, minCostVertNext, minCostVertNextNext;
-//
-//     // Iterate over the out edges
-//     foreach(Edge e, boost::out_edges(currentVertex, g_))
-//     {
-//
-//         // Get the target node of the edge
-//         Vertex targetNode = boost::target(e, g_);  
-//
-//         // The FIRM edge to take from the target node
-//         //Edge nextFIRMEdge = feedback_.at(targetNode);
-//
-//         // The node to which next firm edge goes
-//         //Vertex targetOfNextFIRMEdge = boost::target(nextFIRMEdge, g_);
-//
-//         // for debug
-//         if(ompl::magic::PRINT_FEEDBACK_PATH)
-//             std::cout << "PATH[" << currentVertex;
-//
-//         // Check if feedback from target to goal is valid or not
-//         if(!isFeedbackPolicyValid(targetNode, goal))
-//         {
-//
-//             //OMPL_INFORM("Rollout: Invalid path detected from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
-//
-//             updateEdgeCollisionCost(targetNode, goal);
-//
-//             // resolve Dijkstra/DP
-//             solveDijkstraSearch(goal);
-//             solveDynamicProgram(goal, false);
-//
-//             //targetOfNextFIRMEdge = boost::target(feedback_.at(targetNode), g_);  
-//             //OMPL_INFORM("Rollout: Updated path, next firm edge moving from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
-//
-//         }
-//
-//         // The cost to go from the target node
-//         double nextNodeCostToGo = costToGo_[targetNode];
-//
-//         // Find the weight of the edge
-//         FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, e);
-//
-//         // The transition prob of the edge
-//         double transitionProbability = edgeWeight.getSuccessProbability();        
-//         
-//         // compute distance from goal to target
-//         //arma::colvec targetToGoalVec = stateProperty_[goal]->as<FIRM::StateType>()->getArmaData() - stateProperty_[targetNode]->as<FIRM::StateType>()->getArmaData();
-//         //double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
-//
-//         // get the stationary penalty
-//         // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
-//         double stationaryPenalty = 0.0;
-//         if(stationaryPenalties_.find(targetNode) != stationaryPenalties_.end())
-//             stationaryPenalty = stationaryPenalties_.at(targetNode);
-//
-//         // the cost of taking the edge
-//         //double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
-//         // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
-//         double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost() + stationaryPenalty;  // HACK only for rollout policy search; actual execution cost will not consider stationaryPenalty
-//
-//
-//         // for debug
-//         if(ompl::magic::PRINT_COST_TO_GO)
-// //             std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
-//             std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << " + " << stationaryPenalty << std::endl;
-//
-//
-//         if(edgeCostToGo < minCost)
-//         {
-//             minCost  = edgeCostToGo;
-//             edgeToTake = e;
-//
-//             // for debug
-//             minCostVertCurrent = currentVertex;
-//             minCostVertNext = targetNode;
-//             //minCostVertNextNext = targetOfNextFIRMEdge;
-//         }
-//     }
-//
-//     // for debug
-//     if(ompl::magic::PRINT_COST_TO_GO)
-//         std::cout << "minC[" << minCostVertCurrent << "->" << minCostVertNext << "->G] " << minCost << std::endl;
-//
-//     return edgeToTake;
 }
 
 double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev, int& collisionDepth)
@@ -866,14 +772,15 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
         double totalCostToGo = executionCost + discountFactor*delayedCostToGo;
 
         
-    // NOTE penalize collision with discount
-    // obstacleCostToGo_ would affect up to ~5 steps from the depth of collision and decay beyond it, so that its parent branch can have a chance to be selected
-    int depthDiff = collisionDepth - currentDepth;
-    depthDiff = (depthDiff < 0) ? 0 : depthDiff;
-    double discountedCollisionPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));
-//     totalCostToGo += computeDiscountedCollisionPenalty(executionCost, currentDepth, collisionDepth);
-//     totalCostToGo += discountedCollisionPenalty;
-    double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedCollisionPenalty;
+        // no need to do this here
+//     // NOTE penalize collision with discount
+//     // obstacleCostToGo_ would affect up to ~5 steps from the depth of collision and decay beyond it, so that its parent branch can have a chance to be selected
+//     int depthDiff = collisionDepth - currentDepth;
+//     depthDiff = (depthDiff < 0) ? 0 : depthDiff;
+//     double discountedPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));
+// //     totalCostToGo += computeDiscountedCollisionPenalty(executionCost, currentDepth, collisionDepth);
+// //     totalCostToGo += discountedPenalty;
+//     double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedPenalty;
 
         return totalCostToGo;
     }
@@ -931,47 +838,47 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
             // SELECT AN ACTION USING GREEDY UCB POLICY
             const std::vector<Vertex>& childQnodes = currentBelief->as<FIRM::StateType>()->getChildQnodes();
-            double minQvalue = infiniteCostToGo_;
-            std::vector<Vertex> minQvalueNodes;
+            double minQcosttogo = infiniteCostToGo_;
+            std::vector<Vertex> minQcosttogoNodes;
             Vertex childQnode;
-            double childQvalue;
+            double childQcosttogo;
             for (int j=0; j<childQnodes.size(); j++)
             {
                 childQnode = childQnodes[j];
-                childQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(childQnode);
+                childQcosttogo = currentBelief->as<FIRM::StateType>()->getChildQcosttogo(childQnode);
 
                 //for debug
-                //std::cout << "childQvalue = " << childQvalue;
+                //std::cout << "childQcosttogo = " << childQcosttogo;
 
                 // apply exploration bonus!
                 double thisQVvisit = currentBelief->as<FIRM::StateType>()->getThisQVvisit();            // N(h)
                 double childQvisit = currentBelief->as<FIRM::StateType>()->getChildQvisit(childQnode);  // N(ha)
                 // NOTE we minimize, not maximize, the cost-to-go
-//                 childQvalue -= cExploration_ * std::sqrt( std::log(thisQVvisit+1) / (childQvisit+1) );
-                childQvalue -= cExploration_ * std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1e-10) );
+//                 childQcosttogo -= cExploration_ * std::sqrt( std::log(thisQVvisit+1) / (childQvisit+1) );
+                childQcosttogo -= cExploration_ * std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1e-10) );
                 //for debug
-                //std::cout << " - " << cExploration_ << " * " << std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1e-10) ) << " = " << childQvalue << std::endl;
-                childQvalue = (childQvalue > 0.0) ? childQvalue : 0.0;
+                //std::cout << " - " << cExploration_ << " * " << std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1e-10) ) << " = " << childQcosttogo << std::endl;
+                childQcosttogo = (childQcosttogo > 0.0) ? childQcosttogo : 0.0;
 
-                if (minQvalue >= childQvalue)
+                if (minQcosttogo >= childQcosttogo)
                 {
-                    if (minQvalue > childQvalue)
+                    if (minQcosttogo > childQcosttogo)
                     {
-                        minQvalueNodes.clear();
+                        minQcosttogoNodes.clear();
                     }
-                    minQvalue = childQvalue;
-                    minQvalueNodes.push_back(childQnode);
+                    minQcosttogo = childQcosttogo;
+                    minQcosttogoNodes.push_back(childQnode);
                 }
             }
-            if (minQvalueNodes.size()==1)
+            if (minQcosttogoNodes.size()==1)
             {
-                selectedChildQnode = minQvalueNodes[0];
+                selectedChildQnode = minQcosttogoNodes[0];
             }
             else
             {
-                assert(minQvalueNodes.size()!=0);
-                int random = rand() % minQvalueNodes.size();
-                selectedChildQnode = minQvalueNodes[random];  // to break the tie
+                assert(minQcosttogoNodes.size()!=0);
+                int random = rand() % minQcosttogoNodes.size();
+                selectedChildQnode = minQcosttogoNodes[random];  // to break the tie
             }
             // for debug
 //             OMPL_INFORM("FIRMCP-Simulate >>>> selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
@@ -1047,7 +954,8 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 //                 //nextVertex = which childQVnode?
 //                 //exit(0);    // XXX
 //
-//                 nextVertex = reachedChildQVnodes[0];
+//                 int random = rand() % reachedChildQVnodes.size();
+//                 nextVertex = reachedChildQVnodes[random];  // to break the tie
 //             }
 //             else if (reachedChildQVnodes.size()==0)
 
@@ -1071,6 +979,7 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
         else
             std::cout << ".[" << selectedChildQnode << "]." << nextVertex;
 
+
         // recursively call pomcpSimulate()
         double delayedCostToGo = 0.0;
         if (executionStatus)  // if not collided during latest execution
@@ -1083,21 +992,19 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
 
 
-
-
         // total cost-to-go from this node
         double discountFactor = 1.0;
-        double totalCostToGo = executionCost + discountFactor*delayedCostToGo;
+        double totalCostToGo = executionCost + discountFactor*delayedCostToGo;  // V(ha): childQvalues[selectedQnode]
 
         
     // NOTE penalize collision with discount
     // obstacleCostToGo_ would affect up to ~5 steps from the depth of collision and decay beyond it, so that its parent branch can have a chance to be selected
     int depthDiff = collisionDepth - currentDepth;
     depthDiff = (depthDiff < 0) ? 0 : depthDiff;
-    double discountedCollisionPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));
+    double discountedPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));  // C(ha): childQpenalties_[selectedQnode]
 //     totalCostToGo += computeDiscountedCollisionPenalty(executionCost, currentDepth, collisionDepth);
-//     totalCostToGo += discountedCollisionPenalty;
-    double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedCollisionPenalty;
+//     totalCostToGo += discountedPenalty;
+//     double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedPenalty;
 
 
 
@@ -1105,18 +1012,17 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
         currentBelief->as<FIRM::StateType>()->addThisQVvisit();                    // N(h) += 1
         currentBelief->as<FIRM::StateType>()->addChildQvisit(selectedChildQnode);  // N(ha) += 1
 
-            // for debug
-    //         if (isNewNodeExpanded)
-    //             std::cout << "approxQvalue: " << currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode) << std::endl;
-
 
         // UPDATE THE COST-TO-GO
         // REVIEW CHECK how about other heuristics to update the value, like simply taking the min value?
         // min value may lead to collision during execution!
         double selectedChildQvisit = currentBelief->as<FIRM::StateType>()->getChildQvisit(selectedChildQnode);  // N(ha)
         double selectedChildQvalue, selectedChildQvalueUpdated;
+        double selectedChildQpenalty, selectedChildQpenaltyUpdated;
+        double selectedChildQcosttogoUpdated;
 
-        selectedChildQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode);     // V(ha)
+        selectedChildQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode);      // V(ha)
+        selectedChildQpenalty = currentBelief->as<FIRM::StateType>()->getChildQpenalty(selectedChildQnode);  // C(ha)
 
         // a) V(ha) = V(ha) + (totalCostToGo - V(ha)) / N(ha); All Moves As First (AMAF) heuristic
         // collision happening very far from the current node affects this without any discount; execution gets stuck
@@ -1138,22 +1044,32 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 //             selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGo);  // V(ha) = min(V(ha), totalCostToGo)
 
         // d) V(ha) = min(V(ha), totalCostToGoWithDiscountedPenalty); Greedily taking the mininum
+//         // this naively ignores the chance of collision if there is at least a particle that didn't experience collision
+//         if (isNewNodeExpanded)   // XXXXX
+//             selectedChildQvalueUpdated = totalCostToGoWithDiscountedPenalty;  // V(ha) = totalCostToGoWithDiscountedPenalty for the first new node
+//         else
+//             selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGoWithDiscountedPenalty);  // V(ha) = min(V(ha), totalCostToGoWithDiscountedPenalty)
+
+        //*e) V(ha) = min(V(ha), totalCostToGo), C(ha) = max(C(ha), discountedPenalty), J(ha) = V(ha) + C(ha); Greedily taking the mininum
         // this naively ignores the chance of collision if there is at least a particle that didn't experience collision
         if (isNewNodeExpanded)   // XXXXX
-            selectedChildQvalueUpdated = totalCostToGoWithDiscountedPenalty;  // V(ha) = totalCostToGoWithDiscountedPenalty for the first new node
+            selectedChildQvalueUpdated = totalCostToGo;  // V(ha) = totalCostToGo for the first new node
         else
-            selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGoWithDiscountedPenalty);  // V(ha) = min(V(ha), totalCostToGoWithDiscountedPenalty)
+            selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGo);              // V(ha) = min(V(ha), totalCostToGo)
+        selectedChildQpenaltyUpdated = std::max(selectedChildQpenalty, discountedPenalty);          // C(ha) = max(C(ha), discountedPenalty)
+        selectedChildQcosttogoUpdated = selectedChildQvalueUpdated + selectedChildQpenaltyUpdated;  // J(ha) = V(ha) + C(ha)
 
 
+        // a,b,c,d)
+//         currentBelief->as<FIRM::StateType>()->setChildQvalue(selectedChildQnode, selectedChildQvalueUpdated);
+        //*e)
         currentBelief->as<FIRM::StateType>()->setChildQvalue(selectedChildQnode, selectedChildQvalueUpdated);
-
-            // for debug
-    //         if (isNewNodeExpanded)
-    //             std::cout << "executedQvalue: " << currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode) << std::endl;
-
+        currentBelief->as<FIRM::StateType>()->setChildQpenalty(selectedChildQnode, selectedChildQpenaltyUpdated);
+        currentBelief->as<FIRM::StateType>()->setChildQcosttogo(selectedChildQnode, selectedChildQcosttogoUpdated);
 
 
         // return total cost-to-go
+        // NOTE recursive return value is V(ha), not J(ha), to separate C(ha) from accumulation!
         return totalCostToGo;
 
     } // else if ((currentBelief->as<FIRM::StateType>()->getChildQnodes()).size()!=0)
@@ -1402,7 +1318,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 //                 //nextVertex = which childQVnode?
 //                 //exit(0);    // XXX
 //
-//                 nextVertex = reachedChildQVnodes[0];
+//                 int random = rand() % reachedChildQVnodes.size();
+//                 nextVertex = reachedChildQVnodes[random];  // to break the tie
 //             }
 //             else if (reachedChildQVnodes.size()==0)
 
@@ -1426,6 +1343,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     else
         std::cout << ".(" << selectedChildQnode << ")." << nextVertex;
 
+
     // recursively call pomcpRollout()
     double delayedCostToGo = 0.0;
     if (executionStatus)  // if not collided during latest execution
@@ -1437,18 +1355,19 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     siF_->freeState(nextBelief);
 
 
+
     // total cost-to-go from this node
     double discountFactor = 1.0;
-    double totalCostToGo = executionCost + discountFactor*delayedCostToGo;
+    double totalCostToGo = executionCost + discountFactor*delayedCostToGo;  // V(ha): childQvalues[selectedQnode]
 
     // NOTE penalize collision with discount
     // obstacleCostToGo_ would affect up to ~5 steps from the depth of collision and decay beyond it, so that its parent branch can have a chance to be selected
     int depthDiff = collisionDepth - currentDepth;
     depthDiff = (depthDiff < 0) ? 0 : depthDiff;
-    double discountedCollisionPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));
+    double discountedPenalty = obstacleCostToGo_ * 1.0/(1 + std::exp(2*(depthDiff-3)));  // C(ha): childQpenalties_[selectedQnode]
 //     totalCostToGo += computeDiscountedCollisionPenalty(executionCost, currentDepth, collisionDepth);
-//     totalCostToGo += discountedCollisionPenalty;
-    double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedCollisionPenalty;
+//     totalCostToGo += discountedPenalty;
+//     double totalCostToGoWithDiscountedPenalty = totalCostToGo + discountedPenalty;
 
 
     if (isNewNodeExpanded)
@@ -1457,17 +1376,17 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
         currentBelief->as<FIRM::StateType>()->addThisQVvisit();                    // N(h) += 1
         currentBelief->as<FIRM::StateType>()->addChildQvisit(selectedChildQnode);  // N(ha) += 1
 
-        // for debug
-        //         if (isNewNodeExpanded)
-        //             std::cout << "approxQvalue: " << currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode) << std::endl;
 
         // UPDATE THE COST-TO-GO
         // REVIEW CHECK how about other heuristics to update the value, like simply taking the min value?
         // min value may lead to collision during execution!
         double selectedChildQvisit = currentBelief->as<FIRM::StateType>()->getChildQvisit(selectedChildQnode);  // N(ha)
         double selectedChildQvalue, selectedChildQvalueUpdated;
+        double selectedChildQpenalty, selectedChildQpenaltyUpdated;
+        double selectedChildQcosttogoUpdated;
 
-        selectedChildQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode);     // V(ha)
+        selectedChildQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode);      // V(ha)
+        selectedChildQpenalty = currentBelief->as<FIRM::StateType>()->getChildQpenalty(selectedChildQnode);  // C(ha)
 
         // a) V(ha) = V(ha) + (totalCostToGo - V(ha)) / N(ha); All Moves As First (AMAF) heuristic
         // collision happening very far from the current node affects this without any discount; execution gets stuck
@@ -1489,19 +1408,33 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 //             selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGo);  // V(ha) = min(V(ha), totalCostToGo)
 
         // d) V(ha) = min(V(ha), totalCostToGoWithDiscountedPenalty); Greedily taking the mininum
+//         // this naively ignores the chance of collision if there is at least a particle that didn't experience collision
+//         if (isNewNodeExpanded)   // XXXXX
+//             selectedChildQvalueUpdated = totalCostToGoWithDiscountedPenalty;  // V(ha) = totalCostToGoWithDiscountedPenalty for the first new node
+//         else
+//             selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGoWithDiscountedPenalty);  // V(ha) = min(V(ha), totalCostToGoWithDiscountedPenalty)
+
+        //*e) V(ha) = min(V(ha), totalCostToGo), C(ha) = max(C(ha), discountedPenalty), J(ha) = V(ha) + C(ha); Greedily taking the mininum
         // this naively ignores the chance of collision if there is at least a particle that didn't experience collision
         if (isNewNodeExpanded)   // XXXXX
-            selectedChildQvalueUpdated = totalCostToGoWithDiscountedPenalty;  // V(ha) = totalCostToGoWithDiscountedPenalty for the first new node
+            selectedChildQvalueUpdated = totalCostToGo;  // V(ha) = totalCostToGo for the first new node
         else
-            selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGoWithDiscountedPenalty);  // V(ha) = min(V(ha), totalCostToGoWithDiscountedPenalty)
+            selectedChildQvalueUpdated = std::min(selectedChildQvalue, totalCostToGo);              // V(ha) = min(V(ha), totalCostToGo)
+        selectedChildQpenaltyUpdated = std::max(selectedChildQpenalty, discountedPenalty);          // C(ha) = max(C(ha), discountedPenalty)
+        selectedChildQcosttogoUpdated = selectedChildQvalueUpdated + selectedChildQpenaltyUpdated;  // J(ha) = V(ha) + C(ha)
 
 
+        // a,b,c,d)
+//         currentBelief->as<FIRM::StateType>()->setChildQvalue(selectedChildQnode, selectedChildQvalueUpdated);
+        //*e)
         currentBelief->as<FIRM::StateType>()->setChildQvalue(selectedChildQnode, selectedChildQvalueUpdated);
+        currentBelief->as<FIRM::StateType>()->setChildQpenalty(selectedChildQnode, selectedChildQpenaltyUpdated);
+        currentBelief->as<FIRM::StateType>()->setChildQcosttogo(selectedChildQnode, selectedChildQcosttogoUpdated);
     }
     
 
-
     // return total cost-to-go
+    // NOTE recursive return value is V(ha), not J(ha), to separate C(ha) from accumulation!
     return totalCostToGo;
 }
 
