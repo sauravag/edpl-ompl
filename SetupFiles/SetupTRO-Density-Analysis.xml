@@ -163,8 +163,8 @@
 	<!-- [OPTION1] FIRM vs Rollout -->
 	<!-- method 0 for FIRM, 1 for Rollout, 2 for multimodal -->
 	<!-- dynobst 1 to activate -->
-<!-- 	<PlannerMode  method = "0"  dynobst = "0" /> -->
-	<PlannerMode  method = "1"  dynobst = "0" />
+	<PlannerMode  method = "0"  dynobst = "0" />
+<!-- 	<PlannerMode  method = "1"  dynobst = "0" /> -->
 
 	<!-- [OPTION2] FIRM Node Density -->
 	<FIRMNodes  minNodes = "350"  maxNodes = "350" />
@@ -180,7 +180,8 @@
 
 	<!-- [OPTION3] Roadmap -->
 <!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-350.xml" useRoadMap = "1" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;350.xml" useRoadMap = "1" /> -->
+    <RoadMap roadmapFile = "./FIRMRoadMap-FIRMCPSet1-350.xml" useRoadMap = "1" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet9&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet9&#45;400.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;DensitySet9&#45;450.xml" useRoadMap = "1" /> -->

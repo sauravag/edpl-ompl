@@ -173,11 +173,16 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
             {
                 Vertex childQVnode = selectedChildQVnodes[j];
 
-                // CHECK which one? there is no from-to relationship between these selectedChildQVnodes...
+                // NOTE need to check for both directions since there is no from-to relationship between these selectedChildQVnodes
                 if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
-                    //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
                 {
-                    OMPL_WARN("Existing childQVnode!");
+                    //OMPL_WARN("Existing childQVnode!");
+                    nextVertex = childQVnode;
+                    reachedChildQVnodes.push_back(childQVnode);
+                }
+                else if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
+                {
+                    //OMPL_WARN("Existing childQVnode!");
                     nextVertex = childQVnode;
                     reachedChildQVnodes.push_back(childQVnode);
                 }
@@ -205,7 +210,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 //         else
 
     {
-        //OMPL_INFORM("A new childQVnode!");
+        OMPL_INFORM("A new childQVnode after actual execution!");
         nextVertex = addQVnodeToPOMCPTree(siF_->cloneState(nextBelief));
         currentBelief->as<FIRM::StateType>()->addChildQVnode(selectedChildQnode, nextVertex);
     }
@@ -594,13 +599,12 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 //     int numPOMCPParticles_ = 100;
 //     int numPOMCPParticles_ = 30;
 //     int numPOMCPParticles_ = 10;
-    int numPOMCPParticles_ = 5;
+//     int numPOMCPParticles_ = 5;
+    int numPOMCPParticles_ = 3;
     double nsigma_ = 3.0;
 
 
     // declare local variables
-    ompl::base::State* currentBelief = siF_->cloneState(stateProperty_[currentVertex]);
-    ompl::base::State* goalBelief = siF_->cloneState(stateProperty_[goal]);
     ompl::base::State* tempTrueStateCopy = siF_->allocState();
     ompl::base::State* sampState = siF_->allocState();
 
@@ -630,7 +634,7 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
     {
         // sample a particle from the root (current) belief state
         // NOTE random sampling of a true state from the current belief state for Monte Carlo simulation
-        if(!currentBelief->as<FIRM::StateType>()->sampleTrueStateFromBelief(sampState, nsigma_))
+        if(!stateProperty_[currentVertex]->as<FIRM::StateType>()->sampleTrueStateFromBelief(sampState, nsigma_))
         {
             OMPL_WARN("Could not sample a true state from the current belief state!");
             continue;
@@ -664,8 +668,8 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 
     // select the best action
     // GreedyUCB()
-//             const std::vector<Vertex>& childQnodes = currentBelief->as<FIRM::StateType>()->getChildQnodes();
             const std::vector<Vertex>& childQnodes = stateProperty_[currentVertex]->as<FIRM::StateType>()->getChildQnodes();
+//             const std::vector<Vertex>& childQnodes = stateProperty_[currentVertex]->as<FIRM::StateType>()->getChildQnodes();
             double minQcosttogo = infiniteCostToGo_;
             std::vector<Vertex> minQcosttogoNodes;
             Vertex childQnode, selectedChildQnode;
@@ -722,8 +726,6 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 
 
     // free the memory
-    siF_->freeState(currentBelief);
-    siF_->freeState(goalBelief);
     siF_->freeState(tempTrueStateCopy);
     siF_->freeState(sampState);
 
@@ -734,15 +736,17 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 {
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
+    int maxPOMCPDepth_ = 30;
 //     int maxPOMCPDepth_ = 10;
-    int maxPOMCPDepth_ = 5;
+//     int maxPOMCPDepth_ = 5;
 //     int maxPOMCPDepth_ = 1;
     int maxFIRMReachDepth_ = 300;
 //     int maxFIRMReachDepth_ = 100;
 //     double c_exploration = std::sqrt(2.0);
-//     double c_exploration = 1.0;
 //     double cExploration_ = 0.1;
-    double cExploration_ = 0.0;
+    double cExploration_ = 0.05;
+//     double cExploration_ = 0.01;
+//     double cExploration_ = 0.0;
 
 
     ompl::base::State* currentBelief = stateProperty_[currentVertex];
@@ -764,8 +768,6 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
         delayedCostToGo = pomcpRollout(currentVertex, currentDepth, selectedEdgePrev, collisionDepth, isNewNodeExpanded);   // pass isNewNodeExpanded only for the first pomcpRollout()
         executionCost = 0.0;
-
-        currentBelief->as<FIRM::StateType>()->setChildQexpanded();
 
         // total cost-to-go from this node
         double discountFactor = 1.0;
@@ -936,9 +938,14 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 //             {
 //                 Vertex childQVnode = selectedChildQVnodes[j];
 //
-//                 // CHECK which one? there is no from-to relationship between these selectedChildQVnodes...
+//                 // NOTE need to check for both directions since there is no from-to relationship between these selectedChildQVnodes
 //                 if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
-//                     //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
+//                 {
+//                     //OMPL_WARN("Existing childQVnode!");
+//                     nextVertex = childQVnode;
+//                     reachedChildQVnodes.push_back(childQVnode);
+//                 }
+//                 else if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
 //                 {
 //                     //OMPL_WARN("Existing childQVnode!");
 //                     nextVertex = childQVnode;
@@ -1079,8 +1086,9 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 {
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
+    int maxPOMCPDepth_ = 30;
 //     int maxPOMCPDepth_ = 10;
-    int maxPOMCPDepth_ = 5;
+//     int maxPOMCPDepth_ = 5;
 //     int maxPOMCPDepth_ = 1;
     int maxFIRMReachDepth_ = 300;
 //     int maxFIRMReachDepth_ = 100;
@@ -1300,11 +1308,16 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 //             {
 //                 Vertex childQVnode = selectedChildQVnodes[j];
 //
-//                 // CHECK which one? there is no from-to relationship between these selectedChildQVnodes...
+//                 // NOTE need to check for both directions since there is no from-to relationship between these selectedChildQVnodes
 //                 if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
-//                     //if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
 //                 {
-//                     OMPL_WARN("Existing childQVnode!");
+//                     //OMPL_WARN("Existing childQVnode!");
+//                     nextVertex = childQVnode;
+//                     reachedChildQVnodes.push_back(childQVnode);
+//                 }
+//                 else if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
+//                 {
+//                     //OMPL_WARN("Existing childQVnode!");
 //                     nextVertex = childQVnode;
 //                     reachedChildQVnodes.push_back(childQVnode);
 //                 }
@@ -1608,6 +1621,9 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
 
     policyGenerator_->addFIRMNodeToObservationGraph(stateProperty_[m]);
 
+    // mark that this node's childQnodes are expanded now
+    stateProperty_[m]->as<FIRM::StateType>()->setChildQexpanded();
+
     return true;
 }
 
@@ -1659,6 +1675,15 @@ FIRMWeight FIRMCP::addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const 
 
 FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
 {
+    // XXX tuning parameters (these are determined from actual transition results)
+    double heurPosStepSize_ = 0.1;
+    double heurOriStepSize_ = 0.05;
+    double heurCovStepSize_ = 0.000001;  // NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks
+//     double heurCovStepSize_ = 0.00001;
+    double covConvergenceRate_ = 0.9;   // cov_{k+1} = covConvergenceRate * cov_k
+//     double covConvergenceRate_ = 0.99;   // cov_{k+1} = covConvergenceRate * cov_k
+
+
     // just for compatibility with FIRM::generateEdgeNodeControllerWithCost
     bool constructionMode = false;
 
@@ -1668,14 +1693,6 @@ FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a
 
      // Generate the edge controller for given start and end state
     generateEdgeController(startNodeState,targetNodeState,edgeController);
-
-
-    // XXX tuning parameters (these are determined from actual transition results)
-    double heurPosStepSize_ = 0.1;
-    double heurOriStepSize_ = 0.05;
-    double heurCovStepSize_ = 0.000001;  // NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks
-//     double heurCovStepSize_ = 0.00001;
-    double covConvergenceRate_ = 0.9;   // cov_{k+1} = covConvergenceRate * cov_k
 
     // compute the distance between two states
     double posDistance = startNodeState->as<FIRM::StateType>()->getPosDistanceTo(targetNodeState);
