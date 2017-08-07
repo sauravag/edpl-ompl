@@ -41,7 +41,7 @@
 	<!--DataLog save = "1" folder = "./DataLog/" /-->
 	<DataLog save = "1" folder = "./" />
 	<Roadmap save = "1" />
-	<MCParticles numparticles = "5" />
+	<MCParticles numparticles = "5" />	<!-- NOTE this is not used for FIRMCP online Monte Carlo simulation -->
 	<!--MCParticles numparticles = "10" /-->
 	<RolloutSteps rolloutsteps = "1" />
 	<NNRadius nnradius = "2.25" />

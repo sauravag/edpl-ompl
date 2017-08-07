@@ -828,8 +828,8 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 {
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
-    int maxPOMCPDepth_ = 10;
-//     int maxPOMCPDepth_ = 5;
+//     int maxPOMCPDepth_ = 10;
+    int maxPOMCPDepth_ = 5;
 //     int maxPOMCPDepth_ = 1;
     int maxFIRMReachDepth_ = 300;
 //     int maxFIRMReachDepth_ = 100;
@@ -1163,8 +1163,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 {
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
-    int maxPOMCPDepth_ = 10;
-//     int maxPOMCPDepth_ = 5;
+//     int maxPOMCPDepth_ = 10;
+    int maxPOMCPDepth_ = 5;
 //     int maxPOMCPDepth_ = 1;
     int maxFIRMReachDepth_ = 300;
 //     int maxFIRMReachDepth_ = 100;
@@ -1791,6 +1791,10 @@ FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a
 
 bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost)
 {
+    // XXX tuning parameters
+    int scaleStabNumSteps_ = 10;  // scaling factor to rolloutSteps_ for StabilizeUpto() by node controller
+
+
     EdgeControllerType edgeController;
     NodeControllerType nodeController;
 
@@ -1917,7 +1921,10 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
             nodeController = nodeControllers_.at(targetNode);
             nodeController.setSpaceInformation(policyExecutionSI_);
 
-            nodeControllerStatus = nodeController.StabilizeUpto(numSteps, cstartState, cendState, costCov, stepsExecuted, false);
+            //nodeControllerStatus = nodeController.StabilizeUpto(numSteps, cstartState, cendState, costCov, stepsExecuted, false);
+
+            // NOTE to reduce the number of mostly identical POMCP tree nodes during stabilization, inflate the number of execution steps
+            nodeControllerStatus = nodeController.StabilizeUpto(scaleStabNumSteps_*numSteps, cstartState, cendState, costCov, stepsExecuted, false);
 
 
             // NOTE how to penalize uncertainty (covariance) and path length (time steps) in the cost
