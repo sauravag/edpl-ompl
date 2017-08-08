@@ -215,6 +215,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         currentBelief->as<FIRM::StateType>()->addChildQVnode(selectedChildQnode, nextVertex);
     }
 
+
     // for debug
     OMPL_INFORM("FIRMCP: Moved from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to %u (%2.3f, %2.3f, %2.3f, %2.6f)", tempVertex, nextVertex, 
             stateProperty_[tempVertex]->as<FIRM::StateType>()->getX(),
@@ -229,7 +230,32 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
     //std::cout << tempVertex << " #[" << selectedChildQnode << "]# " << nextVertex;
     //OMPL_INFORM("FIRMCP: Moved %d #[%d]# %d", tempVertex, selectedChildQnode, nextVertex);
 
-    tempVertex = nextVertex;
+
+        // prune the old tree to free the memory
+        if (tempVertex != start)
+        {
+//             if (reachedChildQVnodes.size()!=0)  // nextBelief matches at least one node on POMCP tree
+//             {
+
+                const std::vector<Vertex>& childQnodes = currentBelief->as<FIRM::StateType>()->getChildQnodes();
+                for (const auto& childQnode : childQnodes)
+                {
+                    const std::vector<Vertex>& childQVnodes = currentBelief->as<FIRM::StateType>()->getChildQVnodes(childQnode);
+                    for (const auto& childQVnode : childQVnodes)
+                    {
+                        if (childQVnode != nextVertex)
+                        {
+                            prunePOMCPTreeFrom(childQVnode);
+                        }
+                    }
+                }
+
+//             }
+//             else  // nextBelief does not match any nodes on POMCP tree
+//             {
+//                 prunePOMCPTreeFrom(tempVertex);
+//             }
+        }
 
 
             // save the current true state
@@ -237,6 +263,9 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
     // if want/do not want to show monte carlo sim
     siF_->showRobotVisualization(ompl::magic::SHOW_MONTE_CARLO);
+
+
+    tempVertex = nextVertex;
 
             // select the best next edge
             e = generatePOMCPPolicy(tempVertex, goal);
@@ -1946,5 +1975,42 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
     siF_->copyState(endState, cendState);
 
     return true;
+}
+
+void FIRMCP::prunePOMCPTreeFrom(const Vertex rootVertex)
+{
+    ompl::base::State* rootState = stateProperty_[rootVertex];
+
+    // recursively call prunePOMCPTreeFrom() to destruct the descendent nodes starting from the leaves
+    if (rootState->as<FIRM::StateType>()->getChildQexpanded())
+    {
+        const std::vector<Vertex>& childQnodes = rootState->as<FIRM::StateType>()->getChildQnodes();
+        for (const auto& childQnode : childQnodes)
+        {
+            const std::vector<Vertex>& childQVnodes = rootState->as<FIRM::StateType>()->getChildQVnodes(childQnode);
+            for (const auto& childQVnode : childQVnodes)
+            {
+                prunePOMCPTreeFrom(childQVnode);
+            }
+        }
+    }
+
+
+    // free the memory of controller
+    // NOTE there is no node controller generated for POMCP tree nodes during rollout execution
+    foreach(Edge edge, boost::out_edges(rootVertex, g_))
+    {
+        edgeControllers_[edge].freeSeparatedController();
+        edgeControllers_[edge].freeLinearSystems();
+        edgeControllers_.erase(edge);
+    }
+
+    // free the memory of state
+    siF_->freeState(rootState);
+
+    // remove the node/edges from POMCP tree
+    boost::clear_vertex(rootVertex, g_);    // remove all edges from or to rootVertex
+    //boost::remove_vertex(rootVertex, g_);   // remove rootVertex  // NOTE commented this to avoid confusion from vertex IDs
+    //stateProperty_.erase(rootVertex);
 }
 

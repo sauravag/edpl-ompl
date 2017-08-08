@@ -71,6 +71,9 @@ protected:
     FIRMWeight generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController);
 
     bool executeSimulationFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost);
+
+    void prunePOMCPTreeFrom(const Vertex rootVertex);
+
 };
 
 
