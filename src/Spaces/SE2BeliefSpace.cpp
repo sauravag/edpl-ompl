@@ -108,7 +108,24 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxed
     return true;
 }
 
-bool SE2BeliefSpace::StateType::isReachedPose(const ompl::base::State *state) const
+bool SE2BeliefSpace::StateType::isReachedWithinNEps(const ompl::base::State *state, const double nEps) const
+{
+    // check if position and orientation errors are less than thresholds
+    if(!this->isReachedPose(state, nEps))
+        return false;
+
+    // check if covariance error is less than a threshold
+    if(!this->isReachedCov(state, nEps))
+        return false;
+
+    // for debug
+    //std::cout << "isReached()!" << std::endl;
+
+    // otherwise, the given state is considered to have reached this state
+    return true;
+}
+
+bool SE2BeliefSpace::StateType::isReachedPose(const ompl::base::State *state, const double nEps) const
 {
     // subtract the two beliefs and get the norm
     arma::colvec stateDiff = state->as<SE2BeliefSpace::StateType>()->getArmaData() - this->getArmaData();
@@ -127,24 +144,24 @@ bool SE2BeliefSpace::StateType::isReachedPose(const ompl::base::State *state) co
     double ori_distance_to_goal = std::abs(stateDiff[2]);
 
     // check for position and orientation thresholds
-    if(pos_distance_to_goal > reachDistPos_)
+    if(pos_distance_to_goal > nEps * reachDistPos_)
     {
         // for debug
-        //std::cout << "pos_distance_to_goal: " << pos_distance_to_goal << "  (threshold: " << reachDistPos_ << ")" << std::endl;
+        //std::cout << "pos_distance_to_goal: " << pos_distance_to_goal << "  (threshold: " << nEps * reachDistPos_ << ")" << std::endl;
 
         return false;
     }
-    if(ori_distance_to_goal > reachDistOri_)
+    if(ori_distance_to_goal > nEps * reachDistOri_)
     {
         // for debug
-        //std::cout << "ori_distance_to_goal: " << ori_distance_to_goal << "  (threshold: " << reachDistOri_ << ")" << std::endl;
+        //std::cout << "ori_distance_to_goal: " << ori_distance_to_goal << "  (threshold: " << nEps * reachDistOri_ << ")" << std::endl;
 
         return false;
     }
     return true;
 }
 
-bool SE2BeliefSpace::StateType::isReachedCov(const ompl::base::State *state) const
+bool SE2BeliefSpace::StateType::isReachedCov(const ompl::base::State *state, const double nEps) const
 {
     // subtract the two covariances
     arma::mat covDiff = state->as<SE2BeliefSpace::StateType>()->getCovariance() - this->getCovariance();
@@ -162,10 +179,10 @@ bool SE2BeliefSpace::StateType::isReachedCov(const ompl::base::State *state) con
     double cov_distance_to_goal = arma::norm(abs(covDiffDiag) % normWeights_, 2);
 
     // check for position and orientation thresholds
-    if(cov_distance_to_goal > reachDistCov_)
+    if(cov_distance_to_goal > nEps * reachDistCov_)
     {
         // for debug
-        //std::cout << "cov_distance_to_goal: " << cov_distance_to_goal << "  (threshold: " << reachDistCov_ << ")" << std::endl;
+        //std::cout << "cov_distance_to_goal: " << cov_distance_to_goal << "  (threshold: " << nEps * reachDistCov_ << ")" << std::endl;
 
         return false;
     }

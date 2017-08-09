@@ -165,9 +165,9 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 childQnodes_.clear();
             }
 
-            void clearChildQweights(){
-                childQweights_.clear();
-            }
+//             void clearChildQweights(){
+//                 childQweights_.clear();
+//             }
 
             void clearChildQvalues(){
                 childQvalues_.clear();
@@ -202,9 +202,9 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 childQnodes_.push_back(childQnode);
             }
 
-            void setChildQweight(const Vertex childQnode, const double weight){
-                childQweights_[childQnode] = weight;
-            }
+//             void setChildQweight(const Vertex childQnode, const double weight){
+//                 childQweights_[childQnode] = weight;
+//             }
 
             void setChildQvalue(const Vertex childQnode, const double value){
                 childQvalues_[childQnode] = value;
@@ -251,14 +251,14 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return childQnodes_;
             }
 
-            double getChildQweight(const Vertex childQnode){
-                if (childQweights_.find(childQnode) == childQweights_.end())
-                {
-                    OMPL_ERROR("childQnode key is not found in childQweights_!");
-                    return 0.0;   // not to allow this action to be selected
-                }
-                return childQweights_.at(childQnode);
-            }
+//             double getChildQweight(const Vertex childQnode){
+//                 if (childQweights_.find(childQnode) == childQweights_.end())
+//                 {
+//                     OMPL_ERROR("childQnode key is not found in childQweights_!");
+//                     return 0.0;   // not to allow this action to be selected
+//                 }
+//                 return childQweights_.at(childQnode);
+//             }
 
             const std::map<Vertex, double> getChildQvalues() const {
                 return childQvalues_;
@@ -322,11 +322,13 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             /** \brief Checks if the input state has stabilized to this state (node pose and covariance reachability check) */
             bool isReached(ompl::base::State *state, bool relaxedConstraint=false) const;
 
+            bool isReachedWithinNEps(const ompl::base::State *state, const double nEps=1.0) const;
+
             /** \brief Checks if the input state's pose has reached this state (node pose reachability check) */
-            bool isReachedPose(const ompl::base::State *state) const;
+            bool isReachedPose(const ompl::base::State *state, const double nEps=1.0) const;
 
             /** \brief Checks if the input state's covariance has reached this state (node covariance reachability check) */
-            bool isReachedCov(const ompl::base::State *state) const;
+            bool isReachedCov(const ompl::base::State *state, const double nEps=1.0) const;
 
 
             /** \brief Sample a border belief state from this belief state (mainly for Monte Carlo simulation) */
@@ -360,7 +362,7 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
 
               bool childQexpanded_;                                 // true if this node is added to POMCP tree
               std::vector<Vertex> childQnodes_;                     // T(ha)  // size: [number of actions (controllers to the connected neighbors)]
-              std::map<Vertex, double> childQweights_;              // w(ha)  // size: [number of actions]  // heuristic value only for POMCP-Rollout
+//               std::map<Vertex, double> childQweights_;              // w(ha)  // size: [number of actions]  // heuristic value only for POMCP-Rollout
               std::map<Vertex, double> childQvalues_;               // V(ha)  // size: [number of actions]  // min(V(ha)) for pure cost-to-go
               std::map<Vertex, double> childQpenalties_;            // C(ha)  // size: [number of actions]  // max(C(ha)) for discounted collition penalty
               std::map<Vertex, double> childQcosttogoes_;           // J(ha)  // size: [number of actions]  // J(ha) = V(ha) + C(ha)

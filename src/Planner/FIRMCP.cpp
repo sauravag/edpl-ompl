@@ -316,7 +316,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
-        OMPL_INFORM("FIRMCP: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to [%u] (%2.3f, %2.3f, %2.3f, %2.6f) with TP = %f", tempVertex, targetNode, 
+        OMPL_INFORM("FIRMCP: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to [%u] (%2.3f, %2.3f, %2.3f, %2.6f)", tempVertex, targetNode, 
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getX(),
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getY(),
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getYaw(),
@@ -324,8 +324,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
                 stateProperty_[targetNode]->as<FIRM::StateType>()->getX(),
                 stateProperty_[targetNode]->as<FIRM::StateType>()->getY(),
                 stateProperty_[targetNode]->as<FIRM::StateType>()->getYaw(),
-                arma::trace(stateProperty_[targetNode]->as<FIRM::StateType>()->getCovariance()),
-                succProb);
+                arma::trace(stateProperty_[targetNode]->as<FIRM::StateType>()->getCovariance()));
 
         // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
         // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
@@ -631,8 +630,8 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 //     int numPOMCPParticles_ = 100;
 //     int numPOMCPParticles_ = 30;
 //     int numPOMCPParticles_ = 10;
-//     int numPOMCPParticles_ = 5;
-    int numPOMCPParticles_ = 3;
+    int numPOMCPParticles_ = 5;
+//     int numPOMCPParticles_ = 3;
 //     int numPOMCPParticles_ = 2;
     double nsigma_ = 3.0;
 
@@ -696,7 +695,8 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 
 // for debug
 //         std::cout << "totalCostToGo: " << totalCostToGo << std::endl;
-        std::cout << "totalCostToGoWithDiscountedPenalty: " << totalCostToGoWithDiscountedPenalty << std::endl;
+//         std::cout << "totalCostToGoWithDiscountedPenalty: " << totalCostToGoWithDiscountedPenalty << std::endl;
+        std::cout << "particleCostToGo: " << totalCostToGoWithDiscountedPenalty << "(=" << totalCostToGo << "+" << discountedPenalty << ")" << std::endl;
     }
 
     // select the best action
@@ -778,9 +778,10 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 //     int maxPOMCPDepth_ = 1;
     int maxFIRMReachDepth_ = 300;
 //     int maxFIRMReachDepth_ = 100;
-//     double c_exploration = std::sqrt(2.0);
+    double cExplorationForSimulate_ = 5.0;
+//     double cExplorationForSimulate_ = std::sqrt(2.0);
 //     double cExplorationForSimulate_ = 0.1;
-    double cExplorationForSimulate_ = 0.05;
+//     double cExplorationForSimulate_ = 0.05;
 //     double cExplorationForSimulate_ = 0.01;
 //     double cExplorationForSimulate_ = 0.0;
 
@@ -827,20 +828,25 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
         if (currentDepth >= maxPOMCPDepth_)
         {
+            Vertex targetVertex = boost::target(selectedEdgePrev, g_);   // latest target before reaching the finite horizon
 
             if (currentDepth >= maxFIRMReachDepth_)
             {
                 OMPL_WARN("Could not reach to the target node within %d iterations", maxFIRMReachDepth_);
                 //return obstacleCostToGo_;
 
-                // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
-                double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
-                executionCost *= maxFIRMReachDepth_ - currentDepth;
+//                 // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+//                 double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
+//                 executionCost *= maxFIRMReachDepth_ - currentDepth;
                 collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
-                return executionCost;
-            }
+//                 return executionCost;
 
-            Vertex targetVertex = boost::target(selectedEdgePrev, g_);   // latest target before reaching the finite horizon
+                // compute approximate edge cost and cost-to-go
+                double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
+                double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
+
+                return approxCostToGo;
+            }
 
             // TODO CONTINUE TO MOVE TOWARD THE LATEST TARGET FIRM NODE AND RETURN COST-TO-GO
             if (stateProperty_[targetVertex]->as<FIRM::StateType>()->isReached(currentBelief))
@@ -852,8 +858,11 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
                 // for debug
                 std::cout << std::endl;
 
-                //return costToGo_[targetVertex] + edgeCostToCenterBelief;
-                return costToGo_[targetVertex];
+                // compute approximate edge cost and cost-to-go
+                double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
+                double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
+
+                return approxCostToGo;
             }
 
             selectedEdge = selectedEdgePrev;    // selectedEdgePrev should be one of function arguments
@@ -885,17 +894,18 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
                 childQnode = childQnodes[j];
                 childQcosttogo = currentBelief->as<FIRM::StateType>()->getChildQcosttogo(childQnode);
 
-                //for debug
-                //std::cout << "childQcosttogo = " << childQcosttogo;
+                // for debug
+//                 std::cout << "childQcosttogo = " << childQcosttogo;
 
                 // apply exploration bonus!
                 double thisQVvisit = currentBelief->as<FIRM::StateType>()->getThisQVvisit();            // N(h)
                 double childQvisit = currentBelief->as<FIRM::StateType>()->getChildQvisit(childQnode);  // N(ha)
                 // NOTE we minimize, not maximize, the cost-to-go
-//                 childQcosttogo -= cExplorationForSimulate_ * std::sqrt( std::log(thisQVvisit+1) / (childQvisit+1) );
-                childQcosttogo -= cExplorationForSimulate_ * std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1e-10) );
-                //for debug
-                //std::cout << " - " << cExplorationForSimulate_ << " * " << std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1e-10) ) << " = " << childQcosttogo << std::endl;
+                childQcosttogo -= cExplorationForSimulate_ * std::sqrt( std::log(thisQVvisit+1) / (childQvisit+1) );
+//                 childQcosttogo -= cExplorationForSimulate_ * std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1e-10) );
+                // for debug
+//                 std::cout << " - " << cExplorationForSimulate_ << " * " << std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1.0) ) << " = " << childQcosttogo << std::endl;
+//                 std::cout << " - " << cExplorationForSimulate_ << " * " << std::sqrt( std::log(thisQVvisit+1.0) / (childQvisit+1e-10) ) << " = " << childQcosttogo << std::endl;
                 childQcosttogo = (childQcosttogo > 0.0) ? childQcosttogo : 0.0;
 
                 if (minQcosttogo >= childQcosttogo)
@@ -944,9 +954,14 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
             OMPL_ERROR("Failed to executeSimulationFromUpto()!");
             //executionCost = obstacleCostToGo_;  // commented; obstacleCostToGo_ penalty will be considered by collisionDepth
 
-            // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
-            executionCost *= maxFIRMReachDepth_ - currentDepth;
+//             // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+//             executionCost *= maxFIRMReachDepth_ - currentDepth;
             collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
+
+            // compute approximate edge cost
+            Vertex targetVertex = boost::target(selectedEdge, g_);   // latest target before reaching the finite horizon
+            double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
+            executionCost += approxEdgeCost;
         }
 
         // XXXXX for debug
@@ -1134,26 +1149,50 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
     int maxFIRMReachDepth_ = 300;
 //     int maxFIRMReachDepth_ = 100;
 
-    ompl::base::State* currentBelief = stateProperty_[currentVertex];
+//     double costToGoRegulator_ = 1e-6;      // exploitative  // now this is just to prevent divide-by-zero
+//     double costToGoRegulator_ = 1.0;
+//     double costToGoRegulator_ = 10000.0;  // explorative
+    double costToGoRegulatorOutOfReach_ = 1e-6;      // exploitative  // this is just to prevent divide-by-zero
+    double costToGoRegulatorWithinReach_ = 10.0;     // explorative; larger value for near-uniform distribution
+
+//     double cExploitationForRolloutOutOfReach_ = 1.0;
+//     double cExploitationForRolloutOutOfReach_ = 3.0;
+//     double cExploitationForRolloutOutOfReach_ = 5.0;
+    double cExploitationForRolloutOutOfReach_ = 10.0;  // exploitative
+    double cExploitationForRolloutWithinReach_ = 1.0;   // explorative
+
+//     double nEpsForIsReached_ = 10.0;
+    double nEpsForIsReached_ = 3.0;
+
+
+    ompl::base::State* currentBelief = stateProperty_[currentVertex];  // current belief after applying previous control toward the latest target
     Edge selectedEdge;
     Vertex selectedChildQnode;
 
+
     if (currentDepth >= maxPOMCPDepth_)
     {
+
+        Vertex targetVertex = boost::target(selectedEdgePrev, g_);   // latest target before reaching the finite horizon
 
         if (currentDepth >= maxFIRMReachDepth_)
         {
             OMPL_WARN("Could not reach to the target node within %d iterations", maxFIRMReachDepth_);
             //return obstacleCostToGo_;
 
-            // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
-            double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
-            executionCost *= maxFIRMReachDepth_ - currentDepth;
+//             // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+//             double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
+//             executionCost *= maxFIRMReachDepth_ - currentDepth;
             collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
-            return executionCost;
+//             return executionCost;
+
+            // compute approximate edge cost and cost-to-go
+            double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
+            double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
+
+            return approxCostToGo;
         }
 
-        // TODO need code cleanup
         // CREATE A NEW NODE IF NOT COINCIDES ANY OF EXISTING POMCP TREE NODES
 //         if ((currentBelief->as<FIRM::StateType>()->getChildQnodes()).size()==0)
     if (!currentBelief->as<FIRM::StateType>()->getChildQexpanded())  // NOTE childQvalues are added only if this node was expanded before in expandQnodesOnPOMCPTreeWithApproxCostToGo()
@@ -1165,16 +1204,20 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
                 OMPL_WARN("Failed to expandQnodesOnPOMCPTreeWithApproxCostToGo()!");
                 //return obstacleCostToGo_;
 
-                // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
-                double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
-                executionCost *= maxFIRMReachDepth_ - currentDepth;
+//                 // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+//                 double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
+//                 executionCost *= maxFIRMReachDepth_ - currentDepth;
                 collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
-                return executionCost;
+//                 return executionCost;
+
+                // compute approximate edge cost and cost-to-go
+                double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
+                double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
+
+                return approxCostToGo;
             }
         }
 
-
-        Vertex targetVertex = boost::target(selectedEdgePrev, g_);   // latest target before reaching the finite horizon
 
         // TODO CONTINUE TO MOVE TOWARD THE LATEST TARGET FIRM NODE AND RETURN COST-TO-GO
         if (stateProperty_[targetVertex]->as<FIRM::StateType>()->isReached(currentBelief))
@@ -1186,8 +1229,11 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
             // for debug
             std::cout << std::endl;
 
-            //return costToGo_[targetVertex] + edgeCostToCenterBelief;
-            return costToGo_[targetVertex];
+            // compute approximate edge cost and cost-to-go
+            double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
+            double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
+
+            return approxCostToGo;
         }
 
         selectedEdge = selectedEdgePrev;
@@ -1217,11 +1263,20 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
                 OMPL_WARN("Failed to expandQnodesOnPOMCPTreeWithApproxCostToGo()!");
                 //return obstacleCostToGo_;
 
-                // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
-                double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
-                executionCost *= maxFIRMReachDepth_ - currentDepth;
+//                 // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+//                 double executionCost = currentBelief->as<FIRM::StateType>()->getTraceCovariance();
+//                 executionCost *= maxFIRMReachDepth_ - currentDepth;
                 collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
-                return executionCost;
+//                 return executionCost;
+
+                std::cout << "segfault here?" << std::endl;
+        Vertex targetVertex = boost::target(selectedEdgePrev, g_);   // latest target before reaching the finite horizon
+
+                // compute approximate edge cost and cost-to-go
+                double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
+                double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
+
+                return approxCostToGo;
             }
         }
 
@@ -1250,10 +1305,51 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 
         // allot a section in the weight bar according to each weight
         std::vector<double> weightSections;  // upper limit of accumulated weight for each action
-        double weight, weightSum = 0.0;
+        double costtogo, weight, weightSum = 0.0;
+
+        // check for isReachedWithinNEps for any of nearest neighbor FIRM nodes
+        bool isReachedWithinNEps = false;
         for (const auto& childQnode : childQnodes)
         {
-            weight = currentBelief->as<FIRM::StateType>()->getChildQweight(childQnode);
+            isReachedWithinNEps = stateProperty_[childQnode]->as<FIRM::StateType>()->isReachedWithinNEps(currentBelief, nEpsForIsReached_);
+            break;
+        }
+
+        for (const auto& childQnode : childQnodes)
+        {
+                // FIXME in this case, childQweight is not needed since it is the same with the initialized childQvalue
+                // and it makes more sense that pomcpRollout() uses UPDATED childQcosttogo for action selection once childQnode is expanded!
+//             weight = currentBelief->as<FIRM::StateType>()->getChildQweight(childQnode);
+//             weightSum += weight;
+
+
+
+            // NOTE POMCP-Rollout is to explore the unknown area of the search space!
+            // in our problem, the main unknown area is between the approximate stabilization of isReached() and the true stabilization
+            // if isReachedWithinNEps() is satisfied, increase the randomness of POMCP-Rollout policy to explore this region,
+            // otherwise, decrease the randomness to be more exploitative like FIRM-Rollout
+
+            costtogo = currentBelief->as<FIRM::StateType>()->getChildQcosttogo(childQnode);
+
+            //if (stateProperty_[targetVertex]->as<FIRM::StateType>()->isReachedWithinNEps(currentBelief))
+            if (isReachedWithinNEps)
+            {
+                // explorative
+                weight = 1.0 / std::pow(costtogo + costToGoRegulatorWithinReach_, cExploitationForRolloutWithinReach_);
+
+                // for debug
+                //std::cout << "isReachedWithinNEps: true" << std::endl;
+            }
+            else
+            {
+                // exploitative
+                weight = 1.0 / std::pow(costtogo + costToGoRegulatorOutOfReach_, cExploitationForRolloutOutOfReach_);
+
+                // for debug
+                //std::cout << "isReachedWithinNEps: false" << std::endl;
+            }
+
+
             weightSum += weight;
             weightSections.push_back(weightSum);
         }
@@ -1318,9 +1414,14 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
         OMPL_ERROR("Failed to executeSimulationFromUpto()!");
         //executionCost = obstacleCostToGo_;  // commented; obstacleCostToGo_ penalty will be considered by collisionDepth
 
-        // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
-        executionCost *= maxFIRMReachDepth_ - currentDepth;
+//         // approximately penalize the stabilization cost in the case that it immediately stops recursive simulation
+//         executionCost *= maxFIRMReachDepth_ - currentDepth;
         collisionDepth = currentDepth;  // mark that collision happened at this depth from the root
+
+        // compute approximate edge cost
+        Vertex targetVertex = boost::target(selectedEdge, g_);   // latest target before reaching the finite horizon
+        double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
+        executionCost += approxEdgeCost;
     }
 
     // for debug
@@ -1516,16 +1617,6 @@ FIRM::Vertex FIRMCP::addQVnodeToPOMCPTree(ompl::base::State *state)
 
 bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const bool isNewNodeExpanded)
 {
-    // XXX tuning parameters
-    double costToGoRegulator_ = 0.0;      // exploitative
-//     double costToGoRegulator_ = 1.0;
-    //double costToGoRegulator_ = 10000.0;  // explorative
-//     double cExploitationForRollout_ = 1.0;
-    double cExploitationForRollout_ = 3.0;
-//     double cExploitationForRollout_ = 5.0;
-//     double cExploitationForRollout_ = 10.0;
-
-
     // just for compatibility with FIRM::addStateToGraph()
     bool addReverseEdge = false;
 
@@ -1629,16 +1720,22 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
                     // with higher costToGoRegulator_, weight will be closer to uniform distribution over actions
 //                     weight = 1.0 / (approxCostToGo + costToGoRegulator_);
 
-                    // HACK XXX XXX extremely exploitative
-                    // NOTE POMCP-Rollout policy should be more exploitative, so that pure-rollout branch can be more similar to the optimal branch and thus, simulate() also just follow the incrementally constructed rollout branch
-                    weight = 1.0 / (std::pow(approxCostToGo, cExploitationForRollout_) + costToGoRegulator_);
 
-                    // for debug
-                    //std::cout << "weight[" << n << "]: " << weight << " (=1.0/(" << approxCostToGo << "+" << costToGoRegulator_ << "))" << std::endl;
+                    // FIXME in this case, childQweight is not needed since it is the same with the initialized childQvalue
+                    // and it makes more sense that pomcpRollout() uses UPDATED childQcosttogo for action selection once childQnode is expanded!
+//                     // HACK XXX XXX extremely exploitative
+//                     // NOTE POMCP-Rollout policy should be more exploitative, so that pure-rollout branch can be more similar to the optimal branch and thus, simulate() also just follow the incrementally constructed rollout branch
+//                     //weight = 1.0 / (std::pow(approxCostToGo, cExploitationForRollout_) + costToGoRegulator_);
+//                     weight = approxCostToGo;  // save the raw approxCostToGo data, and the above computation is done in pomcpRollout()  // FIXME in this case, childQweight is not needed since it is the same with the initialized childQvalue
+//
+//                     // for debug
+//                     //std::cout << "weight[" << n << "]: " << weight << " (=1.0/(" << approxCostToGo << "+" << costToGoRegulator_ << "))" << std::endl;
+
 
                     // save childQnode and weight for next POMCP-Rollout
                     stateProperty_[m]->as<FIRM::StateType>()->addChildQnode(n);
-                    stateProperty_[m]->as<FIRM::StateType>()->setChildQweight(n, weight);
+                    //stateProperty_[m]->as<FIRM::StateType>()->setChildQweight(n, weight);  // deprecated
+
 
                     // save approximate cost-to-go as an initial value for next POMCP-Simulate
                     // save for all nodes, and check for expanded by getChildQexpanded()
@@ -1722,31 +1819,55 @@ FIRMWeight FIRMCP::addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const 
 
 FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
 {
-    // XXX tuning parameters (these are determined from actual transition results)
-    double heurPosStepSize_ = 0.1;
-    double heurOriStepSize_ = 0.05;
-    double heurCovStepSize_ = 0.000001;  // NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks
-//     double heurCovStepSize_ = 0.00001;
-    double covConvergenceRate_ = 0.9;   // cov_{k+1} = covConvergenceRate * cov_k
-//     double covConvergenceRate_ = 0.95;
-//     double covConvergenceRate_ = 0.99;
-
-
-    // just for compatibility with FIRM::generateEdgeNodeControllerWithCost
-    bool constructionMode = false;
-
-
     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
 
      // Generate the edge controller for given start and end state
     generateEdgeController(startNodeState,targetNodeState,edgeController);
 
+
+    // compute approximate edge cost
+    double approxEdgeCost = computeApproxEdgeCost(a, b);
+
+    ompl::base::Cost edgeCost(approxEdgeCost);
+    double transitionProbability = 1.0;    // just naively set this to 1.0
+
+    FIRMWeight weight(edgeCost.value(), transitionProbability);
+
+    // free the memory
+    siF_->freeState(startNodeState);
+
+    return weight;
+}
+
+double FIRMCP::computeApproxEdgeCost(const FIRM::Vertex a, const FIRM::Vertex b)
+{
+    // XXX tuning parameters (these are determined from actual transition results)
+    double heurPosStepSize_ = 0.1;
+    double heurOriStepSize_ = 0.05;
+    double heurCovStepSize_ = 0.000001;  // NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks
+//     double heurCovStepSize_ = 0.00001;
+//     double covConvergenceRate_ = 0.9;   // cov_{k+1} = covConvergenceRate * cov_k
+//     double covConvergenceRate_ = 0.95;
+    double covConvergenceRate_ = 0.99;
+
+
+//     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
+//     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+    ompl::base::State* startNodeState = stateProperty_[a];
+    ompl::base::State* targetNodeState = stateProperty_[b];
+
     // compute the distance between two states
     double posDistance = startNodeState->as<FIRM::StateType>()->getPosDistanceTo(targetNodeState);
     double oriDistance = startNodeState->as<FIRM::StateType>()->getOriDistanceTo(targetNodeState);
-    double covDistance = startNodeState->as<FIRM::StateType>()->getCovDistanceTo(targetNodeState);
+
+//     double covDistance = startNodeState->as<FIRM::StateType>()->getCovDistanceTo(targetNodeState);
+//     double startTraceCov = startNodeState->as<FIRM::StateType>()->getTraceCovariance();
+
     double startTraceCov = startNodeState->as<FIRM::StateType>()->getTraceCovariance();
+    double targetTraceCov = startNodeState->as<FIRM::StateType>()->getTraceCovariance();
+    double covDistance = startTraceCov - targetTraceCov;
+    covDistance = (covDistance > 0.0) ? covDistance : 0.0;
 
     // compensate the distance considering isReached() tolerance
     // OPTIONAL) enabling these may lead to under-estimation of the actual cost, which then can result in jiggling execution
@@ -1776,15 +1897,10 @@ FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a
         std::cout << "approxEdgeCost[" << a << "->" << b << "] " << approxEdgeCost << std::endl;
 
 
-    ompl::base::Cost edgeCost(approxEdgeCost);
-    double transitionProbability = 1.0;    // just naively set this to 1.0
-
-    FIRMWeight weight(edgeCost.value(), transitionProbability);
-
     // free the memory
-    siF_->freeState(startNodeState);
+//     siF_->freeState(startNodeState);
 
-    return weight;
+    return approxEdgeCost;
 }
 
 bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost)
