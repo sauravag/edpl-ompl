@@ -74,6 +74,8 @@ protected:
 
     void prunePOMCPTreeFrom(const Vertex rootVertex);
 
+    void prunePOMCPNode(const Vertex rootVertex);
+
 };
 
 

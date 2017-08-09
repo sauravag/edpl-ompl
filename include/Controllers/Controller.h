@@ -861,7 +861,8 @@ bool Controller<SeparatedControllerType, FilterType>::StabilizeUpto(const int nu
     si_->copyState(tempState1, startState);
     si_->copyState(tempState2, startState);
 
-    while(stepsTaken < numSteps)    // iteration up to numSteps, not maxTries_
+    // NOTE replaced while(){}; to do{}while(); in order to prevent zero cost with no evolution toward the end state when the start state is within nodeReachedDistance_ from the end state
+    do
     {
 
         this->Evolve(tempState1, k, tempState2);
@@ -881,6 +882,7 @@ bool Controller<SeparatedControllerType, FilterType>::StabilizeUpto(const int nu
 
         // TODO check for state validity
     }
+    while(stepsTaken < numSteps && !goal_->as<StateType>()->isReached(tempState1));    // iteration up to numSteps, not maxTries_
 
    stabilizationFilteringCost = ompl::base::Cost(cost);
 
