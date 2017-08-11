@@ -169,48 +169,48 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
 // 1)
             // ORIGINAL
-//             for (int j=0; j<selectedChildQVnodes.size(); j++)
-//             {
-//                 Vertex childQVnode = selectedChildQVnodes[j];
-//
-//                 // NOTE need to check for both directions since there is no from-to relationship between these selectedChildQVnodes
-//                 if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
-//                 {
-//                     //OMPL_WARN("Existing childQVnode!");
-//                     nextVertex = childQVnode;
-//                     reachedChildQVnodes.push_back(childQVnode);
-//                 }
-//                 else if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
-//                 {
-//                     //OMPL_WARN("Existing childQVnode!");
-//                     nextVertex = childQVnode;
-//                     reachedChildQVnodes.push_back(childQVnode);
-//                 }
-//             }
-//             // REVIEW what if a new childQVnode coincides more than one existing selectedChildQVnodes (for the same action)?
-//             // pick the closest one?
-//             // OR merge all selectedChildQVnodes[selectedChildQnode] into one node but with proper belief state merging scheme?!
-//             if (reachedChildQVnodes.size()>1)
-//             {
-//                 OMPL_WARN("There are %d reachedChildQVnodes for this new childQVnode!", reachedChildQVnodes.size());
-//                 //nextVertex = which childQVnode?
-//                 //exit(0);    // XXX
-//
-//                 int random = rand() % reachedChildQVnodes.size();
-//                 nextVertex = reachedChildQVnodes[random];  // to break the tie
-//             }
-//             else if (reachedChildQVnodes.size()==0)
+            for (int j=0; j<selectedChildQVnodes.size(); j++)
+            {
+                Vertex childQVnode = selectedChildQVnodes[j];
+
+                // NOTE need to check for both directions since there is no from-to relationship between these selectedChildQVnodes
+                if (stateProperty_[childQVnode]->as<FIRM::StateType>()->isReached(nextBelief))
+                {
+                    //OMPL_WARN("Existing childQVnode!");
+                    nextVertex = childQVnode;
+                    reachedChildQVnodes.push_back(childQVnode);
+                }
+                else if (nextBelief->as<FIRM::StateType>()->isReached(stateProperty_[childQVnode]))
+                {
+                    //OMPL_WARN("Existing childQVnode!");
+                    nextVertex = childQVnode;
+                    reachedChildQVnodes.push_back(childQVnode);
+                }
+            }
+            // REVIEW what if a new childQVnode coincides more than one existing selectedChildQVnodes (for the same action)?
+            // pick the closest one?
+            // OR merge all selectedChildQVnodes[selectedChildQnode] into one node but with proper belief state merging scheme?!
+            if (reachedChildQVnodes.size()>1)
+            {
+                OMPL_WARN("There are %d reachedChildQVnodes for this new childQVnode!", reachedChildQVnodes.size());
+                //nextVertex = which childQVnode?
+                //exit(0);    // XXX
+
+                int random = rand() % reachedChildQVnodes.size();
+                nextVertex = reachedChildQVnodes[random];  // to break the tie
+            }
+            else if (reachedChildQVnodes.size()==0)
 
 // 2)
-        if (selectedChildQVnodes.size()!=0)
-        {
-            int random = rand() % selectedChildQVnodes.size();
-            nextVertex = selectedChildQVnodes[random];  // to break the tie
-
-            // update the matching belief state
-            siF_->copyState(stateProperty_[nextVertex], nextBelief);
-        }
-        else
+//         if (selectedChildQVnodes.size()!=0)
+//         {
+//             int random = rand() % selectedChildQVnodes.size();
+//             nextVertex = selectedChildQVnodes[random];  // to break the tie
+//
+//             // update the matching belief state
+//             siF_->copyState(stateProperty_[nextVertex], nextBelief);
+//         }
+//         else
 
     {
         OMPL_INFORM("A new childQVnode after actual execution!");
@@ -630,8 +630,8 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 //     int numPOMCPParticles_ = 100;
 //     int numPOMCPParticles_ = 30;
 //     int numPOMCPParticles_ = 10;
-    int numPOMCPParticles_ = 5;
-//     int numPOMCPParticles_ = 3;
+//     int numPOMCPParticles_ = 5;
+    int numPOMCPParticles_ = 3;
 //     int numPOMCPParticles_ = 2;
     double nsigma_ = 3.0;
 
@@ -771,15 +771,15 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 {
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
-//     int maxPOMCPDepth_ = 50;
-    int maxPOMCPDepth_ = 30;
+    int maxPOMCPDepth_ = 50;
+//     int maxPOMCPDepth_ = 30;
 //     int maxPOMCPDepth_ = 10;
 //     int maxPOMCPDepth_ = 5;
 //     int maxPOMCPDepth_ = 1;
     int maxFIRMReachDepth_ = 300;
 //     int maxFIRMReachDepth_ = 100;
-    double cExplorationForSimulate_ = 5.0;
-//     double cExplorationForSimulate_ = std::sqrt(2.0);
+//     double cExplorationForSimulate_ = 5.0;
+    double cExplorationForSimulate_ = std::sqrt(2.0);
 //     double cExplorationForSimulate_ = 0.1;
 //     double cExplorationForSimulate_ = 0.05;
 //     double cExplorationForSimulate_ = 0.01;
@@ -862,7 +862,8 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
                 double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
                 double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
 
-                return approxCostToGo;
+//                 return approxCostToGo;
+                return costToGo_[targetVertex];
             }
 
             selectedEdge = selectedEdgePrev;    // selectedEdgePrev should be one of function arguments
@@ -1141,8 +1142,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 {
     // XXX tuning parameters
 //     int maxPOMCPDepth_ = 100;
-//     int maxPOMCPDepth_ = 50;
-    int maxPOMCPDepth_ = 30;
+    int maxPOMCPDepth_ = 50;
+//     int maxPOMCPDepth_ = 30;
 //     int maxPOMCPDepth_ = 10;
 //     int maxPOMCPDepth_ = 5;
 //     int maxPOMCPDepth_ = 1;
@@ -1153,7 +1154,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 //     double costToGoRegulator_ = 1.0;
 //     double costToGoRegulator_ = 10000.0;  // explorative
     double costToGoRegulatorOutOfReach_ = 1e-6;      // exploitative  // this is just to prevent divide-by-zero
-    double costToGoRegulatorWithinReach_ = 10.0;     // explorative; larger value for near-uniform distribution
+    double costToGoRegulatorWithinReach_ = 1000.0;     // explorative; larger value for near-uniform distribution
 
 //     double cExploitationForRolloutOutOfReach_ = 1.0;
 //     double cExploitationForRolloutOutOfReach_ = 3.0;
@@ -1163,6 +1164,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 
 //     double nEpsForIsReached_ = 10.0;
     double nEpsForIsReached_ = 3.0;
+//     double nEpsForIsReached_ = 1.0;
 
 
     ompl::base::State* currentBelief = stateProperty_[currentVertex];  // current belief after applying previous control toward the latest target
@@ -1233,7 +1235,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
             double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
             double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
 
-            return approxCostToGo;
+//             return approxCostToGo;
+            return costToGo_[targetVertex];
         }
 
         selectedEdge = selectedEdgePrev;
@@ -1335,7 +1338,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
             if (isReachedWithinNEps)
             {
                 // explorative
-                weight = 1.0 / std::pow(costtogo + costToGoRegulatorWithinReach_, cExploitationForRolloutWithinReach_);
+//                 weight = 1.0 / std::pow(costtogo + costToGoRegulatorWithinReach_, cExploitationForRolloutWithinReach_);
+                weight = 1.0 / (std::pow(costtogo, cExploitationForRolloutWithinReach_) + costToGoRegulatorWithinReach_);
 
                 // for debug
                 //std::cout << "isReachedWithinNEps: true" << std::endl;
@@ -1343,7 +1347,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
             else
             {
                 // exploitative
-                weight = 1.0 / std::pow(costtogo + costToGoRegulatorOutOfReach_, cExploitationForRolloutOutOfReach_);
+//                 weight = 1.0 / std::pow(costtogo + costToGoRegulatorOutOfReach_, cExploitationForRolloutOutOfReach_);
+                weight = 1.0 / (std::pow(costtogo, cExploitationForRolloutOutOfReach_) + costToGoRegulatorOutOfReach_);
 
                 // for debug
                 //std::cout << "isReachedWithinNEps: false" << std::endl;
@@ -1845,11 +1850,11 @@ double FIRMCP::computeApproxEdgeCost(const FIRM::Vertex a, const FIRM::Vertex b)
     // XXX tuning parameters (these are determined from actual transition results)
     double heurPosStepSize_ = 0.1;
     double heurOriStepSize_ = 0.05;
-    double heurCovStepSize_ = 0.000001;  // NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks
-//     double heurCovStepSize_ = 0.00001;
-//     double covConvergenceRate_ = 0.9;   // cov_{k+1} = covConvergenceRate * cov_k
+//     double heurCovStepSize_ = 0.000001;  // NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks
+    double heurCovStepSize_ = 0.00001;
+    double covConvergenceRate_ = 0.9;   // cov_{k+1} = covConvergenceRate * cov_k
 //     double covConvergenceRate_ = 0.95;
-    double covConvergenceRate_ = 0.99;
+//     double covConvergenceRate_ = 0.99;
 
 
 //     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
