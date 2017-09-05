@@ -36,7 +36,8 @@
 
 #include "Planner/FIRMCP.h"
 #include "Visualization/Visualizer.h"
-#include <boost/circular_buffer.hpp>  // XXX
+#include <boost/circular_buffer.hpp>
+#include <tinyxml.h>
 
 #define foreach BOOST_FOREACH
 #define foreach_reverse BOOST_REVERSE_FOREACH
@@ -48,6 +49,128 @@ FIRMCP::FIRMCP(const firm::SpaceInformation::SpaceInformationPtr &si, bool debug
 
 FIRMCP::~FIRMCP(void)
 {
+}
+
+void FIRMCP::loadParametersFromFile(const std::string &pathToFile)
+{
+    // load parameters for FIRM
+    FIRM::loadParametersFromFile(pathToFile);
+
+
+    // load parameters for FIRMCP
+    TiXmlDocument doc(pathToFile);
+    bool loadOkay = doc.LoadFile();
+    if( !loadOkay )
+    {
+        printf( "FIRMCP: Could not load setup file. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+        exit( 1 );
+    }
+
+    TiXmlNode* node = 0;
+    TiXmlNode* child = 0;
+    TiXmlElement* itemElement = 0;
+
+    node = doc.FirstChild( "FIRMCP" );
+    assert( node );
+
+
+    child = node->FirstChild("numPOMCPParticles");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryIntAttribute("numPOMCPParticles", &numPOMCPParticles_);
+    itemElement = 0;
+
+    child = node->FirstChild("maxPOMCPDepth");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryIntAttribute("maxPOMCPDepth", &maxPOMCPDepth_);
+    itemElement = 0;
+
+    child = node->FirstChild("maxFIRMReachDepth");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryIntAttribute("maxFIRMReachDepth", &maxFIRMReachDepth_);
+    itemElement = 0;
+
+    child = node->FirstChild("cExplorationForSimulate");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("cExplorationForSimulate", &cExplorationForSimulate_);
+    itemElement = 0;
+
+    child = node->FirstChild("costToGoRegulatorOutOfReach");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("costToGoRegulatorOutOfReach", &costToGoRegulatorOutOfReach_);
+    itemElement = 0;
+
+    child = node->FirstChild("costToGoRegulatorWithinReach");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("costToGoRegulatorWithinReach", &costToGoRegulatorWithinReach_);
+    itemElement = 0;
+
+    child = node->FirstChild("cExploitationForRolloutOutOfReach");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("cExploitationForRolloutOutOfReach", &cExploitationForRolloutOutOfReach_);
+    itemElement = 0;
+
+    child = node->FirstChild("cExploitationForRolloutWithinReach");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("cExploitationForRolloutWithinReach", &cExploitationForRolloutWithinReach_);
+    itemElement = 0;
+
+    child = node->FirstChild("nEpsForIsReached");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("nEpsForIsReached", &nEpsForIsReached_);
+    itemElement = 0;
+
+    child = node->FirstChild("heurPosStepSize");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("heurPosStepSize", &heurPosStepSize_);
+    itemElement = 0;
+
+    child = node->FirstChild("heurOriStepSize");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("heurOriStepSize", &heurOriStepSize_);
+    itemElement = 0;
+
+    child = node->FirstChild("heurCovStepSize");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("heurCovStepSize", &heurCovStepSize_);
+    itemElement = 0;
+
+    child = node->FirstChild("covConvergenceRate");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("covConvergenceRate", &covConvergenceRate_);
+    itemElement = 0;
+
+    child = node->FirstChild("scaleStabNumSteps");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryIntAttribute("scaleStabNumSteps", &scaleStabNumSteps_);
+    itemElement = 0;
 }
 
 void FIRMCP::executeFeedbackWithPOMCP(void)
@@ -626,16 +749,6 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
 FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const FIRM::Vertex goal)
 {
-    // XXX tuning parameters for POMCP    // should move to setup file
-//     int numPOMCPParticles_ = 100;
-//     int numPOMCPParticles_ = 30;
-//     int numPOMCPParticles_ = 10;
-//     int numPOMCPParticles_ = 5;
-    int numPOMCPParticles_ = 3;
-//     int numPOMCPParticles_ = 2;
-    double nsigma_ = 3.0;
-
-
     // declare local variables
     ompl::base::State* tempTrueStateCopy = siF_->allocState();
     ompl::base::State* sampState = siF_->allocState();
@@ -666,7 +779,8 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
     {
         // sample a particle from the root (current) belief state
         // NOTE random sampling of a true state from the current belief state for Monte Carlo simulation
-        if(!stateProperty_[currentVertex]->as<FIRM::StateType>()->sampleTrueStateFromBelief(sampState, nsigma_))
+        double nsigma = 3.0;   // HACK to increase the chance of detecting collision with a few number of particles
+        if(!stateProperty_[currentVertex]->as<FIRM::StateType>()->sampleTrueStateFromBelief(sampState, nsigma))
         {
             OMPL_WARN("Could not sample a true state from the current belief state!");
             continue;
@@ -769,23 +883,7 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 
 double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev, int& collisionDepth)
 {
-    // XXX tuning parameters
-//     int maxPOMCPDepth_ = 100;
-    int maxPOMCPDepth_ = 50;
-//     int maxPOMCPDepth_ = 30;
-//     int maxPOMCPDepth_ = 10;
-//     int maxPOMCPDepth_ = 5;
-//     int maxPOMCPDepth_ = 1;
-    int maxFIRMReachDepth_ = 300;
-//     int maxFIRMReachDepth_ = 100;
-//     double cExplorationForSimulate_ = 5.0;
-    double cExplorationForSimulate_ = std::sqrt(2.0);
-//     double cExplorationForSimulate_ = 0.1;
-//     double cExplorationForSimulate_ = 0.05;
-//     double cExplorationForSimulate_ = 0.01;
-//     double cExplorationForSimulate_ = 0.0;
-
-
+    // declare local variables
     ompl::base::State* currentBelief = stateProperty_[currentVertex];
     Edge selectedEdge;
     Vertex selectedChildQnode;
@@ -1140,33 +1238,7 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
 double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, const Edge& selectedEdgePrev, int& collisionDepth, const bool isNewNodeExpanded)
 {
-    // XXX tuning parameters
-//     int maxPOMCPDepth_ = 100;
-    int maxPOMCPDepth_ = 50;
-//     int maxPOMCPDepth_ = 30;
-//     int maxPOMCPDepth_ = 10;
-//     int maxPOMCPDepth_ = 5;
-//     int maxPOMCPDepth_ = 1;
-    int maxFIRMReachDepth_ = 300;
-//     int maxFIRMReachDepth_ = 100;
-
-//     double costToGoRegulator_ = 1e-6;      // exploitative  // now this is just to prevent divide-by-zero
-//     double costToGoRegulator_ = 1.0;
-//     double costToGoRegulator_ = 10000.0;  // explorative
-    double costToGoRegulatorOutOfReach_ = 1e-6;      // exploitative  // this is just to prevent divide-by-zero
-    double costToGoRegulatorWithinReach_ = 1000.0;     // explorative; larger value for near-uniform distribution
-
-//     double cExploitationForRolloutOutOfReach_ = 1.0;
-//     double cExploitationForRolloutOutOfReach_ = 3.0;
-//     double cExploitationForRolloutOutOfReach_ = 5.0;
-    double cExploitationForRolloutOutOfReach_ = 10.0;  // exploitative
-    double cExploitationForRolloutWithinReach_ = 1.0;   // explorative
-
-//     double nEpsForIsReached_ = 10.0;
-    double nEpsForIsReached_ = 3.0;
-//     double nEpsForIsReached_ = 1.0;
-
-
+    // declare local variables
     ompl::base::State* currentBelief = stateProperty_[currentVertex];  // current belief after applying previous control toward the latest target
     Edge selectedEdge;
     Vertex selectedChildQnode;
@@ -1746,7 +1818,7 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
                     // save for all nodes, and check for expanded by getChildQexpanded()
 //                     if (isNewNodeExpanded)
                     {
-                        // CHECK if approxCostToGo are actually a good initial value!
+                        // CHECK if approxCostToGo are actually a good initial value or not!
                         // this should depend on the tuning parameters... for the current setting, it over-estimates the executedCostToGo by 10 %
                         stateProperty_[m]->as<FIRM::StateType>()->setChildQvalue(n, approxCostToGo);
                     }
@@ -1847,16 +1919,7 @@ FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a
 
 double FIRMCP::computeApproxEdgeCost(const FIRM::Vertex a, const FIRM::Vertex b)
 {
-    // XXX tuning parameters (these are determined from actual transition results)
-    double heurPosStepSize_ = 0.1;
-    double heurOriStepSize_ = 0.05;
-//     double heurCovStepSize_ = 0.000001;  // NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks
-    double heurCovStepSize_ = 0.00001;
-    double covConvergenceRate_ = 0.9;   // cov_{k+1} = covConvergenceRate * cov_k
-//     double covConvergenceRate_ = 0.95;
-//     double covConvergenceRate_ = 0.99;
-
-
+    // declare local variables
 //     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
 //     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
     ompl::base::State* startNodeState = stateProperty_[a];
@@ -1910,11 +1973,6 @@ double FIRMCP::computeApproxEdgeCost(const FIRM::Vertex a, const FIRM::Vertex b)
 
 bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost)
 {
-    // XXX tuning parameters
-//     int scaleStabNumSteps_ = 10;  // scaling factor to rolloutSteps_ for StabilizeUpto() by node controller
-    int scaleStabNumSteps_ = 30;
-
-
     EdgeControllerType edgeController;
     NodeControllerType nodeController;
 

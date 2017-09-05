@@ -52,6 +52,9 @@ public:
     /** \brief Executes the Partially Observable Monte Carlo Planning (POMCP) on top of FIRM graph */
     void executeFeedbackWithPOMCP(void);
 
+    /** \brief Load planner parameters specific to this planner. */
+    virtual void loadParametersFromFile(const std::string &pathToFile);
+
 
 protected:
 
@@ -78,6 +81,27 @@ protected:
 
     void prunePOMCPNode(const Vertex rootVertex);
 
+
+    // parameters
+
+    int numPOMCPParticles_;
+
+    int maxPOMCPDepth_;
+    int maxFIRMReachDepth_;
+    double cExplorationForSimulate_;
+
+    double costToGoRegulatorOutOfReach_;
+    double costToGoRegulatorWithinReach_;
+    double cExploitationForRolloutOutOfReach_;
+    double cExploitationForRolloutWithinReach_;
+    double nEpsForIsReached_;
+
+    double heurPosStepSize_;
+    double heurOriStepSize_;
+    double heurCovStepSize_;
+    double covConvergenceRate_;
+
+    int scaleStabNumSteps_;
 };
 
 

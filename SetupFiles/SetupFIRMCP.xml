@@ -70,6 +70,30 @@
 </FIRM> 
 
 
+<FIRMCP>
+    <numPOMCPParticles numPOMCPParticles = "3" />
+
+    <maxPOMCPDepth maxPOMCPDepth = "50" />
+    <maxFIRMReachDepth maxFIRMReachDepth = "300" />
+    <cExplorationForSimulate cExplorationForSimulate = "1.414213" />
+
+    <costToGoRegulatorOutOfReach costToGoRegulatorOutOfReach = "1e-6" />  <!-- exploitative -->
+    <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1000.0" />  <!-- explorative -->
+    <cExploitationForRolloutOutOfReach cExploitationForRolloutOutOfReach = "10.0" />  <!-- exploitative -->
+    <cExploitationForRolloutWithinReach cExploitationForRolloutWithinReach = "1.0" />  <!-- explorative -->
+    <nEpsForIsReached nEpsForIsReached = "3.0" />
+
+    <!-- (these are determined from actual transition results) -->
+    <heurPosStepSize heurPosStepSize = "0.1" />
+    <heurOriStepSize heurOriStepSize = "0.05" />
+<!--     <heurCovStepSize heurCovStepSize = "0.000001" />  <!&#45;&#45; NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks &#45;&#45;> -->
+    <heurCovStepSize heurCovStepSize = "0.00001" />
+    <covConvergenceRate covConvergenceRate = "0.9" />  <!-- cov_{k+1} = covConvergenceRate * cov_k -->
+
+    <scaleStabNumSteps scaleStabNumSteps = "30" />
+</FIRMCP>
+
+
 <PlanningProblem>
 
 
@@ -95,6 +119,7 @@
 	<!-- [OPTION3] Roadmap -->
 <!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
     <RoadMap roadmapFile = "./FIRMRoadMap-350.xml" useRoadMap = "1" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;400.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;450.xml" useRoadMap = "1" /> -->
