@@ -70,11 +70,37 @@
 </FIRM> 
 
 
-<FIRMCP>
-    <numPOMCPParticles numPOMCPParticles = "3" />
+<!-- <FIRMCP> -->
+<!--     <numPOMCPParticles numPOMCPParticles = "3" /> -->
+<!--     <maxPOMCPDepth maxPOMCPDepth = "50" /> -->
+<!--     <maxFIRMReachDepth maxFIRMReachDepth = "300" /> -->
+<!--  -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" /> -->
+<!--  -->
+<!--     <costToGoRegulatorOutOfReach costToGoRegulatorOutOfReach = "1e&#45;6" />  <!&#45;&#45; exploitative &#45;&#45;> -->
+<!--     <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1000.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
+<!--     <cExploitationForRolloutOutOfReach cExploitationForRolloutOutOfReach = "10.0" />  <!&#45;&#45; exploitative &#45;&#45;> -->
+<!--     <cExploitationForRolloutWithinReach cExploitationForRolloutWithinReach = "1.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
+<!--     <nEpsForIsReached nEpsForIsReached = "3.0" /> -->
+<!--  -->
+<!--     <!&#45;&#45; (these are determined from actual transition results) &#45;&#45;> -->
+<!--     <heurPosStepSize heurPosStepSize = "0.1" /> -->
+<!--     <heurOriStepSize heurOriStepSize = "0.05" /> -->
+<!-- <!&#45;&#45;     <heurCovStepSize heurCovStepSize = "0.000001" />  <!&#38;#45;&#38;#45; NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks &#38;#45;&#38;#45;> &#45;&#45;> -->
+<!--     <heurCovStepSize heurCovStepSize = "0.00001" /> -->
+<!--     <covConvergenceRate covConvergenceRate = "0.9" />  <!&#45;&#45; cov_{k+1} = covConvergenceRate * cov_k &#45;&#45;> -->
+<!--  -->
+<!--     <scaleStabNumSteps scaleStabNumSteps = "30" /> -->
+<!-- </FIRMCP> -->
 
-    <maxPOMCPDepth maxPOMCPDepth = "50" />
-    <maxFIRMReachDepth maxFIRMReachDepth = "300" />
+<FIRMCP>
+    <numPOMCPParticles numPOMCPParticles = "10" />
+<!--     <numPOMCPParticles numPOMCPParticles = "5" /> -->
+<!--     <maxPOMCPDepth maxPOMCPDepth = "5" /> -->
+<!--     <maxPOMCPDepth maxPOMCPDepth = "20" /> -->
+    <maxPOMCPDepth maxPOMCPDepth = "30" />
+    <maxFIRMReachDepth maxFIRMReachDepth = "200" />
+
     <cExplorationForSimulate cExplorationForSimulate = "1.414213" />
 
     <costToGoRegulatorOutOfReach costToGoRegulatorOutOfReach = "1e-6" />  <!-- exploitative -->
@@ -87,10 +113,12 @@
     <heurPosStepSize heurPosStepSize = "0.1" />
     <heurOriStepSize heurOriStepSize = "0.05" />
 <!--     <heurCovStepSize heurCovStepSize = "0.000001" />  <!&#45;&#45; NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks &#45;&#45;> -->
-    <heurCovStepSize heurCovStepSize = "0.00001" />
+	<heurCovStepSize heurCovStepSize = "0.00001" />  <!-- no longer being used -->
     <covConvergenceRate covConvergenceRate = "0.9" />  <!-- cov_{k+1} = covConvergenceRate * cov_k -->
+<!--     <covConvergenceRate covConvergenceRate = "0.95" />  <!&#45;&#45; cov_{k+1} = covConvergenceRate * cov_k &#45;&#45;> -->
 
     <scaleStabNumSteps scaleStabNumSteps = "30" />
+<!--     <scaleStabNumSteps scaleStabNumSteps = "50" /> -->
 </FIRMCP>
 
 

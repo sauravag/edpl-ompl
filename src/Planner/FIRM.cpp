@@ -69,6 +69,8 @@ FIRM::FIRM(const firm::SpaceInformation::SpaceInformationPtr &si, bool debugMode
     userSetConnectionStrategy_(false),
     addedSolution_(false)
 {
+    arma::arma_rng::set_seed_random();
+
     specs_.recognizedGoal = ompl::base::GOAL_SAMPLEABLE_REGION;
     specs_.approximateSolutions = true;
     specs_.optimizingPaths = true;

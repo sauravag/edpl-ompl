@@ -117,6 +117,10 @@ namespace ompl
         static const double DEFAULT_DISTANCE_TO_GOAL_COST_WEIGHT = 0.01; 
 
 
+        /** \brief Macro for invalid Vertex ID */
+        static const unsigned long int INVALID_VERTEX_ID = (unsigned long int) -1;
+
+
         /** \brief Weighting factor for filtering cost */
         // NOTE this parameter should be small (compared to DEFAULT_TIME_TO_STOP_COST_WEIGHT) to prevent the robot from staying at a place for a long time until the covariance penalty gets smaller
         // this parameter will be reset to 'infcostw' in the setup file

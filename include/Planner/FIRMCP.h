@@ -74,6 +74,8 @@ protected:
     FIRMWeight generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController);
 
     double computeApproxEdgeCost(const FIRM::Vertex a, const FIRM::Vertex b);
+    double computeApproxTransitionCost(const FIRM::Vertex a, const FIRM::Vertex b);
+    double computeApproxStabilizationCost(const FIRM::Vertex a, const FIRM::Vertex b);
 
     bool executeSimulationFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost);
 

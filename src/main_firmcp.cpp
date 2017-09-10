@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 
     #ifdef USE_ROS
         // Initialize the ros node
-        ros::init(argc, argv, "firm_planner");
+        ros::init(argc, argv, "firmcp_planner");
     #endif
 
     //srand(239645);
