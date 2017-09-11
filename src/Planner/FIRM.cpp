@@ -2766,7 +2766,24 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
 
     if(nIter >= boost::num_vertices(g_))
     {
-        OMPL_WARN("Reached a node that is NOT connected to the goal! Quit isFeedbackPolicyValid()!");
+        OMPL_WARN("Reached a node that is NOT connected to the goal! Clean up feedback_ and quit isFeedbackPolicyValid()!");
+
+        // remove these unconnected nodes from the feedback_ data
+        while (true)
+        {
+            if (feedback_.find(currentVertex) == feedback_.end())    // there is no feedback edge coming from this vertex
+            {
+                break;
+            }
+
+            Edge edge = feedback_.at(currentVertex); // get the edge
+            Vertex target = boost::target(edge, g_); // get the target of this edge
+
+            feedback_.erase(currentVertex);
+
+            currentVertex =  target;
+        }
+
         return true;    // not returning false to avoid calling solveDijkstraSearch()/solveDynamicProgram() again!
     }
 

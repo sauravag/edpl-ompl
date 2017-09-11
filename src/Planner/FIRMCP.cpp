@@ -834,7 +834,7 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
 //         std::cout << "totalCostToGo: " << totalCostToGo << std::endl;
 //         std::cout << "totalCostToGoWithDiscountedPenalty: " << totalCostToGoWithDiscountedPenalty << std::endl;
 //         std::cout << "particleCostToGo: " << totalCostToGoWithDiscountedPenalty << "(=" << totalCostToGo << "+" << discountedPenalty << ")" << std::endl;
-        std::cout << "particleCostToGo: " << totalCostToGo << std::endl;
+        std::cout << "thisQVmincosttogo: " << totalCostToGo << std::endl;
     }
 
     // select the best action
@@ -882,6 +882,20 @@ FIRM::Edge FIRMCP::generatePOMCPPolicy(const FIRM::Vertex currentVertex, const F
             std::cout << "minQcosttogo: " << "[" << selectedChildQnode << "]" << minQcosttogo << std::endl;
             std::cout << "executionCost: " << executionCost_ << std::endl;
             std::cout << "expTotalCost: " << minQcosttogo + executionCost_ << std::endl;
+
+
+        // Check if the feedback from selected target to goal is valid or not
+        if(!isFeedbackPolicyValid(selectedChildQnode, goal))
+        {
+            //OMPL_INFORM("FIRMCP: Invalid path detected from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+
+            updateEdgeCollisionCost(selectedChildQnode, goal);
+
+            // resolve Dijkstra/DP
+            solveDijkstraSearch(goal);
+            solveDynamicProgram(goal, false);
+        }
+
 
             // for debug
 //             OMPL_INFORM("FIRMCP-Execute ##### selectedChlidQnode %u (%2.3f, %2.3f, %2.3f, %2.6f)", selectedChildQnode, 
@@ -991,7 +1005,8 @@ double FIRMCP::pomcpSimulate(const Vertex currentVertex, const int currentDepth,
 
                 // compute approximate edge cost and cost-to-go
                 double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
-                double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
+//                 double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
+                double approxCostToGo = getCostToGoWithApproxStabCost(targetVertex) + approxEdgeCost;
 
                 // UPDATE THE NUMBER OF VISITS AND COST-TO-GO
                 currentBelief->as<FIRM::StateType>()->addThisQVvisit();                    // N(h) += 1
@@ -1436,7 +1451,8 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 
             // compute approximate edge cost and cost-to-go
             double approxEdgeCost = computeApproxEdgeCost(currentVertex, targetVertex);
-            double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
+//             double approxCostToGo = costToGo_[targetVertex] + approxEdgeCost;
+            double approxCostToGo = getCostToGoWithApproxStabCost(targetVertex) + approxEdgeCost;
 
             // UPDATE THE NUMBER OF VISITS AND COST-TO-GO
             currentBelief->as<FIRM::StateType>()->addThisQVvisit();                    // N(h) += 1
@@ -2042,7 +2058,8 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
                     successfulConnectionAttemptsProperty_[m]++;
 
                     // compute the approximate cost-to-go
-                    approxCostToGo = approxEdgeCost.getCost() + costToGo_[n];
+//                     approxCostToGo = approxEdgeCost.getCost() + costToGo_[n];
+                    approxCostToGo = approxEdgeCost.getCost() + getCostToGoWithApproxStabCost(n);
 
                     // compute weight for this action with regularization
                     // with higher costToGoRegulator_, weight will be closer to uniform distribution over actions
@@ -2250,8 +2267,8 @@ double FIRMCP::computeApproxStabilizationCost(const FIRM::Vertex a, const FIRM::
 //     // for debug
 //     std::cout << "numCovConvergence: " << numCovConvergence << std::endl;
 
-//     double maxNumConvergence = numCovConvergence;
-    double maxNumConvergence = numCovConvergence * 10;  // XXX
+    double maxNumConvergence = numCovConvergence;
+//     double maxNumConvergence = numCovConvergence * 10;  // XXX
     double stepsToStop = maxNumConvergence;
     double filteringCost = startTraceCov * covConvergenceRate_ * (1 - std::pow(covConvergenceRate_, stepsToStop)) / (1 - covConvergenceRate_);  // sum_{k=1}^{stepsToStop}(covConvergenceRate^k * startTraceCov)
 
@@ -2273,6 +2290,54 @@ double FIRMCP::computeApproxStabilizationCost(const FIRM::Vertex a, const FIRM::
 //     siF_->freeState(startNodeState);
 
     return approxStabCost;
+}
+
+double FIRMCP::getCostToGoWithApproxStabCost(const Vertex vertex)
+{
+    if (costToGoWithApproxStabCost_.find(vertex) == costToGoWithApproxStabCost_.end())
+    {
+        if (!updateCostToGoWithApproxStabCost(vertex))
+        {
+            OMPL_ERROR("Failed to updateCostToGoWithApproxStabCost()!");
+            return infiniteCostToGo_;
+        }
+    }
+
+    return costToGoWithApproxStabCost_.at(vertex);
+}
+
+bool FIRMCP::updateCostToGoWithApproxStabCost(const Vertex current)
+{
+    const Vertex goal = goalM_[0];
+
+    if (current == goal)
+    {
+        costToGoWithApproxStabCost_[current] = costToGo_.at(current);  // no need to update
+        return true;
+    }
+
+    // check if feedback_ path exists for this node
+    if (feedback_.find(current) == feedback_.end())
+    {
+        OMPL_WARN("No feedback path is found for the given node %d!", current);
+        return false;
+    }
+    Edge edge = feedback_.at(current);
+
+    Vertex next = boost::target(edge, g_);
+    if (next == goal)
+    {
+        costToGoWithApproxStabCost_[current] = costToGo_.at(current);  // no need to update
+        return true;
+    }
+
+    // recursively update the cost-to-go with approximate stabilization cost
+//     costToGoWithApproxStabCost_[current] = costToGo_.at(current) + (getCostToGoWithApproxStabCost(next) - costToGo_.at(next)) + computeApproxStabilizationCost(next+epsilon, next);  // deprecated: rigorously, approximate stabilization cost should start from a covariance which is larger than that of next by epsilon)
+//     costToGoWithApproxStabCost_[current] = costToGo_.at(current) + (getCostToGoWithApproxStabCost(next) - costToGo_.at(next)) + computeApproxStabilizationCost(forward_simulated_next_reached, next_stationary_cov);  // rigorously, approximate stabilization cost should consider history from the start (computed by forward simulation like FIRM-Offline)
+    double inflation = 100.0; // NOTE to compensate under-estimation of actual (history dependent) stabilization cost approximately computed with stationary covariances
+    costToGoWithApproxStabCost_[current] = costToGo_.at(current) + (getCostToGoWithApproxStabCost(next) - costToGo_.at(next)) + inflation*computeApproxStabilizationCost(current, next);  // HACK XXX
+
+    return true;
 }
 
 bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost)

@@ -94,14 +94,18 @@
 <!-- </FIRMCP> -->
 
 <FIRMCP>
+<!--     <numPOMCPParticles numPOMCPParticles = "30" /> -->
     <numPOMCPParticles numPOMCPParticles = "10" />
 <!--     <numPOMCPParticles numPOMCPParticles = "5" /> -->
-<!--     <maxPOMCPDepth maxPOMCPDepth = "5" /> -->
+    <maxPOMCPDepth maxPOMCPDepth = "5" />
 <!--     <maxPOMCPDepth maxPOMCPDepth = "20" /> -->
-    <maxPOMCPDepth maxPOMCPDepth = "30" />
+<!--     <maxPOMCPDepth maxPOMCPDepth = "30" /> -->
+<!--     <maxFIRMReachDepth maxFIRMReachDepth = "300" /> -->
     <maxFIRMReachDepth maxFIRMReachDepth = "200" />
 
-    <cExplorationForSimulate cExplorationForSimulate = "1.414213" />
+<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" /> -->  <!-- exploitative -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "10" /> -->
+    <cExplorationForSimulate cExplorationForSimulate = "100.0" />  <!-- explorative -->
 
     <costToGoRegulatorOutOfReach costToGoRegulatorOutOfReach = "1e-6" />  <!-- exploitative -->
     <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1000.0" />  <!-- explorative -->
@@ -114,8 +118,9 @@
     <heurOriStepSize heurOriStepSize = "0.05" />
 <!--     <heurCovStepSize heurCovStepSize = "0.000001" />  <!&#45;&#45; NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks &#45;&#45;> -->
 	<heurCovStepSize heurCovStepSize = "0.00001" />  <!-- no longer being used -->
-    <covConvergenceRate covConvergenceRate = "0.9" />  <!-- cov_{k+1} = covConvergenceRate * cov_k -->
+<!--     <covConvergenceRate covConvergenceRate = "0.9" />  <!&#45;&#45; cov_{k+1} = covConvergenceRate * cov_k &#45;&#45;> -->
 <!--     <covConvergenceRate covConvergenceRate = "0.95" />  <!&#45;&#45; cov_{k+1} = covConvergenceRate * cov_k &#45;&#45;> -->
+    <covConvergenceRate covConvergenceRate = "0.99" />  <!-- cov_{k+1} = covConvergenceRate * cov_k -->
 
     <scaleStabNumSteps scaleStabNumSteps = "30" />
 <!--     <scaleStabNumSteps scaleStabNumSteps = "50" /> -->
@@ -133,10 +138,10 @@
 	<PlannerMode  method = "3"  dynobst = "0" />
 
 	<!-- [OPTION2] FIRM Node Density -->
-	<FIRMNodes  minNodes = "350"  maxNodes = "350" />
+<!-- 	<FIRMNodes  minNodes = "350"  maxNodes = "350" /> -->
 <!-- 	<FIRMNodes  minNodes = "400"  maxNodes = "400" /> -->
 <!-- 	<FIRMNodes  minNodes = "450"  maxNodes = "450" /> -->
-<!-- 	<FIRMNodes  minNodes = "500"  maxNodes = "500" /> -->
+	<FIRMNodes  minNodes = "500"  maxNodes = "500" />
 <!-- 	<FIRMNodes  minNodes = "550"  maxNodes = "550" /> -->
 <!-- 	<FIRMNodes  minNodes = "600"  maxNodes = "600" /> -->
 <!-- 	<FIRMNodes  minNodes = "650"  maxNodes = "650" /> -->
@@ -146,7 +151,8 @@
 
 	<!-- [OPTION3] Roadmap -->
 <!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-350.xml" useRoadMap = "1" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;350.xml" useRoadMap = "1" /> -->
+    <RoadMap roadmapFile = "./FIRMRoadMap-500.xml" useRoadMap = "1" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;400.xml" useRoadMap = "1" /> -->

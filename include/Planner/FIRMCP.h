@@ -77,11 +77,18 @@ protected:
     double computeApproxTransitionCost(const FIRM::Vertex a, const FIRM::Vertex b);
     double computeApproxStabilizationCost(const FIRM::Vertex a, const FIRM::Vertex b);
 
+    double getCostToGoWithApproxStabCost(const Vertex vertex);
+    bool updateCostToGoWithApproxStabCost(const Vertex current);
+
     bool executeSimulationFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost);
 
     void prunePOMCPTreeFrom(const Vertex rootVertex);
 
     void prunePOMCPNode(const Vertex rootVertex);
+
+
+    /** \brief A table that stores the cost-to-go updated with approximate stabilization cost along the feedback path*/
+    std::map <Vertex, double> costToGoWithApproxStabCost_;
 
 
     // parameters
