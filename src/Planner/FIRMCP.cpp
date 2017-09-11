@@ -175,8 +175,8 @@ void FIRMCP::loadParametersFromFile(const std::string &pathToFile)
 
 void FIRMCP::executeFeedbackWithPOMCP(void)
 {
-    EdgeControllerType edgeController;
-    NodeControllerType nodeController;
+//     EdgeControllerType edgeController;
+//     NodeControllerType nodeController;
 
     bool edgeControllerStatus;
     bool nodeControllerStatus;
@@ -191,7 +191,8 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
     ompl::base::State *cstartState = siF_->allocState();
     ompl::base::State *cstartStatePrev = siF_->allocState();
     ompl::base::State *cendState = siF_->allocState();
-    ompl::base::State *goalState = siF_->cloneState(stateProperty_[goal]);
+//     ompl::base::State *goalState = siF_->cloneState(stateProperty_[goal]);
+    ompl::base::State *goalState = stateProperty_[goal];
     ompl::base::State *tempTrueStateCopy = siF_->allocState();
 
     //===== SET A Custom Init Covariance=====================
@@ -375,6 +376,8 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         //std::cout << "prunedNodes:";
 //         if (reachedChildQVnodes.size()!=0)  // nextBelief matches at least one node on POMCP tree
 //         {
+//         if (selectedChildQVnode != ompl::magic::INVALID_VERTEX_ID)
+        {
             const std::vector<Vertex>& childQnodes = currentBelief->as<FIRM::StateType>()->getChildQnodes();
             for (const auto& childQnode : childQnodes)
             {
@@ -395,13 +398,14 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
                         prunePOMCPTreeFrom(childQVnode);
                     }
                 }
-
             }
 //             prunePOMCPNode(tempVertex);
-//         }
+        }
 //         else  // nextBelief does not match any nodes on POMCP tree
+//         if (selectedChildQVnode == ompl::magic::INVALID_VERTEX_ID)
 //         {
-//             prunePOMCPTreeFrom(tempVertex);
+// //             prunePOMCPTreeFrom(tempVertex);
+//             prunePOMCPNode(tempVertex);
 //         }
         // for debug
         //std::cout << std::endl;
@@ -530,7 +534,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         // NOTE NodeController will be invoked after executing EdgeController for the given rolloutSteps_ steps
 
         // [1] EdgeController
-        edgeController = edgeControllers_.at(e);
+        EdgeControllerType& edgeController = edgeControllers_.at(e);
         edgeController.setSpaceInformation(policyExecutionSI_);
         if(!edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
@@ -610,7 +614,7 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
             // call StabilizeUpto() at every rollout iteration
             {
-                nodeController = nodeControllers_.at(targetNode);
+                NodeControllerType& nodeController = nodeControllers_.at(targetNode);
                 nodeController.setSpaceInformation(policyExecutionSI_);
                 nodeControllerStatus = nodeController.StabilizeUpto(rolloutSteps_, cstartState, cendState, costCov, stepsExecuted, false);
 
@@ -2028,7 +2032,7 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
             if (m==neighbors[0])
             {
                 OMPL_ERROR("No neighbor other than itself was found for vertex %d", m);
-                exit(0);    // XXX  debug
+                exit(0);    // XXX for debug
                 return false;
             }
         }
@@ -2108,7 +2112,7 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
                 Visualizer::addRolloutConnection(stateProperty_[m], stateProperty_[n]);
             }
         }
-        //boost::this_thread::sleep(boost::posix_time::milliseconds(50));  // moved to FIRM::executeFeedbackWithRollout() for more accurate time computation
+        //boost::this_thread::sleep(boost::posix_time::milliseconds(50));  // moved to FIRM::executeFeedbackWithRollout() for more accurate time computatiof
     }
 
     policyGenerator_->addFIRMNodeToObservationGraph(stateProperty_[m]);
@@ -2168,7 +2172,8 @@ FIRMWeight FIRMCP::addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const 
 FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController)
 {
     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
-    ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+//     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+    ompl::base::State* targetNodeState = stateProperty_[b];
 
      // Generate the edge controller for given start and end state
     generateEdgeController(startNodeState,targetNodeState,edgeController);
@@ -2184,6 +2189,7 @@ FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a
 
     // free the memory
     siF_->freeState(startNodeState);
+//     siF_->freeState(targetNodeState);
 
     return weight;
 }
@@ -2342,8 +2348,8 @@ bool FIRMCP::updateCostToGoWithApproxStabCost(const Vertex current)
 
 bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost)
 {
-    EdgeControllerType edgeController;
-    NodeControllerType nodeController;
+//     EdgeControllerType edgeController;
+//     NodeControllerType nodeController;
 
     bool edgeControllerStatus;
     bool nodeControllerStatus;
@@ -2364,7 +2370,8 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
 
     ompl::base::State *cstartState = si_->allocState();
     ompl::base::State *cendState = si_->allocState();
-    ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
+//     ompl::base::State *goalState = si_->cloneState(stateProperty_[goal]);
+    ompl::base::State *goalState = stateProperty_[goal];
     ompl::base::State *tempTrueStateCopy = si_->allocState();
 
     siF_->copyState(cstartState, startState);
@@ -2372,7 +2379,7 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
 
     // [1] EdgeController
     Vertex targetNode = boost::target(selectedEdge, g_);
-    edgeController = edgeControllers_.at(selectedEdge);
+    EdgeControllerType& edgeController = edgeControllers_.at(selectedEdge);
     edgeController.setSpaceInformation(policyExecutionSI_);
     if(!edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
     {
@@ -2465,7 +2472,7 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
 
         // call StabilizeUpto() at every rollout iteration
         {
-            nodeController = nodeControllers_.at(targetNode);
+            NodeControllerType& nodeController = nodeControllers_.at(targetNode);
             nodeController.setSpaceInformation(policyExecutionSI_);
 
             //nodeControllerStatus = nodeController.StabilizeUpto(numSteps, cstartState, cendState, costCov, stepsExecuted, false);
@@ -2542,6 +2549,11 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
     // return the simulated result state
     siF_->copyState(endState, cendState);
 
+    // free the memory
+    si_->freeState(cstartState);
+    si_->freeState(cendState);
+    si_->freeState(tempTrueStateCopy);
+
     return true;
 }
 
@@ -2563,7 +2575,9 @@ void FIRMCP::prunePOMCPTreeFrom(const Vertex rootVertex)
 
             const Vertex childQVnode = rootState->as<FIRM::StateType>()->getChildQVnode(childQnode);
             if (childQVnode != ompl::magic::INVALID_VERTEX_ID)
+            {
                 prunePOMCPTreeFrom(childQVnode);
+            }
         }
     }
 
@@ -2581,7 +2595,7 @@ void FIRMCP::prunePOMCPNode(const Vertex rootVertex)
         foreach(Edge edge, boost::out_edges(rootVertex, g_))
         {
             edgeControllers_[edge].freeSeparatedController();
-            edgeControllers_[edge].freeLinearSystems();
+//             edgeControllers_[edge].freeLinearSystems();
             edgeControllers_.erase(edge);
         }
 

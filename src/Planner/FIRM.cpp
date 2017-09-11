@@ -994,7 +994,8 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edge
 FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController, const bool constructionMode)
 {
     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
-    ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+//     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+    ompl::base::State* targetNodeState = stateProperty_[b];
 
     ompl::base::State* tempBelief = siF_->allocState();
     ompl::base::State* sampState = siF_->allocState();
@@ -1171,7 +1172,8 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
 FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController, const bool constructionMode)
 {
     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
-    ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+//     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+    ompl::base::State* targetNodeState = stateProperty_[b];
 
     ompl::base::State* tempBelief = siF_->allocState();
     ompl::base::State* sampState = siF_->allocState();
@@ -1298,7 +1300,8 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
     return weight;
 }
 
-void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
+// void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
+void FIRM::generateEdgeController(const ompl::base::State *start, ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
 {
     assert(target && "The target state for generating the edge controller is NULL");
     std::vector<ompl::base::State*> intermediates;
@@ -1322,14 +1325,18 @@ void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::ba
     }
 
     // assign the edge controller
-    edgeController = EdgeControllerType(target, intermediates, openLoopControls, siF_);
+    edgeController = EdgeControllerType(target, intermediates, openLoopControls, siF_);  // 'target' state should not be freed unless this controller will never be used
+
+    // free the memory
+    si_->freeState(intermediate);
 }
 
 void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeControllerType &nodeController)
 {
     // Create a copy of the node state
-    ompl::base::State *node = si_->allocState();
-    siF_->copyState(node, state);
+//     ompl::base::State *node = si_->allocState();
+//     siF_->copyState(node, state);
+    ompl::base::State *node = state;
 
     arma::mat stationaryCovariance; 
 
@@ -2430,7 +2437,7 @@ void FIRM::executeFeedbackWithRollout(void)
             foreach(Edge edge, boost::out_edges(tempVertex, g_))
             {
                 edgeControllers_[edge].freeSeparatedController();
-                edgeControllers_[edge].freeLinearSystems();
+//                 edgeControllers_[edge].freeLinearSystems();
                 edgeControllers_.erase(edge);
             }
 
@@ -3012,7 +3019,8 @@ void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
             Vertex b = loadedEdgeProperties_[i].first.second;
 
             ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
-            ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+//             ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
+            ompl::base::State* targetNodeState = stateProperty_[b];
 
             // Generate the edge controller for given start and end state
             generateEdgeController(startNodeState,targetNodeState,edgeController);
@@ -3037,6 +3045,7 @@ void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
 
             // free the memory
             siF_->freeState(startNodeState);
+//             siF_->freeState(targetNodeState);
         }
 
     }

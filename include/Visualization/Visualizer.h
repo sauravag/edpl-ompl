@@ -137,16 +137,19 @@ class Visualizer
             graphEdges_.push_back(edge);
         }
 
-        static void addFeedbackEdge(const ompl::base::State *source, const ompl::base::State *target, double cost)
+//         static void addFeedbackEdge(const ompl::base::State *source, const ompl::base::State *target, double cost)
+        static void addFeedbackEdge(ompl::base::State *source, ompl::base::State *target, double cost)
         {
             boost::mutex::scoped_lock sl(drawMutex_);
             VZRFeedbackEdge edge;
 
-            edge.source = si_->allocState();
-            si_->copyState(edge.source, source);
+//             edge.source = si_->allocState();
+//             si_->copyState(edge.source, source);
+            edge.source = source;
 
-            edge.target = si_->allocState();
-            si_->copyState(edge.target, target);
+//             edge.target = si_->allocState();
+//             si_->copyState(edge.target, target);
+            edge.target = target;
 
             edge.cost = cost;
 
@@ -158,7 +161,7 @@ class Visualizer
         {
             boost::mutex::scoped_lock sl(drawMutex_);
 
-            std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+            std::pair<ompl::base::State*, ompl::base::State*> edge;
 
             edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
 
@@ -170,7 +173,8 @@ class Visualizer
         {
             boost::mutex::scoped_lock sl(drawMutex_);
 
-            std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+//             std::pair<const ompl::base::State*, const ompl::base::State*> edge;
+            std::pair<ompl::base::State*, ompl::base::State*> edge;
 
             edge = std::make_pair(si_->cloneState(source),si_->cloneState(target));
 
@@ -181,7 +185,8 @@ class Visualizer
         {
             boost::mutex::scoped_lock sl(drawMutex_);
 
-            boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > edge(std::make_pair(si_->cloneState(source),si_->cloneState(target)));
+//             boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > edge(std::make_pair(si_->cloneState(source),si_->cloneState(target)));
+            boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > edge(std::make_pair(source,target));
 
             chosenRolloutConnection_ = edge;
         }
@@ -202,12 +207,28 @@ class Visualizer
         static void clearRolloutConnections()
         {
             boost::mutex::scoped_lock sl(drawMutex_);
+
+            // free the memory for cloned states
+            for (const auto edge : rolloutConnections_)
+            {
+                si_->freeState(edge.first);
+                si_->freeState(edge.second);
+            }
+
             rolloutConnections_.clear();
         }
 
         static void clearMostLikelyPath()
         {
             boost::mutex::scoped_lock sl(drawMutex_);
+
+            // free the memory for cloned states
+            for (const auto edge : mostLikelyPath_)
+            {
+                si_->freeState(edge.first);
+                si_->freeState(edge.second);
+            }
+
             mostLikelyPath_.clear();
         }
 
@@ -270,6 +291,13 @@ class Visualizer
         static void clearRobotPath()
         {
             boost::mutex::scoped_lock sl(drawMutex_);
+
+            // free the memory for cloned states
+            for (const auto state : robotPath_)
+            {
+                si_->freeState(state);
+            }
+
             robotPath_.clear();
         }
 
@@ -356,10 +384,12 @@ class Visualizer
         static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > graphEdges_;
 
         /** \brief Store the Rollout connections */
-        static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > rolloutConnections_;
+//         static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > rolloutConnections_;
+        static std::vector<std::pair<ompl::base::State*, ompl::base::State*> > rolloutConnections_;
 
         /** \brief Store the Rollout connections */
-        static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > mostLikelyPath_;
+//         static std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > mostLikelyPath_;
+        static std::vector<std::pair<ompl::base::State*, ompl::base::State*> > mostLikelyPath_;
 
         /** \brief The rollout connection that gets chosen as the next target*/
         static boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> >chosenRolloutConnection_;
@@ -368,7 +398,8 @@ class Visualizer
         static std::vector<VZRFeedbackEdge> feedbackEdges_;
 
         /** \brief stores the sequence of states of the real robot */
-        static std::vector<const ompl::base::State*> robotPath_;
+//         static std::vector<const ompl::base::State*> robotPath_;
+        static std::vector<ompl::base::State*> robotPath_;
 
         /** \brief Container for RRT paths generated as candidates during Multi-Modal operation */
         static std::vector<ompl::geometric::PathGeometric> openLoopRRTPaths_;

@@ -46,6 +46,9 @@
 #include "boost/date_time/local_time/local_time.hpp"
 #include <boost/thread.hpp>
 
+#include "SeparatedControllers/RHCICreate.h"
+class RHCICreate;
+
 /** \brief Base class for Controller. A controller's task is to use the filter to estimate the belief robot's state and
           generate control commands using the separated controller. For example by fusing an LQR and Kalman Filter
           we generate an LQG controller. */
@@ -66,7 +69,8 @@ class Controller
         Controller() {};
 
         /** \brief Constructor */
-        Controller(const ompl::base::State *goal,
+//         Controller(const ompl::base::State *goal,
+        Controller(ompl::base::State *goal,
                  const std::vector<ompl::base::State*>& nominalXs,
                  const std::vector<ompl::control::Control*>& nominalUs,
                  const firm::SpaceInformation::SpaceInformationPtr si);
@@ -120,7 +124,8 @@ class Controller
         virtual bool isTerminated(const ompl::base::State *state, const size_t t);
 
         /** \brief Evolve the controller over a single time step, i.e. apply control, predict, get observation, update */
-        virtual void Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState);
+//         virtual void Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState);
+        virtual void Evolve(ompl::base::State *state, size_t t, ompl::base::State* nextState);
 
         /** \brief get the controllers goal state */
         ompl::base::State* getGoal() {return goal_; }
@@ -234,15 +239,18 @@ template <class SeparatedControllerType, class FilterType>
 double Controller<SeparatedControllerType, FilterType>::nominalTrajDeviationThreshold_ = -1;
 
 template <class SeparatedControllerType, class FilterType>
-Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::State *goal,
+// Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::State *goal,
+Controller<SeparatedControllerType, FilterType>::Controller(ompl::base::State *goal,
             const std::vector<ompl::base::State*>& nominalXs,
             const std::vector<ompl::control::Control*>& nominalUs,
             const firm::SpaceInformation::SpaceInformationPtr si): si_(si)
 {
 
-  goal_ = si_->allocState();
+//   goal_ = si_->allocState();
+//
+//   si_->copyState(goal_, goal);
 
-  si_->copyState(goal_, goal);
+    goal_ = goal;
 
   lss_.reserve(nominalXs.size());
 
@@ -733,7 +741,8 @@ bool Controller<SeparatedControllerType, FilterType>::executeFromUpto(const int 
 }
 
 template <class SeparatedControllerType, class FilterType>
-void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
+// void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
+void Controller<SeparatedControllerType, FilterType>::Evolve(ompl::base::State *state, size_t t, ompl::base::State* nextState)
 {
     ompl::control::Control* control = separatedController_.generateFeedbackControl(state, t);
 
@@ -774,6 +783,10 @@ void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::S
 
     // free the memory
     si_->freeState(nextBelief);
+    if (!std::is_same<SeparatedControllerType, RHCICreate>::value)
+    {
+        si_->freeControl(control);
+    }
 }
 
 

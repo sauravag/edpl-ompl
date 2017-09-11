@@ -74,7 +74,8 @@ class ExtendedKF : public  KalmanFilterMethod
 
         /** \brief  Evolves the robot's belief on the input control, previous state and new observation. It first calls predict
                     and then update.*/
-        void Evolve(const ompl::base::State *belief,
+//         void Evolve(const ompl::base::State *belief,
+        void Evolve(ompl::base::State *belief,
                     const ompl::control::Control* control,
                     const ObservationType& obs,
                     const LinearSystem& lsPred,

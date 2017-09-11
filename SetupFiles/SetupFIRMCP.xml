@@ -138,10 +138,10 @@
 	<PlannerMode  method = "3"  dynobst = "0" />
 
 	<!-- [OPTION2] FIRM Node Density -->
-<!-- 	<FIRMNodes  minNodes = "350"  maxNodes = "350" /> -->
+	<FIRMNodes  minNodes = "350"  maxNodes = "350" />
 <!-- 	<FIRMNodes  minNodes = "400"  maxNodes = "400" /> -->
 <!-- 	<FIRMNodes  minNodes = "450"  maxNodes = "450" /> -->
-	<FIRMNodes  minNodes = "500"  maxNodes = "500" />
+<!-- 	<FIRMNodes  minNodes = "500"  maxNodes = "500" /> -->
 <!-- 	<FIRMNodes  minNodes = "550"  maxNodes = "550" /> -->
 <!-- 	<FIRMNodes  minNodes = "600"  maxNodes = "600" /> -->
 <!-- 	<FIRMNodes  minNodes = "650"  maxNodes = "650" /> -->
@@ -152,8 +152,8 @@
 	<!-- [OPTION3] Roadmap -->
 <!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;350.xml" useRoadMap = "1" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-500.xml" useRoadMap = "1" />
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;350.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;500.xml" useRoadMap = "1" /> -->
+    <RoadMap roadmapFile = "./FIRMRoadMap-FIRMCPSet5-350.xml" useRoadMap = "1" />
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;400.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;450.xml" useRoadMap = "1" /> -->

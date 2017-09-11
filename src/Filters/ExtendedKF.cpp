@@ -97,7 +97,8 @@ const LinearSystem& ls, ompl::base::State *updatedState)
 
 }
 
-void ExtendedKF::Evolve(const ompl::base::State *belief,
+// void ExtendedKF::Evolve(const ompl::base::State *belief,
+void ExtendedKF::Evolve(ompl::base::State *belief,
     const ompl::control::Control* control,
     const ObservationType& obs,
     const LinearSystem& lsPred,

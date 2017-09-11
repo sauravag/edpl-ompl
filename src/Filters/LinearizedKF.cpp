@@ -88,7 +88,8 @@ const LinearSystem& ls, ompl::base::State *updatedState)
  }
 
 
-void LinearizedKF::Evolve(const ompl::base::State *belief,
+// void LinearizedKF::Evolve(const ompl::base::State *belief,
+void LinearizedKF::Evolve(ompl::base::State *belief,
     const ompl::control::Control* control,
     const ObservationType& obs,
     const LinearSystem& lsPred,

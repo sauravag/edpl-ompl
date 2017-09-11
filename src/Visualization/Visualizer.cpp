@@ -52,15 +52,18 @@ firm::SpaceInformation::SpaceInformationPtr Visualizer::si_;
 
 std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::graphEdges_;
 
-std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::rolloutConnections_;
+// std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::rolloutConnections_;
+std::vector<std::pair<ompl::base::State*, ompl::base::State*> > Visualizer::rolloutConnections_;
 
-std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::mostLikelyPath_;
+// std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::mostLikelyPath_;
+std::vector<std::pair<ompl::base::State*, ompl::base::State*> > Visualizer::mostLikelyPath_;
 
 std::vector<Visualizer::VZRFeedbackEdge> Visualizer::feedbackEdges_;
 
 boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::chosenRolloutConnection_;
 
-std::vector<const ompl::base::State*> Visualizer::robotPath_;
+// std::vector<const ompl::base::State*> Visualizer::robotPath_;
+std::vector<ompl::base::State*> Visualizer::robotPath_;
 
 std::vector<ompl::geometric::PathGeometric> Visualizer::openLoopRRTPaths_;
 
@@ -512,9 +515,11 @@ void Visualizer::drawFeedbackEdges()
     glLineWidth(1.0);
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
-        std::pair<const ompl::base::State*, const ompl::base::State*> vertexPair = std::make_pair(i->source, i->target);
+//         std::pair<const ompl::base::State*, const ompl::base::State*> vertexPair = std::make_pair(i->source, i->target);
+        std::pair<ompl::base::State*, ompl::base::State*> vertexPair = std::make_pair(i->source, i->target);
 
-        std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> >::iterator it = std::find(mostLikelyPath_.begin(), mostLikelyPath_.end(), vertexPair);
+//         std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> >::iterator it = std::find(mostLikelyPath_.begin(), mostLikelyPath_.end(), vertexPair);
+        std::vector<std::pair<ompl::base::State*, ompl::base::State*> >::iterator it = std::find(mostLikelyPath_.begin(), mostLikelyPath_.end(), vertexPair);
 
         // if this pair does not exist in most likely path, then draw it, other we will only draw it in most likely path
         if( it == mostLikelyPath_.end())
