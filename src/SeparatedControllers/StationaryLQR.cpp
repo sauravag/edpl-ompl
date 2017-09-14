@@ -40,8 +40,9 @@ StationaryLQR::StationaryLQR(ompl::base::State *goal,
         const std::vector<ompl::base::State*> &nominalXs,
         const std::vector<ompl::control::Control*> &nominalUs,
         const std::vector<LinearSystem>& linearSystems,  // Linear systems are not used in this class but it is here to unify the interface
-        const MotionModelPointer mm) :
-        SeparatedControllerMethod(goal, nominalXs, nominalUs, linearSystems, mm)
+        const MotionModelPointer mm,
+        const firm::SpaceInformation::SpaceInformationPtr si) :
+        SeparatedControllerMethod(goal, nominalXs, nominalUs, linearSystems, mm, si)
 {
 
     // set the weighting matrices
@@ -67,11 +68,9 @@ ompl::control::Control* StationaryLQR::generateFeedbackControl(const ompl::base:
 
     using namespace arma;
 
-    SpaceType *space; space =  new SpaceType();
+    ompl::base::State *relativeState = si_->allocState();
 
-    ompl::base::State *relativeState = space->allocState();
-
-    space->getRelativeState(goal_, state, relativeState);
+    dynamic_cast<SpaceType*>(si_.get())->getRelativeState(goal_, state, relativeState);
 
     colvec relativeCfg =  relativeState->as<StateType>()->getArmaData();
 
@@ -83,7 +82,7 @@ ompl::control::Control* StationaryLQR::generateFeedbackControl(const ompl::base:
     ompl::control::Control* newcontrol  = motionModel_->ARMA2OMPL(nomU + dU);// control is nomU + dU
 
     // free the memory
-    space->freeState(relativeState);
+    si_->freeState(relativeState);
 
     return newcontrol;
 }

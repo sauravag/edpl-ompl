@@ -102,20 +102,6 @@ void FIRMCP::loadParametersFromFile(const std::string &pathToFile)
     itemElement->QueryDoubleAttribute("cExplorationForSimulate", &cExplorationForSimulate_);
     itemElement = 0;
 
-    child = node->FirstChild("costToGoRegulatorOutOfReach");
-    assert( child );
-    itemElement = child->ToElement();
-    assert( itemElement );
-    itemElement->QueryDoubleAttribute("costToGoRegulatorOutOfReach", &costToGoRegulatorOutOfReach_);
-    itemElement = 0;
-
-    child = node->FirstChild("costToGoRegulatorWithinReach");
-    assert( child );
-    itemElement = child->ToElement();
-    assert( itemElement );
-    itemElement->QueryDoubleAttribute("costToGoRegulatorWithinReach", &costToGoRegulatorWithinReach_);
-    itemElement = 0;
-
     child = node->FirstChild("cExploitationForRolloutOutOfReach");
     assert( child );
     itemElement = child->ToElement();
@@ -128,6 +114,20 @@ void FIRMCP::loadParametersFromFile(const std::string &pathToFile)
     itemElement = child->ToElement();
     assert( itemElement );
     itemElement->QueryDoubleAttribute("cExploitationForRolloutWithinReach", &cExploitationForRolloutWithinReach_);
+    itemElement = 0;
+
+    child = node->FirstChild("costToGoRegulatorOutOfReach");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("costToGoRegulatorOutOfReach", &costToGoRegulatorOutOfReach_);
+    itemElement = 0;
+
+    child = node->FirstChild("costToGoRegulatorWithinReach");
+    assert( child );
+    itemElement = child->ToElement();
+    assert( itemElement );
+    itemElement->QueryDoubleAttribute("costToGoRegulatorWithinReach", &costToGoRegulatorWithinReach_);
     itemElement = 0;
 
     child = node->FirstChild("nEpsForIsReached");
@@ -463,8 +463,8 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         siF_->copyState(cstartStatePrev, cstartState);
         targetNode = boost::target(e, g_);
 
-        double succProb = evaluateSuccessProbability(e, tempVertex, goal);
-        successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
+//         double succProb = evaluateSuccessProbability(e, tempVertex, goal);
+//         successProbabilityHistory_.push_back(std::make_pair(currentTimeStep_, succProb ) );
 
         OMPL_INFORM("FIRMCP: Moving from Vertex %u (%2.3f, %2.3f, %2.3f, %2.6f) to [%u] (%2.3f, %2.3f, %2.3f, %2.6f)", tempVertex, targetNode, 
                 stateProperty_[tempVertex]->as<FIRM::StateType>()->getX(),
@@ -479,36 +479,36 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {1} CONNECTION TO FUTURE FIRM NODES
         // 5) forcefully include future feedback nodes of several previous target nodes in the candidate (nearest neighbor) list
         // update the future feedback node at every iteration
-        if(connectToFutureNodes_)
-        {
-            Vertex futureVertex = targetNode;
-            for(int i=0; i<numberOfFeedbackLookAhead_; i++)
-            {
-                futureFIRMNodes.push_back(futureVertex);
-
-                if(feedback_.find(futureVertex) != feedback_.end())    // there exists a valid feedback edge for this vertex
-                {
-                    futureVertex = boost::target(feedback_.at(futureVertex), g_);
-                }
-                else    // there is no feedback edge coming from this vertex
-                {
-                    // fill the rest of the buffer with the last valid vertex; redundant vertices will be ignored for rollout check
-                    for(int j=i+1; j<numberOfFeedbackLookAhead_; j++)
-                    {
-                        futureFIRMNodes.push_back(futureVertex);
-                    }
-                    break;
-                }
-            }
-            // for debug
-            // if(ompl::magic::PRINT_FUTURE_NODES)
-            // {
-            //     std::cout << "futureFIRMNodesDuplicate: { ";
-            //     foreach(futureVertex, futureFIRMNodes)
-            //         std::cout << futureVertex << " ";
-            //     std::cout << "}" << std::endl;
-            // }
-        }
+//         if(connectToFutureNodes_)
+//         {
+//             Vertex futureVertex = targetNode;
+//             for(int i=0; i<numberOfFeedbackLookAhead_; i++)
+//             {
+//                 futureFIRMNodes.push_back(futureVertex);
+//
+//                 if(feedback_.find(futureVertex) != feedback_.end())    // there exists a valid feedback edge for this vertex
+//                 {
+//                     futureVertex = boost::target(feedback_.at(futureVertex), g_);
+//                 }
+//                 else    // there is no feedback edge coming from this vertex
+//                 {
+//                     // fill the rest of the buffer with the last valid vertex; redundant vertices will be ignored for rollout check
+//                     for(int j=i+1; j<numberOfFeedbackLookAhead_; j++)
+//                     {
+//                         futureFIRMNodes.push_back(futureVertex);
+//                     }
+//                     break;
+//                 }
+//             }
+//             // for debug
+//             // if(ompl::magic::PRINT_FUTURE_NODES)
+//             // {
+//             //     std::cout << "futureFIRMNodesDuplicate: { ";
+//             //     foreach(futureVertex, futureFIRMNodes)
+//             //         std::cout << futureVertex << " ";
+//             //     std::cout << "}" << std::endl;
+//             // }
+//         }
 
 
 
@@ -576,37 +576,37 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         // [2] NodeController
         else
         {
-            // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {2} ACCUMULATING STATIONARY PENALTY
-            if(applyStationaryPenalty_)
-            {
-                // incrementally penalize a node that is being selected as a target due to the not-yet-converged current covariance even after the robot reached that node's position and orientation
-                // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
-                // it will help to break (almost) indefinite stabilization process during rollout, especially when land marks are not very close
-                if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReachedPose(cstartState))
-                {
-                    if(targetNode != goal)
-                    {
-                        // increase the stationary penalty
-                        if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
-                        {
-                            stationaryPenalties_[targetNode] = statCostIncrement_;
-                            // for log
-                            numberOfStationaryPenalizedNodes_++;
-                        }
-                        else
-                        {
-                            stationaryPenalties_[targetNode] += statCostIncrement_;
-                        }
-                        // for log
-                        sumOfStationaryPenalties_ += statCostIncrement_;
-                        stationaryPenaltyHistory_.push_back(std::make_tuple(currentTimeStep_, numberOfStationaryPenalizedNodes_, sumOfStationaryPenalties_));
-
-                        // for debug
-                        if(ompl::magic::PRINT_STATIONARY_PENALTY)
-                            std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
-                    }
-                }
-            }
+//             // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {2} ACCUMULATING STATIONARY PENALTY
+//             if(applyStationaryPenalty_)
+//             {
+//                 // incrementally penalize a node that is being selected as a target due to the not-yet-converged current covariance even after the robot reached that node's position and orientation
+//                 // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
+//                 // it will help to break (almost) indefinite stabilization process during rollout, especially when land marks are not very close
+//                 if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReachedPose(cstartState))
+//                 {
+//                     if(targetNode != goal)
+//                     {
+//                         // increase the stationary penalty
+//                         if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
+//                         {
+//                             stationaryPenalties_[targetNode] = statCostIncrement_;
+//                             // for log
+//                             numberOfStationaryPenalizedNodes_++;
+//                         }
+//                         else
+//                         {
+//                             stationaryPenalties_[targetNode] += statCostIncrement_;
+//                         }
+//                         // for log
+//                         sumOfStationaryPenalties_ += statCostIncrement_;
+// //                         stationaryPenaltyHistory_.push_back(std::make_tuple(currentTimeStep_, numberOfStationaryPenalizedNodes_, sumOfStationaryPenalties_));
+//
+//                         // for debug
+//                         if(ompl::magic::PRINT_STATIONARY_PENALTY)
+//                             std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
+//                     }
+//                 }
+//             }
             // NOTE tried applying the stationary penalty if isReached(), instead of isTerminated(), is satisfied, but the resultant policy was more suboptimal
             //if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReached(cstartState))
             //{
@@ -703,6 +703,9 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 
 
     } // while()
+
+    // save the visualization
+    Visualizer::doSaveVideo(true);
 
     // XXX HACK CHECK REVIEW
 //     // [3'] Free the memory for states and controls for this temporary node/edge created from previous iteration
@@ -1956,8 +1959,8 @@ FIRM::Vertex FIRMCP::addQVnodeToPOMCPTree(ompl::base::State *state)
     m = boost::add_vertex(g_);
 
     stateProperty_[m] = state;
-    totalConnectionAttemptsProperty_[m] = 1;
-    successfulConnectionAttemptsProperty_[m] = 0;
+//     totalConnectionAttemptsProperty_[m] = 1;
+//     successfulConnectionAttemptsProperty_[m] = 0;
 
     return m;
 }
@@ -2045,8 +2048,8 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
     {
         if ( m!=n )
         {
-            totalConnectionAttemptsProperty_[m]++;
-            totalConnectionAttemptsProperty_[n]++;
+//             totalConnectionAttemptsProperty_[m]++;
+//             totalConnectionAttemptsProperty_[n]++;
 
             // XXX CHECK is it better to checkMotion() beforehand, or learn by running Monte Carlo simulation?
             if (siF_->checkMotion(stateProperty_[m], stateProperty_[n]))     // NOTE skip this process since it calls (computationally expensive) isValid() function for all interpolated states along the edge
@@ -2059,7 +2062,7 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
 
                 if(forwardEdgeAdded)
                 {
-                    successfulConnectionAttemptsProperty_[m]++;
+//                     successfulConnectionAttemptsProperty_[m]++;
 
                     // compute the approximate cost-to-go
 //                     approxCostToGo = approxEdgeCost.getCost() + costToGo_[n];
@@ -2304,7 +2307,7 @@ double FIRMCP::getCostToGoWithApproxStabCost(const Vertex vertex)
     {
         if (!updateCostToGoWithApproxStabCost(vertex))
         {
-            OMPL_ERROR("Failed to updateCostToGoWithApproxStabCost()!");
+            //OMPL_ERROR("Failed to updateCostToGoWithApproxStabCost()!");
             return infiniteCostToGo_;
         }
     }
@@ -2325,7 +2328,8 @@ bool FIRMCP::updateCostToGoWithApproxStabCost(const Vertex current)
     // check if feedback_ path exists for this node
     if (feedback_.find(current) == feedback_.end())
     {
-        OMPL_WARN("No feedback path is found for the given node %d!", current);
+        //OMPL_WARN("No feedback path is found for the given node %d!", current);
+        costToGoWithApproxStabCost_[current] = infiniteCostToGo_;  // fill infinite value here to avoid repetitive call for this node
         return false;
     }
     Edge edge = feedback_.at(current);
@@ -2402,7 +2406,7 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
         //executionCost = informationCostWeight_*executionCostCov/(currentTimeStep==0 ? 1e-10 : currentTimeStep) + timeCostWeight_*currentTimeStep;    // 3)
         //executionCost = informationCostWeight_*executionCostCov;    // 4)
 
-        //costHistory_.push_back(std::make_tuple(currentTimeStep, executionCostCov, executionCost));
+        costHistory_.push_back(std::make_tuple(currentTimeStep, executionCostCov, executionCost));
 
 
         // if edgeControllerStatus is false (usually due to collision or too much of deviation)
@@ -2433,37 +2437,37 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
     // [2] NodeController
     else
     {
-        // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {2} ACCUMULATING STATIONARY PENALTY
-        if(applyStationaryPenalty_)
-        {
-            // incrementally penalize a node that is being selected as a target due to the not-yet-converged current covariance even after the robot reached that node's position and orientation
-            // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
-            // it will help to break (almost) indefinite stabilization process during rollout, especially when land marks are not very close
-            if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReachedPose(cstartState))
-            {
-                if(targetNode != goal)
-                {
-                    // increase the stationary penalty
-                    if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
-                    {
-                        stationaryPenalties_[targetNode] = statCostIncrement_;
-                        // for log
-                        numberOfStationaryPenalizedNodes_++;
-                    }
-                    else
-                    {
-                        stationaryPenalties_[targetNode] += statCostIncrement_;
-                    }
-                    // for log
-                    sumOfStationaryPenalties_ += statCostIncrement_;
-                    //stationaryPenaltyHistory_.push_back(std::make_tuple(currentTimeStep_, numberOfStationaryPenalizedNodes_, sumOfStationaryPenalties_));
-
-                    // for debug
-                    if(ompl::magic::PRINT_STATIONARY_PENALTY)
-                        std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
-                }
-            }
-        }
+//         // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {2} ACCUMULATING STATIONARY PENALTY
+//         if(applyStationaryPenalty_)
+//         {
+//             // incrementally penalize a node that is being selected as a target due to the not-yet-converged current covariance even after the robot reached that node's position and orientation
+//             // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
+//             // it will help to break (almost) indefinite stabilization process during rollout, especially when land marks are not very close
+//             if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReachedPose(cstartState))
+//             {
+//                 if(targetNode != goal)
+//                 {
+//                     // increase the stationary penalty
+//                     if(stationaryPenalties_.find(targetNode) == stationaryPenalties_.end())
+//                     {
+//                         stationaryPenalties_[targetNode] = statCostIncrement_;
+//                         // for log
+//                         numberOfStationaryPenalizedNodes_++;
+//                     }
+//                     else
+//                     {
+//                         stationaryPenalties_[targetNode] += statCostIncrement_;
+//                     }
+//                     // for log
+//                     sumOfStationaryPenalties_ += statCostIncrement_;
+//                     //stationaryPenaltyHistory_.push_back(std::make_tuple(currentTimeStep_, numberOfStationaryPenalizedNodes_, sumOfStationaryPenalties_));
+//
+//                     // for debug
+//                     if(ompl::magic::PRINT_STATIONARY_PENALTY)
+//                         std::cout << "stationaryPenalty[" << targetNode << "]: " << stationaryPenalties_[targetNode] << std::endl;
+//                 }
+//             }
+//         }
         // NOTE tried applying the stationary penalty if isReached(), instead of isTerminated(), is satisfied, but the resultant policy was more suboptimal
         //if(stateProperty_[targetNode]->as<FIRM::StateType>()->isReached(cstartState))
         //{
@@ -2473,10 +2477,10 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
         // call StabilizeUpto() at every rollout iteration
         {
             NodeControllerType& nodeController = nodeControllers_.at(targetNode);
+
             nodeController.setSpaceInformation(policyExecutionSI_);
 
             //nodeControllerStatus = nodeController.StabilizeUpto(numSteps, cstartState, cendState, costCov, stepsExecuted, false);
-
             // NOTE to reduce the number of mostly identical POMCP tree nodes during stabilization, inflate the number of execution steps
             nodeControllerStatus = nodeController.StabilizeUpto(scaleStabNumSteps_*numSteps, cstartState, cendState, costCov, stepsExecuted, false);
 
@@ -2495,7 +2499,7 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
             //executionCost = informationCostWeight_*executionCostCov/(currentTimeStep==0 ? 1e-10 : currentTimeStep) + timeCostWeight_*currentTimeStep;    // 3)
             //executionCost = informationCostWeight_*executionCostCov;    // 4)
 
-            //costHistory_.push_back(std::make_tuple(currentTimeStep, executionCostCov, executionCost));
+            costHistory_.push_back(std::make_tuple(currentTimeStep, executionCostCov, executionCost));
 
 
             // if nodeControllerStatus is false (usually due to too many iterations, more than maxTries_)
@@ -2610,5 +2614,103 @@ void FIRMCP::prunePOMCPNode(const Vertex rootVertex)
         // for debug
         //std::cout << " " << rootVertex;
     }
+}
+
+// for FIRM-Rollout
+FIRM::Edge FIRMCP::generateRolloutPolicy(const FIRM::Vertex currentVertex, const FIRM::Vertex goal)
+{
+    /**
+        For the given node, find the out edges and see the total cost of taking that edge
+        The cost of taking the edge is cost to go from the target of the edge + the cost of the edge itself
+    */
+    double minCost = std::numeric_limits<double>::max();
+    Edge edgeToTake;
+
+    // for debug
+    FIRM::Vertex minCostVertCurrent, minCostVertNext, minCostVertNextNext;
+
+    // Iterate over the out edges
+    foreach(Edge e, boost::out_edges(currentVertex, g_))
+    {
+
+        // Get the target node of the edge
+        Vertex targetNode = boost::target(e, g_);  
+
+        // The FIRM edge to take from the target node
+        //Edge nextFIRMEdge = feedback_.at(targetNode);
+
+        // The node to which next firm edge goes
+        //Vertex targetOfNextFIRMEdge = boost::target(nextFIRMEdge, g_);
+
+        // for debug
+        if(ompl::magic::PRINT_FEEDBACK_PATH)
+            std::cout << "PATH[" << currentVertex;
+
+        // Check if feedback from target to goal is valid or not
+        if(!isFeedbackPolicyValid(targetNode, goal))
+        {
+
+            //OMPL_INFORM("Rollout: Invalid path detected from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+
+            updateEdgeCollisionCost(targetNode, goal);
+
+            // resolve Dijkstra/DP
+            solveDijkstraSearch(goal);
+            solveDynamicProgram(goal, false);
+
+            //targetOfNextFIRMEdge = boost::target(feedback_.at(targetNode), g_);  
+            //OMPL_INFORM("Rollout: Updated path, next firm edge moving from Vertex %u to %u", targetNode, targetOfNextFIRMEdge);
+
+        }
+
+        // The cost to go from the target node
+//         double nextNodeCostToGo = costToGo_[targetNode];
+        double nextNodeCostToGo = getCostToGoWithApproxStabCost(targetNode);
+
+        // Find the weight of the edge
+        FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, e);
+
+        // The transition prob of the edge
+        double transitionProbability = edgeWeight.getSuccessProbability();        
+        
+        // compute distance from goal to target
+        //arma::colvec targetToGoalVec = stateProperty_[goal]->as<FIRM::StateType>()->getArmaData() - stateProperty_[targetNode]->as<FIRM::StateType>()->getArmaData();
+        //double distToGoalFromTarget = arma::norm(targetToGoalVec.subvec(0,1),2); 
+
+        // get the stationary penalty
+        // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
+        double stationaryPenalty = 0.0;
+        if(stationaryPenalties_.find(targetNode) != stationaryPenalties_.end())
+            stationaryPenalty = stationaryPenalties_.at(targetNode);
+
+        // the cost of taking the edge
+        //double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost();
+        // NOTE this is to myopically improve the suboptimal policy based on approximate value function (with inaccurate edge cost induced from isReached() relaxation)
+        double edgeCostToGo = transitionProbability*nextNodeCostToGo + (1-transitionProbability)*obstacleCostToGo_ + edgeWeight.getCost() + stationaryPenalty;  // HACK only for rollout policy search; actual execution cost will not consider stationaryPenalty
+
+
+        // for debug
+        if(ompl::magic::PRINT_COST_TO_GO)
+//             std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << std::endl;
+            std::cout << "COST[" << currentVertex << "->" << targetNode << "->G] " << edgeCostToGo << " = " << transitionProbability << "*" << nextNodeCostToGo << " + " << "(1-" << transitionProbability << ")*" << obstacleCostToGo_ << " + " << edgeWeight.getCost() << " + " << stationaryPenalty << std::endl;
+
+
+        if(edgeCostToGo < minCost)
+        {
+            minCost  = edgeCostToGo;
+            edgeToTake = e;
+
+            // for debug
+            minCostVertCurrent = currentVertex;
+            minCostVertNext = targetNode;
+            //minCostVertNextNext = targetOfNextFIRMEdge;
+        }
+    }
+
+    // for debug
+    if(ompl::magic::PRINT_COST_TO_GO)
+        std::cout << "minC[" << minCostVertCurrent << "->" << minCostVertNext << "->G] " << minCost << std::endl;
+
+    return edgeToTake;
 }
 

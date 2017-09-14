@@ -52,17 +52,14 @@ firm::SpaceInformation::SpaceInformationPtr Visualizer::si_;
 
 std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::graphEdges_;
 
-// std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::rolloutConnections_;
 std::vector<std::pair<ompl::base::State*, ompl::base::State*> > Visualizer::rolloutConnections_;
 
-// std::vector<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::mostLikelyPath_;
 std::vector<std::pair<ompl::base::State*, ompl::base::State*> > Visualizer::mostLikelyPath_;
 
 std::vector<Visualizer::VZRFeedbackEdge> Visualizer::feedbackEdges_;
 
-boost::optional<std::pair<const ompl::base::State*, const ompl::base::State*> > Visualizer::chosenRolloutConnection_;
+boost::optional<std::pair<ompl::base::State*, ompl::base::State*> > Visualizer::chosenRolloutConnection_;
 
-// std::vector<const ompl::base::State*> Visualizer::robotPath_;
 std::vector<ompl::base::State*> Visualizer::robotPath_;
 
 std::vector<ompl::geometric::PathGeometric> Visualizer::openLoopRRTPaths_;
@@ -331,7 +328,7 @@ void Visualizer::refresh()
             {
                 glColor3d(1.0 , 0.0 , 0.0);
                 glLineWidth(4.0);
-                    drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
+                drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
                 glLineWidth(1.0);
             }
 
@@ -355,7 +352,7 @@ void Visualizer::refresh()
             {
                 glColor3d(1.0 , 0.0 , 0.0);
                 glLineWidth(4.0);
-                    drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
+                drawEdge(chosenRolloutConnection_->first, chosenRolloutConnection_->second);
                 glLineWidth(1.0);
             }
 
@@ -413,8 +410,15 @@ void Visualizer::drawEdge(const ompl::base::State* source, const ompl::base::Sta
 {
     using namespace arma;
 
-    colvec::fixed<2> sourceData = source->as<SE2BeliefSpace::StateType>()->getArmaData().subvec(0,1);
-    colvec::fixed<2> targetData = target->as<SE2BeliefSpace::StateType>()->getArmaData().subvec(0,1);
+    colvec::fixed<2> sourceData, targetData;
+    if (source)
+        sourceData = source->as<SE2BeliefSpace::StateType>()->getArmaData().subvec(0,1);
+    else
+        return;
+    if (target)
+        targetData = target->as<SE2BeliefSpace::StateType>()->getArmaData().subvec(0,1);
+    else
+        return;
 
     glBegin(GL_LINES);
         glVertex2d(sourceData[0],sourceData[1]);

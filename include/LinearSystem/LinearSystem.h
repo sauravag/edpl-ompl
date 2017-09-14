@@ -116,7 +116,11 @@ class LinearSystem
     /** \brief  Return the state at which this system was constructed. */
     ompl::base::State* getX() {return x_; }
 
-    void freeX() { si_->freeState(x_); }
+    void freeX()
+    {
+        if (!x_)
+            si_->freeState(x_);
+    }
 
     /** \brief  Get the state transition jacobian. */
     arma::mat getA() const { return motionModel_->getStateJacobian(x_, u_, w_); }

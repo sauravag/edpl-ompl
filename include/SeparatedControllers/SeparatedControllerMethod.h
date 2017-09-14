@@ -40,6 +40,7 @@
 
 #include "MotionModels/MotionModelMethod.h"
 #include "LinearSystem/LinearSystem.h"
+#include "SpaceInformation/SpaceInformation.h"
 #include "ompl/control/Control.h"
 
 class SeparatedControllerMethod
@@ -60,12 +61,14 @@ class SeparatedControllerMethod
         const std::vector<ompl::base::State*>& nominalXs,
         const std::vector<ompl::control::Control*>& nominalUs,
         const std::vector<LinearSystem>& linearSystems,
-        const MotionModelPointer mm) :
+        const MotionModelPointer mm,
+        const firm::SpaceInformation::SpaceInformationPtr si) :
         goal_(goal),
         nominalXs_(nominalXs),
         nominalUs_(nominalUs),
         linearSystems_(linearSystems),
-        motionModel_(mm) {}
+        motionModel_(mm),
+        si_(si) {}
 
     ~SeparatedControllerMethod() {}
 
@@ -109,6 +112,9 @@ class SeparatedControllerMethod
     
     MotionModelPointer motionModel_;
     
+    /** \brief The pointer to the space information. */
+    SpaceInformationPtr si_; // Instead of the actuation system, in OMPL we have the spaceinformation
+
 };
 
 #endif

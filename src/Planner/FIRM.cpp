@@ -230,7 +230,11 @@ void FIRM::clear(void)
 void FIRM::freeMemory(void)
 {
     foreach (Vertex v, boost::vertices(g_))
-        si_->freeState(stateProperty_[v]);
+    {
+        const auto state = stateProperty_[v];
+        if (!state)
+            si_->freeState(state);
+    }
     g_.clear();
 }
 
@@ -913,6 +917,9 @@ bool FIRM::constructFeedbackPath(const Vertex &start, const Vertex &goal, ompl::
 
     while(currentVertex!=goal)
     {
+        if(feedback_.find(currentVertex) == feedback_.end())  // not connected to the goal
+            return false;
+
         Edge edge = feedback_.at(currentVertex); // get the edge
 
         Vertex target = boost::target(edge, g_); // get the target of this edge
@@ -1718,6 +1725,9 @@ double FIRM::evaluateSuccessProbability(const Edge currentEdge, const FIRM::Vert
 
     while(v != goal)
     {
+        if(feedback_.find(v) == feedback_.end())  // not connected to the goal
+            return 0.0;
+
         Edge edge = feedback_.at(v);
 
         const FIRMWeight edgeWeight =  boost::get(boost::edge_weight, g_, edge);
@@ -1740,6 +1750,9 @@ void FIRM::updateEdgeCollisionCost(FIRM::Vertex currentVertex, FIRM::Vertex goal
     // cycle through feedback, update edge costs for edges in collision
     while(currentVertex != goalVertex)
     {
+        if(feedback_.find(currentVertex) == feedback_.end())  // not connected to the goal
+            return;
+
         Edge edge = feedback_.at(currentVertex); // get the edge
 
         Vertex target = boost::target(edge, g_); // get the target of this edge
@@ -1964,6 +1977,8 @@ void FIRM::executeFeedback(void)
 
     } // while()
 
+    // save the visualization
+    Visualizer::doSaveVideo(true);
 
     // for analysis
     // this data is also saved in run-(TIMESTAMP)/RolloutFIRMCostHistory.csv
@@ -2591,6 +2606,9 @@ void FIRM::executeFeedbackWithRollout(void)
 
     } // while()
 
+    // save the visualization
+    Visualizer::doSaveVideo(true);
+
     // [3'] Free the memory for states and controls for this temporary node/edge created from previous iteration
     if(tempVertex != start)
     {
@@ -2773,7 +2791,7 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
 
     if(nIter >= boost::num_vertices(g_))
     {
-        OMPL_WARN("Reached a node that is NOT connected to the goal! Clean up feedback_ and quit isFeedbackPolicyValid()!");
+        OMPL_WARN("Reached a node that is NOT connected to the goal! Cleaning up feedback_ and quit isFeedbackPolicyValid()...");
 
         // remove these unconnected nodes from the feedback_ data
         while (true)
@@ -2786,6 +2804,7 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
             Edge edge = feedback_.at(currentVertex); // get the edge
             Vertex target = boost::target(edge, g_); // get the target of this edge
 
+            costToGo_[currentVertex] = infiniteCostToGo_;
             feedback_.erase(currentVertex);
 
             currentVertex =  target;

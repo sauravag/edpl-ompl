@@ -80,12 +80,9 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
 
     double distance  = norm(diff.subvec(0,1), 2);
 
-    SpaceType *space;
-    space =  new SpaceType();
+    ompl::base::State *relativeState = si_->allocState();
 
-    ompl::base::State *relativeState = space->allocState();
-
-    space->getRelativeState(state, goal_, relativeState);
+    dynamic_cast<SpaceType*>(si_.get())->getRelativeState(state, goal_, relativeState);
 
     colvec relativeCfg =  relativeState->as<StateType>()->getArmaData();
 
@@ -109,7 +106,7 @@ RHCICreate::generateFeedbackControl(const ompl::base::State *state, const size_t
     }
 
     // free the memory
-    space->freeState(relativeState);
+    si_->freeState(relativeState);
 
     return control;
 }

@@ -39,8 +39,9 @@ FiniteTimeLQR::FiniteTimeLQR(ompl::base::State *goal,
         const std::vector<ompl::base::State*> &nominalXs,
         const std::vector<ompl::control::Control*> &nominalUs,
         const std::vector<LinearSystem>& linearSystems,  // Linear systems are not used in this class but it is here to unify the interface
-        const MotionModelPointer mm) :
-        SeparatedControllerMethod(goal, nominalXs, nominalUs, linearSystems, mm)
+        const MotionModelPointer mm,
+        const firm::SpaceInformation::SpaceInformationPtr si) :
+        SeparatedControllerMethod(goal, nominalXs, nominalUs, linearSystems, mm, si)
 {
 
     // set the weighting matrices
@@ -74,7 +75,7 @@ FiniteTimeLQR::FiniteTimeLQR(ompl::base::State *goal,
 
     std::vector<LinearSystem>  tls; tls.push_back(linearSystems[linearSystems.size()-1]);
 
-    StationaryLQR stblr =  StationaryLQR(goal, txs, tus, tls, mm);
+    StationaryLQR stblr =  StationaryLQR(goal, txs, tus, tls, mm, si);
 
     stabilizer_  = stblr;
     //=================================
@@ -86,9 +87,7 @@ ompl::control::Control* FiniteTimeLQR::generateFeedbackControl(const ompl::base:
 
     using namespace arma;
 
-    SpaceType *space; space =  new SpaceType();
-
-    ompl::base::State *relativeState = space->allocState();
+    ompl::base::State *relativeState = si_->allocState();
 
     ompl::control::Control* newcontrol;
 
@@ -97,7 +96,7 @@ ompl::control::Control* FiniteTimeLQR::generateFeedbackControl(const ompl::base:
     if(TT <= numT_ - 1)
     {
 
-        space->getRelativeState(nominalXs_[TT], state, relativeState);
+        dynamic_cast<SpaceType*>(si_.get())->getRelativeState(nominalXs_[TT], state, relativeState);
 
         colvec relativeCfg =  relativeState->as<StateType>()->getArmaData();
 
@@ -114,6 +113,9 @@ ompl::control::Control* FiniteTimeLQR::generateFeedbackControl(const ompl::base:
         newcontrol  = stabilizer_.generateFeedbackControl(state);
 
     }
+
+    // free the memory
+    si_->freeState(relativeState);
 
     return newcontrol;
 }

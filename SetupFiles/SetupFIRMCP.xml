@@ -51,9 +51,14 @@
 
 	<!-- WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT -->
 	<!-- 0: disabled, 1: enabled -->
+<!-- 	<StabilizationHack -->
+<!-- 		connectToFutureNodes = "0" -->
+<!-- 		applyStationaryPenalty = "0" -->
+<!-- 		borderBeliefSampling = "0" -->
+<!-- 		/> -->
 	<StabilizationHack
 		connectToFutureNodes = "0"
-		applyStationaryPenalty = "0"
+		applyStationaryPenalty = "1"
 		borderBeliefSampling = "0"
 		/>
 
@@ -95,8 +100,9 @@
 
 <FIRMCP>
 <!--     <numPOMCPParticles numPOMCPParticles = "30" /> -->
-    <numPOMCPParticles numPOMCPParticles = "10" />
+<!--     <numPOMCPParticles numPOMCPParticles = "10" /> -->
 <!--     <numPOMCPParticles numPOMCPParticles = "5" /> -->
+    <numPOMCPParticles numPOMCPParticles = "3" />
     <maxPOMCPDepth maxPOMCPDepth = "5" />
 <!--     <maxPOMCPDepth maxPOMCPDepth = "20" /> -->
 <!--     <maxPOMCPDepth maxPOMCPDepth = "30" /> -->
@@ -107,10 +113,10 @@
 <!--     <cExplorationForSimulate cExplorationForSimulate = "10" /> -->
     <cExplorationForSimulate cExplorationForSimulate = "100.0" />  <!-- explorative -->
 
-    <costToGoRegulatorOutOfReach costToGoRegulatorOutOfReach = "1e-6" />  <!-- exploitative -->
-    <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1000.0" />  <!-- explorative -->
     <cExploitationForRolloutOutOfReach cExploitationForRolloutOutOfReach = "10.0" />  <!-- exploitative -->
     <cExploitationForRolloutWithinReach cExploitationForRolloutWithinReach = "1.0" />  <!-- explorative -->
+    <costToGoRegulatorOutOfReach costToGoRegulatorOutOfReach = "1e-6" />  <!-- exploitative -->
+    <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1000.0" />  <!-- explorative -->
     <nEpsForIsReached nEpsForIsReached = "3.0" />
 
     <!-- (these are determined from actual transition results) -->
@@ -154,16 +160,16 @@
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;500.xml" useRoadMap = "1" /> -->
     <RoadMap roadmapFile = "./FIRMRoadMap-FIRMCPSet5-350.xml" useRoadMap = "1" />
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;350.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;400.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;450.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;500.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;550.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;600.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;650.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;700.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;750.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet1&#45;800.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;350.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;400.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;450.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;500.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;550.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;600.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;650.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;700.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;750.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;800.xml" useRoadMap = "1" /> -->
 
 
 	<Robot robotFile = "./Models/iRobot_thin.obj" />

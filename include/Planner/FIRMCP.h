@@ -86,6 +86,8 @@ protected:
 
     void prunePOMCPNode(const Vertex rootVertex);
 
+    virtual Edge generateRolloutPolicy(const Vertex currentVertex, const FIRM::Vertex goal);
+
 
     /** \brief A table that stores the cost-to-go updated with approximate stabilization cost along the feedback path*/
     std::map <Vertex, double> costToGoWithApproxStabCost_;
@@ -99,10 +101,10 @@ protected:
     int maxFIRMReachDepth_;
     double cExplorationForSimulate_;
 
-    double costToGoRegulatorOutOfReach_;
-    double costToGoRegulatorWithinReach_;
     double cExploitationForRolloutOutOfReach_;
     double cExploitationForRolloutWithinReach_;
+    double costToGoRegulatorOutOfReach_;
+    double costToGoRegulatorWithinReach_;
     double nEpsForIsReached_;
 
     double heurPosStepSize_;

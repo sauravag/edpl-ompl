@@ -55,7 +55,8 @@ class FiniteTimeLQR : public SeparatedControllerMethod
         const std::vector<ompl::base::State*> &nominalXs,
         const std::vector<ompl::control::Control*> &nominalUs,
         const std::vector<LinearSystem>& linearSystems,
-        const MotionModelPointer mm);
+        const MotionModelPointer mm,
+        const firm::SpaceInformation::SpaceInformationPtr si);
 
     ~FiniteTimeLQR() {}
 

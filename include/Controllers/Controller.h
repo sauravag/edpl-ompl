@@ -257,18 +257,14 @@ Controller<SeparatedControllerType, FilterType>::Controller(ompl::base::State *g
   for(size_t i=0; i<nominalXs.size(); ++i)
   {
 
-    LinearSystem ls(si_, nominalXs[i], nominalUs[i], si_->getMotionModel(), si_->getObservationModel());
+    lss_.push_back(LinearSystem(si_, nominalXs[i], nominalUs[i], si_->getMotionModel(), si_->getObservationModel()));
 
-    lss_.push_back(ls);
   }
 
   //copy construct separated controller
-  SeparatedControllerType sepController(goal_, nominalXs, nominalUs, lss_,si_->getMotionModel());
+  separatedController_ = SeparatedControllerType(goal_, nominalXs, nominalUs, lss_, si_->getMotionModel(), si_);
 
-  separatedController_ = sepController;
-
-  FilterType filter(si);
-  filter_ = filter;
+  filter_ = FilterType(si);
 
   tries_ = 0;
 
@@ -741,7 +737,6 @@ bool Controller<SeparatedControllerType, FilterType>::executeFromUpto(const int 
 }
 
 template <class SeparatedControllerType, class FilterType>
-// void Controller<SeparatedControllerType, FilterType>::Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState)
 void Controller<SeparatedControllerType, FilterType>::Evolve(ompl::base::State *state, size_t t, ompl::base::State* nextState)
 {
     ompl::control::Control* control = separatedController_.generateFeedbackControl(state, t);
@@ -783,7 +778,7 @@ void Controller<SeparatedControllerType, FilterType>::Evolve(ompl::base::State *
 
     // free the memory
     si_->freeState(nextBelief);
-    if (!std::is_same<SeparatedControllerType, RHCICreate>::value)
+    if (!std::is_same<SeparatedControllerType, RHCICreate>::value)  // RHCICreate controller should be freed in the upper level
     {
         si_->freeControl(control);
     }

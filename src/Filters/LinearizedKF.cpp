@@ -61,7 +61,8 @@ const LinearSystem& ls, ompl::base::State *updatedState)
 
     if(!innov.n_rows || !innov.n_cols)
     {
-        updatedState = si_->cloneState(belief);
+        //updatedState = si_->cloneState(belief);
+        si_->copyState(updatedState, belief);
         return; // return the prediction if you don't have any innovation
     }
 
