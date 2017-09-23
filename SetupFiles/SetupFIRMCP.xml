@@ -75,48 +75,33 @@
 </FIRM> 
 
 
-<!-- <FIRMCP> -->
-<!--     <numPOMCPParticles numPOMCPParticles = "3" /> -->
-<!--     <maxPOMCPDepth maxPOMCPDepth = "50" /> -->
-<!--     <maxFIRMReachDepth maxFIRMReachDepth = "300" /> -->
-<!--  -->
-<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" /> -->
-<!--  -->
-<!--     <costToGoRegulatorOutOfReach costToGoRegulatorOutOfReach = "1e&#45;6" />  <!&#45;&#45; exploitative &#45;&#45;> -->
-<!--     <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1000.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
-<!--     <cExploitationForRolloutOutOfReach cExploitationForRolloutOutOfReach = "10.0" />  <!&#45;&#45; exploitative &#45;&#45;> -->
-<!--     <cExploitationForRolloutWithinReach cExploitationForRolloutWithinReach = "1.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
-<!--     <nEpsForIsReached nEpsForIsReached = "3.0" /> -->
-<!--  -->
-<!--     <!&#45;&#45; (these are determined from actual transition results) &#45;&#45;> -->
-<!--     <heurPosStepSize heurPosStepSize = "0.1" /> -->
-<!--     <heurOriStepSize heurOriStepSize = "0.05" /> -->
-<!-- <!&#45;&#45;     <heurCovStepSize heurCovStepSize = "0.000001" />  <!&#38;#45;&#38;#45; NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks &#38;#45;&#38;#45;> &#45;&#45;> -->
-<!--     <heurCovStepSize heurCovStepSize = "0.00001" /> -->
-<!--     <covConvergenceRate covConvergenceRate = "0.9" />  <!&#45;&#45; cov_{k+1} = covConvergenceRate * cov_k &#45;&#45;> -->
-<!--  -->
-<!--     <scaleStabNumSteps scaleStabNumSteps = "30" /> -->
-<!-- </FIRMCP> -->
-
 <FIRMCP>
 <!--     <numPOMCPParticles numPOMCPParticles = "30" /> -->
+<!--     <numPOMCPParticles numPOMCPParticles = "20" /> -->
 <!--     <numPOMCPParticles numPOMCPParticles = "10" /> -->
 <!--     <numPOMCPParticles numPOMCPParticles = "5" /> -->
     <numPOMCPParticles numPOMCPParticles = "3" />
-    <maxPOMCPDepth maxPOMCPDepth = "5" />
-<!--     <maxPOMCPDepth maxPOMCPDepth = "20" /> -->
 <!--     <maxPOMCPDepth maxPOMCPDepth = "30" /> -->
+<!--     <maxPOMCPDepth maxPOMCPDepth = "20" /> -->
+    <maxPOMCPDepth maxPOMCPDepth = "5" />
 <!--     <maxFIRMReachDepth maxFIRMReachDepth = "300" /> -->
     <maxFIRMReachDepth maxFIRMReachDepth = "200" />
 
-<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" /> -->  <!-- exploitative -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0" /> -->
+    <cExplorationForSimulate cExplorationForSimulate = "0.0000001" />
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0001" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.001" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.1" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" />  <!&#45;&#45; exploitative &#45;&#45;> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "10" /> -->
-    <cExplorationForSimulate cExplorationForSimulate = "100.0" />  <!-- explorative -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "100.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
 
     <cExploitationForRolloutOutOfReach cExploitationForRolloutOutOfReach = "10.0" />  <!-- exploitative -->
-    <cExploitationForRolloutWithinReach cExploitationForRolloutWithinReach = "1.0" />  <!-- explorative -->
     <costToGoRegulatorOutOfReach costToGoRegulatorOutOfReach = "1e-6" />  <!-- exploitative -->
-    <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1000.0" />  <!-- explorative -->
+<!--     <cExploitationForRolloutWithinReach cExploitationForRolloutWithinReach = "1.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
+<!--     <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1000.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
+    <cExploitationForRolloutWithinReach cExploitationForRolloutWithinReach = "10.0" />  <!-- exploitative -->
+    <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1e-6" />  <!-- exploitative -->
     <nEpsForIsReached nEpsForIsReached = "3.0" />
 
     <!-- (these are determined from actual transition results) -->
@@ -130,6 +115,8 @@
 
     <scaleStabNumSteps scaleStabNumSteps = "30" />
 <!--     <scaleStabNumSteps scaleStabNumSteps = "50" /> -->
+
+    <inflationForApproxStabCost inflationForApproxStabCost= "100.0" />
 </FIRMCP>
 
 
@@ -156,10 +143,10 @@
 <!-- 	<FIRMNodes  minNodes = "800"  maxNodes = "800" /> -->
 
 	<!-- [OPTION3] Roadmap -->
-<!--     <RoadMap roadmapFile = "" useRoadMap = "0" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;350.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;500.xml" useRoadMap = "1" /> -->
-    <RoadMap roadmapFile = "./FIRMRoadMap-FIRMCPSet5-350.xml" useRoadMap = "1" />
+    <RoadMap roadmapFile = "" useRoadMap = "0" />
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet4&#45;350.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet2&#45;350.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;400.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;450.xml" useRoadMap = "1" /> -->
@@ -183,7 +170,8 @@
 	<Environment environmentFile = "./Models/iLQG-TRO-Task1-Pole9x9.obj" />
 <!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9x2.obj" /> -->
 
-	<StartPose x = "2.125"	y = "2.125" />
+	<StartPose x = "2.215"	y = "2.215" />
+	<!-- 	<StartPose x = "1.8"	y = "2.8" /> -->  <!-- for 9x9x2 map -->
 	<PlanningTime maxTime = "800" />
 	<KidnappedState x = 1.5 y = 19.5 />
 </PlanningProblem>
@@ -191,6 +179,9 @@
 <GoalList>
 	<GoalPose x = "17.875" y = "17.875" />
 </GoalList>
+<!-- <GoalList> -->
+<!-- 	<GoalPose x = "17.5" y = "18.5" /> -->  <!-- for 9x9x2 map -->
+<!-- </GoalList> -->
 
 <GoalConstraints>
 	<Weights meanNormWeight = "3.0" covNormWeight = "1.0" />

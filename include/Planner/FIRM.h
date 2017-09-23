@@ -547,7 +547,7 @@ protected:
     void updateEdgeCollisionCost(Vertex currentVertex, Vertex goalVertex);
 
     /** \brief Check if policy from currentVertex to goal is collision free */
-    bool isFeedbackPolicyValid(Vertex currentVertex, Vertex goalVertex);
+    bool isFeedbackPolicyValid(Vertex currentVertex, Vertex goalVertex, const bool reset=false);
 
     void addStateToVisualization(const ompl::base::State *state) ;
 
@@ -655,6 +655,9 @@ protected:
 
     // This feedback will eventually be in a feedbackpath class
     std::map <Vertex, Edge> feedback_;
+
+    // Mark a node valid once it passes isFeedbackPolicyValid() test
+    std::map <Vertex, bool> feedbackValid_;
 
     /** \brief The number of particles to use for monte carlo simulations*/
     unsigned int numMCParticles_;

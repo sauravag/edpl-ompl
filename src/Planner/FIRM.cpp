@@ -490,6 +490,8 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
                 bool reinit = false;
                 solveDynamicProgram(goal, reinit);
 
+                Visualizer::doSaveVideo(true);
+                sleep(0.33);
 
                 if(!constructFeedbackPath(start, goal, solution))
                     return false;
@@ -1979,6 +1981,7 @@ void FIRM::executeFeedback(void)
 
     // save the visualization
     Visualizer::doSaveVideo(true);
+    sleep(0.33);
 
     // for analysis
     // this data is also saved in run-(TIMESTAMP)/RolloutFIRMCostHistory.csv
@@ -2006,7 +2009,8 @@ void FIRM::executeFeedback(void)
         writeTimeSeriesDataToFile("StandardFIRMNodesReachedHistory.csv","nodesReached");
         writeTimeSeriesDataToFile("StandardFIRMVelocityHistory.csv", "velocity");
     }
-    Visualizer::doSaveVideo(false);
+    Visualizer::doSaveVideo(true);
+    sleep(0.33);
 
     // free the memory
     si_->freeState(tempTrueStateCopy);
@@ -2178,7 +2182,8 @@ void FIRM::executeFeedbackWithKidnapping(void)
 
     }
 
-    Visualizer::doSaveVideo(false);
+    Visualizer::doSaveVideo(true);
+    sleep(0.33);
 
     // free the memory
     si_->freeState(cstartState);
@@ -2606,9 +2611,6 @@ void FIRM::executeFeedbackWithRollout(void)
 
     } // while()
 
-    // save the visualization
-    Visualizer::doSaveVideo(true);
-
     // [3'] Free the memory for states and controls for this temporary node/edge created from previous iteration
     if(tempVertex != start)
     {
@@ -2669,7 +2671,8 @@ void FIRM::executeFeedbackWithRollout(void)
         }
         writeTimeSeriesDataToFile("RolloutFIRMVelocityHistory.csv", "velocity");
     }
-    Visualizer::doSaveVideo(false);
+    Visualizer::doSaveVideo(true);
+    sleep(0.33);
 
     // free the memory
     si_->freeState(cstartState);
@@ -2743,8 +2746,14 @@ void FIRM::sendMostLikelyPathToViz(const FIRM::Vertex start, const FIRM::Vertex 
     }
 }
 
-bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVertex)
+bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVertex, const bool reset)
 {
+    if (reset)
+    {
+        // clear cached feedback path validity data
+        feedbackValid_.clear();
+    }
+
     // for debug
     if(ompl::magic::PRINT_FEEDBACK_PATH)
         std::cout << "->" << currentVertex;
@@ -2755,18 +2764,33 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
     int nIter=0;
     while(currentVertex != goalVertex && nIter < boost::num_vertices(g_))
     {
+        // check if this node is already checked for feedback path validity
+        if (feedbackValid_.find(currentVertex) != feedbackValid_.end())
+        {
+            return feedbackValid_.at(currentVertex);
+        }
+
+
         // to avoid illegal access to non-existing element in feedback_
         if (feedback_.find(currentVertex) == feedback_.end())    // there is no feedback edge coming from this vertex
         {
             OMPL_WARN("Reached a node that is NOT connected to the goal! Quit isFeedbackPolicyValid()!");
-            return true;    // not returning false to avoid calling solveDijkstraSearch()/solveDynamicProgram() again!
+
+            // mark this node invalid
+            feedbackValid_[currentVertex] = false;
+
+            return false;
         }
 
         // to avoid infinite loop of checkMotion() and effectively ignore disconnected node from rollout candidates
         if (costToGo_[currentVertex] >= infiniteCostToGo_)
         {
             OMPL_WARN("Reached a node that is NOT connected to the goal! Quit isFeedbackPolicyValid()!");
-            return true;    // not returning false to avoid calling solveDijkstraSearch()/solveDynamicProgram() again!
+
+            // mark this node invalid
+            feedbackValid_[currentVertex] = false;
+
+            return false;
         }
 
 
@@ -2777,6 +2801,9 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
         // if edge is invalid, increase its cost
         if(!si_->checkMotion(stateProperty_[currentVertex], stateProperty_[target]))
         {
+            // mark this node invalid
+            feedbackValid_[currentVertex] = false;
+
             return false;
         }
            
@@ -2807,15 +2834,21 @@ bool FIRM::isFeedbackPolicyValid(FIRM::Vertex currentVertex, FIRM::Vertex goalVe
             costToGo_[currentVertex] = infiniteCostToGo_;
             feedback_.erase(currentVertex);
 
+            // mark this node invalid
+            feedbackValid_[currentVertex] = false;
+
             currentVertex =  target;
         }
 
-        return true;    // not returning false to avoid calling solveDijkstraSearch()/solveDynamicProgram() again!
+        return false;
     }
 
     // for debug
     if(ompl::magic::PRINT_FEEDBACK_PATH)
         std::cout << "]" << std::endl;
+
+    // mark this node valid
+    feedbackValid_[currentVertex] = true;
 
     return true;
 

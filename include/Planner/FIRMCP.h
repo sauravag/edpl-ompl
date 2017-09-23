@@ -113,6 +113,8 @@ protected:
     double covConvergenceRate_;
 
     int scaleStabNumSteps_;
+
+    int inflationForApproxStabCost_;
 };
 
 

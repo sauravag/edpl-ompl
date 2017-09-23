@@ -97,7 +97,6 @@ void plan(const std::string &setupFilePath)
 
             mySetup->Run();
             OMPL_INFORM("Plan Executed.");
-            //Visualizer::doSaveVideo(true);  // true: save the final trajectory executed by the robot
 
 #ifdef __linux__
             // HACK to make a beep sound (linux only)
