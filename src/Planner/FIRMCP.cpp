@@ -541,7 +541,9 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
         // NOTE NodeController will be invoked after executing EdgeController for the given rolloutSteps_ steps
 
         // [1] EdgeController
-        EdgeControllerType& edgeController = edgeControllers_.at(e);
+        // NOTE instead of generating edge controllers immediately after adding a node, do that lazily at the time the controller is actually being used!
+        //EdgeControllerType& edgeController = edgeControllers_.at(e);
+        EdgeControllerType& edgeController = getEdgeControllerOnPOMCPTree(e);
         edgeController.setSpaceInformation(policyExecutionSI_);
         if(!edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
         {
@@ -664,9 +666,12 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 //         {
 //             foreach(Edge edge, boost::out_edges(tempVertex, g_))
 //             {
-//                 edgeControllers_[edge].freeSeparatedController();
-//                 edgeControllers_[edge].freeLinearSystems();
-//                 edgeControllers_.erase(edge);
+//                 if (edgeControllers_.find(edge) != edgeControllers_.end())
+//                 {
+//                     edgeControllers_.at(edge).freeSeparatedController();
+//                     edgeControllers_.at(edge).freeLinearSystems();
+//                     edgeControllers_.erase(edge);
+//                 }
 //             }
 //
 //             // NOTE there is no node controller generated for this temporary node during rollout execution
@@ -717,9 +722,12 @@ void FIRMCP::executeFeedbackWithPOMCP(void)
 //     {
 //         foreach(Edge edge, boost::out_edges(tempVertex, g_))
 //         {
-//             edgeControllers_[edge].freeSeparatedController();
-//             edgeControllers_[edge].freeLinearSystems();
-//             edgeControllers_.erase(edge);
+//             if (edgeControllers_.find(edge) != edgeControllers_.end())
+//             {
+//                 edgeControllers_.at(edge).freeSeparatedController();
+//                 edgeControllers_.at(edge).freeLinearSystems();
+//                 edgeControllers_.erase(edge);
+//             }
 //         }
 //
 //         // NOTE there is no node controller generated for this temporary node during rollout execution
@@ -2053,7 +2061,9 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
                 bool forwardEdgeAdded=false;
 
                 // NOTE in execution mode, i.e., addReverseEdge is false, compute edge cost from the center belief state, not from a sampled border belief state
-                approxEdgeCost = addEdgeToPOMCPTreeWithApproxCost(m, n, forwardEdgeAdded);
+                //approxEdgeCost = addEdgeToPOMCPTreeWithApproxCost(m, n, forwardEdgeAdded);
+                // NOTE instead of generating edge controllers immediately after adding a node, do that lazily at the time the controller is actually being used!
+                approxEdgeCost = lazilyAddEdgeToPOMCPTreeWithApproxCost(m, n, forwardEdgeAdded);
 
                 if(forwardEdgeAdded)
                 {
@@ -2121,7 +2131,46 @@ bool FIRMCP::expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const boo
     return true;
 }
 
-FIRMWeight FIRMCP::addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded)
+FIRMWeight FIRMCP::lazilyAddEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded)
+{
+    // NOTE instead of generating edge controllers immediately after adding a node, do that lazily at the time the controller is actually being used!
+
+    // compute approximate edge cost
+    double approxEdgeCost = computeApproxEdgeCost(a, b);
+    double transitionProbability = 1.0;    // just naively set this to 1.0
+    FIRMWeight weight(approxEdgeCost, transitionProbability);
+
+    // create an boost::edge with the edge weight property
+    const unsigned int id = maxEdgeID_++;
+    const Graph::edge_property_type properties(approxEdgeCost, id);
+    std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
+
+    edgeAdded = true;
+
+    return weight;
+}
+
+FIRM::EdgeControllerType& FIRMCP::getEdgeControllerOnPOMCPTree(const Edge& edge)
+{
+    if (edgeControllers_.find(edge) == edgeControllers_.end())
+    {
+        Vertex a = boost::source(edge, g_);
+        Vertex b = boost::target(edge, g_);
+        bool forwardEdgeAdded=false;
+
+        // generate an edge controller
+        addEdgeToPOMCPTreeWithApproxCost(a, b, forwardEdgeAdded, &edge);
+        if (!forwardEdgeAdded)
+        {
+            OMPL_ERROR("Failed to addEdgeToPOMCPTreeWithApproxCost()!");
+            exit(0);  // for debug
+        }
+    }
+
+    return edgeControllers_.at(edge);
+}
+
+FIRMWeight FIRMCP::addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded, const Edge* pEdge)
 {
     // just for compatibility with FIRM::addEdgeToGraph()
     bool addReverseEdge = false;
@@ -2153,14 +2202,22 @@ FIRMWeight FIRMCP::addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const 
 
     assert(edgeController.getGoal() && "The generated controller has no goal");
 
-    const unsigned int id = maxEdgeID_++;
 
-    const Graph::edge_property_type properties(weight, id);
+    // add the generated controller to the container
+    if (pEdge)  // if an boost::edge(a,b) is already added to the graph and its controller is being lazily generated here
+    {
+        edgeControllers_[*pEdge] = edgeController;
+    }
+    else
+    {
+        const unsigned int id = maxEdgeID_++;
+        const Graph::edge_property_type properties(weight, id);
 
-    // create an edge with the edge weight property
-    std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
+        // create an edge with the edge weight property
+        std::pair<Edge, bool> newEdge = boost::add_edge(a, b, properties, g_);
 
-    edgeControllers_[newEdge.first] = edgeController;
+        edgeControllers_[newEdge.first] = edgeController;
+    }
 
     edgeAdded = true;
 
@@ -2176,14 +2233,10 @@ FIRMWeight FIRMCP::generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a
      // Generate the edge controller for given start and end state
     generateEdgeController(startNodeState,targetNodeState,edgeController);
 
-
     // compute approximate edge cost
     double approxEdgeCost = computeApproxEdgeCost(a, b);
-
-    ompl::base::Cost edgeCost(approxEdgeCost);
     double transitionProbability = 1.0;    // just naively set this to 1.0
-
-    FIRMWeight weight(edgeCost.value(), transitionProbability);
+    FIRMWeight weight(approxEdgeCost, transitionProbability);
 
     // free the memory
     siF_->freeState(startNodeState);
@@ -2392,7 +2445,9 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
 
     // [1] EdgeController
     Vertex targetNode = boost::target(selectedEdge, g_);
-    EdgeControllerType& edgeController = edgeControllers_.at(selectedEdge);
+    // NOTE instead of generating edge controllers immediately after adding a node, do that lazily at the time the controller is actually being used!
+    //EdgeControllerType& edgeController = edgeControllers_.at(selectedEdge);
+    EdgeControllerType& edgeController = getEdgeControllerOnPOMCPTree(selectedEdge);
     edgeController.setSpaceInformation(policyExecutionSI_);
     if(!edgeController.isTerminated(cstartState, 0))  // check if cstartState is near to the target FIRM node (by x,y position); this is the termination condition B) for EdgeController::Execute()
     {
@@ -2543,9 +2598,12 @@ bool FIRMCP::executeSimulationFromUpto(const int kStep, const int numSteps, cons
 //     {
 //         foreach(Edge edge, boost::out_edges(tempVertex, g_))
 //         {
-//             edgeControllers_[edge].freeSeparatedController();
-//             edgeControllers_[edge].freeLinearSystems();
-//             edgeControllers_.erase(edge);
+//             if (edgeControllers_.find(edge) != edgeControllers_.end())
+//             {
+//                 edgeControllers_.at(edge).freeSeparatedController();
+//                 edgeControllers_.at(edge).freeLinearSystems();
+//                 edgeControllers_.erase(edge);
+//             }
 //         }
 //
 //         // NOTE there is no node controller generated for this temporary node during rollout execution
@@ -2607,9 +2665,12 @@ void FIRMCP::prunePOMCPNode(const Vertex rootVertex)
         // NOTE there is no node controller generated for POMCP tree nodes during rollout execution
         foreach(Edge edge, boost::out_edges(rootVertex, g_))
         {
-            edgeControllers_[edge].freeSeparatedController();
-//             edgeControllers_[edge].freeLinearSystems();
-            edgeControllers_.erase(edge);
+            if (edgeControllers_.find(edge) != edgeControllers_.end())
+            {
+                edgeControllers_.at(edge).freeSeparatedController();
+                //edgeControllers_.at(edge).freeLinearSystems();
+                edgeControllers_.erase(edge);
+            }
         }
 
         // free the memory of state

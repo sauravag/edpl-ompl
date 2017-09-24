@@ -69,7 +69,11 @@ protected:
 
     bool expandQnodesOnPOMCPTreeWithApproxCostToGo(const Vertex m, const bool isNewNodeExpanded=false);
 
-    FIRMWeight addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
+    FIRMWeight lazilyAddEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded);
+
+    FIRM::EdgeControllerType& getEdgeControllerOnPOMCPTree(const Edge& edge);
+
+    FIRMWeight addEdgeToPOMCPTreeWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, bool &edgeAdded, const Edge* pEdge = NULL);
 
     FIRMWeight generateEdgeNodeControllerWithApproxCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController);
 
