@@ -1822,8 +1822,9 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
 
 
     // REVIEW do BACKUP() for all nodes during Rollout or not?
-//     if (isNewNodeExpanded)
-//     {
+        double thisQVmincosttogoUpdated;
+    if (isNewNodeExpanded)
+    {
         // UPDATE THE NUMBER OF VISITS AND MISSES
         currentBelief->as<FIRM::StateType>()->addThisQVvisit();                    // N(h) += 1
         currentBelief->as<FIRM::StateType>()->addChildQvisit(selectedChildQnode);  // N(ha) += 1
@@ -1844,7 +1845,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
         double selectedChildQcosttogo = currentBelief->as<FIRM::StateType>()->getChildQcosttogo(selectedChildQnode);    // Q(ha)
         double selectedChildQcosttogoUpdated;
         double thisQVmincosttogo = currentBelief->as<FIRM::StateType>()->getThisQVmincosttogo();      // J(h)
-        double thisQVmincosttogoUpdated;
+//         double thisQVmincosttogoUpdated;
 
 //         selectedChildQvalue = currentBelief->as<FIRM::StateType>()->getChildQvalue(selectedChildQnode);      // V(ha)
 //         selectedChildQpenalty = currentBelief->as<FIRM::StateType>()->getChildQpenalty(selectedChildQnode);  // C(ha)
@@ -1940,7 +1941,7 @@ double FIRMCP::pomcpRollout(const Vertex currentVertex, const int currentDepth, 
         // for debug
 //         std::cout << "selectedChildQcosttogoUpdated[" << selectedChildQnode << "]: " << selectedChildQcosttogoUpdated << std::endl;
 
-//     } // if (isNewNodeExpanded)
+    } // if (isNewNodeExpanded)
     
 
     // return total cost-to-go

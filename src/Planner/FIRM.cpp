@@ -490,9 +490,6 @@ bool FIRM::existsPolicy(const std::vector<Vertex> &starts, const std::vector<Ver
                 bool reinit = false;
                 solveDynamicProgram(goal, reinit);
 
-                Visualizer::doSaveVideo(true);
-                sleep(0.33);
-
                 if(!constructFeedbackPath(start, goal, solution))
                     return false;
                 
@@ -634,6 +631,10 @@ ompl::base::PlannerStatus FIRM::solve(const ompl::base::PlannerTerminationCondit
     {
         OMPL_INFORM("%s: No roadmap was loaded or the number of nodes in the roadmap is less than minNodes! More samples will be added to the roadmap...", getName().c_str());
         constructRoadmap(ptcOrSolutionFound);
+
+        // (optional) save the visualization of the roadmap
+        Visualizer::doSaveVideo(true);
+        sleep(1.0);
     }
 
     // NOTE Now manually check for solution
@@ -1978,10 +1979,6 @@ void FIRM::executeFeedback(void)
         }
 
     } // while()
-
-    // save the visualization
-    Visualizer::doSaveVideo(true);
-    sleep(0.33);
 
     // for analysis
     // this data is also saved in run-(TIMESTAMP)/RolloutFIRMCostHistory.csv

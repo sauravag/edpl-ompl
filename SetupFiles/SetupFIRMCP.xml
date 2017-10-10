@@ -88,7 +88,8 @@
     <maxFIRMReachDepth maxFIRMReachDepth = "200" />
 
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.0" /> -->
-    <cExplorationForSimulate cExplorationForSimulate = "0.0000001" />
+    <cExplorationForSimulate cExplorationForSimulate = "0.000000001" />
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0000001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.0001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.1" /> -->
@@ -131,8 +132,8 @@
 	<PlannerMode  method = "3"  dynobst = "0" />
 
 	<!-- [OPTION2] FIRM Node Density -->
-	<FIRMNodes  minNodes = "350"  maxNodes = "350" />
-<!-- 	<FIRMNodes  minNodes = "400"  maxNodes = "400" /> -->
+<!-- 	<FIRMNodes  minNodes = "350"  maxNodes = "350" /> -->
+	<FIRMNodes  minNodes = "400"  maxNodes = "400" />
 <!-- 	<FIRMNodes  minNodes = "450"  maxNodes = "450" /> -->
 <!-- 	<FIRMNodes  minNodes = "500"  maxNodes = "500" /> -->
 <!-- 	<FIRMNodes  minNodes = "550"  maxNodes = "550" /> -->
@@ -144,6 +145,7 @@
 
 	<!-- [OPTION3] Roadmap -->
     <RoadMap roadmapFile = "" useRoadMap = "0" />
+<!-- 	<RoadMap roadmapFile = "./FIRMRoadMap&#45;text.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet4&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet2&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;350.xml" useRoadMap = "1" /> -->

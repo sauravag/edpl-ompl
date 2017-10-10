@@ -77,11 +77,14 @@ bool Visualizer::saveVideo_ = false;
 void Visualizer::drawLandmark(arma::colvec& landmark)
 {
 
-    double scale = 0.15;
+//     double scale = 0.15;
+    double scale = 0.20;
 
     glPushMatrix();
 
-    glColor3d(0.0,0.0,0.0);
+//     glColor3d(0.0, 0.0, 0.0); // black
+    glColor3d(1.0, 1.0, 0.0); // yellow
+//     glColor3d(0.8, 0.8, 0.0); // yellow
 
     glTranslated(landmark[1], landmark[2], 0.0);
     glVertex3f(0.8,0.8,0.8);
@@ -148,7 +151,9 @@ void Visualizer::drawState(const ompl::base::State *state, VZRStateType stateTyp
         case GraphNodeState:
             outerDiskRadius = 0.15;
             z = -0.5;
-            glColor3d(0,1,1); // cyan
+//             glColor3d(0,1,1); // cyan
+//             glColor3d(0.5, 0.7, 0.9); // cyan
+            glColor3d(0.6, 0.8, 1.0); // cyan
             break;
 
         default:
@@ -516,7 +521,7 @@ void Visualizer::drawFeedbackEdges()
         maxCost = std::max(maxCost, i->cost);
     }
 
-    glLineWidth(1.0);
+    glLineWidth(1.5);
     for(typename std::vector<VZRFeedbackEdge>::iterator i=feedbackEdges_.begin(), e=feedbackEdges_.end();i!=e; ++i)
     {
 //         std::pair<const ompl::base::State*, const ompl::base::State*> vertexPair = std::make_pair(i->source, i->target);
@@ -529,7 +534,8 @@ void Visualizer::drawFeedbackEdges()
         if( it == mostLikelyPath_.end())
         {
             double costFactor = sqrt(i->cost/maxCost);
-            glColor3d(0.9,0.9,1.0);
+//             glColor3d(0.9,0.9,1.0);
+            glColor3d(0.8, 0.8, 1.0);
 
             drawEdge(i->source, i->target);
 
@@ -542,11 +548,13 @@ void Visualizer::drawMostLikelyPath()
 {
     glDisable(GL_LIGHTING);
 
-    glLineWidth(4.0);
+//     glLineWidth(4.0);
+    glLineWidth(5.0);
     for(int i=0; i<mostLikelyPath_.size();i++)
     {
-        glColor3d(1.0 , 1.0 , 0.0); // yellow
+//         glColor3d(1.0 , 1.0 , 0.0); // yellow
         //glColor3d(0.2 , 0.2 , 0.2); // almost black
+        glColor3d(0.0 , 0.8 , 0.6); // green
 
         drawEdge(mostLikelyPath_[i].first,mostLikelyPath_[i].second);
     }
@@ -567,7 +575,8 @@ void Visualizer::drawRobotPath()
 //            glColor3d(0.0 , 1.0 , 0.6); // green
             glColor3d(1.0 , 0.5 , 0.0); // orange
 
-            glLineWidth(4.0);
+//             glLineWidth(4.0);
+            glLineWidth(5.0);
                 drawEdge(robotPath_[i],robotPath_[i+1]);
             glLineWidth(1.f);
         }
