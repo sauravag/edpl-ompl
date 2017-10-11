@@ -103,6 +103,9 @@ void plan(const std::string &setupFilePath)
             //ret = system("sh -c \"echo '\a'> $(tty)\" 2>/dev/null");
 #endif
 
+            Visualizer::doSaveVideo(true);
+            sleep(1);
+
             keepTrying = 0;
 
         }

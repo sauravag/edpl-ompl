@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- <LandmarkList> -->
+<!-- 	<landmark id = 4   x = 1		y = 7.75 /> -->
+<!-- 	<landmark id = 15  x = 3.25		y = 10 /> -->
+<!-- 	<landmark id = 26  x = 5.5		y = 12.25 /> -->
+<!-- 	<landmark id = 37  x = 7.75		y = 14.5 /> -->
+<!-- 	<landmark id = 48  x = 10		y = 16.75 /> -->
+<!-- 	<landmark id = 59  x = 12.25	y = 19 /> -->
+<!-- </LandmarkList> -->
+<!-- <LandmarkList> -->
+<!-- 	<landmark id = 55  x = 2   y = 10.0001 /> -->
+<!-- 	<landmark id = 99  x = 18   y = 10.0001 /> -->
+<!-- </LandmarkList> -->
+<LandmarkList>
+	<landmark id = 15  x = 10		y = 8.875 />
+	<landmark id = 16  x = 10		y = 11.125 />
+</LandmarkList>
+<ObservationModels>
+	<HeadingBeaconObservationModel
+		sigma_heading = "0.000001"
+		sigma_ss = "0.005"
+		/>
+</ObservationModels>
+<MotionModels>
+	<OmnidirectionalMotionModel 
+		sigmaV="0.0"
+		etaV="0.0"
+        sigmaOmega="0.0"
+        etaOmega="0.0"
+		P_Wg_filename=""
+		wind_noise_pos = "0.001"
+		wind_noise_ang="0.000001"
+		min_linear_velocity= "-1.0"
+		max_linear_velocity= "1.0"
+		max_angular_velocity= "0.60"
+		dt= "0.1"
+		/> 
+	<TwoDPointMotionModel 
+		sigmaV="0.0"
+		etaV="0.0"
+		wind_noise_pos="0.1"
+		max_linear_velocity= "4.0"
+		dt= "0.1"
+		/>
+</MotionModels>
+<FIRM>
+	<Video save = "0" />
+	<!--DataLog save = "0"/-->
+	<!--DataLog save = "1" folder = "./DataLog/" /-->
+	<DataLog save = "1" folder = "./" />
+	<Roadmap save = "1" />
+	<MCParticles numparticles = "5" />	<!-- NOTE this is not used for FIRMCP online Monte Carlo simulation -->
+	<!--MCParticles numparticles = "10" /-->
+	<RolloutSteps rolloutsteps = "1" />
+	<NNRadius nnradius = "2.25" />
+	<NumNN numnn = "10" />	<!-- NOTE this will be used for additional connection to k-nearest neighbors during rollout only -->
+	<DPDiscountFactor discountfac = "1.0" />
+	<DistCostWeight distcostw = "0.1"/>
+
+	<!-- WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT -->
+	<!-- 0: disabled, 1: enabled -->
+<!-- 	<StabilizationHack -->
+<!-- 		connectToFutureNodes = "0" -->
+<!-- 		applyStationaryPenalty = "0" -->
+<!-- 		borderBeliefSampling = "0" -->
+<!-- 		/> -->
+	<StabilizationHack
+		connectToFutureNodes = "0"
+		applyStationaryPenalty = "1"
+		borderBeliefSampling = "0"
+		/>
+
+	<!-- weights in cost function -->
+	<InfCostWeight infcostw = "100.0"/>
+	<TimeCostWeight timecostw = "0.0"/>
+	<StatCostInc statcostinc = "1.0"/>	<!-- NOTE if applyStationaryPenalty is set to 0, this will have no effect! -->
+
+	<GoalCostToGo goalctg = "0.0"/>
+	<ObstCostToGo obsctg = "20000.0" />
+	<InitCostToGo initctg = "2.0" />
+	<MaxDPIter dpiter = "1000" />
+	<DPConvergenceThreshold dpconvthresh = "0.1" />
+</FIRM> 
+
+
+<FIRMCP>
+<!--     <numPOMCPParticles numPOMCPParticles = "30" /> -->
+<!--     <numPOMCPParticles numPOMCPParticles = "20" /> -->
+<!--     <numPOMCPParticles numPOMCPParticles = "10" /> -->
+<!--     <numPOMCPParticles numPOMCPParticles = "5" /> -->
+    <numPOMCPParticles numPOMCPParticles = "3" />
+<!--     <maxPOMCPDepth maxPOMCPDepth = "30" /> -->
+<!--     <maxPOMCPDepth maxPOMCPDepth = "20" /> -->
+    <maxPOMCPDepth maxPOMCPDepth = "5" />
+<!--     <maxFIRMReachDepth maxFIRMReachDepth = "300" /> -->
+    <maxFIRMReachDepth maxFIRMReachDepth = "200" />
+
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0" /> -->
+    <cExplorationForSimulate cExplorationForSimulate = "0.000000001" />
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0000001" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0001" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.001" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.1" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" />  <!&#45;&#45; exploitative &#45;&#45;> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "10" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "100.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
+
+    <cExploitationForRolloutOutOfReach cExploitationForRolloutOutOfReach = "10.0" />  <!-- exploitative -->
+    <costToGoRegulatorOutOfReach costToGoRegulatorOutOfReach = "1e-6" />  <!-- exploitative -->
+<!--     <cExploitationForRolloutWithinReach cExploitationForRolloutWithinReach = "1.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
+<!--     <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1000.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
+    <cExploitationForRolloutWithinReach cExploitationForRolloutWithinReach = "10.0" />  <!-- exploitative -->
+    <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1e-6" />  <!-- exploitative -->
+    <nEpsForIsReached nEpsForIsReached = "3.0" />
+
+    <!-- (these are determined from actual transition results) -->
+    <heurPosStepSize heurPosStepSize = "0.1" />
+    <heurOriStepSize heurOriStepSize = "0.05" />
+<!--     <heurCovStepSize heurCovStepSize = "0.000001" />  <!&#45;&#45; NOTE a rough value since covaraince convergence is highly dependent on the distances to land marks &#45;&#45;> -->
+	<heurCovStepSize heurCovStepSize = "0.00001" />  <!-- no longer being used -->
+<!--     <covConvergenceRate covConvergenceRate = "0.9" />  <!&#45;&#45; cov_{k+1} = covConvergenceRate * cov_k &#45;&#45;> -->
+<!--     <covConvergenceRate covConvergenceRate = "0.95" />  <!&#45;&#45; cov_{k+1} = covConvergenceRate * cov_k &#45;&#45;> -->
+    <covConvergenceRate covConvergenceRate = "0.99" />  <!-- cov_{k+1} = covConvergenceRate * cov_k -->
+
+    <scaleStabNumSteps scaleStabNumSteps = "30" />
+<!--     <scaleStabNumSteps scaleStabNumSteps = "50" /> -->
+
+    <inflationForApproxStabCost inflationForApproxStabCost= "100.0" />
+</FIRMCP>
+
+
+<PlanningProblem>
+
+
+	<!-- [OPTION1] FIRM vs Rollout vs FIRMCP -->
+	<!-- method 0 for FIRM, 1 for Rollout, 2 for multimodal, 3 for FIRMCP -->
+	<!-- dynobst 1 to activate -->
+<!-- 	<PlannerMode  method = "0"  dynobst = "0" /> -->
+<!-- 	<PlannerMode  method = "1"  dynobst = "0" /> -->
+	<PlannerMode  method = "3"  dynobst = "0" />
+
+	<!-- [OPTION2] FIRM Node Density -->
+<!-- 	<FIRMNodes  minNodes = "350"  maxNodes = "350" /> -->
+	<FIRMNodes  minNodes = "400"  maxNodes = "452" />
+<!-- 	<FIRMNodes  minNodes = "450"  maxNodes = "450" /> -->
+<!-- 	<FIRMNodes  minNodes = "500"  maxNodes = "500" /> -->
+<!-- 	<FIRMNodes  minNodes = "550"  maxNodes = "550" /> -->
+<!-- 	<FIRMNodes  minNodes = "600"  maxNodes = "600" /> -->
+<!-- 	<FIRMNodes  minNodes = "650"  maxNodes = "650" /> -->
+<!-- 	<FIRMNodes  minNodes = "700"  maxNodes = "700" /> -->
+<!-- 	<FIRMNodes  minNodes = "750"  maxNodes = "750" /> -->
+<!-- 	<FIRMNodes  minNodes = "800"  maxNodes = "800" /> -->
+
+	<!-- [OPTION3] Roadmap -->
+    <RoadMap roadmapFile = "" useRoadMap = "0" />
+<!--     <RoadMap roadmapFile = "./Experiment/Wall/run&#45;FIRMCP&#45;Wall&#45;0/FIRMRoadMap&#45;FIRMCP&#45;Wall&#45;0.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./Experiment/Wall/run&#45;FIRMCP&#45;Wall&#45;2/FIRMRoadMap&#45;FIRMCP&#45;Wall&#45;2.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./Experiment/Wall/run&#45;FIRMCP&#45;Wall&#45;4/FIRMRoadMap&#45;FIRMCP&#45;Wall&#45;4.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./Experiment/Wall/run&#45;FIRMCP&#45;Wall&#45;6/FIRMRoadMap&#45;FIRMCP&#45;Wall&#45;6.xml" useRoadMap = "1" /> -->
+<!--     <RoadMap roadmapFile = "./Experiment/Wall/run&#45;FIRMCP&#45;Wall&#45;8/FIRMRoadMap&#45;FIRMCP&#45;Wall&#45;8.xml" useRoadMap = "1" /> -->
+
+
+	<Robot robotFile = "./Models/iRobot_thin.obj" />
+<!-- 	<Robot robotFile = "./Models/iRobot.obj" /> -->
+<!-- 	<Robot robotFile = "./Models/iRobot_fat.obj" /> -->
+
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole0x0.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole1x1.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole3x3.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole5x5.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9x2.obj" /> -->
+
+	<Environment environmentFile = "./Models/FIRMCP_Wall_0.obj" />
+<!-- 	<Environment environmentFile = "./Models/FIRMCP_Wall_2.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/FIRMCP_Wall_4.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/FIRMCP_Wall_6.obj" /> -->
+<!-- 	<Environment environmentFile = "./Models/FIRMCP_Wall_8.obj" /> -->
+
+	<StartPose x = "2"	y = "10" />
+<!-- 	<StartPose x = "2.215"	y = "2.215" /> -->
+	<!-- 	<StartPose x = "1.8"	y = "2.8" /> -->  <!-- for 9x9x2 map -->
+	<PlanningTime maxTime = "800" />
+	<KidnappedState x = 1.5 y = 19.5 />
+</PlanningProblem>
+
+<GoalList>
+	<GoalPose x = "18" y = "10" />
+</GoalList>
+<!-- <GoalList> -->
+<!-- 	<GoalPose x = "17.875" y = "17.875" /> -->
+<!-- </GoalList> -->
+<!-- <GoalList> -->
+<!-- 	<GoalPose x = "17.5" y = "18.5" /> -->  <!-- for 9x9x2 map -->
+<!-- </GoalList> -->
+
+<GoalConstraints>
+	<Weights meanNormWeight = "3.0" covNormWeight = "1.0" />
+	<Threshold reachDist = "0.1" />
+</GoalConstraints>
+
