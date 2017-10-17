@@ -2,9 +2,9 @@
 # Exported from SketchUp, (c) 2000-2012 Trimble Navigation Limited
 # File units = meters
 
-mtllib iLQG-TRO-Task1_Pole0x0.mtl
+mtllib iLQG-TRO-Task1-Pole0x0.mtl
 
-g Mesh1 Mesh60 iLQG_TRO_Task1_obj Model
+g Mesh1 Mesh6061 iLQG_TRO_Task1_Pole9x9_obj Model
 
 usemtl FrontColor
 v -0.55 20.58 7.87919e-15
