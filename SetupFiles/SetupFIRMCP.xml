@@ -7,17 +7,6 @@
 	<landmark id = 48  x = 10		y = 16.75 />
 	<landmark id = 59  x = 12.25	y = 19 />
 </LandmarkList>
-<!-- <LandmarkList> -->
-<!-- 	<landmark id = 4   x = 1		y = 10 /> -->
-<!-- 	<landmark id = 15  x = 3.25		y = 10 /> -->
-<!-- 	<landmark id = 26  x = 5.5		y = 10 /> -->
-<!-- 	<landmark id = 37  x = 7.75		y = 10 /> -->
-<!-- 	<landmark id = 48  x = 10		y = 10 /> -->
-<!-- 	<landmark id = 59  x = 12.25	y = 10 /> -->
-<!-- 	<landmark id = 59  x = 14.5		y = 10 /> -->
-<!-- 	<landmark id = 59  x = 16.75	y = 10 /> -->
-<!-- 	<landmark id = 59  x = 19		y = 10 /> -->
-<!-- </LandmarkList> -->
 <ObservationModels>
 	<HeadingBeaconObservationModel
 		sigma_heading = "0.000001"
@@ -97,14 +86,15 @@
     <maxPOMCPDepth maxPOMCPDepth = "5" />
 <!--     <maxFIRMReachDepth maxFIRMReachDepth = "300" /> -->
     <maxFIRMReachDepth maxFIRMReachDepth = "200" />
+    <nSigmaForPOMCPParticle nSigmaForPOMCPParticle = "3.0" />
 
-<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0" />  <!&#45;&#45; exploitative &#45;&#45;> -->
     <cExplorationForSimulate cExplorationForSimulate = "0.000000001" />
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.0000001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.0001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.1" /> -->
-<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" />  <!&#45;&#45; exploitative &#45;&#45;> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "10" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "100.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
 
@@ -114,7 +104,7 @@
 <!--     <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1000.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
     <cExploitationForRolloutWithinReach cExploitationForRolloutWithinReach = "10.0" />  <!-- exploitative -->
     <costToGoRegulatorWithinReach costToGoRegulatorWithinReach = "1e-6" />  <!-- exploitative -->
-    <nEpsForIsReached nEpsForIsReached = "3.0" />
+    <nEpsilonForRolloutIsReached nEpsilonForRolloutIsReached = "3.0" />
 
     <!-- (these are determined from actual transition results) -->
     <heurPosStepSize heurPosStepSize = "0.1" />
@@ -127,6 +117,10 @@
 
     <scaleStabNumSteps scaleStabNumSteps = "30" />
 <!--     <scaleStabNumSteps scaleStabNumSteps = "50" /> -->
+
+<!--     <nEpsilonForQVnodeMerging nEpsilonForQVnodeMerging = "0.5" />  <!&#45;&#45; tighter condition for merging &#45;&#45;> -->
+<!--     <nEpsilonForQVnodeMerging nEpsilonForQVnodeMerging = "5.0" /> -->
+    <nEpsilonForQVnodeMerging nEpsilonForQVnodeMerging = "50.0" />  <!-- looser condition for merging -->
 
     <inflationForApproxStabCost inflationForApproxStabCost= "100.0" />
 </FIRMCP>
@@ -143,10 +137,10 @@
 	<PlannerMode  method = "3"  dynobst = "0" />
 
 	<!-- [OPTION2] FIRM Node Density -->
-	<FIRMNodes  minNodes = "350"  maxNodes = "350" />
+<!-- 	<FIRMNodes  minNodes = "350"  maxNodes = "350" /> -->
 <!-- 	<FIRMNodes  minNodes = "400"  maxNodes = "400" /> -->
 <!-- 	<FIRMNodes  minNodes = "450"  maxNodes = "450" /> -->
-<!-- 	<FIRMNodes  minNodes = "500"  maxNodes = "500" /> -->
+	<FIRMNodes  minNodes = "500"  maxNodes = "500" />
 <!-- 	<FIRMNodes  minNodes = "550"  maxNodes = "550" /> -->
 <!-- 	<FIRMNodes  minNodes = "600"  maxNodes = "600" /> -->
 <!-- 	<FIRMNodes  minNodes = "650"  maxNodes = "650" /> -->
@@ -156,10 +150,6 @@
 
 	<!-- [OPTION3] Roadmap -->
     <RoadMap roadmapFile = "" useRoadMap = "0" />
-<!-- 	<RoadMap roadmapFile = "./FIRMRoadMap&#45;Block&#45;3.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet8&#45;800.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet2&#45;350.xml" useRoadMap = "1" /> -->
-<!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;350.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;400.xml" useRoadMap = "1" /> -->
 <!--     <RoadMap roadmapFile = "./FIRMRoadMap&#45;FIRMCPSet5&#45;450.xml" useRoadMap = "1" /> -->
@@ -183,11 +173,7 @@
 	<Environment environmentFile = "./Models/iLQG-TRO-Task1-Pole9x9.obj" />
 <!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9x2.obj" /> -->
 
-<!-- 	<Environment environmentFile = "./Models/FIRMCP_Block.obj" /> -->
-<!-- 	<Environment environmentFile = "./Models/FIRMCP_Block_3.obj" /> -->
-
 	<StartPose x = "2.215"	y = "2.215" />
-<!-- 	<StartPose x = "1.75"	y = "2.5" /> -->
 	<PlanningTime maxTime = "800" />
 	<KidnappedState x = 1.5 y = 19.5 />
 </PlanningProblem>
@@ -195,18 +181,6 @@
 <GoalList>
 	<GoalPose x = "17.785" y = "17.785" />
 </GoalList>
-<!-- <GoalList> -->
-<!-- 	<GoalPose x = "1.75" y = "17.5" /> -->
-<!-- </GoalList> -->
-<!-- <GoalList> -->
-<!-- 	<GoalPose x = "16.875" y = "16.875" /> -->
-<!-- </GoalList> -->
-<!-- <GoalList> -->
-<!-- 	<GoalPose x = "2.215" y = "17.875" /> -->
-<!-- </GoalList> -->
-<!-- <GoalList> -->
-<!-- 	<GoalPose x = "17.5" y = "18.5" /> -->  <!-- for 9x9x2 map -->
-<!-- </GoalList> -->
 
 <GoalConstraints>
 	<Weights meanNormWeight = "3.0" covNormWeight = "1.0" />

@@ -86,8 +86,10 @@ protected:
 
     bool executeSimulationFromUpto(const int kStep, const int numSteps, const ompl::base::State *startState, const Edge& selectedEdge, ompl::base::State* endState, double& executionCost);
 
-    void prunePOMCPTreeFrom(const Vertex rootVertex);
+    bool updateQVnodeBeliefOnPOMCPTree(const Vertex currentVertex, const Vertex selectedChildQnode, const ompl::base::State* evolvedBelief, Vertex& evolvedVertex, const bool reset=false);
+    bool updateQVnodeValuesOnPOMCPTree(const Vertex currentVertex, const Vertex selectedChildQnode, const bool executionStatus, const double executionCost, const double selectedChildQVmincosttogo, double& thisQVmincosttogoUpdated, const bool isNewNodeExpanded=false);
 
+    void prunePOMCPTreeFrom(const Vertex rootVertex);
     void prunePOMCPNode(const Vertex rootVertex);
 
     virtual Edge generateRolloutPolicy(const Vertex currentVertex, const FIRM::Vertex goal);
@@ -100,16 +102,17 @@ protected:
     // parameters
 
     int numPOMCPParticles_;
-
     int maxPOMCPDepth_;
     int maxFIRMReachDepth_;
+    double nSigmaForPOMCPParticle_;
+
     double cExplorationForSimulate_;
 
     double cExploitationForRolloutOutOfReach_;
     double cExploitationForRolloutWithinReach_;
     double costToGoRegulatorOutOfReach_;
     double costToGoRegulatorWithinReach_;
-    double nEpsForIsReached_;
+    double nEpsilonForRolloutIsReached_;
 
     double heurPosStepSize_;
     double heurOriStepSize_;
@@ -117,6 +120,8 @@ protected:
     double covConvergenceRate_;
 
     int scaleStabNumSteps_;
+
+    double nEpsilonForQVnodeMerging_;
 
     int inflationForApproxStabCost_;
 };

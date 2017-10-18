@@ -68,7 +68,6 @@ class LinearSystem
   	LinearSystem() {}
 
     /** \brief  Constructor.*/
-//     LinearSystem (const ompl::base::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control* control,
     LinearSystem (const ompl::base::SpaceInformationPtr si, ompl::base::State *state, const ompl::control::Control* control,
                   MotionModelPointer motionModel, ObservationModelPointer observationModel):
                   si_(si),u_(control), motionModel_(motionModel), observationModel_(observationModel)
@@ -76,7 +75,6 @@ class LinearSystem
 
       using namespace arma;
 
-//       x_ = si_->cloneState(state);
       x_ = state;
 
       w_ = motionModel_->getZeroNoise();
@@ -88,7 +86,6 @@ class LinearSystem
     }
 
     /** \brief  Constructor.*/
-//     LinearSystem (const ompl::base::SpaceInformationPtr si, const ompl::base::State *state, const ompl::control::Control* control, const ObservationType& obs,
     LinearSystem (const ompl::base::SpaceInformationPtr si, ompl::base::State *state, const ompl::control::Control* control, const ObservationType& obs,
       MotionModelPointer motionModel,
       ObservationModelPointer observationModel):
@@ -98,7 +95,6 @@ class LinearSystem
 
       using namespace arma;
 
-//       x_ = si_->cloneState(state);
       x_ = state;
 
       ObservationType observation = obs;

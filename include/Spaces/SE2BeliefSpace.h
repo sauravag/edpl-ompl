@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal */
+/* Authors: Sung Kyun Kim, Saurav Agarwal */
 
 #ifndef SE2BELIEF_SPACE_H_
 #define SE2BELIEF_SPACE_H_
@@ -172,18 +172,6 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 childQnodes_.clear();
             }
 
-//             void clearChildQweights(){
-//                 childQweights_.clear();
-//             }
-
-//             void clearChildQvalues(){
-//                 childQvalues_.clear();
-//             }
-//
-//             void clearChildQpenalties(){
-//                 childQpenalties_.clear();
-//             }
-
             void clearChildQcosttogoes(){
                 childQcosttogoes_.clear();
             }
@@ -222,33 +210,9 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 childQnodes_.push_back(childQnode);
             }
 
-//             void setChildQweight(const Vertex childQnode, const double weight){
-//                 childQweights_[childQnode] = weight;
-//             }
-
-//             void setChildQvalue(const Vertex childQnode, const double value){
-//                 childQvalues_[childQnode] = value;
-//             }
-//
-//             void updateChildQvalue(const Vertex childQnode, const double value){
-//                 childQvalues_[childQnode] = std::min(getChildQvalue(childQnode), value);
-//             }
-//
-//             void setChildQpenalty(const Vertex childQnode, const double penalty){
-//                 childQpenalties_[childQnode] = penalty;
-//             }
-//
-//             void updateChildQpenalty(const Vertex childQnode, const double penalty){
-//                 childQpenalties_[childQnode] = std::max(getChildQpenalty(childQnode), penalty);
-//             }
-
             void setChildQcosttogo(const Vertex childQnode, const double costtogo){
                 childQcosttogoes_[childQnode] = costtogo;
             }
-
-//             void updateChildQcosttogo(const Vertex childQnode){
-//                 childQcosttogoes_[childQnode] = getChildQvalue(childQnode) + getChildQpenalty(childQnode);
-//             }
 
             void addChildQvisit(const Vertex childQnode, const double visit=1.0){
                 childQvisits_[childQnode] += visit;
@@ -259,8 +223,8 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
             }
 
             void addChildQVnode(const Vertex childQnode, const Vertex childQVnode){
-//                 childQVnodes_[childQnode].push_back(childQVnode);
-                childQVnodes_[childQnode] = childQVnode;
+                //childQVnodes_[childQnode] = childQVnode;
+                childQVnodes_[childQnode].push_back(childQVnode);
             }
 
 
@@ -280,42 +244,6 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return childQnodes_;
             }
 
-//             double getChildQweight(const Vertex childQnode){
-//                 if (childQweights_.find(childQnode) == childQweights_.end())
-//                 {
-//                     OMPL_ERROR("childQnode key is not found in childQweights_!");
-//                     return 0.0;   // not to allow this action to be selected
-//                 }
-//                 return childQweights_.at(childQnode);
-//             }
-
-//             const std::map<Vertex, double> getChildQvalues() const {
-//                 return childQvalues_;
-//             }
-//
-//             double getChildQvalue(const Vertex childQnode){
-//                 if (childQvalues_.find(childQnode) == childQvalues_.end())
-//                 {
-//                     OMPL_ERROR("childQnode key is not found in childQvalues_!");
-//                     //return ompl::magic::DEFAULT_INF_COST_TO_GO;   // not to allow this action to be selected
-//                     return 1000000000.0;
-//                 }
-//                 return childQvalues_.at(childQnode);
-//             }
-//
-//             const std::map<Vertex, double> getChildQpenalties() const {
-//                 return childQpenalties_;
-//             }
-//
-//             double getChildQpenalty(const Vertex childQnode){
-//                 if (childQpenalties_.find(childQnode) == childQpenalties_.end())
-//                 {
-//                     //OMPL_ERROR("childQnode key is not found in childQpenalties_!");
-//                     return 0.0;  // default value should be the minimum since C(ha) = max(C(ha), penalty)
-//                 }
-//                 return childQpenalties_.at(childQnode);
-//             }
-
             const std::map<Vertex, double> getChildQcosttogoes() const {
                 return childQcosttogoes_;
             }
@@ -324,7 +252,6 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 if (childQcosttogoes_.find(childQnode) == childQcosttogoes_.end())
                 {
                     OMPL_ERROR("childQnode key is not found in childQcosttogoes_!");
-//                     updateChildQcosttogo(childQnode);  // J(ha) = V(ha) + C(ha)
                 }
                 return childQcosttogoes_.at(childQnode);
             }
@@ -347,42 +274,44 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
                 return childQmisses_.at(childQnode);
             }
 
-//             const std::vector<Vertex> getChildQVnodes(const Vertex selectedChildQnode) const {
-//                 if (childQVnodes_.find(selectedChildQnode) == childQVnodes_.end())
-//                 {
-//                     //OMPL_INFO("selectedChildQnode key is not found in childQVnodes_!");
-//                     return std::vector<Vertex>();  // return an empty vector
-//                 }
-//                 return childQVnodes_.at(selectedChildQnode);
-//             }
-            const Vertex getChildQVnode(const Vertex selectedChildQnode) const {
+            // const Vertex getChildQVnode(const Vertex selectedChildQnode) const {
+            //     if (childQVnodes_.find(selectedChildQnode) == childQVnodes_.end())
+            //     {
+            //         //OMPL_WARN("selectedChildQnode key is not found in childQVnodes_!");
+            //         //return std::vector<Vertex>();  // return an empty vector
+            //         return INVALID_VERTEX_ID;
+            //     }
+            //     return childQVnodes_.at(selectedChildQnode);
+            // }
+            const std::vector<Vertex> getChildQVnodes(const Vertex selectedChildQnode) const {
                 if (childQVnodes_.find(selectedChildQnode) == childQVnodes_.end())
                 {
-                    //OMPL_WARN("selectedChildQnode key is not found in childQVnodes_!");
-                    //return std::vector<Vertex>();  // return an empty vector
-                    return INVALID_VERTEX_ID;
+                    //OMPL_INFO("selectedChildQnode key is not found in childQVnodes_!");
+                    return std::vector<Vertex>();  // return an empty vector
                 }
                 return childQVnodes_.at(selectedChildQnode);
             }
+
+            bool mergeBeliefIntoThis(const ompl::base::State *newBelief);
 
 
             /** \brief Checks if the input state has stabilized to this state (node pose and covariance reachability check) */
             bool isReached(ompl::base::State *state, bool relaxedConstraint=false) const;
 
-            bool isReachedWithinNEps(const ompl::base::State *state, const double nEps=1.0) const;
+            bool isReachedWithinNEpsilon(const ompl::base::State *state, const double nEpsilon=1.0) const;
 
             /** \brief Checks if the input state's pose has reached this state (node pose reachability check) */
-            bool isReachedPose(const ompl::base::State *state, const double nEps=1.0) const;
+            bool isReachedPose(const ompl::base::State *state, const double nEpsilon=1.0) const;
 
             /** \brief Checks if the input state's covariance has reached this state (node covariance reachability check) */
-            bool isReachedCov(const ompl::base::State *state, const double nEps=1.0) const;
+            bool isReachedCov(const ompl::base::State *state, const double nEpsilon=1.0) const;
 
 
             /** \brief Sample a border belief state from this belief state (mainly for Monte Carlo simulation) */
             bool sampleBorderBeliefState(ompl::base::State* borderBelief) const;
 
             /** \brief Sample a new state from this belief state (mainly for Monte Carlo simulation) */
-            bool sampleTrueStateFromBelief(ompl::base::State* sampState, const double nsigma=2.0) const;
+            bool sampleTrueStateFromBelief(ompl::base::State* sampState, const double nSigma=2.0) const;
 
 
             double getStateDistanceTo(const ompl::base::State *state) const;
@@ -410,15 +339,12 @@ class SE2BeliefSpace : public ompl::base::CompoundStateSpace
 
               bool childQexpanded_;                                 // true if this node is added to POMCP tree
               std::vector<Vertex> childQnodes_;                     // T(ha)  // size: [number of actions (controllers to the connected neighbors)]
-//               std::map<Vertex, double> childQweights_;              // w(ha)  // size: [number of actions]  // heuristic value only for POMCP-Rollout
-//               std::map<Vertex, double> childQvalues_;               // V(ha)  // size: [number of actions]  // min(V(ha)) for pure cost-to-go   // XXX
-//               std::map<Vertex, double> childQpenalties_;            // C(ha)  // size: [number of actions]  // max(C(ha)) for discounted collition penalty  // XXX
               std::map<Vertex, double> childQcosttogoes_;           // J(ha)  // size: [number of actions]  // J(ha) = V(ha) + C(ha)
               std::map<Vertex, double> childQvisits_;               // N(ha)  // size: [number of actions]
               std::map<Vertex, double> childQmisses_;               // M(ha)  // size: [number of actions]  // number of collisions out of N(ha) visits
 
-//               std::map<Vertex, std::vector<Vertex>> childQVnodes_;  // T(hao) // size: [number of actions] x [number of (distinctive) observations] // XXX
-              std::map<Vertex, Vertex> childQVnodes_;               // T(hao) // size: [number of actions]  // NOTE assuming all childQVnodes_[selectedChildQnode] except collision can be merged into one Gaussian belief state
+              //std::map<Vertex, Vertex> childQVnodes_;               // T(hao) // size: [number of actions]  // NOTE assuming all childQVnodes_[selectedChildQnode] except collision can be merged into one Gaussian belief state
+              std::map<Vertex, std::vector<Vertex>> childQVnodes_;  // T(hao) // size: [number of actions] x [number of (distinctive) observations]
 
         };
 

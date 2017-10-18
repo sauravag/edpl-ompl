@@ -1,15 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- <LandmarkList> -->
-<!-- 	<landmark id = 4   x = 1		y = 7.75 /> -->
-<!-- 	<landmark id = 15  x = 3.25		y = 10 /> -->
-<!-- 	<landmark id = 26  x = 5.5		y = 12.25 /> -->
-<!-- 	<landmark id = 37  x = 7.75		y = 14.5 /> -->
-<!-- 	<landmark id = 48  x = 10		y = 16.75 /> -->
-<!-- 	<landmark id = 59  x = 12.25	y = 19 /> -->
-<!-- </LandmarkList> -->
-<!-- <LandmarkList> -->
-<!-- 	<landmark id = 55  x = 2   y = 10.0001 /> -->
-<!-- 	<landmark id = 99  x = 18   y = 10.0001 /> -->
+<!-- 	<landmark id = 99  x = 10		y = 2.5 /> -->
+<!-- 	<landmark id = 0   x = 10		y = 4.375 /> -->
+<!-- 	<landmark id = 4   x = 10		y = 6.625 /> -->
+<!-- 	<landmark id = 15  x = 10		y = 8.875 /> -->
+<!-- 	<landmark id = 16  x = 10		y = 11.125 /> -->
+<!-- 	<landmark id = 26  x = 10		y = 13.375 /> -->
+<!-- 	<landmark id = 37  x = 10		y = 15.625 /> -->
+<!-- 	<landmark id = 48  x = 10		y = 17.5 /> -->
 <!-- </LandmarkList> -->
 <LandmarkList>
 	<landmark id = 15  x = 10		y = 8.875 />
@@ -95,13 +93,13 @@
 <!--     <maxFIRMReachDepth maxFIRMReachDepth = "300" /> -->
     <maxFIRMReachDepth maxFIRMReachDepth = "200" />
 
-<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0" />  <!&#45;&#45; exploitative &#45;&#45;> -->
     <cExplorationForSimulate cExplorationForSimulate = "0.000000001" />
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.0000001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.0001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.1" /> -->
-<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" />  <!&#45;&#45; exploitative &#45;&#45;> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "10" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "100.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
 
@@ -178,8 +176,6 @@
 <!-- 	<Environment environmentFile = "./Models/FIRMCP_Wall_8.obj" /> -->
 
 	<StartPose x = "2"	y = "10" />
-<!-- 	<StartPose x = "2.215"	y = "2.215" /> -->
-	<!-- 	<StartPose x = "1.8"	y = "2.8" /> -->  <!-- for 9x9x2 map -->
 	<PlanningTime maxTime = "800" />
 	<KidnappedState x = 1.5 y = 19.5 />
 </PlanningProblem>
@@ -187,12 +183,6 @@
 <GoalList>
 	<GoalPose x = "18" y = "10" />
 </GoalList>
-<!-- <GoalList> -->
-<!-- 	<GoalPose x = "17.875" y = "17.875" /> -->
-<!-- </GoalList> -->
-<!-- <GoalList> -->
-<!-- 	<GoalPose x = "17.5" y = "18.5" /> -->  <!-- for 9x9x2 map -->
-<!-- </GoalList> -->
 
 <GoalConstraints>
 	<Weights meanNormWeight = "3.0" covNormWeight = "1.0" />

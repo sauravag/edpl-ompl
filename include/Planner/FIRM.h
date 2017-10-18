@@ -164,7 +164,7 @@ namespace ompl
 
         static const int DEFAULT_STEPS_TO_ROLLOUT = 10;
 
-//         static const double EDGE_COST_BIAS = 0.001; // In controller.h all edge costs are added up from 0.001 as the starting cost, this helps DP converge
+        // static const double EDGE_COST_BIAS = 0.001; // In controller.h all edge costs are added up from 0.001 as the starting cost, this helps DP converge
         static const double EDGE_COST_BIAS = 0.0; // NOTE this bias is set to 0.0 for density analysis in include/Controllers/Controller.h
 
 
@@ -528,7 +528,6 @@ protected:
     //virtual FIRMWeight loadEdgeControllerWithCost(const Vertex start, const Vertex goal, EdgeControllerType &edgeController);
 
     /** \brief Generates the edge controller that drives the robot from start to end of edge */
-//     virtual void generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, EdgeControllerType &edgeController);
     virtual void generateEdgeController(const ompl::base::State *start, ompl::base::State* target, EdgeControllerType &edgeController);
 
     /** \brief Generates the node controller that stabilizes the robot to the node and sets the stationary covariance at the node. */

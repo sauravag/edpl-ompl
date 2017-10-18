@@ -91,13 +91,13 @@
 <!--     <maxFIRMReachDepth maxFIRMReachDepth = "300" /> -->
     <maxFIRMReachDepth maxFIRMReachDepth = "200" />
 
-<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0" /> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "0.0" />  <!&#45;&#45; exploitative &#45;&#45;> -->
     <cExplorationForSimulate cExplorationForSimulate = "0.000000001" />
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.0000001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.0001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.001" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "0.1" /> -->
-<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" />  <!&#45;&#45; exploitative &#45;&#45;> -->
+<!--     <cExplorationForSimulate cExplorationForSimulate = "1.414213" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "10" /> -->
 <!--     <cExplorationForSimulate cExplorationForSimulate = "100.0" />  <!&#45;&#45; explorative &#45;&#45;> -->
 
@@ -160,13 +160,6 @@
 <!-- 	<Robot robotFile = "./Models/iRobot.obj" /> -->
 <!-- 	<Robot robotFile = "./Models/iRobot_fat.obj" /> -->
 
-<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole0x0.obj" /> -->
-<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole1x1.obj" /> -->
-<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole3x3.obj" /> -->
-<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole5x5.obj" /> -->
-<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9.obj" /> -->
-<!-- 	<Environment environmentFile = "./Models/iLQG&#45;TRO&#45;Task1&#45;Pole9x9x2.obj" /> -->
-
 <!-- 	<Environment environmentFile = "./Models/FIRMCP_Wall_0.obj" /> -->
 <!-- 	<Environment environmentFile = "./Models/FIRMCP_Wall_2.obj" /> -->
 <!-- 	<Environment environmentFile = "./Models/FIRMCP_Wall_4.obj" /> -->
@@ -174,8 +167,6 @@
 	<Environment environmentFile = "./Models/FIRMCP_Wall_8.obj" />
 
 	<StartPose x = "2"	y = "10" />
-<!-- 	<StartPose x = "2.215"	y = "2.215" /> -->
-	<!-- 	<StartPose x = "1.8"	y = "2.8" /> -->  <!-- for 9x9x2 map -->
 	<PlanningTime maxTime = "800" />
 	<KidnappedState x = 1.5 y = 19.5 />
 </PlanningProblem>
@@ -183,12 +174,6 @@
 <GoalList>
 	<GoalPose x = "18" y = "10" />
 </GoalList>
-<!-- <GoalList> -->
-<!-- 	<GoalPose x = "17.875" y = "17.875" /> -->
-<!-- </GoalList> -->
-<!-- <GoalList> -->
-<!-- 	<GoalPose x = "17.5" y = "18.5" /> -->  <!-- for 9x9x2 map -->
-<!-- </GoalList> -->
 
 <GoalConstraints>
 	<Weights meanNormWeight = "3.0" covNormWeight = "1.0" />

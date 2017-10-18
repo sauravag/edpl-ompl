@@ -189,9 +189,6 @@ int main(int argc, char *argv[])
         ros::init(argc, argv, "firmcp_planner");
     #endif
 
-    //srand(239645);
-
-    //arma_rng::set_seed(239645);
     arma::arma_rng::set_seed_random();
 
     QApplication app(argc, argv);

@@ -93,15 +93,12 @@ QSize GLWidget::sizeHint() const
 
 void GLWidget::resetCam()
 {
-//     m_camPos[0] = 7.5;
-//     m_camPos[1] = 7.5;
     m_camPos[0] = 10.0;
     m_camPos[1] = 10.0;
     m_camPos[2] = -250.0;
     m_camAt[0] = 0.0;
     m_camAt[1] = 0.0;
     m_camAt[2] = -1.0;
-//     m_camZoom = 40; // 75 for 6 cordr world
     m_camZoom = 45; // 75 for 6 cordr world
     m_long = -boost::math::constants::pi<double>()/2.0;
     m_lat = 0.0;

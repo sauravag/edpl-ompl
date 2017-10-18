@@ -69,7 +69,6 @@ class Controller
         Controller() {};
 
         /** \brief Constructor */
-//         Controller(const ompl::base::State *goal,
         Controller(ompl::base::State *goal,
                  const std::vector<ompl::base::State*>& nominalXs,
                  const std::vector<ompl::control::Control*>& nominalUs,
@@ -124,7 +123,6 @@ class Controller
         virtual bool isTerminated(const ompl::base::State *state, const size_t t);
 
         /** \brief Evolve the controller over a single time step, i.e. apply control, predict, get observation, update */
-//         virtual void Evolve(const ompl::base::State *state, size_t t, ompl::base::State* nextState);
         virtual void Evolve(ompl::base::State *state, size_t t, ompl::base::State* nextState);
 
         /** \brief get the controllers goal state */
@@ -239,18 +237,13 @@ template <class SeparatedControllerType, class FilterType>
 double Controller<SeparatedControllerType, FilterType>::nominalTrajDeviationThreshold_ = -1;
 
 template <class SeparatedControllerType, class FilterType>
-// Controller<SeparatedControllerType, FilterType>::Controller(const ompl::base::State *goal,
 Controller<SeparatedControllerType, FilterType>::Controller(ompl::base::State *goal,
             const std::vector<ompl::base::State*>& nominalXs,
             const std::vector<ompl::control::Control*>& nominalUs,
             const firm::SpaceInformation::SpaceInformationPtr si): si_(si)
 {
 
-//   goal_ = si_->allocState();
-//
-//   si_->copyState(goal_, goal);
-
-    goal_ = goal;
+  goal_ = goal;
 
   lss_.reserve(nominalXs.size());
 
@@ -307,7 +300,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     //cost = 0.01 , for covariance based
 
     // REVIEW artificial manipulation of cost for faster convergence of Dynamic Programming... can we get rid of this?
-//     double cost = 0.001;
+    //double cost = 0.001;
     double cost = 0.000;    // this should be fine for Dijkstra search
 
     //float totalCollisionCheckComputeTime = 0;
@@ -412,7 +405,7 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
             nominalX_K = lss_[k].getX();
         else
         {
-//             nominalX_K = lss_[lss_.size()-1].getX();
+            //nominalX_K = lss_[lss_.size()-1].getX();
 
             // quit edge controller and switch to node controller!
             //OMPL_INFORM("Reached the end of EdgeController... Now switch to NodeController!");
@@ -512,7 +505,6 @@ bool Controller<SeparatedControllerType, FilterType>::Execute(const ompl::base::
     return true ;
 }
 
-
 template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k, const ompl::base::State *startState,
                                                               ompl::base::State* endState,
@@ -527,13 +519,12 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     //cost = 0.01 , for covariance based
 
     // REVIEW artificial manipulation of cost for faster convergence of Dynamic Programming... can we get rid of this?
-//     double cost = 0.001;
+    //double cost = 0.001;
     double cost = 0.000;    // this should be fine for Dijkstra search
 
     ompl::base::State *internalState = si_->allocState();
     si_->copyState(internalState, startState);
 
-//     ompl::base::State  *nominalX_K = si_->allocState();  // memory leak!
     ompl::base::State  *nominalX_K;
 
     ompl::base::State *tempEndState = si_->allocState();
@@ -625,7 +616,6 @@ bool Controller<SeparatedControllerType, FilterType>::executeOneStep(const int k
     return result;
 }
 
-
 template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::executeUpto(const int numSteps, const ompl::base::State *startState,
                                                               ompl::base::State* endState,
@@ -692,13 +682,13 @@ bool Controller<SeparatedControllerType, FilterType>::executeFromUpto(const int 
 
     ompl::base::State *tempEndState = si_->allocState();
 
-//     int k = 0;
+    // int k = 0;
     int k = kStep;
 
     filteringCost = ompl::base::Cost(0.0);
     ompl::base::Cost filteringCostOneStep;
 
-//     while(k < numSteps)
+    // while(k < numSteps)
     while(k < numSteps + kStep)
     {
 
@@ -718,7 +708,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeFromUpto(const int 
 
             si_->freeState(tempState);
 
-//             stepsTaken = k;
+            // stepsTaken = k;
             stepsTaken = k - kStep;
 
             return false;
@@ -730,7 +720,7 @@ bool Controller<SeparatedControllerType, FilterType>::executeFromUpto(const int 
 
     si_->freeState(tempState);
 
-//     stepsTaken = k;
+    // stepsTaken = k;
     stepsTaken = k - kStep;
 
     return true;
@@ -783,7 +773,6 @@ void Controller<SeparatedControllerType, FilterType>::Evolve(ompl::base::State *
         si_->freeControl(control);
     }
 }
-
 
 template <class SeparatedControllerType, class FilterType>
 bool Controller<SeparatedControllerType, FilterType>::Stabilize(const ompl::base::State *startState,

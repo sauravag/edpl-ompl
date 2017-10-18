@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Authors: Saurav Agarwal */
+/* Authors: Sung Kyun Kim, Saurav Agarwal */
 
 #include "Spaces/SE2BeliefSpace.h"
 
@@ -101,31 +101,25 @@ bool SE2BeliefSpace::StateType::isReached(ompl::base::State *state, bool relaxed
     if(!this->isReachedCov(state))
         return false;
 
-    // for debug
-    //std::cout << "isReached()!" << std::endl;
-
     // otherwise, the given state is considered to have reached this state
     return true;
 }
 
-bool SE2BeliefSpace::StateType::isReachedWithinNEps(const ompl::base::State *state, const double nEps) const
+bool SE2BeliefSpace::StateType::isReachedWithinNEpsilon(const ompl::base::State *state, const double nEpsilon) const
 {
     // check if position and orientation errors are less than thresholds
-    if(!this->isReachedPose(state, nEps))
+    if(!this->isReachedPose(state, nEpsilon))
         return false;
 
     // check if covariance error is less than a threshold
-    if(!this->isReachedCov(state, nEps))
+    if(!this->isReachedCov(state, nEpsilon))
         return false;
-
-    // for debug
-    //std::cout << "isReached()!" << std::endl;
 
     // otherwise, the given state is considered to have reached this state
     return true;
 }
 
-bool SE2BeliefSpace::StateType::isReachedPose(const ompl::base::State *state, const double nEps) const
+bool SE2BeliefSpace::StateType::isReachedPose(const ompl::base::State *state, const double nEpsilon) const
 {
     // subtract the two beliefs and get the norm
     arma::colvec stateDiff = state->as<SE2BeliefSpace::StateType>()->getArmaData() - this->getArmaData();
@@ -144,24 +138,24 @@ bool SE2BeliefSpace::StateType::isReachedPose(const ompl::base::State *state, co
     double ori_distance_to_goal = std::abs(stateDiff[2]);
 
     // check for position and orientation thresholds
-    if(pos_distance_to_goal > nEps * reachDistPos_)
+    if(pos_distance_to_goal > nEpsilon * reachDistPos_)
     {
         // for debug
-        //std::cout << "pos_distance_to_goal: " << pos_distance_to_goal << "  (threshold: " << nEps * reachDistPos_ << ")" << std::endl;
+        //std::cout << "pos_distance_to_goal: " << pos_distance_to_goal << "  (threshold: " << nEpsilon * reachDistPos_ << ")" << std::endl;
 
         return false;
     }
-    if(ori_distance_to_goal > nEps * reachDistOri_)
+    if(ori_distance_to_goal > nEpsilon * reachDistOri_)
     {
         // for debug
-        //std::cout << "ori_distance_to_goal: " << ori_distance_to_goal << "  (threshold: " << nEps * reachDistOri_ << ")" << std::endl;
+        //std::cout << "ori_distance_to_goal: " << ori_distance_to_goal << "  (threshold: " << nEpsilon * reachDistOri_ << ")" << std::endl;
 
         return false;
     }
     return true;
 }
 
-bool SE2BeliefSpace::StateType::isReachedCov(const ompl::base::State *state, const double nEps) const
+bool SE2BeliefSpace::StateType::isReachedCov(const ompl::base::State *state, const double nEpsilon) const
 {
     // subtract the two covariances
     arma::mat covDiff = state->as<SE2BeliefSpace::StateType>()->getCovariance() - this->getCovariance();
@@ -179,10 +173,10 @@ bool SE2BeliefSpace::StateType::isReachedCov(const ompl::base::State *state, con
     double cov_distance_to_goal = arma::norm(abs(covDiffDiag) % normWeights_, 2);
 
     // check for position and orientation thresholds
-    if(cov_distance_to_goal > nEps * reachDistCov_)
+    if(cov_distance_to_goal > nEpsilon * reachDistCov_)
     {
         // for debug
-        //std::cout << "cov_distance_to_goal: " << cov_distance_to_goal << "  (threshold: " << nEps * reachDistCov_ << ")" << std::endl;
+        //std::cout << "cov_distance_to_goal: " << cov_distance_to_goal << "  (threshold: " << nEpsilon * reachDistCov_ << ")" << std::endl;
 
         return false;
     }
@@ -241,7 +235,7 @@ bool SE2BeliefSpace::StateType::sampleBorderBeliefState(ompl::base::State* borde
     return true;
 }
 
-bool SE2BeliefSpace::StateType::sampleTrueStateFromBelief(ompl::base::State* sampState, const double nsigma) const
+bool SE2BeliefSpace::StateType::sampleTrueStateFromBelief(ompl::base::State* sampState, const double nSigma) const
 {
     // Cholesky decomposition such that covariance_ = transform * transform.t()
     arma::mat transform;
@@ -256,7 +250,7 @@ bool SE2BeliefSpace::StateType::sampleTrueStateFromBelief(ompl::base::State* sam
 
     // transform this random sample for this Gaussian distribution
     arma::colvec mean = getArmaData();
-    arma::colvec randvec_transformed = mean + nsigma * transform * randvec;
+    arma::colvec randvec_transformed = mean + nSigma * transform * randvec;
 
     // set the new state property
     sampState->as<StateType>()->setX(randvec_transformed[0]);
@@ -282,8 +276,7 @@ double SE2BeliefSpace::StateType::getStateDistanceTo(const ompl::base::State *st
     }
 
     // compute weighted sum of position and orientation errors
-    arma::colvec stateDiffDiag = stateDiff.diag();
-    double state_distance = arma::norm(abs(stateDiffDiag) % normWeights_, 2);
+    double state_distance = arma::norm(stateDiff % normWeights_, 2);
 
     return state_distance;
 }
@@ -337,6 +330,38 @@ double SE2BeliefSpace::StateType::getCovDistanceTo(const ompl::base::State *stat
     double cov_distance = arma::norm(abs(covDiffDiag) % normWeights_, 2);
 
     return cov_distance;
+}
+
+bool SE2BeliefSpace::StateType::mergeBeliefIntoThis(const ompl::base::State *newBelief)
+{
+    // NOTE this function should be called before incrementing N(h) by +1
+
+    // retrieve means and covariances
+    arma::mat covThis = this->getCovariance();
+    arma::colvec meanThis = this->getArmaData();
+    arma::mat covNew = newBelief->as<StateType>()->getCovariance();
+    arma::colvec meanNew = newBelief->as<StateType>()->getArmaData();
+
+    // compute natural parameters
+    arma::mat invCovThis = arma::inv(covThis);
+    arma::mat invCovNew = arma::inv(covNew);
+    arma::colvec invMeanThis = invCovThis * meanThis;
+    arma::colvec invMeanNew = invCovNew * meanNew;
+
+    // compute merged parameter values
+    double nVisitThis = this->getThisQVvisit();
+    arma::mat invCovMerged = invCovThis + (invCovNew - invCovThis) / (nVisitThis + 1);
+    arma::colvec invMeanMerged = invMeanThis + (invMeanNew - invMeanThis) / (nVisitThis + 1);
+
+    // convert to cannocial parameters
+    arma::mat covMerged = arma::inv(invCovMerged);
+    arma::colvec meanMerged = covMerged * invMeanMerged;
+
+    // apply the change of belief state
+    this->setCovariance(covMerged);
+    this->setArmaData(meanMerged);
+
+    return true;
 }
 
 ompl::base::State* SE2BeliefSpace::allocState(void) const

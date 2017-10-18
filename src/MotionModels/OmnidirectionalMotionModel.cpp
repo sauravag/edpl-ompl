@@ -191,7 +191,13 @@ void OmnidirectionalMotionModel::generateOpenLoopControls(const ompl::base::Stat
         }
         else
         {
-            openLoopControls.push_back(this->getZeroControl());
+            //openLoopControls.push_back(this->getZeroControl());
+
+            // make another instance of zeroControl_, so that controllers can be freed after use
+            colvec u_const_rot(3, fill::zeros);
+            ompl::control::Control *tempControl = si_->allocControl();
+            ARMA2OMPL(u_const_rot, tempControl);
+            openLoopControls.push_back(tempControl);
         }
 
     }

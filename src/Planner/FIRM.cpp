@@ -782,6 +782,7 @@ FIRM::Vertex FIRM::addStateToGraph(ompl::base::State *state, bool addReverseEdge
 
     // NOTE commented this to allow connection to farther but better FIRM node
 /*
+    // HACK WORKAROUNDS FOR INDEFINITE STABILIZATION DURING ROLLOUT: {0} CUTOFF OF CANDIDATE NEIGHBOR NODES; still subject to local minima
     // If reverse edge not required, that means this is a virtual state added in rollout
     // We will sort by cost and use N lowest cost to go neighbors
     if(!addReverseEdge && !neighbors.empty())
@@ -1004,7 +1005,6 @@ void FIRM::addEdgeToGraph(const FIRM::Vertex a, const FIRM::Vertex b, bool &edge
 FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController, const bool constructionMode)
 {
     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
-//     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
     ompl::base::State* targetNodeState = stateProperty_[b];
 
     ompl::base::State* tempBelief = siF_->allocState();
@@ -1182,7 +1182,6 @@ FIRMWeight FIRM::generateEdgeNodeControllerWithCost(const FIRM::Vertex a, const 
 FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM::Vertex b, EdgeControllerType &edgeController, const bool constructionMode)
 {
     ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
-//     ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
     ompl::base::State* targetNodeState = stateProperty_[b];
 
     ompl::base::State* tempBelief = siF_->allocState();
@@ -1310,7 +1309,6 @@ FIRMWeight FIRM::generateEdgeControllerWithCost(const FIRM::Vertex a, const FIRM
     return weight;
 }
 
-// void FIRM::generateEdgeController(const ompl::base::State *start, const ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
 void FIRM::generateEdgeController(const ompl::base::State *start, ompl::base::State* target, FIRM::EdgeControllerType &edgeController)
 {
     assert(target && "The target state for generating the edge controller is NULL");
@@ -1343,9 +1341,6 @@ void FIRM::generateEdgeController(const ompl::base::State *start, ompl::base::St
 
 void FIRM::generateNodeController(ompl::base::State *state, FIRM::NodeControllerType &nodeController)
 {
-    // Create a copy of the node state
-//     ompl::base::State *node = si_->allocState();
-//     siF_->copyState(node, state);
     ompl::base::State *node = state;
 
     arma::mat stationaryCovariance; 
@@ -2454,7 +2449,6 @@ void FIRM::executeFeedbackWithRollout(void)
             foreach(Edge edge, boost::out_edges(tempVertex, g_))
             {
                 edgeControllers_[edge].freeSeparatedController();
-//                 edgeControllers_[edge].freeLinearSystems();
                 edgeControllers_.erase(edge);
             }
 
@@ -3068,7 +3062,6 @@ void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
             Vertex b = loadedEdgeProperties_[i].first.second;
 
             ompl::base::State* startNodeState = siF_->cloneState(stateProperty_[a]);
-//             ompl::base::State* targetNodeState = siF_->cloneState(stateProperty_[b]);
             ompl::base::State* targetNodeState = stateProperty_[b];
 
             // Generate the edge controller for given start and end state
@@ -3094,7 +3087,6 @@ void FIRM::loadRoadMapFromFile(const std::string &pathToFile)
 
             // free the memory
             siF_->freeState(startNodeState);
-//             siF_->freeState(targetNodeState);
         }
 
     }
@@ -3196,7 +3188,7 @@ void FIRM::loadParametersFromFile(const std::string &pathToFile)
     int saveVideo = 0;
     itemElement->QueryIntAttribute("save", &saveVideo);
 //     if(saveVideo == 1) doSaveLogs_ = true;
-    if(saveVideo == 1) doSaveVideo_ = true;     // TODO something is not working with saving videos
+    if(saveVideo == 1) doSaveVideo_ = true;
 
     // Logging
     child = node->FirstChild("DataLog");
@@ -3434,10 +3426,6 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
 
     std::cin.get();
 
-    //ompl::base::State *currentTrueState = siF_->allocState();
-
-    //siF_->getTrueState(currentTrueState);
-
     int counter = 0;
 
     Visualizer::doSaveVideo(doSaveVideo_);
@@ -3474,8 +3462,6 @@ void FIRM::recoverLostRobot(ompl::base::State *recoveredState)
             // If any of the modes gets deleted, break and find new policy
             if(numModesAfter != numModesBefore)
                 break;
-
-            //siF_->getTrueState(currentTrueState);
 
             // If the belief's clearance gets below the threshold, break loop & replan
             if(!policyGenerator_->doCurrentBeliefsSatisfyClearance(i))
