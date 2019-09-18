@@ -49,7 +49,7 @@ StationaryLQR::StationaryLQR(ompl::base::State *goal,
 
     Wx_ = mm->getStateCost();
 
-    Wu_ = mm->getStateCost();
+    Wu_ = mm->getControlCost();
 
     // store nominal values
     nominalUs_ = nominalUs;
